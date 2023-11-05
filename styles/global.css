@@ -34,3 +34,27 @@ img {
   max-width: 100%;
   height: auto;
 }
+
+.radio-inline__input {
+    clip: rect(1px, 1px, 1px, 1px);
+    position: absolute !important;
+}
+
+.radio-inline__label {
+    font-size: 40px;
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    margin-right: 5px;
+    border-radius: 3px;
+    transition: all .2s;
+    outline-color: #FFC733;
+    outline-offset: -2px;
+    outline-style: auto;
+    outline-width: 5px;
+}
+
+.radio-inline__input:checked + .radio-inline__label {
+    background: #B54A4A;
+    color: #fff;
+    text-shadow: 0 0 1px rgba(0,0,0,.7);
+}

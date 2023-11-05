@@ -6,15 +6,31 @@
     "start": "next start"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@fontsource/roboto": "^5.0.8",
+    "@mui/icons-material": "^5.14.16",
+    "@mui/material": "^5.14.16",
+    "@vercel/postgres": "^0.5.0",
+    "axios": "^1.6.0",
+    "canvas": "^2.11.2",
     "date-fns": "^2.30.0",
     "gray-matter": "^4.0.3",
+    "konva": "^9.2.3",
     "next": "latest",
+    "pg": "^8.11.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-konva": "^18.2.10",
     "remark": "^15.0.1",
     "remark-html": "^16.0.1"
   },
   "engines": {
     "node": ">=18"
+  },
+  "devDependencies": {
+    "@types/node": "20.8.6",
+    "@types/react": "18.2.28",
+    "typescript": "5.2.2"
   }
 }

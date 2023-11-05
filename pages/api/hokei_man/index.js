@@ -1,0 +1,162 @@
+import conn from '../../../lib/db'
+
+export default async (req, res) => {
+    try {
+        const query = 'SELECT t1.id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t2.name_kana AS left_name_kana, t4.name AS left_group_name, t3.name AS right_name, t3.name_kana AS right_name_kana, t5.name AS right_group_name, t1.left_player_flag FROM hokei_man AS t1 LEFT JOIN players AS t2 ON t1.left_player_id = t2.hokei_man_player_id LEFT JOIN players AS t3 ON t1.right_player_id = t3.hokei_man_player_id LEFT JOIN groups AS t4 ON t2.group_id = t4.id LEFT JOIN groups AS t5 ON t3.group_id = t5.id';
+        const result_schedule = await conn.query(query);
+        const sorted_data = result_schedule.rows.sort((a, b) => a.id - b.id);
+        // set round 0, 1, ...
+        let round_num = {};
+        for (let i = 0; i < sorted_data.length; i++) {
+            if (i == sorted_data.length - 2) {
+                sorted_data[i]['round'] = 'other';
+            } else if (!('round' in sorted_data[i])) {
+                sorted_data[i]['round'] = 1;
+            }
+            const next_left_id = sorted_data[i]['next_left_id'];
+            if (next_left_id !== null && sorted_data[parseInt(next_left_id)-1] !== undefined) {
+                sorted_data[parseInt(next_left_id)-1]['has_left'] = true;
+                sorted_data[parseInt(next_left_id)-1]['round'] = sorted_data[i]['round'] + 1;
+            }
+            const next_right_id = sorted_data[i]['next_right_id'];
+            if (next_right_id !== null && sorted_data[parseInt(next_right_id)-1] !== undefined) {
+                sorted_data[parseInt(next_right_id)-1]['has_right'] = true;
+                sorted_data[parseInt(next_right_id)-1]['round'] = sorted_data[i]['round'] + 1;
+            }
+            if (round_num[sorted_data[i]['round']] === undefined) {
+                round_num[sorted_data[i]['round']] = 1;
+            } else {
+                round_num[sorted_data[i]['round']] += 1;
+            }
+        }
+        // set left or right block and vertical order
+        let left_block_indices = [];
+        let right_block_indices = [];
+        for (let i = 0; i < sorted_data.length; i++) {
+            let id = sorted_data[i]['id'];
+            const round = sorted_data[i]['round'];
+            let game_id = id;
+            // subtract
+            for (let j = 0; j < round - 1; j++) {
+                game_id -= round_num[j+1];
+            }
+            if (round_num[round] > 1) {
+                sorted_data[i]['game_id'] = game_id;
+                if (game_id <= round_num[round] / 2) {
+                    sorted_data[i]['block_pos'] = 'left';
+                } else {
+                    sorted_data[i]['block_pos'] = 'right';
+                }
+            } else {
+                sorted_data[i]['block_pos'] = 'center';
+            }
+            // insert to block indices
+            if (round === 1) {
+                if (sorted_data[i]['block_pos'] === 'left') {
+                    left_block_indices.push(id);
+                } else {
+                    right_block_indices.push(id);
+                }
+            }
+            const next_left_id = sorted_data[i]['next_left_id'];
+            const next_right_id = sorted_data[i]['next_right_id'];
+            if (round > 1) {
+                continue;
+            }
+            if (next_left_id !== null &&
+                left_block_indices.indexOf(next_left_id) === -1 &&
+                right_block_indices.indexOf(next_left_id) === -1) {
+                const block_pos = sorted_data[i]['block_pos'];
+                if (block_pos === 'left') {
+                    const current_index = left_block_indices.indexOf(sorted_data[i]['id']);
+                    if (current_index !== -1) {
+                        left_block_indices.splice(current_index + 1, 0, next_left_id);
+                    }
+                } else if (block_pos === 'right') {
+                    const current_index = right_block_indices.indexOf(sorted_data[i]['id']);
+                    if (current_index !== -1) {
+                        right_block_indices.splice(current_index, 0, next_left_id);
+                    }
+                }
+            } else if (next_right_id !== null &&
+                       left_block_indices.indexOf(next_right_id) === -1 &&
+                       right_block_indices.indexOf(next_right_id) === -1) {
+                const block_pos = sorted_data[i]['block_pos'];
+                if (block_pos === 'left') {
+                    const current_index = left_block_indices.indexOf(sorted_data[i]['id']);
+                    if (current_index !== -1) {
+                        left_block_indices.splice(current_index, 0, next_right_id);
+                    }
+                } else if (block_pos === 'right') {
+                    const current_index = right_block_indices.indexOf(sorted_data[i]['id']);
+                    if (current_index !== -1) {
+                        right_block_indices.splice(current_index + 1, 0, next_right_id);
+                    }
+                }
+            }
+        }
+        let begin_y = 25;
+        for (let i = 0; i < left_block_indices.length; i++) {
+            const index = left_block_indices[i] - 1;
+            if (sorted_data[index]['round'] === 1) {
+                sorted_data[index]['left_begin_y'] = begin_y;
+                begin_y += 40;
+                sorted_data[index]['right_begin_y'] = begin_y;
+                begin_y += 40;
+            } else {
+                const has_left = ('has_left' in sorted_data[index]);
+                const has_right = ('has_right' in sorted_data[index]);
+                if (!has_left) {
+                    sorted_data[index]['left_begin_y'] = begin_y;
+                    begin_y += 40;
+                }
+                if (!has_right) {
+                    sorted_data[index]['right_begin_y'] = begin_y;
+                    begin_y += 40;
+                }
+            }
+        }
+        begin_y = 25;
+        for (let i = 0; i < right_block_indices.length; i++) {
+            const index = right_block_indices[i] - 1;
+            if (sorted_data[index]['round'] === 1) {
+                sorted_data[index]['right_begin_y'] = begin_y;
+                begin_y += 40;
+                sorted_data[index]['left_begin_y'] = begin_y;
+                begin_y += 40;
+                if (sorted_data[index]['next_left_id'] !== null) {
+                    sorted_data[sorted_data[index]['next_left_id'] - 1]['left_begin_y'] = (sorted_data[index]['left_begin_y'] +
+                                                                                           sorted_data[index]['right_begin_y']) / 2;
+                } else {
+                    sorted_data[sorted_data[index]['next_right_id'] - 1]['right_begin_y'] = (sorted_data[index]['left_begin_y'] +
+                                                                                             sorted_data[index]['right_begin_y']) / 2;
+                }
+            } else {
+                const has_left = ('has_left' in sorted_data[index]);
+                const has_right = ('has_right' in sorted_data[index]);
+                if (!has_right) {
+                    sorted_data[index]['right_begin_y'] = begin_y;
+                    begin_y += 40;
+                }
+                if (!has_left) {
+                    sorted_data[index]['left_begin_y'] = begin_y;
+                    begin_y += 40;
+                }
+            }
+        }
+        for (let i = 0; i < sorted_data.length; i++) {
+            if (sorted_data[i]['next_left_id'] !== null) {
+                sorted_data[sorted_data[i]['next_left_id'] - 1]['left_begin_y'] = (sorted_data[i]['left_begin_y'] +
+                                                                                   sorted_data[i]['right_begin_y']) / 2;
+            } else if (sorted_data[i]['next_right_id'] !== null) {
+                sorted_data[sorted_data[i]['next_right_id'] - 1]['right_begin_y'] = (sorted_data[i]['left_begin_y'] +
+                                                                                     sorted_data[i]['right_begin_y']) / 2;
+            }
+        }
+        console.log(sorted_data);
+        res.json(sorted_data);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: 'Error fetching data'});
+    }
+};
