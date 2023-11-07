@@ -9,7 +9,7 @@ export default async (req, res) => {
         let round_num = {};
         for (let i = 0; i < sorted_data.length; i++) {
             if (i == sorted_data.length - 2) {
-                sorted_data[i]['round'] = 'other';
+                sorted_data[i]['fake_round'] = sorted_data[i-1]['round'] + 1;
             } else if (!('round' in sorted_data[i])) {
                 sorted_data[i]['round'] = 1;
             }

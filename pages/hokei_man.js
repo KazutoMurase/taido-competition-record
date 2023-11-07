@@ -5,13 +5,16 @@ import Grid from '@mui/material/Grid';
 import FlagCircleRoundedIcon from '@mui/icons-material/FlagCircleRounded';
 
 
-function onSubmit(data, left_player_flag) {
+function onSubmit(data, player_flag) {
+    let left_player_flag = (data.block_pos === 'right' ? player_flag : 3 - player_flag);
     let post = {id: data.id,
                 left_player_flag: left_player_flag};
     if (parseInt(left_player_flag) > 1) {
         post['next_player_id'] = data.left_player_id;
+        post['loser_id'] = data.right_player_id;
     } else {
         post['next_player_id'] = data.right_player_id;
+        post['loser_id'] = data.left_player_id;
     }
     if (data.next_left_id !== null) {
         post['next_id'] = data.next_left_id;
@@ -60,13 +63,23 @@ function Home() {
           <Grid container>
           <Grid item xs={4} />
           <Grid item xs={4}>
-          <h2>{data.id}回戦</h2>
+          <h2>第{data.id}試合</h2>
           </Grid>
           <Grid item xs={4} />
           <Grid item xs={1} />
           <Grid item xs={5}>
+          <Button variant="contained">赤不戦勝</Button>
+          <h1>{data.block_pos === 'right' ? data.right_name : data.left_name}</h1>
+          {parseInt(selectedRadioButton) <= 2 ?
+           <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" /> : null}
+          {parseInt(selectedRadioButton) <= 1 ?
+           <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" /> : null}
+          {parseInt(selectedRadioButton) === 0 ?
+           <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" /> : null}
+          </Grid>
+          <Grid item xs={5}>
           <Button variant="contained">白不戦勝</Button>
-          <h1>{data.left_name}</h1>
+          <h1>{data.block_pos === 'right' ? data.left_name : data.right_name}</h1>
           {parseInt(selectedRadioButton) >= 1 ?
            <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="gray" /> :
            <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="white" />}
@@ -74,16 +87,6 @@ function Home() {
            <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="gray" /> : null}
           {parseInt(selectedRadioButton) >= 3 ?
            <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="gray" /> : null}
-          </Grid>
-          <Grid item xs={5}>
-          <Button variant="contained">赤不戦勝</Button>
-          <h1>{data.right_name}</h1>
-          {parseInt(selectedRadioButton) <= 2 ?
-           <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" /> : null}
-          {parseInt(selectedRadioButton) <= 1 ?
-           <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" /> : null}
-          {parseInt(selectedRadioButton) === 0 ?
-           <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" /> : null}
           </Grid>
           <Grid item xs={1} />
           <Grid item xs={3} />

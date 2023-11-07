@@ -112,20 +112,74 @@ function createBlock(item, lineWidth) {
     if (!is_left && !is_right) {
         if ('left_begin_y' in item &&
             'right_begin_y' in item) {
+            const x = 300 + lineWidth + (item['round']-2)*30;
+            const width = ((800 - lineWidth - (item['round']-2)*30) -
+                           (300 + lineWidth + (item['round']-2)*30));
             return (<>
                     <Rect
-                    x={300 + lineWidth + (item['round']-2)*30}
+                    x={x}
                     y={item['left_begin_y']}
-                    width={200}
+                    width={width}
                     height={1}
                     fill='black'
                     />
+                    <Rect
+                    x={x + width / 2}
+                    y={item['left_begin_y']}
+                    width={1}
+                    height={-50}
+                    fill='black'
+                    />
+                    <Text
+                    x={x + width / 2 - 20}
+                    y={item['left_begin_y'] - 70}
+                    text={'決勝'}
+                    fontSize={20}
+                    />
+                    <Text
+                    x={x + width / 2 - 8}
+                    y={item['left_begin_y'] + 5}
+                    text={item['id']}
+                    fill={'gray'}
+                    fontSize={12}
+                    />
                     </>);
-        }
+        } else {
+            const x = 300 + lineWidth + (item['fake_round']-2)*30;
+            const width = ((800 - lineWidth - (item['fake_round']-2)*30) -
+                           (300 + lineWidth + (item['fake_round']-2)*30));
         return (
                 <>
+                <Rect
+            x={x}
+            y={700}
+            width={width}
+            height={1}
+            fill='black'
+                />
+                <Rect
+            x={x + width / 2}
+            y={700}
+            width={1}
+            height={-50}
+            fill='black'
+                />
+                <Text
+            x={x + width / 2 - 20}
+            y={700 - 70}
+            text={'三決'}
+            fontSize={20}
+                />
+                <Text
+            x={x + width / 2 - 8}
+            y={700 + 5}
+            text={item['id']}
+            fill={'gray'}
+            fontSize={12}
+                />
                 </>
         );
+        }
     }
     if ('left_begin_y' in item &&
         'right_begin_y' in item) {
@@ -168,16 +222,16 @@ function createBlock(item, lineWidth) {
             x={is_left ?
                pointX + lineWidth + (item['round']-1)*30 - 10:
                pointX - lineWidth - (item['round']-1)*30}
-            y={is_left ? item['left_begin_y'] - 15 : item['right_begin_y'] - 15}
-            text={(left_player_flag ? left_player_flag : "")}
+            y={is_left ? item['left_begin_y'] - 15 : item['left_begin_y'] + 4}
+            text={(left_player_flag !== null ? left_player_flag : "")}
             fill={'blue'}
             fontSize={15} />
                 <Text
             x={is_left ?
                pointX + lineWidth + (item['round']-1)*30 - 10:
                pointX - lineWidth - (item['round']-1)*30}
-            y={is_left ? item['right_begin_y'] + 2: item['left_begin_y'] + 2}
-            text={(left_player_flag ? (3 - left_player_flag) : "")}
+            y={is_left ? item['right_begin_y'] + 4: item['right_begin_y'] - 15}
+            text={(left_player_flag !== null ? (3 - left_player_flag) : "")}
             fill={'blue'}
             fontSize={15} />
                 <Rect
@@ -195,7 +249,16 @@ function createBlock(item, lineWidth) {
             y={(item['left_begin_y'] + item['right_begin_y']) * 0.5}
             fill={lower_focus ? 'red' : 'black'}
             width={lower_focus ? 5 : 1}
-            height={(item['left_begin_y'] - item['right_begin_y']) * 0.5 * (is_left ? -1 : 1)} />
+            height={(item['left_begin_y'] - item['right_begin_y']) * 0.5 * (is_left ? -1 : 1) + (lower_focus ? 4 : 0)} />
+                <Text
+            x={is_left ?
+               pointX + lineWidth + (item['round']-1)*30 - 15 :
+               pointX - lineWidth - (item['round']-1)*30 + 5}
+            y={(item['left_begin_y'] + item['right_begin_y']) * 0.5 - 5}
+            text={(item['id'] < 10 ? ' ' + item['id'] : item['id'])}
+            fill={'gray'}
+            fontSize={12}
+                />
                 </>
         );
     }

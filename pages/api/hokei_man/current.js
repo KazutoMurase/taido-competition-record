@@ -5,11 +5,57 @@ export default async (req, res) => {
         let query = 'SELECT id from current_hokei_man';
         let result = await conn.query(query);
         const current_id = result.rows[0].id;
-        query = `SELECT t1.id, t1.left_player_id, t1.right_player_id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t3.name AS right_name FROM hokei_man AS t1 LEFT JOIN players AS t2 ON t1.left_player_id = t2.hokei_man_player_id LEFT JOIN players AS t3 ON t1.right_player_id = t3.hokei_man_player_id where t1.id = ${current_id}`;
-        result = await conn.query(query);
-        let result_json = result.rows[0];
-        console.log(result.rows);
-        res.json(result.rows[0]);
+        //query = `SELECT t1.id, t1.left_player_id, t1.right_player_id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t3.name AS right_name FROM hokei_man AS t1 LEFT JOIN players AS t2 ON t1.left_player_id = t2.hokei_man_player_id LEFT JOIN players AS t3 ON t1.right_player_id = t3.hokei_man_player_id where t1.id = ${current_id}`;
+        //result = await conn.query(query);
+        query = `SELECT t1.id, t1.left_player_id, t1.right_player_id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t3.name AS right_name FROM hokei_man AS t1 LEFT JOIN players AS t2 ON t1.left_player_id = t2.hokei_man_player_id LEFT JOIN players AS t3 ON t1.right_player_id = t3.hokei_man_player_id`;
+        const result_schedule = await conn.query(query);
+        const sorted_data = result_schedule.rows.sort((a, b) => a.id - b.id);
+        // set round 0, 1,...until (without final and before final)
+        let round_num = {};
+        for (let i = 0; i < sorted_data.length - 2; i++) {
+            if (!('round' in sorted_data[i])) {
+                sorted_data[i]['round'] = 1;
+            }
+            const next_left_id = sorted_data[i]['next_left_id'];
+            if (next_left_id !== null && sorted_data[parseInt(next_left_id)-1] !== undefined) {
+                sorted_data[parseInt(next_left_id)-1]['round'] = sorted_data[i]['round'] + 1;
+            }
+            const next_right_id = sorted_data[i]['next_right_id'];
+            if (next_right_id !== null && sorted_data[parseInt(next_right_id)-1] !== undefined) {
+                sorted_data[parseInt(next_right_id)-1]['round'] = sorted_data[i]['round'] + 1;
+            }
+            if (round_num[sorted_data[i]['round']] === undefined) {
+                round_num[sorted_data[i]['round']] = 1;
+            } else {
+                round_num[sorted_data[i]['round']] += 1;
+            }
+        }
+        // select item
+        for (let i = 0; i < sorted_data.length; i++) {
+            if (sorted_data[i]['id'] === current_id) {
+                if ('round' in sorted_data[i]) {
+                    const round = sorted_data[i]['round'];
+                    let game_id = sorted_data[i]['id'];
+                    for (let j = 0; j < round - 1; j++) {
+                        game_id -= round_num[j+1];
+                    }
+                    if (game_id <= round_num[round] / 2) {
+                        sorted_data[i]['block_pos'] = 'left';
+                    } else {
+                        sorted_data[i]['block_pos'] = 'right';
+                    }
+                } else {
+                    sorted_data[i]['block_pos'] = 'center';
+                }
+                console.log(sorted_data[i]);
+                res.json(sorted_data[i]);
+                return;
+            }
+        }
+        console.log(result_schedule.rows);
+        res.status(500).json({ error: 'Error fetching data'});
+        //let result_json = result.rows[0];
+        //res.json(result.rows[0]);
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: 'Error fetching data'});
