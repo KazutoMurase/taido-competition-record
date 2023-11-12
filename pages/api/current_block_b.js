@@ -1,9 +1,14 @@
-import conn from '../../../lib/db'
+import conn from '../../lib/db'
 
 export default async (req, res) => {
     try {
-        const current_id = parseInt(req.query.id);
-        let query = `SELECT t1.id, t1.left_player_flag, t1.left_player_id, t1.right_player_id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t3.name AS right_name FROM hokei_man AS t1 LEFT JOIN players AS t2 ON t1.left_player_id = t2.hokei_man_player_id LEFT JOIN players AS t3 ON t1.right_player_id = t3.hokei_man_player_id`;
+        let query = 'SELECT id from current_block_b';
+        let result = await conn.query(query);
+        query = 'SELECT hokei_man_id from block_b where id = $1';
+        let values = [result.rows[0].id];
+        result = await conn.query(query, values);
+        const current_id = result.rows[0].hokei_man_id;
+        query = `SELECT t1.id, t1.left_player_id, t1.right_player_id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t3.name AS right_name FROM hokei_man AS t1 LEFT JOIN players AS t2 ON t1.left_player_id = t2.hokei_man_player_id LEFT JOIN players AS t3 ON t1.right_player_id = t3.hokei_man_player_id`;
         const result_schedule = await conn.query(query);
         const sorted_data = result_schedule.rows.sort((a, b) => a.id - b.id);
         // set round 0, 1,...until (without final and before final)
@@ -28,7 +33,6 @@ export default async (req, res) => {
         }
         // select item
         for (let i = 0; i < sorted_data.length; i++) {
-            console.log(sorted_data[i]);
             if (sorted_data[i]['id'] === current_id) {
                 if ('round' in sorted_data[i]) {
                     const round = sorted_data[i]['round'];
@@ -37,7 +41,7 @@ export default async (req, res) => {
                         game_id -= round_num[j+1];
                     }
                     if (game_id <= round_num[round] / 2) {
-                        // sorted_data[i]['block_pos'] = 'left';
+                        //sorted_data[i]['block_pos'] = 'left';
                         sorted_data[i]['left_color'] = 'red';
                     } else {
                         //sorted_data[i]['block_pos'] = 'right';

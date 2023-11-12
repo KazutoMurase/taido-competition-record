@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import axios from 'axios';
 import { Layer, Stage, Rect, Text } from "react-konva";
 import Grid from '@mui/material/Grid';
 
-
+// TODO: for mobile, onTap should be added in konva-text
 function createText(item) {
     const is_left = (item['block_pos'] === 'left');
     const is_right = (item['block_pos'] === 'right');
@@ -18,11 +19,27 @@ function createText(item) {
                     text={item['left_name_kana']}
                     fontSize={12}
                     />
+                    <Rect
+                    x={is_left ? 80-10 : 820-10}
+                    y={item['left_begin_y']-18}
+                    width={['left_name_kana'].length*120}
+                    height={1}
+                    fill='black'
+                    visible={'left_out' in item}
+                    />
                     <Text
                     x={is_left ? 80 : 820}
                     y={item['left_begin_y']-5}
                     text={item['left_name']}
                     fontSize={20}
+                    />
+                    <Rect
+                    x={is_left ? 80-10 : 820-10}
+                    y={item['left_begin_y']}
+                    width={['left_name'].length*120}
+                    height={1}
+                    fill='black'
+                    visible={'left_out' in item}
                     />
                     <Text
                     x={is_left ? 210 : 950}
@@ -30,11 +47,27 @@ function createText(item) {
                     text={item['left_group_name'].replace('\'', '【').replace('\'', '】')}
                     fontSize={14}
                     />
+                    <Rect
+                    x={is_left ? 210 : 950}
+                    y={item['left_begin_y']+5}
+                    width={['left_group_name'].length*80}
+                    height={1}
+                    fill='black'
+                    visible={'left_out' in item}
+                    />
                     <Text
                     x={is_left ? 80 : 820}
                     y={item['right_begin_y']-20}
                     text={item['right_name_kana']}
                     fontSize={12}
+                    />
+                    <Rect
+                    x={is_left ? 80-10 : 820-10}
+                    y={item['right_begin_y']-18}
+                    width={['right_name_kana'].length*120}
+                    height={1}
+                    fill='black'
+                    visible={'right_out' in item}
                     />
                     <Text
                     x={is_left ? 80 : 820}
@@ -42,11 +75,27 @@ function createText(item) {
                     text={item['right_name']}
                     fontSize={20}
                     />
+                    <Rect
+                    x={is_left ? 80-10 : 820-10}
+                    y={item['right_begin_y']}
+                    width={['right_name'].length*120}
+                    height={1}
+                    fill='black'
+                    visible={'right_out' in item}
+                    />
                     <Text
                     x={is_left ? 210 : 950}
                     y={item['right_begin_y']}
                     text={item['right_group_name'].replace('\'', '【').replace('\'', '】')}
                     fontSize={14}
+                    />
+                    <Rect
+                    x={is_left ? 210 : 950}
+                    y={item['right_begin_y']+5}
+                    width={['right_group_name'].length*80}
+                    height={1}
+                    fill='black'
+                    visible={'right_out' in item}
                     />
                     </>
                    );
@@ -60,17 +109,41 @@ function createText(item) {
                 text={item['left_name_kana']}
                 fontSize={12}
                     />
+                    <Rect
+                x={is_left ? 80-10 : 820-10}
+                y={item['left_begin_y']-18}
+                width={['left_name_kana'].length*120}
+                height={1}
+                fill='black'
+                visible={'left_out' in item}
+                    />
                     <Text
                 x={is_left ? 80 : 820}
                 y={item['left_begin_y']-5}
                 text={item['left_name']}
                 fontSize={20}
                     />
+                    <Rect
+                    x={is_left ? 80-10 : 820-10}
+                    y={item['left_begin_y']}
+                    width={['left_name'].length*120}
+                    height={1}
+                    fill='black'
+                    visible={'left_out' in item}
+                    />
                     <Text
                 x={is_left ? 210 : 950}
                 y={item['left_begin_y']}
                 text={item['left_group_name'].replace('\'', '【').replace('\'', '】')}
                 fontSize={14}
+                    />
+                    <Rect
+                    x={is_left ? 210 : 950}
+                    y={item['left_begin_y']+5}
+                    width={['left_group_name'].length*80}
+                    height={1}
+                    fill='black'
+                    visible={'left_out' in item}
                     />
                     </>
             );
@@ -84,17 +157,41 @@ function createText(item) {
                 text={item['right_name_kana']}
                 fontSize={12}
                     />
+                    <Rect
+                    x={is_left ? 80-10 : 820-10}
+                    y={item['right_begin_y']-18}
+                    width={['right_name_kana'].length*120}
+                    height={1}
+                    fill='black'
+                    visible={'right_out' in item}
+                    />
                     <Text
                 x={is_left ? 80 : 820}
                 y={item['right_begin_y']-5}
                 text={item['right_name']}
                 fontSize={20}
                     />
+                    <Rect
+                    x={is_left ? 80-10 : 820-10}
+                    y={item['right_begin_y']}
+                    width={['right_name'].length*120}
+                    height={1}
+                    fill='black'
+                    visible={'right_out' in item}
+                    />
                     <Text
                 x={is_left ? 210 : 950}
                 y={item['right_begin_y']}
                 text={item['right_group_name'].replace('\'', '【').replace('\'', '】')}
                 fontSize={14}
+                    />
+                    <Rect
+                    x={is_left ? 210 : 950}
+                    y={item['right_begin_y']+5}
+                    width={['right_group_name'].length*80}
+                    height={1}
+                    fill='black'
+                    visible={'right_out' in item}
                     />
                     </>
             );
@@ -106,6 +203,12 @@ function createText(item) {
 }
 
 function createBlock(item, lineWidth) {
+    const router = useRouter();
+
+    const onUpdate = (id) => {
+        router.push('/hokei_man?id=' + id);
+    }
+
     const is_left = (item['block_pos'] === 'left');
     const is_right = (item['block_pos'] === 'right');
     const pointX = (is_left ? 300 : 800);
@@ -204,6 +307,21 @@ function createBlock(item, lineWidth) {
                 upper_focus = true;
             }
         }
+        if (left_player_flag !== null) {
+            if (left_player_flag === -1) {
+                if (is_left) {
+                    item['left_out'] = true;
+                } else {
+                    item['right_out'] = true;
+                }
+            } else if (left_player_flag === 4) {
+                if (is_left) {
+                    item['right_out'] = true;
+                } else {
+                    item['left_out'] = true;
+                }
+            }
+        }
         return (
                 <>
                 <Rect
@@ -223,7 +341,7 @@ function createBlock(item, lineWidth) {
                pointX + lineWidth + (item['round']-1)*30 - 10:
                pointX - lineWidth - (item['round']-1)*30}
             y={is_left ? item['left_begin_y'] - 15 : item['left_begin_y'] + 4}
-            text={(left_player_flag !== null ? left_player_flag : "")}
+            text={((left_player_flag !== null && left_player_flag >= 0 && left_player_flag <= 3) ? left_player_flag : "")}
             fill={'blue'}
             fontSize={15} />
                 <Text
@@ -231,7 +349,7 @@ function createBlock(item, lineWidth) {
                pointX + lineWidth + (item['round']-1)*30 - 10:
                pointX - lineWidth - (item['round']-1)*30}
             y={is_left ? item['right_begin_y'] + 4: item['right_begin_y'] - 15}
-            text={(left_player_flag !== null ? (3 - left_player_flag) : "")}
+            text={((left_player_flag !== null && left_player_flag >= 0 && left_player_flag <= 3) ? (3 - left_player_flag) : "")}
             fill={'blue'}
             fontSize={15} />
                 <Rect
@@ -258,6 +376,7 @@ function createBlock(item, lineWidth) {
             text={(item['id'] < 10 ? ' ' + item['id'] : item['id'])}
             fill={'gray'}
             fontSize={12}
+            onClick={e => onUpdate(item['id'])}
                 />
                 </>
         );
@@ -291,12 +410,12 @@ function Home() {
           <Stage width={1100} height={900}>
           <Layer>
           {sortedData.map((item, index) => (
+              createBlock(item, lineWidth)
+          ))}
+          {sortedData.map((item, index) => (
               createText(item)
           ))
           }
-          {sortedData.map((item, index) => (
-              createBlock(item, lineWidth)
-          ))}
           </Layer>
           </Stage>
           </div>

@@ -1,0 +1,13 @@
+.large_checkbox {
+    width: 40px;
+    height: 40px;
+}
+
+.column {
+    font-size: 20px;
+}
+
+.elem {
+    text-align: center;
+    vertical-align: middle;
+}
