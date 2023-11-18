@@ -31,6 +31,9 @@ export default async (req, res) => {
         const result = await conn.query(query);
         const data = result.rows;
         console.log(result.rows);
+        query = `SELECT player_id FROM notification_request`;
+        const result_requested = await conn.query(query);
+        const requested_data = result_requested.rows;
         // select item
         let result_array = [];
         for (let i = 0; i < data.length; i++) {
@@ -44,16 +47,50 @@ export default async (req, res) => {
                     }
                     const block_pos = (game_id <= round_num[round] / 2 ? 'left' : 'right');
                     if (data[i].left_player_id !== null) {
-                        result_array.push({'id': data[i].left_player_id,
-                                           'name': data[i].left_name,
-                                           'name_kana': data[i].left_name_kana,
-                                           'color': (block_pos === 'left' ? 'red' : 'white')});
+                        let duplicated = false;
+                        for (let k = 0; k < result_array.length; k++) {
+                            if (result_array[k]['id'] == data[i].left_player_id) {
+                                duplicated = true;
+                                break;
+                            }
+                        }
+                        if (!duplicated) {
+                            let requested = false;
+                            for (let k = 0; k < requested_data.length; k++) {
+                                if (requested_data[k]['player_id'] === data[i].left_player_id) {
+                                    requested = true;
+                                    break;
+                                }
+                            }
+                            result_array.push({'id': data[i].left_player_id,
+                                               'name': data[i].left_name,
+                                               'name_kana': data[i].left_name_kana,
+                                               'requested': requested,
+                                               'color': (block_pos === 'left' ? 'red' : 'white')});
+                        }
                     }
                     if (data[i].right_player_id !== null) {
-                        result_array.push({'id': data[i].right_player_id,
-                                           'name': data[i].right_name,
-                                           'name_kana': data[i].right_name_kana,
-                                           'color': (block_pos === 'left' ? 'white' : 'red')});
+                        let duplicated = false;
+                        for (let k = 0; k < result_array.length; k++) {
+                            if (result_array[k]['id'] == data[i].right_player_id) {
+                                duplicated = true;
+                                break;
+                            }
+                        }
+                        if (!duplicated) {
+                            let requested = false;
+                            for (let k = 0; k < requested_data.length; k++) {
+                                if (requested_data[k]['player_id'] === data[i].right_player_id) {
+                                    requested = true;
+                                    break;
+                                }
+                            }
+                            result_array.push({'id': data[i].right_player_id,
+                                               'name': data[i].right_name,
+                                               'name_kana': data[i].right_name_kana,
+                                               'requested': requested,
+                                               'color': (block_pos === 'left' ? 'white' : 'red')});
+                        }
                     }
                 }
             }

@@ -66,6 +66,7 @@ function Home() {
           <th>競技</th>
           <th>選手名</th>
           <th>コート</th>
+          <th>所属</th>
           <th></th>
           </tr>
           {data.map((item, index) => (
@@ -73,6 +74,7 @@ function Home() {
                   <td>{item['event_name'].replace('\'', '').replace('\'', '')}</td>
                   <td>{item['name']}({item['name_kana']})</td>
                   <td>{item['court_name'].replace('\'', '').replace('\'', '')}</td>
+                  <td>{item['group_name'].replace('\'', '').replace('\'', '')}</td>
                   <td><Button variant="contained" type="submit" onClick={e => onClear(item.id)}>呼び出し完了</Button></td>
               </tr>
           ))}

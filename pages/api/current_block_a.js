@@ -8,7 +8,7 @@ export default async (req, res) => {
         let values = [result.rows[0].id];
         result = await conn.query(query, values);
         const current_id = result.rows[0].hokei_man_id;
-        query = `SELECT t1.id, t1.left_player_flag, t1.left_player_id, t1.right_player_id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t3.name AS right_name FROM hokei_man AS t1 LEFT JOIN players AS t2 ON t1.left_player_id = t2.hokei_man_player_id LEFT JOIN players AS t3 ON t1.right_player_id = t3.hokei_man_player_id`;
+        query = `SELECT t1.id, t1.left_player_flag, t1.left_player_id, t1.right_player_id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t3.name AS right_name, t4.name AS left_group_name, t5.name AS right_group_name FROM hokei_man AS t1 LEFT JOIN players AS t2 ON t1.left_player_id = t2.hokei_man_player_id LEFT JOIN players AS t3 ON t1.right_player_id = t3.hokei_man_player_id LEFT JOIN groups AS t4 ON t2.group_id = t4.id LEFT JOIN groups AS t5 ON t3.group_id = t5.id`;
         const result_schedule = await conn.query(query);
         const sorted_data = result_schedule.rows.sort((a, b) => a.id - b.id);
         // set round 0, 1,...until (without final and before final)
@@ -33,6 +33,12 @@ export default async (req, res) => {
         }
         // select item
         for (let i = 0; i < sorted_data.length; i++) {
+            if (sorted_data[i]['left_group_name'] !== null) {
+                sorted_data[i]['left_group_name'] = sorted_data[i]['left_group_name'].replace('\'', '').replace('\'', '');
+            }
+            if (sorted_data[i]['right_group_name'] !== null) {
+                sorted_data[i]['right_group_name'] = sorted_data[i]['right_group_name'].replace('\'', '').replace('\'', '');
+            }
             if (sorted_data[i]['id'] === current_id) {
                 if ('round' in sorted_data[i]) {
                     const round = sorted_data[i]['round'];

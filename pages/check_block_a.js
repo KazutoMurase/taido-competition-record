@@ -7,9 +7,9 @@ import SquareTwoToneIcon from '@mui/icons-material/SquareTwoTone';
 import checkStyles from '../styles/checks.module.css';
 
 
-function onSubmit(data) {
+function onSubmit(id) {
     let post = {event_id: 2,
-                player_id: data.id,
+                player_id: id,
                 court_id: 1
                 };
     axios.post('/api/create_notification_request', post)
@@ -19,15 +19,13 @@ function onSubmit(data) {
         .catch((e) => { console.log(e)})
 }
 
-function onBack(data) {
-    let post = {id: data.id-1,
-                update_block: 'a'};
-    axios.post('/api/hokei_man/back', post)
+function onClear(id) {
+    let post = {player_id: id};
+    axios.post('/api/clear_notification_request', post)
         .then((response) => {
             console.log(response);
         })
         .catch((e) => { console.log(e)})
-    window.location.reload();
 }
 
 function Home() {
@@ -43,9 +41,22 @@ function Home() {
       const response = await fetch('/api/check_block_a');
       const result = await response.json();
       setData(result);
-    }
-    fetchData();
+      }
+    const interval = setInterval(() => {
+      fetchData();
+    }, 3000); // 3秒ごとに更新
+      fetchData();
+    return () => {
+      clearInterval(interval);
+    };
   }, []);
+
+    const waitButtonStyle = {
+        backgroundColor: 'blue'
+    };
+    const activeButtonStyle = {
+        backgroundColor: 'purple'
+    };
   return (
           <div>
           <Grid container>
@@ -65,6 +76,7 @@ function Home() {
           <th>点呼完了</th>
           <th>棄権</th>
           <th></th>
+          <th></th>
           </tr>
           {data.map((item, index) => (
                   <tr className={checkStyles.column}>
@@ -72,7 +84,8 @@ function Home() {
                   <td>{item['name']}({item['name_kana']})</td>
                   <td className={checkStyles.elem}><input type='checkbox' className={checkStyles.large_checkbox} /></td>
                   <td className={checkStyles.elem}><input type='checkbox' className={checkStyles.large_checkbox} /></td>
-                  <td><Button variant="contained" type="submit" onClick={e => onSubmit(item)}>呼び出し</Button></td>
+                  <td><Button variant="contained" type="submit" onClick={e => onSubmit(item.id)} style={!item['requested'] ? null : activeButtonStyle}>{!item['requested'] ? '　呼び出し　' : 'リクエスト済'}</Button></td>
+                  <td><Button variant="contained" type="submit" onClick={e => onClear(item.id)} disabled={!item['requested']}>キャンセル</Button></td>
               </tr>
           ))}
           </tbody>

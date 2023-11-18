@@ -9,7 +9,7 @@ export default async (req, res) => {
         result = await conn.query(query, values);
         const current_id = result.rows[0].hokei_man_id;
         console.log(current_id);
-        query = `SELECT t0.order_id, t1.id, t2.name AS left_name, t2.name_kana AS left_name_kana, t3.name AS right_name, t3.name_kana AS right_name_kana FROM block_a AS t0 LEFT JOIN hokei_man AS t1 ON t0.hokei_man_id = t1.id LEFT JOIN players AS t2 ON t1.left_player_id = t2.hokei_man_player_id LEFT JOIN players AS t3 ON t1.right_player_id = t3.hokei_man_player_id`
+        query = `SELECT t0.order_id, t1.id, t2.name AS left_name, t2.name_kana AS left_name_kana, t3.name AS right_name, t3.name_kana AS right_name_kana, t4.name AS left_group_name, t5.name AS right_group_name FROM block_a AS t0 LEFT JOIN hokei_man AS t1 ON t0.hokei_man_id = t1.id LEFT JOIN players AS t2 ON t1.left_player_id = t2.hokei_man_player_id LEFT JOIN players AS t3 ON t1.right_player_id = t3.hokei_man_player_id LEFT JOIN groups AS t4 ON t2.group_id = t4.id LEFT JOIN groups AS t5 ON t3.group_id = t5.id`;
         const result_block_a = await conn.query(query);
         query = `SELECT t1.id, t1.left_player_id, t1.right_player_id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t3.name AS right_name FROM hokei_man AS t1 LEFT JOIN players AS t2 ON t1.left_player_id = t2.hokei_man_player_id LEFT JOIN players AS t3 ON t1.right_player_id = t3.hokei_man_player_id`;
         const result_schedule = await conn.query(query);
@@ -59,6 +59,12 @@ export default async (req, res) => {
             }
             if ('left_color' in sorted_data[id - 1]) {
                 sorted_block_a_data[i]['left_color'] = sorted_data[id - 1]['left_color'];
+            }
+            if (sorted_block_a_data[i]['left_group_name'] !== null) {
+                sorted_block_a_data[i]['left_group_name'] = sorted_block_a_data[i]['left_group_name'].replace('\'', '').replace('\'', '');
+            }
+            if (sorted_block_a_data[i]['right_group_name'] !== null) {
+                sorted_block_a_data[i]['right_group_name'] = sorted_block_a_data[i]['right_group_name'].replace('\'', '').replace('\'', '');
             }
             if (sorted_block_a_data[i]['id'] === current_id) {
                 sorted_block_a_data[i]['current'] = true;
