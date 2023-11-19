@@ -1,11 +1,11 @@
 import React from 'react';
-import BlockAList from '../components/block_a_list';
+import GamesOnBlock from '../components/games_on_block';
 import HokeiManResult from '../components/hokei_man_result';
 
 const Home = () => {
     return (
             <>
-            <BlockAList />
+            <GamesOnBlock block_number='a' />
             <br />
             <hr />
             <HokeiManResult updateInterval={3000} />

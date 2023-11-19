@@ -1,10 +1,10 @@
 import React from 'react';
-import BlockAList from '../components/block_a_list';
+import GamesOnBlock from '../components/games_on_block';
 
 const Home = () => {
     return (
             <>
-            <BlockAList />
+            <GamesOnBlock block_number='a' />
             </>
     );
 }

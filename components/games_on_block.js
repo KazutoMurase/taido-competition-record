@@ -5,8 +5,8 @@ import Grid from '@mui/material/Grid';
 import FlagCircleRoundedIcon from '@mui/icons-material/FlagCircleRounded';
 import checkStyles from '../styles/checks.module.css';
 
-function onMoveDown(order_id) {
-    let post = {update_block: 'a',
+function onMoveDown(order_id, block_number) {
+    let post = {update_block: block_number,
                 target_order_id: order_id};
     axios.post('/api/hokei_man/change_order', post)
         .then((response) => {
@@ -16,7 +16,7 @@ function onMoveDown(order_id) {
     window.location.reload();
 }
 
-function BlockAList() {
+function GamesOnBlock({block_number}) {
   const [selectedRadioButton, setSelectedRadioButton] = useState(null);
 
   const handleRadioButtonChange = (event) => {
@@ -26,7 +26,7 @@ function BlockAList() {
   const [data, setData] = useState([]);
   useEffect(() => {
       async function fetchData() {
-      const response = await fetch('/api/block_a');
+      const response = await fetch('/api/get_games_on_block?block_number=' + block_number);
       const result = await response.json();
       setData(result);
       }
@@ -62,7 +62,7 @@ function BlockAList() {
                   <td>{item['left_color'] === 'red' ? item['right_group_name'] : item['left_group_name']}</td>
                   <td>{item['left_color'] === 'red' ? item['right_name'] : item['left_name']}</td>
                   <td>{item['left_color'] === 'red' ? item['right_name_kana'] : item['left_name_kana']}</td>
-                  <td><Button variant="contained" type="submit" onClick={e => onMoveDown(item.order_id)}>▼</Button></td>
+                  <td><Button variant="contained" type="submit" onClick={e => onMoveDown(item.order_id, block_number)}>▼</Button></td>
                   </tr>
           ))}
           </tbody>
@@ -71,4 +71,4 @@ function BlockAList() {
   );
 }
 
-export default BlockAList;
+export default GamesOnBlock;
