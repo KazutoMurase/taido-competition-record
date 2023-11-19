@@ -361,20 +361,20 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
             y={is_left ? item['left_begin_y'] : item['right_begin_y']}
             fill={upper_focus ? 'red' : 'black'}
             width={upper_focus ? 5 : 1}
-            height={(item['left_begin_y'] - item['right_begin_y']) * 0.5 * (is_left ? -1 : 1)} />
+            height={(item['left_begin_y'] - item['right_begin_y']) * 0.5 * (is_left ? -1 : 1) + ('offset_y' in item ? item['offset_y'] : 0)} />
                 <Rect
             x={is_left ?
                pointX + lineWidth + (item['round']-1)*30 :
                pointX - lineWidth - (item['round']-1)*30}
-            y={(item['left_begin_y'] + item['right_begin_y']) * 0.5}
+            y={(item['left_begin_y'] + item['right_begin_y']) * 0.5 + ('offset_y' in item ? item['offset_y'] : 0)}
             fill={lower_focus ? 'red' : 'black'}
             width={lower_focus ? 5 : 1}
-            height={(item['left_begin_y'] - item['right_begin_y']) * 0.5 * (is_left ? -1 : 1) + (lower_focus ? 4 : 0)} />
+            height={(item['left_begin_y'] - item['right_begin_y']) * 0.5 * (is_left ? -1 : 1) + (lower_focus ? 4 : 0) - ('offset_y' in item ? item['offset_y'] : 0)} />
                 <Text
             x={is_left ?
                pointX + lineWidth + (item['round']-1)*30 - 15 :
                pointX - lineWidth - (item['round']-1)*30 + 5}
-            y={(item['left_begin_y'] + item['right_begin_y']) * 0.5 - 5}
+            y={(item['left_begin_y'] + item['right_begin_y']) * 0.5 - 5 + ('offset_y' in item ? item['offset_y'] : 0)}
             text={(item['id'] < 10 ? ' ' + item['id'] : item['id'])}
             fill={'gray'}
             fontSize={12}

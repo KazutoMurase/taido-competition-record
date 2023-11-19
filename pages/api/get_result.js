@@ -145,6 +145,7 @@ export default async (req, res) => {
                 }
             }
         }
+        let semi_final_right_id = -1;
         for (let i = 0; i < sorted_data.length; i++) {
             if (sorted_data[i]['next_left_id'] !== null) {
                 sorted_data[sorted_data[i]['next_left_id'] - 1]['left_begin_y'] = (sorted_data[i]['left_begin_y'] +
@@ -152,7 +153,16 @@ export default async (req, res) => {
             } else if (sorted_data[i]['next_right_id'] !== null) {
                 sorted_data[sorted_data[i]['next_right_id'] - 1]['right_begin_y'] = (sorted_data[i]['left_begin_y'] +
                                                                                      sorted_data[i]['right_begin_y']) / 2;
+                // to correct center position later in right-side semi final
+                if (sorted_data[i]['next_right_id'] === sorted_data.length) {
+                    semi_final_right_id = i;
+                }
             }
+        }
+        if (sorted_data.length > 1 &&
+            semi_final_right_id !== -1 &&
+            sorted_data[sorted_data.length - 1]['left_begin_y'] !== sorted_data[sorted_data.length - 1]['right_begin_y']) {
+            sorted_data[semi_final_right_id]['offset_y'] = sorted_data[sorted_data.length - 1]['left_begin_y'] - sorted_data[sorted_data.length - 1]['right_begin_y'];
         }
         console.log(sorted_data);
         res.json(sorted_data);
