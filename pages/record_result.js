@@ -1,6 +1,6 @@
 import React from 'react';
 import RecordResult from '../components/record_result';
-import HokeiManResult from '../components/hokei_man_result';
+import GetResult from '../components/get_result';
 import { useRouter } from 'next/router';
 
 const Home = () => {
@@ -14,7 +14,7 @@ const Home = () => {
             <RecordResult block_number={block_number} />
             <br />
             <hr />
-            <HokeiManResult editable={true} returnUrl={"record_result?block_number=" + block_number} />
+            <GetResult editable={true} event_name='hokei_man' returnUrl={"record_result?block_number=" + block_number} />
             </>
     );
 }

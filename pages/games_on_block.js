@@ -1,6 +1,6 @@
 import React from 'react';
 import GamesOnBlock from '../components/games_on_block';
-import HokeiManResult from '../components/hokei_man_result';
+import GetResult from '../components/get_result';
 import { useRouter } from 'next/router';
 
 const Home = () => {
@@ -14,7 +14,7 @@ const Home = () => {
             <GamesOnBlock block_number={block_number} />
             <br />
             <hr />
-            <HokeiManResult updateInterval={3000} />
+            <GetResult updateInterval={3000} event_name='hokei_man' />
             </>
     );
 }

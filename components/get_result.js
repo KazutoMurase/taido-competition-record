@@ -31,7 +31,7 @@ function createText(item) {
                     x={is_left ? 80 : 820}
                     y={item['left_begin_y']-5}
                     text={item['left_name']}
-                    fontSize={20}
+                    fontSize={item['left_name'].length < 8 ? 20 : 15}
                     />
                     <Rect
                     x={is_left ? 80-10 : 820-10}
@@ -73,7 +73,7 @@ function createText(item) {
                     x={is_left ? 80 : 820}
                     y={item['right_begin_y']-5}
                     text={item['right_name']}
-                    fontSize={20}
+                    fontSize={item['right_name'].length < 8 ? 20 : 15}
                     />
                     <Rect
                     x={is_left ? 80-10 : 820-10}
@@ -121,7 +121,7 @@ function createText(item) {
                 x={is_left ? 80 : 820}
                 y={item['left_begin_y']-5}
                 text={item['left_name']}
-                fontSize={20}
+                fontSize={item['left_name'].length < 8 ? 20 : 15}
                     />
                     <Rect
                     x={is_left ? 80-10 : 820-10}
@@ -169,7 +169,7 @@ function createText(item) {
                 x={is_left ? 80 : 820}
                 y={item['right_begin_y']-5}
                 text={item['right_name']}
-                fontSize={20}
+                fontSize={item['right_name'].length < 8 ? 20 : 15}
                     />
                     <Rect
                     x={is_left ? 80-10 : 820-10}
@@ -202,12 +202,12 @@ function createText(item) {
            );
 }
 
-function createBlock(item, lineWidth, editable, returnUrl) {
+function createBlock(item, lineWidth, editable, event_name, returnUrl) {
     const router = useRouter();
 
     const onUpdate = (id, editable) => {
         if (editable) {
-            router.push('/hokei_man?id=' + id + '&return_url=' + returnUrl);
+            router.push('/' + event_name + '?id=' + id + '&return_url=' + returnUrl);
         }
     }
 
@@ -389,11 +389,14 @@ function createBlock(item, lineWidth, editable, returnUrl) {
     );
 }
 
-function HokeiManResult({editable = false, updateInterval = 0, returnUrl = 'hokei_man_result'}) {
+function GetResult({editable = false, updateInterval = 0, returnUrl = null, event_name}) {
+    if (returnUrl === null) {
+        returnUrl = event_name + '_result';
+    }
     const [data, setData] = useState([]);
     useEffect(() => {
       async function fetchData() {
-          const response = await fetch('/api/hokei_man');
+          const response = await fetch('/api/get_result?event_name=' + event_name);
           const result = await response.json();
           setData(result);
       }
@@ -409,18 +412,25 @@ function HokeiManResult({editable = false, updateInterval = 0, returnUrl = 'hoke
     }, []);
     const sortedData = data.sort((a, b) => a.id - b.id);
     const lineWidth = 60;
+    // TODO: from DB
+    let event_full_name;
+    if (event_name === 'hokei_man') {
+        event_full_name = '男子個人法形競技';
+    } else if (event_name === 'zissen_man') {
+        event_full_name = '男子個人実戦競技';
+    }
   return (
           <div>
           <Grid container>
           <Grid ime xs={5} />
           <Grid item xs={4}>
-          <h1>男子個人法形競技</h1>
+          <h1>{event_full_name}</h1>
           </Grid>
           </Grid>
           <Stage width={1100} height={900}>
           <Layer>
           {sortedData.map((item, index) => (
-              createBlock(item, lineWidth, editable, returnUrl)
+              createBlock(item, lineWidth, editable, event_name, returnUrl)
           ))}
           {sortedData.map((item, index) => (
               createText(item)
@@ -432,4 +442,4 @@ function HokeiManResult({editable = false, updateInterval = 0, returnUrl = 'hoke
   );
 }
 
-export default HokeiManResult;
+export default GetResult;

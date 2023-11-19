@@ -80,7 +80,7 @@ function RecordResult({block_number}) {
           <Grid container>
           <Grid item xs={6} />
           <Grid item xs={4}>
-          <h2><u>コートA</u></h2>
+          <h2><u>コート{block_number.toUpperCase()}</u></h2>
           <h2>第{data.id}試合</h2>
           </Grid>
           <Grid item xs={2} />
