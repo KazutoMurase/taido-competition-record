@@ -2,6 +2,7 @@ import conn from '../../lib/db'
 
 export default async (req, res) => {
     try {
+        const block_name = 'block_' + req.query.block_number;
         let query = `SELECT t1.id, t1.next_left_id, t1.next_right_id FROM hokei_man AS t1`;
         const result_schedule = await conn.query(query);
         const sorted_data = result_schedule.rows.sort((a, b) => a.id - b.id);
@@ -26,8 +27,7 @@ export default async (req, res) => {
             }
         }
         console.log(sorted_data);
-        //query = `SELECT t1.id, t1.left_player_id, t1.right_player_id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t3.name AS right_name, t2.name_kana AS left_name_kana, t3.name_kana AS right_name_kana FROM block_a AS t0 LEFT JOIN hokei_man AS t1 ON t0.hokei_man_id = t1.id  LEFT JOIN players AS t2 ON t1.left_player_id = t2.hokei_man_player_id LEFT JOIN players AS t3 ON t1.right_player_id = t3.hokei_man_player_id`;
-        query = `SELECT t1.id, t2.id AS left_player_id, t3.id AS right_player_id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t3.name AS right_name, t2.name_kana AS left_name_kana, t3.name_kana AS right_name_kana FROM block_a AS t0 LEFT JOIN hokei_man AS t1 ON t0.hokei_man_id = t1.id  LEFT JOIN players AS t2 ON t1.left_player_id = t2.hokei_man_player_id LEFT JOIN players AS t3 ON t1.right_player_id = t3.hokei_man_player_id`;
+        query = 'SELECT t1.id, t2.id AS left_player_id, t3.id AS right_player_id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t3.name AS right_name, t2.name_kana AS left_name_kana, t3.name_kana AS right_name_kana FROM ' + block_name + ' AS t0 LEFT JOIN hokei_man AS t1 ON t0.hokei_man_id = t1.id  LEFT JOIN players AS t2 ON t1.left_player_id = t2.hokei_man_player_id LEFT JOIN players AS t3 ON t1.right_player_id = t3.hokei_man_player_id';
         const result = await conn.query(query);
         const data = result.rows;
         console.log(result.rows);
