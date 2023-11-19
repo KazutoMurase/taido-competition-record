@@ -27,18 +27,9 @@ export default async (req, res) => {
                 result = await conn.query(query, values);
             }
         }
-        if (req.body.update_block === 'a') {
-            query = 'update current_block_a set id = id + 1'
-            result = await conn.query(query);
-        } else if (req.body.update_block === 'b') {
-            query = 'update current_block_b set id = id + 1'
-            result = await conn.query(query);
-        } else {
-            //const next_id = req.body.id + 1;
-            //query = 'update current_hokei_man set id = $1';
-            //result = await conn.query(query, [next_id]);
-            res.status(200).end();
-        }
+        const block_name = 'current_block_' + req.body.update_block;
+        query = 'update ' + block_name + ' set id = id + 1';
+        result = await conn.query(query);
         console.log(result);
     } catch (error) {
         console.log(error);

@@ -9,7 +9,7 @@ import FlagCircleRoundedIcon from '@mui/icons-material/FlagCircleRounded';
 
 function Home() {
   const router = useRouter();
-  const { id } = router.query;
+  const { id, return_url } = router.query;
   const [selectedRadioButton, setSelectedRadioButton] = useState(null);
 
   const handleRadioButtonChange = (event) => {
@@ -39,7 +39,7 @@ function Home() {
   }, [id]);
 
   const onBack = () => {
-      router.push('/block_a_with_result');
+      router.push('/' + return_url);
   }
   const onSubmit = (data, player_flag) => {
     let left_player_flag = (data.left_color === 'white' ? player_flag : 3 - player_flag);
@@ -64,7 +64,7 @@ function Home() {
               console.log(response);
           })
           .catch((e) => { console.log(e)})
-    router.push('/block_a_with_result');
+    router.push('/' + return_url);
   }
 
   return (

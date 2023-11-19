@@ -2,9 +2,10 @@ import conn from '../../lib/db'
 
 export default async (req, res) => {
     try {
-        let query = 'SELECT id from current_block_a';
+        const block_name = 'block_' + req.query.block_number;
+        let query = 'SELECT id from current_' + block_name;
         let result = await conn.query(query);
-        query = 'SELECT hokei_man_id from block_a where order_id = $1';
+        query = 'SELECT hokei_man_id from ' + block_name + ' where order_id = $1';
         let values = [result.rows[0].id];
         result = await conn.query(query, values);
         const current_id = result.rows[0].hokei_man_id;

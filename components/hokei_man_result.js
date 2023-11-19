@@ -202,12 +202,12 @@ function createText(item) {
            );
 }
 
-function createBlock(item, lineWidth, editable) {
+function createBlock(item, lineWidth, editable, returnUrl) {
     const router = useRouter();
 
     const onUpdate = (id, editable) => {
         if (editable) {
-            router.push('/hokei_man?id=' + id);
+            router.push('/hokei_man?id=' + id + '&return_url=' + returnUrl);
         }
     }
 
@@ -389,7 +389,7 @@ function createBlock(item, lineWidth, editable) {
     );
 }
 
-function HokeiManResult({editable = false, updateInterval = 0}) {
+function HokeiManResult({editable = false, updateInterval = 0, returnUrl = 'hokei_man_result'}) {
     const [data, setData] = useState([]);
     useEffect(() => {
       async function fetchData() {
@@ -420,7 +420,7 @@ function HokeiManResult({editable = false, updateInterval = 0}) {
           <Stage width={1100} height={900}>
           <Layer>
           {sortedData.map((item, index) => (
-              createBlock(item, lineWidth, editable)
+              createBlock(item, lineWidth, editable, returnUrl)
           ))}
           {sortedData.map((item, index) => (
               createText(item)

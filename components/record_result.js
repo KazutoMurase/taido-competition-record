@@ -5,11 +5,11 @@ import Grid from '@mui/material/Grid';
 import FlagCircleRoundedIcon from '@mui/icons-material/FlagCircleRounded';
 
 
-function onSubmit(data, player_flag) {
+function onSubmit(data, player_flag, block_number) {
     let left_player_flag = (data.left_color === 'white' ? player_flag : 3 - player_flag);
     let post = {id: data.id,
                 left_player_flag: left_player_flag,
-                update_block: 'b'};
+                update_block: block_number};
     if (parseInt(left_player_flag) > 1) {
         post['next_player_id'] = data.left_player_id;
         post['loser_id'] = data.right_player_id;
@@ -32,9 +32,9 @@ function onSubmit(data, player_flag) {
     window.location.reload();
 }
 
-function onBack(data) {
+function onBack(data, block_number) {
     let post = {id: data.id-1,
-                update_block: 'b'};
+                update_block: block_number};
     axios.post('/api/hokei_man/back', post)
         .then((response) => {
             console.log(response);
@@ -43,7 +43,7 @@ function onBack(data) {
     window.location.reload();
 }
 
-function Home() {
+function RecordResult({block_number}) {
   const [selectedRadioButton, setSelectedRadioButton] = useState(null);
 
   const handleRadioButtonChange = (event) => {
@@ -53,25 +53,43 @@ function Home() {
   const [data, setData] = useState([]);
   useEffect(() => {
       async function fetchData() {
-      const response = await fetch('/api/current_block_b');
+      const response = await fetch('/api/current_block?block_number=' + block_number);
       const result = await response.json();
       setData(result);
+      console.log(result.left_player_flag);
+      if (result.left_player_flag !== null &&
+          result.left_player_flag !== undefined) {
+          if (result.left_color === 'red') {
+              setSelectedRadioButton(3 - result.left_player_flag);
+          } else {
+              setSelectedRadioButton(result.left_player_flag);
+          }
+      }
     }
-    fetchData();
+    const interval = setInterval(() => {
+      fetchData();
+    }, 3000); // 3秒ごとに更新
+      fetchData();
+      return () => {
+          clearInterval(interval);
+      };
   }, []);
 
   return (
           <div>
           <Grid container>
-          <Grid item xs={4} />
+          <Grid item xs={6} />
           <Grid item xs={4}>
-          <h2><u>コートB</u></h2>
+          <h2><u>コートA</u></h2>
           <h2>第{data.id}試合</h2>
           </Grid>
+          <Grid item xs={2} />
           <Grid item xs={4} />
-          <Grid item xs={1} />
-          <Grid item xs={5}>
-          <Button variant="contained">赤不戦勝</Button>
+          <Grid item xs={4}>
+          <Button variant="contained"
+          type="submit"
+          onClick={e => onSubmit(data, -1, block_number)}>赤不戦勝</Button>
+          <h3>{data.left_color === 'white' ? data.right_group_name : data.left_group_name}</h3>
           <h1>{data.left_color === 'white' ? data.right_name : data.left_name}</h1>
           {parseInt(selectedRadioButton) <= 2 ?
            <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" /> : null}
@@ -80,8 +98,11 @@ function Home() {
           {parseInt(selectedRadioButton) === 0 ?
            <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" /> : null}
           </Grid>
-          <Grid item xs={5}>
-          <Button variant="contained">白不戦勝</Button>
+          <Grid item xs={4}>
+          <Button variant="contained"
+                  type="submit"
+          onClick={e => onSubmit(data, 4, block_number)}>白不戦勝</Button>
+          <h3>{data.left_color === 'white' ? data.left_group_name : data.right_group_name}</h3>
           <h1>{data.left_color === 'white' ? data.left_name : data.right_name}</h1>
           {parseInt(selectedRadioButton) >= 1 ?
            <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="gray" /> :
@@ -91,36 +112,36 @@ function Home() {
           {parseInt(selectedRadioButton) >= 3 ?
            <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="gray" /> : null}
           </Grid>
-          <Grid item xs={1} />
+          <Grid item xs={3} />
           <Grid item xs={3} />
           <Grid item xs={4}>
           <h2>白の旗</h2>
           <input class="radio-inline__input" type="radio" id="choice0" name="contact" value="0"
-          onChange={handleRadioButtonChange} />
+          onChange={handleRadioButtonChange} defaultChecked={parseInt(selectedRadioButton)===0} />
           <label class="radio-inline__label" for="choice0">0</label>
           <input class="radio-inline__input" type="radio" id="choice1" name="contact" value="1"
-          onChange={handleRadioButtonChange} />
+          onChange={handleRadioButtonChange}  defaultChecked={parseInt(selectedRadioButton)===1} />
           <label class="radio-inline__label" for="choice1">1</label>
           <input class="radio-inline__input" type="radio" id="choice2" name="contact" value="2"
-          onChange={handleRadioButtonChange} />
+          onChange={handleRadioButtonChange}  defaultChecked={parseInt(selectedRadioButton)===2} />
           <label class="radio-inline__label" for="choice2">2</label>
           <input class="radio-inline__input" type="radio" id="choice3" name="contact" value="3"
-          onChange={handleRadioButtonChange} />
+          onChange={handleRadioButtonChange}  defaultChecked={parseInt(selectedRadioButton)===3} />
           <label class="radio-inline__label" for="choice3">3</label>
           <br />
           <br />
           </Grid>
-          <Grid item xs={5} />
+          <Grid item xs={3} />
           <Grid item xs={4} />
           <Grid item xs={1} >
           <Button variant="contained"
                   type="submit"
-                  onClick={e => onSubmit(data, selectedRadioButton)}>決定</Button>
+          onClick={e => onSubmit(data, selectedRadioButton, block_number)}>決定</Button>
           </Grid>
           <Grid item xs={1} >
           <Button variant="contained"
                   type="submit"
-          onClick={e => onBack(data)}>戻る</Button>
+          onClick={e => onBack(data, block_number)}>戻る</Button>
           </Grid>
           <Grid item xs={5} />
           <Grid item xs={3} />
@@ -129,4 +150,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default RecordResult;
