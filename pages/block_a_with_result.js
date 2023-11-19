@@ -8,7 +8,7 @@ const Home = () => {
             <BlockA />
             <br />
             <hr />
-            <HokeiManResult />
+            <HokeiManResult editable={true} />
             </>
     );
 }

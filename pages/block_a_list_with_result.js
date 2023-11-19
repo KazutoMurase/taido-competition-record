@@ -8,7 +8,7 @@ const Home = () => {
             <BlockAList />
             <br />
             <hr />
-            <HokeiManResult />
+            <HokeiManResult updateInterval={3000} />
             </>
     );
 }

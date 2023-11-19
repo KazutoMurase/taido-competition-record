@@ -202,11 +202,13 @@ function createText(item) {
            );
 }
 
-function createBlock(item, lineWidth) {
+function createBlock(item, lineWidth, editable) {
     const router = useRouter();
 
-    const onUpdate = (id) => {
-        router.push('/hokei_man?id=' + id);
+    const onUpdate = (id, editable) => {
+        if (editable) {
+            router.push('/hokei_man?id=' + id);
+        }
     }
 
     const is_left = (item['block_pos'] === 'left');
@@ -376,7 +378,7 @@ function createBlock(item, lineWidth) {
             text={(item['id'] < 10 ? ' ' + item['id'] : item['id'])}
             fill={'gray'}
             fontSize={12}
-            onClick={e => onUpdate(item['id'])}
+            onClick={e => onUpdate(item['id'], editable)}
                 />
                 </>
         );
@@ -387,22 +389,23 @@ function createBlock(item, lineWidth) {
     );
 }
 
-function HokeiManResult() {
+function HokeiManResult({editable = false, updateInterval = 0}) {
     const [data, setData] = useState([]);
     useEffect(() => {
-        async function fetchData() {
-            const response = await fetch('/api/hokei_man');
-            const result = await response.json();
-            setData(result);
-        }
+      async function fetchData() {
+          const response = await fetch('/api/hokei_man');
+          const result = await response.json();
+          setData(result);
+      }
         fetchData();
-      const interval = setInterval(() => {
-      fetchData();
-    }, 3000); // 3秒ごとに更新
-      fetchData();
-      return () => {
-          clearInterval(interval);
-      };
+      if (updateInterval > 0) {
+          const interval = setInterval(() => {
+              fetchData();
+          }, updateInterval);
+          return () => {
+              clearInterval(interval);
+          };
+      }
     }, []);
     const sortedData = data.sort((a, b) => a.id - b.id);
     const lineWidth = 60;
@@ -417,7 +420,7 @@ function HokeiManResult() {
           <Stage width={1100} height={900}>
           <Layer>
           {sortedData.map((item, index) => (
-              createBlock(item, lineWidth)
+              createBlock(item, lineWidth, editable)
           ))}
           {sortedData.map((item, index) => (
               createText(item)
