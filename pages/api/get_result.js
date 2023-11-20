@@ -96,6 +96,7 @@ export default async (req, res) => {
                 }
             }
         }
+        let max_begin_y = 0;
         let begin_y = 25;
         for (let i = 0; i < left_block_indices.length; i++) {
             const index = left_block_indices[i] - 1;
@@ -117,6 +118,7 @@ export default async (req, res) => {
                 }
             }
         }
+        max_begin_y = begin_y;
         begin_y = 25;
         for (let i = 0; i < right_block_indices.length; i++) {
             const index = right_block_indices[i] - 1;
@@ -145,6 +147,7 @@ export default async (req, res) => {
                 }
             }
         }
+        max_begin_y = Math.max(begin_y, max_begin_y);
         let semi_final_right_id = -1;
         for (let i = 0; i < sorted_data.length; i++) {
             if (sorted_data[i]['next_left_id'] !== null) {
@@ -163,6 +166,9 @@ export default async (req, res) => {
             semi_final_right_id !== -1 &&
             sorted_data[sorted_data.length - 1]['left_begin_y'] !== sorted_data[sorted_data.length - 1]['right_begin_y']) {
             sorted_data[semi_final_right_id]['offset_y'] = sorted_data[sorted_data.length - 1]['left_begin_y'] - sorted_data[sorted_data.length - 1]['right_begin_y'];
+        }
+        if (sorted_data.length > 2) {
+            sorted_data[sorted_data.length - 2]['left_begin_y'] = max_begin_y + 50;
         }
         console.log(sorted_data);
         res.json(sorted_data);

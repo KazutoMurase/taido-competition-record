@@ -257,27 +257,27 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
                 <>
                 <Rect
             x={x}
-            y={700}
+            y={item['left_begin_y']}
             width={width}
             height={1}
             fill='black'
                 />
                 <Rect
             x={x + width / 2}
-            y={700}
+            y={item['left_begin_y']}
             width={1}
             height={-50}
             fill='black'
                 />
                 <Text
             x={x + width / 2 - 20}
-            y={700 - 70}
+            y={item['left_begin_y'] - 70}
             text={'三決'}
             fontSize={20}
                 />
                 <Text
             x={x + width / 2 - 8}
-            y={700 + 5}
+            y={item['left_begin_y'] + 5}
             text={item['id']}
             fill={'gray'}
             fontSize={12}
