@@ -207,7 +207,7 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
 
     const onUpdate = (id, editable) => {
         if (editable) {
-            router.push('/' + event_name + '?id=' + id + '&return_url=' + returnUrl);
+            router.push('/update_result?event_name=' + event_name + '&id=' + id + '&return_url=' + returnUrl);
         }
     }
 
