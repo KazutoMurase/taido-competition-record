@@ -44,9 +44,7 @@ function ShowWhiteFlags(event_name, selectedRadioButton) {
     }
 }
 
-function Home() {
-  const router = useRouter();
-  const { event_name, id, return_url } = router.query;
+function UpdateResult({event_name, id, return_url}) {
   const [selectedRadioButton, setSelectedRadioButton] = useState(null);
 
   const handleRadioButtonChange = (event) => {
@@ -73,7 +71,7 @@ function Home() {
     }
     fetchData();
   }, [id]);
-
+  const router = useRouter();
   const onBack = () => {
       router.push('/' + return_url);
   }
@@ -190,4 +188,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default UpdateResult;

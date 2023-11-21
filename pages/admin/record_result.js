@@ -1,7 +1,7 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
-import RecordResult from '../components/record_result';
-import GetResult from '../components/get_result';
+import RecordResult from '../../components/record_result';
+import GetResult from '../../components/get_result';
 import { useRouter } from 'next/router';
 
 const Home = () => {
@@ -27,7 +27,7 @@ const Home = () => {
             <br />
             <hr />
             {data.map((item, index) => (
-                    <GetResult editable={true} event_name={item} returnUrl={"record_result?block_number=" + block_number} />
+                    <GetResult editable={true} event_name={item} returnUrl={"admin/record_result?block_number=" + block_number} />
             ))}
             </>
     );

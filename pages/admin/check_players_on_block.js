@@ -1,5 +1,5 @@
 import React from 'react';
-import CheckPlayers from '../components/check_players_on_block';
+import CheckPlayers from '../../components/check_players_on_block';
 import { useRouter } from 'next/router';
 
 const Home = () => {

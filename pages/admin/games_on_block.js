@@ -1,7 +1,7 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
-import GamesOnBlock from '../components/games_on_block';
-import GetResult from '../components/get_result';
+import GamesOnBlock from '../../components/games_on_block';
+import GetResult from '../../components/get_result';
 import { useRouter } from 'next/router';
 
 const Home = () => {

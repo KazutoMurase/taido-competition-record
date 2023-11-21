@@ -4,7 +4,7 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import FlagCircleRoundedIcon from '@mui/icons-material/FlagCircleRounded';
 import SquareTwoToneIcon from '@mui/icons-material/SquareTwoTone';
-import checkStyles from '../styles/checks.module.css';
+import checkStyles from '../../styles/checks.module.css';
 
 function onClearAll() {
     let post = {};
