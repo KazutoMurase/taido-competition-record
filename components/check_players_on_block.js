@@ -40,7 +40,7 @@ function onClear(id) {
         .catch((e) => { console.log(e)})
 }
 
-function CheckPlayers({block_number}) {
+function CheckPlayers({block_number, schedule_id}) {
   const [selectedRadioButton, setSelectedRadioButton] = useState(null);
 
   const handleRadioButtonChange = (event) => {
@@ -51,7 +51,7 @@ function CheckPlayers({block_number}) {
   const [data, setData] = useState([]);
   useEffect(() => {
       async function fetchData() {
-      const response = await fetch('/api/check_players_on_block?block_number=' + block_number);
+      const response = await fetch('/api/check_players_on_block?block_number=' + block_number + '&schedule_id=' + schedule_id);
       const result = await response.json();
       setData(result);
    }

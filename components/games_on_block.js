@@ -8,7 +8,7 @@ import checkStyles from '../styles/checks.module.css';
 function onMoveDown(order_id, block_number) {
     let post = {update_block: block_number,
                 target_order_id: order_id};
-    axios.post('/api/hokei_man/change_order', post)
+    axios.post('/api/change_order', post)
         .then((response) => {
             console.log(response);
         })
@@ -16,7 +16,7 @@ function onMoveDown(order_id, block_number) {
     window.location.reload();
 }
 
-function GamesOnBlock({block_number}) {
+function GamesOnBlock({block_number, event_name}) {
   const [selectedRadioButton, setSelectedRadioButton] = useState(null);
 
   const handleRadioButtonChange = (event) => {
@@ -44,7 +44,7 @@ function GamesOnBlock({block_number}) {
           <table border="1">
           <tbody>
           <tr className={checkStyles.column}>
-          <th>種類</th>
+          {event_name === 'hokei_man' ? (<th>種類</th>) : (<></>)}
           <th>地区</th>
           <th>選手(赤)</th>
           <th>カナ</th>
@@ -55,7 +55,7 @@ function GamesOnBlock({block_number}) {
           </tr>
           {data.map((item, index) => (
                   <tr className={checkStyles.column} bgcolor={'current' in item ? 'yellow' : 'white'}>
-                  <td>{item['round'] <= 2 ? '指定法形' : '自由法形'}</td>
+                  {event_name === 'hokei_man' ? (<td>{item['round'] <= 2 ? '指定法形' : '自由法形'}</td>) : (<></>)}
                   <td>{item['left_color'] === 'red' ? item['left_group_name'] : item['right_group_name']}</td>
                   <td>{item['left_color'] === 'red' ? item['left_name'] : item['right_name']}</td>
                   <td>{item['left_color'] === 'red' ? item['left_name_kana'] : item['right_name_kana']}</td>

@@ -4,13 +4,13 @@ import { useRouter } from 'next/router';
 
 const Home = () => {
     const router = useRouter();
-    const { block_number } = router.query;
+    const { block_number, schedule_id } = router.query;
     if (block_number === undefined) {
         return (<></>);
     }
     return (
             <>
-            <CheckPlayers block_number={block_number} />
+            <CheckPlayers block_number={block_number} schedule_id={schedule_id} />
             </>
     );
 }

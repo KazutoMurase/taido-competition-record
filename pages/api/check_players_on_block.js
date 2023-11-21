@@ -3,7 +3,21 @@ import conn from '../../lib/db'
 export default async (req, res) => {
     try {
         const block_name = 'block_' + req.query.block_number;
-        let query = `SELECT t1.id, t1.next_left_id, t1.next_right_id FROM hokei_man AS t1`;
+        const schedule_id = req.query.schedule_id;
+        let query = 'SELECT event_id FROM ' + block_name + ' WHERE id = $1';
+        const block_result = await conn.query(query, [schedule_id]);
+        let event_name;
+        if (block_result.rows[0].event_id === 1) {
+            event_name = 'zissen_man';
+        } else if (block_result.rows[0].event_id === 2) {
+            event_name = 'hokei_man';
+        }
+        query = 'SELECT t1.id, t2.id AS left_player_id, t3.id AS right_player_id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t3.name AS right_name, t2.name_kana AS left_name_kana, t3.name_kana AS right_name_kana FROM ' + block_name + '_games AS t0 LEFT JOIN ' + event_name + ' AS t1 ON t0.game_id = t1.id LEFT JOIN players AS t2 ON t1.left_player_id = t2.' + event_name + '_player_id LEFT JOIN players AS t3 ON t1.right_player_id = t3.' + event_name + '_player_id where t0.schedule_id = $1';
+        const result = await conn.query(query, [schedule_id]);
+        const data = result.rows;
+        console.log(result.rows);
+
+        query = 'SELECT t1.id, t1.next_left_id, t1.next_right_id FROM ' + event_name + ' AS t1';
         const result_schedule = await conn.query(query);
         const sorted_data = result_schedule.rows.sort((a, b) => a.id - b.id);
         // set round 0, 1,...until (without final and before final)
@@ -27,10 +41,6 @@ export default async (req, res) => {
             }
         }
         console.log(sorted_data);
-        query = 'SELECT t1.id, t2.id AS left_player_id, t3.id AS right_player_id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t3.name AS right_name, t2.name_kana AS left_name_kana, t3.name_kana AS right_name_kana FROM ' + block_name + ' AS t0 LEFT JOIN hokei_man AS t1 ON t0.hokei_man_id = t1.id  LEFT JOIN players AS t2 ON t1.left_player_id = t2.hokei_man_player_id LEFT JOIN players AS t3 ON t1.right_player_id = t3.hokei_man_player_id';
-        const result = await conn.query(query);
-        const data = result.rows;
-        console.log(result.rows);
         query = `SELECT player_id FROM notification_request`;
         const result_requested = await conn.query(query);
         const requested_data = result_requested.rows;
