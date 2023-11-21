@@ -7,10 +7,15 @@ export default async (req, res) => {
         let query = 'SELECT event_id FROM ' + block_name + ' WHERE id = $1';
         const block_result = await conn.query(query, [schedule_id]);
         let event_name;
+        // TODO: set from database
         if (block_result.rows[0].event_id === 1) {
             event_name = 'zissen_man';
         } else if (block_result.rows[0].event_id === 2) {
             event_name = 'hokei_man';
+        } else if (block_result.rows[0].event_id === 3) {
+            event_name = 'zissen_woman';
+        } else if (block_result.rows[0].event_id === 4) {
+            event_name = 'hokei_woman';
         }
         query = 'SELECT t1.id, t2.id AS left_player_id, t3.id AS right_player_id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t3.name AS right_name, t2.name_kana AS left_name_kana, t3.name_kana AS right_name_kana FROM ' + block_name + '_games AS t0 LEFT JOIN ' + event_name + ' AS t1 ON t0.game_id = t1.id LEFT JOIN players AS t2 ON t1.left_player_id = t2.' + event_name + '_player_id LEFT JOIN players AS t3 ON t1.right_player_id = t3.' + event_name + '_player_id where t0.schedule_id = $1';
         const result = await conn.query(query, [schedule_id]);

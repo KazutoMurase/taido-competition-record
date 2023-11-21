@@ -293,10 +293,10 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
         const left_player_flag = item['left_player_flag'];
         let left_winner;
         let right_winner;
-        if (event_name === 'hokei_man') {
+        if (event_name.includes('hokei')) {
             left_winner = (left_player_flag !== null && left_player_flag >= 2);
             right_winner = (left_player_flag !== null && left_player_flag < 2);
-        } else if (event_name === 'zissen_man') {
+        } else if (event_name.includes('zissen')) {
             left_winner = (left_player_flag !== null && left_player_flag >= 1);
             right_winner = (left_player_flag !== null && left_player_flag < 1);
         }
@@ -323,13 +323,13 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
                 } else {
                     item['right_out'] = true;
                 }
-            } else if (event_name === 'hokei_man' && left_player_flag === 4) {
+            } else if (event_name.includes('hokei') && left_player_flag === 4) {
                 if (is_left) {
                     item['right_out'] = true;
                 } else {
                     item['left_out'] = true;
                 }
-            } else if (event_name === 'zissen_man' && left_player_flag === 2) {
+            } else if (event_name.includes('zissen') && left_player_flag === 2) {
                 if (is_left) {
                     item['right_out'] = true;
                 } else {
@@ -356,7 +356,7 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
                pointX + lineWidth + (item['round']-1)*30 - 10:
                pointX - lineWidth - (item['round']-1)*30}
             y={is_left ? item['left_begin_y'] - 15 : item['left_begin_y'] + 4}
-            text={((event_name === 'hokei_man' && left_player_flag !== null && left_player_flag >= 0 && left_player_flag <= 3) ? left_player_flag : "")}
+            text={((event_name.includes('hokei') && left_player_flag !== null && left_player_flag >= 0 && left_player_flag <= 3) ? left_player_flag : "")}
             fill={'blue'}
             fontSize={15} />
                 <Text
@@ -364,7 +364,7 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
                pointX + lineWidth + (item['round']-1)*30 - 10:
                pointX - lineWidth - (item['round']-1)*30}
             y={is_left ? item['right_begin_y'] + 4: item['right_begin_y'] - 15}
-            text={((event_name === 'hokei_man' && left_player_flag !== null && left_player_flag >= 0 && left_player_flag <= 3) ? (3 - left_player_flag) : "")}
+            text={((event_name.includes('hokei') && left_player_flag !== null && left_player_flag >= 0 && left_player_flag <= 3) ? (3 - left_player_flag) : "")}
             fill={'blue'}
             fontSize={15} />
                 <Rect
@@ -430,6 +430,10 @@ function GetResult({editable = false, updateInterval = 0, returnUrl = null, even
     if (event_name === 'hokei_man') {
         event_full_name = '男子個人法形競技';
     } else if (event_name === 'zissen_man') {
+        event_full_name = '男子個人実戦競技';
+    } else if (event_name === 'hokei_woman') {
+        event_full_name = '女子個人法形競技';
+    } else if (event_name === 'zissen_woman') {
         event_full_name = '男子個人実戦競技';
     }
   return (

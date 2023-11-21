@@ -7,16 +7,16 @@ import FlagCircleRoundedIcon from '@mui/icons-material/FlagCircleRounded';
 
 function onSubmit(data, player_flag, block_number, event_name) {
     let left_player_flag;
-    if (event_name === 'hokei_man') {
+    if (event_name.includes('hokei')) {
         left_player_flag = (data.left_color === 'white' ? player_flag : 3 - player_flag);
-    } else if (event_name === 'zissen_man') {
+    } else if (event_name.includes('zissen')) {
         left_player_flag = (data.left_color === 'white' ? player_flag : 1 - player_flag);
     }
     let post = {id: data.id,
                 event_name: event_name,
                 left_player_flag: left_player_flag,
                 update_block: block_number};
-    if (event_name === 'hokei_man') {
+    if (event_name.includes('hokei')) {
         if (parseInt(left_player_flag) > 1) {
             post['next_player_id'] = data.left_player_id;
             post['loser_id'] = data.right_player_id;
@@ -24,7 +24,7 @@ function onSubmit(data, player_flag, block_number, event_name) {
             post['next_player_id'] = data.right_player_id;
             post['loser_id'] = data.left_player_id;
         }
-    } else if (event_name === 'zissen_man') {
+    } else if (event_name.includes('zissen')) {
         if (parseInt(left_player_flag) > 0) {
             post['next_player_id'] = data.left_player_id;
             post['loser_id'] = data.right_player_id;
@@ -60,7 +60,7 @@ function onBack(data, block_number) {
 }
 
 function ShowRedFlags(event_name, selectedRadioButton) {
-    if (event_name === 'hokei_man') {
+    if (event_name.includes('hokei')) {
     return (<>
         {parseInt(selectedRadioButton) <= 2 ?
          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" /> : null}
@@ -69,7 +69,7 @@ function ShowRedFlags(event_name, selectedRadioButton) {
         {parseInt(selectedRadioButton) === 0 ?
          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" /> : null}
         </>);
-    } else if (event_name === 'zissen_man') {
+    } else if (event_name.includes('zissen')) {
         return (<>
         <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="white" />
         {parseInt(selectedRadioButton) <= 0 ?
@@ -79,7 +79,7 @@ function ShowRedFlags(event_name, selectedRadioButton) {
 }
 
 function ShowWhiteFlags(event_name, selectedRadioButton) {
-    if (event_name === 'hokei_man') {
+    if (event_name.includes('hokei')) {
     return (<>
           {parseInt(selectedRadioButton) >= 1 ?
            <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="gray" /> :
@@ -89,7 +89,7 @@ function ShowWhiteFlags(event_name, selectedRadioButton) {
           {parseInt(selectedRadioButton) >= 3 ?
            <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="gray" /> : null}
         </>);
-    } else if (event_name === 'zissen_man') {
+    } else if (event_name.includes('zissen')) {
         return (<>
         <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="white" />
         {parseInt(selectedRadioButton) >= 1 ?
@@ -115,9 +115,9 @@ function RecordResult({block_number, event_name}) {
       if (result.left_player_flag !== null &&
           result.left_player_flag !== undefined) {
           if (result.left_color === 'red') {
-              if (event_name === 'hokei_man') {
+              if (event_name.includes('hokei')) {
                   setSelectedRadioButton(3 - result.left_player_flag);
-              } else if (event_name === 'zissen_man') {
+              } else if (event_name.includes('zissen')) {
                   setSelectedRadioButton(1 - result.left_player_flag);
               }
           } else {
@@ -136,10 +136,10 @@ function RecordResult({block_number, event_name}) {
 
     let no_game_red_winner;
     let no_game_white_winner;
-    if (event_name === 'hokei_man') {
+    if (event_name.includes('hokei')) {
         no_game_red_winner = -1;
         no_game_white_winner = 4;
-    } else if (event_name === 'zissen_man') {
+    } else if (event_name.includes('zissen')) {
         no_game_red_winner = -1;
         no_game_white_winner = 2;
     }
@@ -173,7 +173,7 @@ function RecordResult({block_number, event_name}) {
           <Grid item xs={3} />
           <Grid item xs={2} />
           <Grid item xs={5}>
-          {event_name === 'hokei_man' ?
+          {event_name.includes('hokei') ?
            (<><h2>白の旗</h2>
             <input class="radio-inline__input" type="radio" id="choice0" name="contact" value="0"
             onChange={handleRadioButtonChange} defaultChecked={parseInt(selectedRadioButton)===0} />

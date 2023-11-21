@@ -44,7 +44,7 @@ function GamesOnBlock({block_number, event_name}) {
           <table border="1">
           <tbody>
           <tr className={checkStyles.column}>
-          {event_name === 'hokei_man' ? (<th>種類</th>) : (<></>)}
+          {event_name.includes('hokei') ? (<th>種類</th>) : (<></>)}
           <th>地区</th>
           <th>選手(赤)</th>
           <th>カナ</th>
@@ -55,7 +55,7 @@ function GamesOnBlock({block_number, event_name}) {
           </tr>
           {data.map((item, index) => (
                   <tr className={checkStyles.column} bgcolor={'current' in item ? 'yellow' : 'white'}>
-                  {event_name === 'hokei_man' ? (<td>{item['round'] <= 2 ? '指定法形' : '自由法形'}</td>) : (<></>)}
+                  {event_name.includes('hokei') ? (<td>{item['round'] <= 2 ? '指定法形' : '自由法形'}</td>) : (<></>)}
                   <td>{item['left_color'] === 'red' ? item['left_group_name'] : item['right_group_name']}</td>
                   <td>{item['left_color'] === 'red' ? item['left_name'] : item['right_name']}</td>
                   <td>{item['left_color'] === 'red' ? item['left_name_kana'] : item['right_name_kana']}</td>

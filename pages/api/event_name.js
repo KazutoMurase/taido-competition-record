@@ -10,6 +10,10 @@ export default async (req, res) => {
             res.json(['zissen_man']);
         } else if (event_id === 2) {
             res.json(['hokei_man']);
+        } else if (event_id === 3) {
+            res.json(['zissen_woman']);
+        } else if (event_id === 4) {
+            res.json(['hokei_woman']);
         }
     } catch (error) {
         console.log(error);

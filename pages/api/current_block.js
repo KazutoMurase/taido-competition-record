@@ -6,10 +6,15 @@ export default async (req, res) => {
         let query = 'SELECT t0.id, t0.game_id, t1.event_id from current_' + block_name + ' AS t0 LEFT JOIN ' + block_name + ' AS t1 ON t0.id = t1.id';
         let result = await conn.query(query);
         let game_type_name;
+        // TODO: set from database
         if (result.rows[0].event_id === 1) {
             game_type_name = 'zissen_man';
         } else if (result.rows[0].event_id === 2) {
             game_type_name = 'hokei_man';
+        } else if (result.rows[0].event_id === 3) {
+            game_type_name = 'zissen_woman';
+        } else if (result.rows[0].event_id === 4) {
+            game_type_name = 'hokei_woman';
         }
         query = 'SELECT game_id from ' + block_name + '_games where order_id = $1 and schedule_id = $2';
         let values = [result.rows[0].game_id, result.rows[0].id];
