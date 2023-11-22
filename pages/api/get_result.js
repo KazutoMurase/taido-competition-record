@@ -120,27 +120,67 @@ export default async (req, res) => {
                 const block_pos = sorted_data[i]['block_pos'];
                 let target_indices = (block_pos === 'left' ? left_block_indices : right_block_indices);
                 const current_index = target_indices.indexOf(sorted_data[i]['id']);
-                if (current_index === -1) {
-                    continue;
-                }
                 if (next_left_id !== null) {
-                    if ('set_prev_right_position_y' in sorted_data[parseInt(next_left_id) - 1] &&
+                    const set_prev_right_position_y = 'set_prev_right_position_y' in sorted_data[parseInt(next_left_id) - 1];
+                    const set_prev_left_position_y = 'set_prev_left_position_y' in sorted_data[parseInt(next_left_id) - 1];
+                    if (set_prev_left_position_y && set_prev_right_position_y) {
+                        if (block_pos === 'left') {
+                            if (!(target_indices.includes(sorted_data[parseInt(next_left_id) - 1]['prev_left_id'] + 1))) {
+                                target_indices.push(sorted_data[parseInt(next_left_id) - 1]['prev_left_id'] + 1);
+                            }
+                            if (!(target_indices.includes(sorted_data[parseInt(next_left_id) - 1]['prev_right_id'] + 1))) {
+                                target_indices.push(sorted_data[parseInt(next_left_id) - 1]['prev_right_id'] + 1);
+                            }
+                        } else {
+                            if (!(target_indices.includes(sorted_data[parseInt(next_left_id) - 1]['prev_left_id'] + 1))) {
+                                target_indices.splice(0, 0, sorted_data[parseInt(next_left_id) - 1]['prev_left_id'] + 1);
+                            }
+                            if (!(target_indices.includes(sorted_data[parseInt(next_left_id) - 1]['prev_right_id'] + 1))) {
+                                target_indices.splice(0, 0, sorted_data[parseInt(next_left_id) - 1]['prev_right_id'] + 1);
+                            }
+                        }
+                    }
+                    if (current_index === -1) {
+                        continue;
+                    }
+                    if (set_prev_right_position_y &&
                        !target_indices.includes(sorted_data[parseInt(next_left_id) - 1]['prev_right_id'] + 1)) {
                         target_indices.splice(current_index + (block_pos === 'left' ? 2 : -1), 0,
                                               sorted_data[parseInt(next_left_id) - 1]['prev_right_id'] + 1);
-                    } else if ('set_prev_left_position_y' in sorted_data[parseInt(next_left_id) - 1] &&
+                    } else if (set_prev_left_position_y &&
                               !target_indices.includes(sorted_data[parseInt(next_left_id) - 1]['prev_left_id'] + 1)) {
                         target_indices.splice(current_index + (block_pos === 'left' ? -1 : 2), 0,
                                               sorted_data[parseInt(next_left_id) - 1]['prev_left_id'] + 1);
                     }
                 }
                 if (next_right_id !== null) {
-                    if ('set_prev_right_position_y' in sorted_data[parseInt(next_right_id) - 1] &&
+                    const set_prev_right_position_y = 'set_prev_right_position_y' in sorted_data[parseInt(next_right_id) - 1];
+                    const set_prev_left_position_y = 'set_prev_left_position_y' in sorted_data[parseInt(next_right_id) - 1];
+                    if (set_prev_left_position_y && set_prev_right_position_y) {
+                        if (block_pos === 'left') {
+                            if (!(target_indices.includes(sorted_data[parseInt(next_right_id) - 1]['prev_left_id'] + 1))) {
+                                target_indices.push(sorted_data[parseInt(next_right_id) - 1]['prev_left_id'] + 1);
+                            }
+                            if (!(target_indices.includes(sorted_data[parseInt(next_right_id) - 1]['prev_right_id'] + 1))) {
+                                target_indices.push(sorted_data[parseInt(next_right_id) - 1]['prev_right_id'] + 1);
+                            }
+                        } else {
+                            if (!(target_indices.includes(sorted_data[parseInt(next_right_id) - 1]['prev_left_id'] + 1))) {
+                                target_indices.splice(0, 0, sorted_data[parseInt(next_right_id) - 1]['prev_left_id'] + 1);
+                            }
+                            if (!(target_indices.includes(sorted_data[parseInt(next_right_id) - 1]['prev_right_id'] + 1))) {
+                                target_indices.splice(0, 0, sorted_data[parseInt(next_right_id) - 1]['prev_right_id'] + 1);
+                            }
+                        }
+                    }
+                    if (current_index === -1) {
+                        continue;
+                    }
+                    if (set_prev_right_position_y &&
                         !target_indices.includes(sorted_data[parseInt(next_right_id) - 1]['prev_right_id'] + 1)) {
                         target_indices.splice(current_index + (block_pos === 'left' ? -1 : 2), 0,
                                               sorted_data[parseInt(next_right_id) - 1]['prev_right_id'] + 1);
-                        console.log(target_indices);
-                    } else if ('set_prev_left_position_y' in sorted_data[parseInt(next_right_id) - 1] &&
+                    } else if (set_prev_left_position_y &&
                                !target_indices.includes(sorted_data[parseInt(next_right_id) - 1]['prev_left_id'] + 1)) {
                         target_indices.splice(current_index + (block_pos === 'left' ? 2 : -1), 0,
                                               sorted_data[parseInt(next_right_id) - 1]['prev_left_id'] + 1);
