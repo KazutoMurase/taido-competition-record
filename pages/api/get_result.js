@@ -24,17 +24,59 @@ export default async (req, res) => {
             const next_left_id = sorted_data[i]['next_left_id'];
             if (next_left_id !== null && sorted_data[parseInt(next_left_id)-1] !== undefined) {
                 sorted_data[parseInt(next_left_id)-1]['has_left'] = true;
-                sorted_data[parseInt(next_left_id)-1]['round'] = sorted_data[i]['round'] + 1;
+                let update_round = sorted_data[i]['round'] + 1;
+                if ('round' in sorted_data[parseInt(next_left_id)-1] &&
+                    sorted_data[parseInt(next_left_id)-1]['round'] !== update_round) {
+                    if (sorted_data[parseInt(next_left_id)-1]['round'] < update_round) {
+                        if ('prev_left_id' in sorted_data[parseInt(next_left_id)-1]) {
+                            sorted_data[sorted_data[parseInt(next_left_id)-1]['prev_left_id']]['round'] = update_round - 1;
+                            sorted_data[parseInt(next_left_id)-1]['set_prev_left_position_y'] = true;
+                        } else if ('prev_right_id' in sorted_data[parseInt(next_left_id)-1]) {
+                            sorted_data[sorted_data[parseInt(next_left_id)-1]['prev_right_id']]['round'] = update_round - 1;
+                            sorted_data[parseInt(next_left_id)-1]['set_prev_right_position_y'] = true;
+                        }
+                    } else {
+                        update_round = sorted_data[parseInt(next_left_id)-1]['round'];
+                        if ('prev_left_id' in sorted_data[parseInt(next_left_id)-1]) {
+                            sorted_data[i]['round'] = update_round - 1;
+                        } else if ('prev_right_id' in sorted_data[parseInt(next_left_id)-1]) {
+                            sorted_data[i]['round'] = update_round - 1;
+                        }
+                    }
+                }
+                sorted_data[parseInt(next_left_id)-1]['round'] = update_round;
+                sorted_data[parseInt(next_left_id)-1]['prev_left_id'] = i;
                 if (set_position_y_by_next) {
-                    sorted_data[parseInt(next_left_id)-1]['set_prev_left_id'] = i;
+                    sorted_data[parseInt(next_left_id)-1]['set_prev_left_position_y'] = true;
                 }
             }
             const next_right_id = sorted_data[i]['next_right_id'];
             if (next_right_id !== null && sorted_data[parseInt(next_right_id)-1] !== undefined) {
                 sorted_data[parseInt(next_right_id)-1]['has_right'] = true;
-                sorted_data[parseInt(next_right_id)-1]['round'] = sorted_data[i]['round'] + 1;
+                let update_round = sorted_data[i]['round'] + 1;
+                if ('round' in sorted_data[parseInt(next_right_id)-1] &&
+                    sorted_data[parseInt(next_right_id)-1]['round'] !== update_round) {
+                    if (sorted_data[parseInt(next_right_id)-1]['round'] < update_round) {
+                        if ('prev_left_id' in sorted_data[parseInt(next_right_id)-1]) {
+                            sorted_data[sorted_data[parseInt(next_right_id)-1]['prev_left_id']]['round'] = update_round - 1;
+                            sorted_data[parseInt(next_right_id)-1]['set_prev_left_position_y'] = true;
+                        } else if ('prev_right_id' in sorted_data[parseInt(next_right_id)-1]) {
+                            sorted_data[sorted_data[parseInt(next_right_id)-1]['prev_right_id']]['round'] = update_round - 1;
+                            sorted_data[parseInt(next_right_id)-1]['set_prev_right_position_y'] = true;
+                        }
+                    } else {
+                        update_round = sorted_data[parseInt(next_right_id)-1]['round'];
+                        if ('prev_left_id' in sorted_data[parseInt(next_right_id)-1]) {
+                            sorted_data[i]['round'] = update_round - 1;
+                        } else if ('prev_right_id' in sorted_data[parseInt(next_right_id)-1]) {
+                            sorted_data[i]['round'] = update_round - 1;
+                        }
+                    }
+                }
+                sorted_data[parseInt(next_right_id)-1]['round'] = update_round;
+                sorted_data[parseInt(next_right_id)-1]['prev_right_id'] = i;
                 if (set_position_y_by_next) {
-                    sorted_data[parseInt(next_right_id)-1]['set_prev_right_id'] = i;
+                    sorted_data[parseInt(next_right_id)-1]['set_prev_right_position_y'] = true;
                 }
             }
             if (round_num[sorted_data[i]['round']] === undefined) {
@@ -82,26 +124,26 @@ export default async (req, res) => {
                     continue;
                 }
                 if (next_left_id !== null) {
-                    if ('set_prev_right_id' in sorted_data[parseInt(next_left_id) - 1] &&
-                       !target_indices.includes(sorted_data[parseInt(next_left_id) - 1]['set_prev_right_id'] + 1)) {
+                    if ('set_prev_right_position_y' in sorted_data[parseInt(next_left_id) - 1] &&
+                       !target_indices.includes(sorted_data[parseInt(next_left_id) - 1]['prev_right_id'] + 1)) {
                         target_indices.splice(current_index + (block_pos === 'left' ? 2 : -1), 0,
-                                              sorted_data[parseInt(next_left_id) - 1]['set_prev_right_id'] + 1);
-                    } else if ('set_prev_left_id' in sorted_data[parseInt(next_left_id) - 1] &&
-                              !target_indices.includes(sorted_data[parseInt(next_left_id) - 1]['set_prev_left_id'] + 1)) {
+                                              sorted_data[parseInt(next_left_id) - 1]['prev_right_id'] + 1);
+                    } else if ('set_prev_left_position_y' in sorted_data[parseInt(next_left_id) - 1] &&
+                              !target_indices.includes(sorted_data[parseInt(next_left_id) - 1]['prev_left_id'] + 1)) {
                         target_indices.splice(current_index + (block_pos === 'left' ? -1 : 2), 0,
-                                              sorted_data[parseInt(next_left_id) - 1]['set_prev_left_id'] + 1);
+                                              sorted_data[parseInt(next_left_id) - 1]['prev_left_id'] + 1);
                     }
                 }
                 if (next_right_id !== null) {
-                    if ('set_prev_right_id' in sorted_data[parseInt(next_right_id) - 1] &&
-                        !target_indices.includes(sorted_data[parseInt(next_right_id) - 1]['set_prev_right_id'] + 1)) {
+                    if ('set_prev_right_position_y' in sorted_data[parseInt(next_right_id) - 1] &&
+                        !target_indices.includes(sorted_data[parseInt(next_right_id) - 1]['prev_right_id'] + 1)) {
                         target_indices.splice(current_index + (block_pos === 'left' ? -1 : 2), 0,
-                                              sorted_data[parseInt(next_right_id) - 1]['set_prev_right_id'] + 1);
+                                              sorted_data[parseInt(next_right_id) - 1]['prev_right_id'] + 1);
                         console.log(target_indices);
-                    } else if ('set_prev_left_id' in sorted_data[parseInt(next_right_id) - 1] &&
-                               !target_indices.includes(sorted_data[parseInt(next_right_id) - 1]['set_prev_left_id'] + 1)) {
+                    } else if ('set_prev_left_position_y' in sorted_data[parseInt(next_right_id) - 1] &&
+                               !target_indices.includes(sorted_data[parseInt(next_right_id) - 1]['prev_left_id'] + 1)) {
                         target_indices.splice(current_index + (block_pos === 'left' ? 2 : -1), 0,
-                                              sorted_data[parseInt(next_right_id) - 1]['set_prev_left_id'] + 1);
+                                              sorted_data[parseInt(next_right_id) - 1]['prev_left_id'] + 1);
                     }
                 }
                 continue;
