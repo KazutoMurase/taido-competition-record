@@ -1,5 +1,16 @@
 import conn from '../../lib/db'
 
+
+function update(sorted_data, item, value) {
+    if ('prev_left_id' in item) {
+        update(sorted_data, sorted_data[item['prev_left_id']], value);
+    }
+    if ('prev_right_id' in item) {
+        update(sorted_data, sorted_data[item['prev_right_id']], value);
+    }
+    item['block_pos'] = value;
+}
+
 export default async (req, res) => {
     try {
         const event_name = req.query.event_name;
@@ -85,7 +96,17 @@ export default async (req, res) => {
                 round_num[sorted_data[i]['round']] += 1;
             }
         }
-        // set left or right block and vertical order
+        // set block pos
+        if (sorted_data.length > 3 &&
+            'prev_left_id' in sorted_data[sorted_data.length - 1] &&
+            'prev_right_id' in sorted_data[sorted_data.length - 1] ) {
+            sorted_data[sorted_data.length - 1]['block_pos'] = 'center';
+            sorted_data[sorted_data.length - 2]['block_pos'] = 'center';
+            const left_block_id = sorted_data[sorted_data.length - 1]['prev_left_id'];
+            const right_block_id = sorted_data[sorted_data.length - 1]['prev_right_id'];
+            update(sorted_data, sorted_data[left_block_id], 'left');
+            update(sorted_data, sorted_data[right_block_id], 'right');
+        }
         let left_block_indices = [];
         let right_block_indices = [];
         for (let i = 0; i < sorted_data.length; i++) {
@@ -98,13 +119,6 @@ export default async (req, res) => {
             }
             if (round_num[round] > 1) {
                 sorted_data[i]['game_id'] = game_id;
-                if (game_id <= round_num[round] / 2) {
-                    sorted_data[i]['block_pos'] = 'left';
-                } else {
-                    sorted_data[i]['block_pos'] = 'right';
-                }
-            } else {
-                sorted_data[i]['block_pos'] = 'center';
             }
             // insert to block indices
             if (round === 1) {
