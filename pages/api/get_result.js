@@ -9,20 +9,33 @@ export default async (req, res) => {
         // set round 0, 1, ...
         let round_num = {};
         for (let i = 0; i < sorted_data.length; i++) {
+            // TODO: fix round 1 or 2 when next_round is different for round 3?
+            let set_position_y_by_next = false;
             if (i == sorted_data.length - 2) {
                 sorted_data[i]['fake_round'] = sorted_data[i-1]['round'] + 1;
             } else if (!('round' in sorted_data[i])) {
-                sorted_data[i]['round'] = 1;
+                if (i === 0 || sorted_data[i-1]['round'] === 1) {
+                    sorted_data[i]['round'] = 1;
+                } else {
+                    sorted_data[i]['round'] = 2;
+                    set_position_y_by_next = true;
+                }
             }
             const next_left_id = sorted_data[i]['next_left_id'];
             if (next_left_id !== null && sorted_data[parseInt(next_left_id)-1] !== undefined) {
                 sorted_data[parseInt(next_left_id)-1]['has_left'] = true;
                 sorted_data[parseInt(next_left_id)-1]['round'] = sorted_data[i]['round'] + 1;
+                if (set_position_y_by_next) {
+                    sorted_data[parseInt(next_left_id)-1]['set_prev_left_id'] = i;
+                }
             }
             const next_right_id = sorted_data[i]['next_right_id'];
             if (next_right_id !== null && sorted_data[parseInt(next_right_id)-1] !== undefined) {
                 sorted_data[parseInt(next_right_id)-1]['has_right'] = true;
                 sorted_data[parseInt(next_right_id)-1]['round'] = sorted_data[i]['round'] + 1;
+                if (set_position_y_by_next) {
+                    sorted_data[parseInt(next_right_id)-1]['set_prev_right_id'] = i;
+                }
             }
             if (round_num[sorted_data[i]['round']] === undefined) {
                 round_num[sorted_data[i]['round']] = 1;
@@ -62,6 +75,35 @@ export default async (req, res) => {
             const next_left_id = sorted_data[i]['next_left_id'];
             const next_right_id = sorted_data[i]['next_right_id'];
             if (round > 1) {
+                const block_pos = sorted_data[i]['block_pos'];
+                let target_indices = (block_pos === 'left' ? left_block_indices : right_block_indices);
+                const current_index = target_indices.indexOf(sorted_data[i]['id']);
+                if (current_index === -1) {
+                    continue;
+                }
+                if (next_left_id !== null) {
+                    if ('set_prev_right_id' in sorted_data[parseInt(next_left_id) - 1] &&
+                       !target_indices.includes(sorted_data[parseInt(next_left_id) - 1]['set_prev_right_id'] + 1)) {
+                        target_indices.splice(current_index + (block_pos === 'left' ? 2 : -1), 0,
+                                              sorted_data[parseInt(next_left_id) - 1]['set_prev_right_id'] + 1);
+                    } else if ('set_prev_left_id' in sorted_data[parseInt(next_left_id) - 1] &&
+                              !target_indices.includes(sorted_data[parseInt(next_left_id) - 1]['set_prev_left_id'] + 1)) {
+                        target_indices.splice(current_index + (block_pos === 'left' ? -1 : 2), 0,
+                                              sorted_data[parseInt(next_left_id) - 1]['set_prev_left_id'] + 1);
+                    }
+                }
+                if (next_right_id !== null) {
+                    if ('set_prev_right_id' in sorted_data[parseInt(next_right_id) - 1] &&
+                        !target_indices.includes(sorted_data[parseInt(next_right_id) - 1]['set_prev_right_id'] + 1)) {
+                        target_indices.splice(current_index + (block_pos === 'left' ? -1 : 2), 0,
+                                              sorted_data[parseInt(next_right_id) - 1]['set_prev_right_id'] + 1);
+                        console.log(target_indices);
+                    } else if ('set_prev_left_id' in sorted_data[parseInt(next_right_id) - 1] &&
+                               !target_indices.includes(sorted_data[parseInt(next_right_id) - 1]['set_prev_left_id'] + 1)) {
+                        target_indices.splice(current_index + (block_pos === 'left' ? 2 : -1), 0,
+                                              sorted_data[parseInt(next_right_id) - 1]['set_prev_left_id'] + 1);
+                    }
+                }
                 continue;
             }
             if (next_left_id !== null &&

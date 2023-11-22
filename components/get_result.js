@@ -434,7 +434,7 @@ function GetResult({editable = false, updateInterval = 0, returnUrl = null, even
     } else if (event_name === 'hokei_woman') {
         event_full_name = '女子個人法形競技';
     } else if (event_name === 'zissen_woman') {
-        event_full_name = '男子個人実戦競技';
+        event_full_name = '女子個人実戦競技';
     }
   return (
           <div>
@@ -449,7 +449,7 @@ function GetResult({editable = false, updateInterval = 0, returnUrl = null, even
           {sortedData.map((item, index) => (
               createBlock(item, lineWidth, editable, event_name, returnUrl)
           ))}
-          {sortedData.map((item, index) => (
+      {sortedData.map((item, index) => (
               createText(item)
           ))
           }
