@@ -3,7 +3,13 @@ import conn from '../../lib/db'
 export default async (req, res) => {
     try {
         const block_number = req.query.block_number;
-        let query = 'SELECT t1.event_id FROM current_block_' + block_number + ' AS t0 LEFT JOIN block_' + block_number + ' AS t1 ON t0.id = t1.id';
+        let query;
+        if (req.query.schedule_id !== undefined &&
+            req.query.schedule_id !== null) {
+            query = 'SELECT event_id FROM block_' + block_number + ' WHERE id = ' + req.query.schedule_id;
+        } else {
+            query = 'SELECT t1.event_id FROM current_block_' + block_number + ' AS t0 LEFT JOIN block_' + block_number + ' AS t1 ON t0.id = t1.id';
+        }
         const result = await conn.query(query);
         const event_id = result.rows[0].event_id;
         if (event_id === 1) {
