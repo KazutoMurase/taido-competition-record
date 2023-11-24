@@ -403,13 +403,13 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
     );
 }
 
-function GetResult({editable = false, updateInterval = 0, returnUrl = null, event_name = null, isAdmin = false}) {
+function GetResult({editable = false, updateInterval = 0, returnUrl = null, event_name = null, block_number = null}) {
     const router = useRouter();
     if (returnUrl === null) {
         returnUrl = event_name + '_result';
     }
     const onBack = () => {
-        router.push('/admin');
+        router.push('/admin/block?block_number=' + block_number);
     }
 
     const [data, setData] = useState([]);
@@ -463,9 +463,11 @@ function GetResult({editable = false, updateInterval = 0, returnUrl = null, even
           }
           </Layer>
           </Stage>
-          {isAdmin ?
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '1vh' }}>
+          {block_number !== null ?
            <Button variant="contained" type="submit" onClick={e => onBack()}>戻る</Button> : <></>
           }
+          </Grid>
           </div>
   );
 }

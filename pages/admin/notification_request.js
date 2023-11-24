@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import axios from 'axios';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
@@ -33,6 +34,10 @@ function Home() {
   const handleRadioButtonChange = (event) => {
       setSelectedRadioButton(event.target.value);
   };
+    const router = useRouter();
+    const ToBack = () => {
+        router.push("/admin");
+    }
 
   const [data, setData] = useState([]);
   useEffect(() => {
@@ -87,6 +92,10 @@ function Home() {
           <br />
           <Button variant="contained" type="submit" onClick={e => onClearAll()}>全呼び出し完了</Button>
           </Grid>
+          </Grid>
+          <br/><br/>
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '1vh' }}>
+          <Button variant="contained" type="submit" onClick={e => ToBack()}>戻る</Button>
           </Grid>
           </div>
   );

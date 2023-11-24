@@ -28,7 +28,7 @@ const Home = () => {
             <br />
             <hr />
             {data.map((item, index) => (
-                    <GetResult updateInterval={3000} event_name={item} isAdmin={true} />
+                    <GetResult updateInterval={3000} event_name={item} block_number={block_number} />
             ))}
             </>
     );

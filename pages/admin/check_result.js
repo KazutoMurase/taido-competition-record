@@ -24,7 +24,7 @@ const Home = () => {
         return (
                 <>
                 {data.map((item, index) => (
-                        <GetResult editable={true} event_name={item} returnUrl={return_url} isAdmin={true} />
+                        <GetResult editable={true} event_name={item} returnUrl={return_url} block_number={block_number} />
                 ))}
             </>
         );
