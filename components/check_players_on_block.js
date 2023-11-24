@@ -42,6 +42,15 @@ function onClear(id) {
 
 function CheckPlayers({block_number, schedule_id}) {
     const router = useRouter();
+    let left_retire_array = {};
+    let right_retire_array = {};
+    function onUpdate(game_id, is_left) {
+        if (is_left) {
+            left_retire_array[game_id] = true;
+        } else {
+            right_retire_array[game_id] = true;
+        }
+    }
     function onFinish(block_number, schedule_id) {
         let post = {schedule_id: schedule_id,
                     block_number: block_number
@@ -112,7 +121,7 @@ function CheckPlayers({block_number, schedule_id}) {
                   <td><SquareTwoToneIcon sx={{ fontSize: 60 }} htmlColor={item['color'] === 'red' ? 'red' : 'gray'} /></td>
                   <td>{item['name']}({item['name_kana']})</td>
                   <td className={checkStyles.elem}><input type='checkbox' className={checkStyles.large_checkbox} /></td>
-                  <td className={checkStyles.elem}><input type='checkbox' className={checkStyles.large_checkbox} /></td>
+                  <td className={checkStyles.elem}><input type='checkbox' className={checkStyles.large_checkbox} onChange={onUpdate(item.game_id, item.is_left)}/></td>
                   <td><Button variant="contained" type="submit" onClick={e => onSubmit(item.id,
                                                                                        block_number,
                                                                                        item.event_id)} style={!item['requested'] ? null : activeButtonStyle}>{!item['requested'] ? '　呼び出し　' : 'リクエスト済'}

@@ -32,17 +32,63 @@ export default async (req, res) => {
         const sorted_data = result_schedule.rows.sort((a, b) => a.id - b.id);
         // set round 0, 1,...until (without final and before final)
         let round_num = {};
-        for (let i = 0; i < sorted_data.length - 2; i++) {
-            if (!('round' in sorted_data[i])) {
-                sorted_data[i]['round'] = 1;
+        for (let i = 0; i < sorted_data.length; i++) {
+            if (i == sorted_data.length - 2) {
+                sorted_data[i]['fake_round'] = sorted_data[i-1]['round'] + 1;
+            } else if (!('round' in sorted_data[i])) {
+                if (i === 0 || sorted_data[i-1]['round'] === 1) {
+                    sorted_data[i]['round'] = 1;
+                } else {
+                    sorted_data[i]['round'] = 2;
+                }
             }
             const next_left_id = sorted_data[i]['next_left_id'];
             if (next_left_id !== null && sorted_data[parseInt(next_left_id)-1] !== undefined) {
-                sorted_data[parseInt(next_left_id)-1]['round'] = sorted_data[i]['round'] + 1;
+                sorted_data[parseInt(next_left_id)-1]['has_left'] = true;
+                let update_round = sorted_data[i]['round'] + 1;
+                if ('round' in sorted_data[parseInt(next_left_id)-1] &&
+                    sorted_data[parseInt(next_left_id)-1]['round'] !== update_round) {
+                    if (sorted_data[parseInt(next_left_id)-1]['round'] < update_round) {
+                        if ('prev_left_id' in sorted_data[parseInt(next_left_id)-1]) {
+                            sorted_data[sorted_data[parseInt(next_left_id)-1]['prev_left_id']]['round'] = update_round - 1;
+                        } else if ('prev_right_id' in sorted_data[parseInt(next_left_id)-1]) {
+                            sorted_data[sorted_data[parseInt(next_left_id)-1]['prev_right_id']]['round'] = update_round - 1;
+                        }
+                    } else {
+                        update_round = sorted_data[parseInt(next_left_id)-1]['round'];
+                        if ('prev_left_id' in sorted_data[parseInt(next_left_id)-1]) {
+                            sorted_data[i]['round'] = update_round - 1;
+                        } else if ('prev_right_id' in sorted_data[parseInt(next_left_id)-1]) {
+                            sorted_data[i]['round'] = update_round - 1;
+                        }
+                    }
+                }
+                sorted_data[parseInt(next_left_id)-1]['round'] = update_round;
+                sorted_data[parseInt(next_left_id)-1]['prev_left_id'] = i;
             }
             const next_right_id = sorted_data[i]['next_right_id'];
             if (next_right_id !== null && sorted_data[parseInt(next_right_id)-1] !== undefined) {
-                sorted_data[parseInt(next_right_id)-1]['round'] = sorted_data[i]['round'] + 1;
+                sorted_data[parseInt(next_right_id)-1]['has_right'] = true;
+                let update_round = sorted_data[i]['round'] + 1;
+                if ('round' in sorted_data[parseInt(next_right_id)-1] &&
+                    sorted_data[parseInt(next_right_id)-1]['round'] !== update_round) {
+                    if (sorted_data[parseInt(next_right_id)-1]['round'] < update_round) {
+                        if ('prev_left_id' in sorted_data[parseInt(next_right_id)-1]) {
+                            sorted_data[sorted_data[parseInt(next_right_id)-1]['prev_left_id']]['round'] = update_round - 1;
+                        } else if ('prev_right_id' in sorted_data[parseInt(next_right_id)-1]) {
+                            sorted_data[sorted_data[parseInt(next_right_id)-1]['prev_right_id']]['round'] = update_round - 1;
+                        }
+                    } else {
+                        update_round = sorted_data[parseInt(next_right_id)-1]['round'];
+                        if ('prev_left_id' in sorted_data[parseInt(next_right_id)-1]) {
+                            sorted_data[i]['round'] = update_round - 1;
+                        } else if ('prev_right_id' in sorted_data[parseInt(next_right_id)-1]) {
+                            sorted_data[i]['round'] = update_round - 1;
+                        }
+                    }
+                }
+                sorted_data[parseInt(next_right_id)-1]['round'] = update_round;
+                sorted_data[parseInt(next_right_id)-1]['prev_right_id'] = i;
             }
             if (round_num[sorted_data[i]['round']] === undefined) {
                 round_num[sorted_data[i]['round']] = 1;

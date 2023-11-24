@@ -29,25 +29,72 @@ export default async (req, res) => {
         const sorted_data = result_schedule.rows.sort((a, b) => a.id - b.id);
         // set round 0, 1,...until (without final and before final)
         let round_num = {};
-        for (let i = 0; i < sorted_data.length - 2; i++) {
-            if (!('round' in sorted_data[i])) {
-                sorted_data[i]['round'] = 1;
+        for (let i = 0; i < sorted_data.length; i++) {
+            if (i == sorted_data.length - 2) {
+                sorted_data[i]['fake_round'] = sorted_data[i-1]['round'] + 1;
+            } else if (!('round' in sorted_data[i])) {
+                if (i === 0 || sorted_data[i-1]['round'] === 1) {
+                    sorted_data[i]['round'] = 1;
+                } else {
+                    sorted_data[i]['round'] = 2;
+                }
             }
             const next_left_id = sorted_data[i]['next_left_id'];
             if (next_left_id !== null && sorted_data[parseInt(next_left_id)-1] !== undefined) {
-                sorted_data[parseInt(next_left_id)-1]['round'] = sorted_data[i]['round'] + 1;
+                sorted_data[parseInt(next_left_id)-1]['has_left'] = true;
+                let update_round = sorted_data[i]['round'] + 1;
+                if ('round' in sorted_data[parseInt(next_left_id)-1] &&
+                    sorted_data[parseInt(next_left_id)-1]['round'] !== update_round) {
+                    if (sorted_data[parseInt(next_left_id)-1]['round'] < update_round) {
+                        if ('prev_left_id' in sorted_data[parseInt(next_left_id)-1]) {
+                            sorted_data[sorted_data[parseInt(next_left_id)-1]['prev_left_id']]['round'] = update_round - 1;
+                        } else if ('prev_right_id' in sorted_data[parseInt(next_left_id)-1]) {
+                            sorted_data[sorted_data[parseInt(next_left_id)-1]['prev_right_id']]['round'] = update_round - 1;
+                        }
+                    } else {
+                        update_round = sorted_data[parseInt(next_left_id)-1]['round'];
+                        if ('prev_left_id' in sorted_data[parseInt(next_left_id)-1]) {
+                            sorted_data[i]['round'] = update_round - 1;
+                        } else if ('prev_right_id' in sorted_data[parseInt(next_left_id)-1]) {
+                            sorted_data[i]['round'] = update_round - 1;
+                        }
+                    }
+                }
+                sorted_data[parseInt(next_left_id)-1]['round'] = update_round;
+                sorted_data[parseInt(next_left_id)-1]['prev_left_id'] = i;
             }
             const next_right_id = sorted_data[i]['next_right_id'];
             if (next_right_id !== null && sorted_data[parseInt(next_right_id)-1] !== undefined) {
-                sorted_data[parseInt(next_right_id)-1]['round'] = sorted_data[i]['round'] + 1;
+                sorted_data[parseInt(next_right_id)-1]['has_right'] = true;
+                let update_round = sorted_data[i]['round'] + 1;
+                if ('round' in sorted_data[parseInt(next_right_id)-1] &&
+                    sorted_data[parseInt(next_right_id)-1]['round'] !== update_round) {
+                    if (sorted_data[parseInt(next_right_id)-1]['round'] < update_round) {
+                        if ('prev_left_id' in sorted_data[parseInt(next_right_id)-1]) {
+                            sorted_data[sorted_data[parseInt(next_right_id)-1]['prev_left_id']]['round'] = update_round - 1;
+                        } else if ('prev_right_id' in sorted_data[parseInt(next_right_id)-1]) {
+                            sorted_data[sorted_data[parseInt(next_right_id)-1]['prev_right_id']]['round'] = update_round - 1;
+                        }
+                    } else {
+                        update_round = sorted_data[parseInt(next_right_id)-1]['round'];
+                        if ('prev_left_id' in sorted_data[parseInt(next_right_id)-1]) {
+                            sorted_data[i]['round'] = update_round - 1;
+                        } else if ('prev_right_id' in sorted_data[parseInt(next_right_id)-1]) {
+                            sorted_data[i]['round'] = update_round - 1;
+                        }
+                    }
+                }
+                sorted_data[parseInt(next_right_id)-1]['round'] = update_round;
+                sorted_data[parseInt(next_right_id)-1]['prev_right_id'] = i;
             }
+        }
+        for (let i = 0; i < sorted_data.length; i++) {
             if (round_num[sorted_data[i]['round']] === undefined) {
                 round_num[sorted_data[i]['round']] = 1;
             } else {
                 round_num[sorted_data[i]['round']] += 1;
             }
         }
-        console.log(sorted_data);
         query = `SELECT player_id FROM notification_request`;
         const result_requested = await conn.query(query);
         const requested_data = result_requested.rows;
@@ -57,8 +104,8 @@ export default async (req, res) => {
             for (let j = 0; j < sorted_data.length; j++) {
                 if ('round' in sorted_data[j] &&
                    data[i].id === sorted_data[j].id) {
-                    const round = sorted_data[i]['round'];
-                    let game_id = sorted_data[i]['id'];
+                    const round = sorted_data[j]['round'];
+                    let game_id = sorted_data[j]['id'];
                     for (let k = 0; k < round - 1; k++) {
                         game_id -= round_num[k+1];
                     }
@@ -80,6 +127,8 @@ export default async (req, res) => {
                                 }
                             }
                             result_array.push({'id': data[i].left_player_id,
+                                               'game_id': sorted_data[j].id,
+                                               'is_left': true,
                                                'event_id': block_result.rows[0].event_id,
                                                'name': data[i].left_name,
                                                'name_kana': data[i].left_name_kana,
@@ -104,6 +153,8 @@ export default async (req, res) => {
                                 }
                             }
                             result_array.push({'id': data[i].right_player_id,
+                                               'game_id': sorted_data[j].id,
+                                               'is_left': false,
                                                'event_id': block_result.rows[0].event_id,
                                                'name': data[i].right_name,
                                                'name_kana': data[i].right_name_kana,

@@ -44,6 +44,9 @@ function GamesOnBlock({block_number, event_name, schedule_id}) {
           clearInterval(interval);
       };
   }, []);
+    const retireButtonStyle = {
+        backgroundColor: 'gray'
+    };
 
   return (
           <div>
@@ -58,6 +61,8 @@ function GamesOnBlock({block_number, event_name, schedule_id}) {
           <th>選手(白)</th>
           <th>カナ</th>
           <th>順序変更</th>
+          {event_name.includes('zissen') ? (<th>赤棄権</th>) : (<></>)}
+          {event_name.includes('zissen') ? (<th>白棄権</th>) : (<></>)}
           </tr>
           {data.map((item, index) => (
                   <tr className={checkStyles.column} bgcolor={'current' in item ? 'yellow' : 'white'}>
@@ -88,6 +93,8 @@ function GamesOnBlock({block_number, event_name, schedule_id}) {
                    (<span>{item['left_color'] === 'red' ? item['right_name_kana'] : item['left_name_kana']}</span>)}
                       </td>
                   <td><Button variant="contained" type="submit" onClick={e => onMoveDown(item.order_id, block_number)}>▼</Button></td>
+                  {event_name.includes('zissen') ? (<td><Button style={retireButtonStyle} variant="contained" type="submit" onClick={e => onMoveDown(item.order_id, block_number)}>OK</Button></td>) : (<></>)}
+                  {event_name.includes('zissen') ? (<td><Button style={retireButtonStyle} variant="contained" type="submit" onClick={e => onMoveDown(item.order_id, block_number)}>OK</Button></td>) : (<></>)}
                   </tr>
           ))}
           </tbody>
