@@ -41,6 +41,19 @@ function onClear(id) {
 }
 
 function CheckPlayers({block_number, schedule_id}) {
+    const router = useRouter();
+    function onFinish(block_number, schedule_id) {
+        let post = {schedule_id: schedule_id,
+                    block_number: block_number
+                   };
+        axios.post('/api/complete_players_check', post)
+            .then((response) => {
+                console.log(response);
+            })
+            .catch((e) => { console.log(e)})
+        router.push("/admin");
+    }
+
   const [selectedRadioButton, setSelectedRadioButton] = useState(null);
 
   const handleRadioButtonChange = (event) => {
@@ -97,7 +110,10 @@ function CheckPlayers({block_number, schedule_id}) {
                   <td>{item['name']}({item['name_kana']})</td>
                   <td className={checkStyles.elem}><input type='checkbox' className={checkStyles.large_checkbox} /></td>
                   <td className={checkStyles.elem}><input type='checkbox' className={checkStyles.large_checkbox} /></td>
-                  <td><Button variant="contained" type="submit" onClick={e => onSubmit(item.id, block_number, item.event_id)} style={!item['requested'] ? null : activeButtonStyle}>{!item['requested'] ? '　呼び出し　' : 'リクエスト済'}</Button></td>
+                  <td><Button variant="contained" type="submit" onClick={e => onSubmit(item.id,
+                                                                                       block_number,
+                                                                                       item.event_id)} style={!item['requested'] ? null : activeButtonStyle}>{!item['requested'] ? '　呼び出し　' : 'リクエスト済'}
+              </Button></td>
                   <td><Button variant="contained" type="submit" onClick={e => onClear(item.id)} disabled={!item['requested']}>キャンセル</Button></td>
               </tr>
           ))}
@@ -108,7 +124,7 @@ function CheckPlayers({block_number, schedule_id}) {
           <Grid item xs={4} />
           <Grid item xs={2}>
           <br />
-          <Button variant="contained" type="submit">決定</Button>
+          <Button variant="contained" type="submit" onClick={e => onFinish(block_number, schedule_id)}>決定</Button>
           </Grid>
           </Grid>
           </div>
