@@ -435,6 +435,8 @@ function GetResult({editable = false, updateInterval = 0, returnUrl = null, even
         event_full_name = '女子個人法形競技';
     } else if (event_name === 'zissen_woman') {
         event_full_name = '女子個人実戦競技';
+    } else if (event_name === 'hokei_sonen') {
+        event_full_name = '壮年法形競技';
     }
   return (
           <div>

@@ -14,6 +14,8 @@ export default async (req, res) => {
             game_type_name = 'zissen_woman';
         } else if (result.rows[0].event_id === 4) {
             game_type_name = 'hokei_woman';
+        } else if (result.rows[0].event_id === 5) {
+            game_type_name = 'hokei_sonen';
         }
         query = 'SELECT game_id from ' + block_name + '_games where order_id = $1 and schedule_id = $2';
         let values = [result.rows[0].game_id, result.rows[0].id];

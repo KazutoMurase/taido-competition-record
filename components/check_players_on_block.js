@@ -8,7 +8,7 @@ import checkStyles from '../styles/checks.module.css';
 import { useRouter } from 'next/router';
 
 
-function onSubmit(id, block_number) {
+function onSubmit(id, block_number, event_id) {
     // TODO: FIXME
     let court_id;
     if (block_number === 'a') {
@@ -20,7 +20,7 @@ function onSubmit(id, block_number) {
     } else if (block_number === 'd') {
         court_id = 4;
     }
-    let post = {event_id: 2,
+    let post = {event_id: event_id,
                 player_id: id,
                 court_id: court_id
                 };
@@ -97,7 +97,7 @@ function CheckPlayers({block_number, schedule_id}) {
                   <td>{item['name']}({item['name_kana']})</td>
                   <td className={checkStyles.elem}><input type='checkbox' className={checkStyles.large_checkbox} /></td>
                   <td className={checkStyles.elem}><input type='checkbox' className={checkStyles.large_checkbox} /></td>
-                  <td><Button variant="contained" type="submit" onClick={e => onSubmit(item.id, block_number)} style={!item['requested'] ? null : activeButtonStyle}>{!item['requested'] ? '　呼び出し　' : 'リクエスト済'}</Button></td>
+                  <td><Button variant="contained" type="submit" onClick={e => onSubmit(item.id, block_number, item.event_id)} style={!item['requested'] ? null : activeButtonStyle}>{!item['requested'] ? '　呼び出し　' : 'リクエスト済'}</Button></td>
                   <td><Button variant="contained" type="submit" onClick={e => onClear(item.id)} disabled={!item['requested']}>キャンセル</Button></td>
               </tr>
           ))}

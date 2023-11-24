@@ -14,6 +14,8 @@ export default async (req, res) => {
             res.json(['zissen_woman']);
         } else if (event_id === 4) {
             res.json(['hokei_woman']);
+        } else if (event_id === 5) {
+            res.json(['hokei_sonen']);
         }
     } catch (error) {
         console.log(error);

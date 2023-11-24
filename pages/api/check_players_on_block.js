@@ -16,6 +16,8 @@ export default async (req, res) => {
             event_name = 'zissen_woman';
         } else if (block_result.rows[0].event_id === 4) {
             event_name = 'hokei_woman';
+        } else if (block_result.rows[0].event_id === 5) {
+            event_name = 'hokei_sonen';
         }
         query = 'SELECT t1.id, t2.id AS left_player_id, t3.id AS right_player_id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t3.name AS right_name, t2.name_kana AS left_name_kana, t3.name_kana AS right_name_kana FROM ' + block_name + '_games AS t0 LEFT JOIN ' + event_name + ' AS t1 ON t0.game_id = t1.id LEFT JOIN players AS t2 ON t1.left_player_id = t2.' + event_name + '_player_id LEFT JOIN players AS t3 ON t1.right_player_id = t3.' + event_name + '_player_id where t0.schedule_id = $1';
         const result = await conn.query(query, [schedule_id]);
@@ -78,6 +80,7 @@ export default async (req, res) => {
                                 }
                             }
                             result_array.push({'id': data[i].left_player_id,
+                                               'event_id': block_result.rows[0].event_id,
                                                'name': data[i].left_name,
                                                'name_kana': data[i].left_name_kana,
                                                'requested': requested,
@@ -101,6 +104,7 @@ export default async (req, res) => {
                                 }
                             }
                             result_array.push({'id': data[i].right_player_id,
+                                               'event_id': block_result.rows[0].event_id,
                                                'name': data[i].right_name,
                                                'name_kana': data[i].right_name_kana,
                                                'requested': requested,
