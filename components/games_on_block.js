@@ -63,11 +63,30 @@ function GamesOnBlock({block_number, event_name, schedule_id}) {
                   <tr className={checkStyles.column} bgcolor={'current' in item ? 'yellow' : 'white'}>
                   {event_name.includes('hokei') ? (<td>{item['round'] <= 2 ? '指定法形' : '自由法形'}</td>) : (<></>)}
                   <td>{item['left_color'] === 'red' ? item['left_group_name'] : item['right_group_name']}</td>
-                  <td>{item['left_color'] === 'red' ? item['left_name'] : item['right_name']}</td>
-                  <td>{item['left_color'] === 'red' ? item['left_name_kana'] : item['right_name_kana']}</td>
-                  <td>{item['left_color'] === 'red' ? item['right_group_name'] : item['left_group_name']}</td>
-                  <td>{item['left_color'] === 'red' ? item['right_name'] : item['left_name']}</td>
-                  <td>{item['left_color'] === 'red' ? item['right_name_kana'] : item['left_name_kana']}</td>
+                  <td>
+                  {((item['left_color'] === 'red' && item['left_retire']) || (item['left_color'] !== 'red' && item['right_retire'])) ? (
+                          <s>{item['left_color'] === 'red' ? item['left_name'] : item['right_name']}</s>) :
+                   (<span>{item['left_color'] === 'red' ? item['left_name'] : item['right_name']}</span>
+                  )}
+              </td>
+                  <td>
+                  {((item['left_color'] === 'red' && item['left_retire']) || (item['left_color'] !== 'red' && item['right_retire'])) ? (
+                          <s>{item['left_color'] === 'red' ? item['left_name_kana'] : item['right_name_kana']}</s>) :
+                   (<span>{item['left_color'] === 'red' ? item['left_name_kana'] : item['right_name_kana']}</span>)}
+              </td>
+                  <td>
+                  {item['left_color'] === 'red' ? item['right_group_name'] : item['left_group_name']}
+              </td>
+                  <td>
+                  {((item['left_color'] === 'red' && item['right_retire']) || (item['left_color'] !== 'red' && item['left_retire'])) ? (
+                          <s>{item['left_color'] === 'red' ? item['right_name'] : item['left_name']}</s>) :
+                   (<span>{item['left_color'] === 'red' ? item['right_name'] : item['left_name']}</span>)}
+                      </td>
+                  <td>
+                  {((item['left_color'] === 'red' && item['right_retire']) || (item['left_color'] !== 'red' && item['left_retire'])) ? (
+                          <s>{item['left_color'] === 'red' ? item['right_name_kana'] : item['left_name_kana']}</s>) :
+                   (<span>{item['left_color'] === 'red' ? item['right_name_kana'] : item['left_name_kana']}</span>)}
+                      </td>
                   <td><Button variant="contained" type="submit" onClick={e => onMoveDown(item.order_id, block_number)}>▼</Button></td>
                   </tr>
           ))}
