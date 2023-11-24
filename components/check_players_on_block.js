@@ -53,6 +53,9 @@ function CheckPlayers({block_number, schedule_id}) {
             .catch((e) => { console.log(e)})
         router.push("/admin");
     }
+    function onBack() {
+        router.push("/admin");
+    }
 
   const [selectedRadioButton, setSelectedRadioButton] = useState(null);
 
@@ -125,6 +128,8 @@ function CheckPlayers({block_number, schedule_id}) {
           <Grid item xs={2}>
           <br />
           <Button variant="contained" type="submit" onClick={e => onFinish(block_number, schedule_id)}>決定</Button>
+          &nbsp;&nbsp;
+          <Button variant="contained" type="submit" onClick={e => onBack()}>戻る</Button>
           </Grid>
           </Grid>
           </div>

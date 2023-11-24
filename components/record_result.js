@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import axios from 'axios';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
@@ -98,18 +99,22 @@ function ShowWhiteFlags(event_name, selectedRadioButton) {
     }
 }
 
-function RecordResult({block_number, event_name}) {
+function RecordResult({block_number, event_name, schedule_id}) {
   const [selectedRadioButton, setSelectedRadioButton] = useState(null);
 
   const handleRadioButtonChange = (event) => {
       setSelectedRadioButton(event.target.value);
   };
+        const router = useRouter();
 
   const [data, setData] = useState([]);
   useEffect(() => {
       async function fetchData() {
-      const response = await fetch('/api/current_block?block_number=' + block_number);
+      const response = await fetch('/api/current_block?block_number=' + block_number + "&schedule_id=" + schedule_id);
       const result = await response.json();
+      if (result.length === 0) {
+          router.push("/admin");
+      }
       setData(result);
       console.log(result.left_player_flag);
       if (result.left_player_flag !== null &&

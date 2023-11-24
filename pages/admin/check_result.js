@@ -10,24 +10,19 @@ const Home = () => {
     if (block_number === undefined) {
         return (<></>);
     }
-    const [data, setData] = useState([]);
-    useEffect(() => {
+     const [data, setData] = useState([]);
+        useEffect(() => {
             async function fetchData() {
-                let url = '/api/event_name?block_number=' + block_number + "&schedule_id=" + schedule_id;
+                const url = '/api/event_name?block_number=' + block_number + "&schedule_id=" + schedule_id;
                 const response = await fetch(url);
                 const result = await response.json();
                 setData(result);
             }
             fetchData();
         }, []);
-        const return_url = ("admin/record_result?block_number=" + block_number + "%26schedule_id=" + schedule_id);
+        const return_url = ("admin/check_result?block_number=" + block_number + "%26schedule_id=" + schedule_id);
         return (
                 <>
-                {data.map((item, index) => (
-                        <RecordResult block_number={block_number} event_name={item} schedule_id={schedule_id} />
-                ))}
-                <br />
-                <hr />
                 {data.map((item, index) => (
                         <GetResult editable={true} event_name={item} returnUrl={return_url} isAdmin={true} />
                 ))}

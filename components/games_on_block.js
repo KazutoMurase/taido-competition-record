@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import axios from 'axios';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
@@ -16,18 +17,23 @@ function onMoveDown(order_id, block_number) {
     window.location.reload();
 }
 
-function GamesOnBlock({block_number, event_name}) {
+
+function GamesOnBlock({block_number, event_name, schedule_id}) {
   const [selectedRadioButton, setSelectedRadioButton] = useState(null);
 
   const handleRadioButtonChange = (event) => {
       setSelectedRadioButton(event.target.value);
   };
+    const router = useRouter();
 
   const [data, setData] = useState([]);
   useEffect(() => {
       async function fetchData() {
-      const response = await fetch('/api/get_games_on_block?block_number=' + block_number);
+      const response = await fetch('/api/get_games_on_block?block_number=' + block_number + "&schedule_id=" + schedule_id);
       const result = await response.json();
+      if (result.length === 0) {
+          router.push("/admin");
+      }
       setData(result);
       }
     const interval = setInterval(() => {

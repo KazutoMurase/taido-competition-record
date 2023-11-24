@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
+import Button from '@mui/material/Button';
 import { Layer, Stage, Rect, Text } from "react-konva";
 import Grid from '@mui/material/Grid';
 
@@ -402,10 +403,15 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
     );
 }
 
-function GetResult({editable = false, updateInterval = 0, returnUrl = null, event_name = null}) {
+function GetResult({editable = false, updateInterval = 0, returnUrl = null, event_name = null, isAdmin = false}) {
+    const router = useRouter();
     if (returnUrl === null) {
         returnUrl = event_name + '_result';
     }
+    const onBack = () => {
+        router.push('/admin');
+    }
+
     const [data, setData] = useState([]);
     useEffect(() => {
       async function fetchData() {
@@ -457,6 +463,9 @@ function GetResult({editable = false, updateInterval = 0, returnUrl = null, even
           }
           </Layer>
           </Stage>
+          {isAdmin ?
+           <Button variant="contained" type="submit" onClick={e => onBack()}>戻る</Button> : <></>
+          }
           </div>
   );
 }

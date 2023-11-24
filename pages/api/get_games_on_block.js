@@ -17,9 +17,14 @@ export default async (req, res) => {
         } else if (result.rows[0].event_id === 5) {
             game_type_name = 'hokei_sonen';
         }
+        if (req.query.schedule_id !== undefined &&
+            parseInt(req.query.schedule_id) !== result.rows[0].id) {
+            res.json([]);
+            return;
+        }
+        let schedule_id = result.rows[0].id;
         query = 'SELECT game_id from ' + block_name + '_games where order_id = $1 and schedule_id = $2';
         let values = [result.rows[0].game_id, result.rows[0].id];
-        let schedule_id = result.rows[0].id;
         result = await conn.query(query, values);
         const current_id = (result.rows.length === 0 ? -1 : result.rows[0].game_id);
         console.log(current_id, schedule_id);

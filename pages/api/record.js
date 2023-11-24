@@ -27,8 +27,20 @@ export default async (req, res) => {
             }
         }
         const block_name = 'current_block_' + req.body.update_block;
-        query = 'update ' + block_name + ' set game_id = game_id + 1';
+        query = 'select id, game_id from ' + block_name;
         result = await conn.query(query);
+        const next_game_id = result.rows[0].game_id + 1;
+        const schedule_id = result.rows[0].id;
+        query = 'select id from block_' + req.body.update_block + '_games where order_id = ' + next_game_id + " and schedule_id = " + schedule_id;
+        result = await conn.query(query);
+        console.log(result.rows);
+        if (result.rows.length === 0) {
+            query = 'update ' + block_name + ' set id = id + 1, game_id = 1';
+            result = await conn.query(query);
+        } else {
+            query = 'update ' + block_name + ' set game_id = ' + next_game_id;
+            result = await conn.query(query);
+        }
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: 'Error fetching data'});

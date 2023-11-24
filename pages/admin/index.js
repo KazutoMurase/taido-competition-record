@@ -9,14 +9,14 @@ export default function Home() {
     const ToCheck = (block_number, id) => {
         router.push("/admin/check_players_on_block?block_number=" + block_number + "&schedule_id=" + id);
     };
-    const ToCall = (block_number) => {
-        router.push("/admin/games_on_block?block_number=" + block_number);
+    const ToCall = (block_number, id) => {
+        router.push("/admin/games_on_block?block_number=" + block_number + "&schedule_id=" + id);
     };
-    const ToRecord = (block_number) => {
-        router.push("/admin/record_result?block_number=" + block_number);
+    const ToRecord = (block_number, id) => {
+        router.push("/admin/record_result?block_number=" + block_number + "&schedule_id=" + id);
     };
     const ToUpdate = (block_number, id) => {
-        router.push("/admin/record_result?block_number=" + block_number + "&schedule_id=" + id);
+        router.push("/admin/check_result?block_number=" + block_number + "&schedule_id=" + id);
     };
     const [data, setData] = useState([]);
     const [current, setCurrent] = useState([]);
@@ -48,7 +48,10 @@ export default function Home() {
       return () => {
           clearInterval();
       };
-   }, []);
+  }, []);
+    const doneButtonStyle = {
+        backgroundColor: 'purple'
+    };
     return (
             <div>
             <h1>Aコート</h1>
@@ -58,17 +61,17 @@ export default function Home() {
             <th>競技</th><th>時間</th><th>試合番号</th><th>試合数</th><th></th>
             </tr>
             {data.map((item, index) => (
-                    <tr className={checkStyles.column}>
+                    <tr className={checkStyles.column} bgcolor={item['id'] === current.id ? 'yellow' : 'white'}>
                     <td>{item['name'].replace('\'', '').replace('\'', '')}</td>
                     <td>{item['time_schedule'].replace('\'', '').replace('\'', '')}</td>
                     <td>{item['games_text']}</td>
                     <td>{item['game_count'] + '試合'}</td>
                     <td>
-                    <Button variant="contained" type="submit" onClick={e => ToCheck(block_number, item['id'])}>{item['players_checked'] ? '点呼完了' : '　点呼　'}</Button>
+                    <Button variant="contained" type="submit" onClick={e => ToCheck(block_number, item['id'])} style={item['players_checked'] ? doneButtonStyle : null} >{item['players_checked'] ? '点呼完了' : '　点呼　'}</Button>
                     &nbsp;&nbsp;
-                    <Button variant="contained" type="submit" onClick={e => ToCall(block_number)} disabled={item['id'] !== current.id || !item['players_checked']}>呼び出し</Button>
+                    <Button variant="contained" type="submit" onClick={e => ToCall(block_number, item['id'])} disabled={item['id'] !== current.id || !item['players_checked']}>呼び出し</Button>
                     &nbsp;&nbsp;
-                    <Button variant="contained" type="submit" onClick={e => ToRecord(block_number)} disabled={item['id'] !== current.id || !item['players_checked']}>記録</Button>
+                    <Button variant="contained" type="submit" onClick={e => ToRecord(block_number, item['id'])} disabled={item['id'] !== current.id || !item['players_checked']}>記録</Button>
                     &nbsp;&nbsp;
                     <Button variant="contained" type="submit" onClick={e => ToUpdate(block_number, item['id'])} disabled={item['id'] > current.id || !item['players_checked']}>結果修正</Button>
                     </td>
