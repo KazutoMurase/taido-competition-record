@@ -164,7 +164,9 @@ function RecordResult({block_number, event_name, schedule_id}) {
           type="submit"
           onClick={e => onSubmit(data, no_game_red_winner, block_number, event_name)}>赤不戦勝</Button>
           <h3>{data.left_color === 'white' ? data.right_group_name : data.left_group_name}</h3>
-          <h1>{data.left_color === 'white' ? data.right_name : data.left_name}</h1>
+          {((data.left_color === 'white' && data.right_retire) || (data.left_color === 'red' && data.left_retire)) ?
+           (<s><h1>{data.left_color === 'white' ? data.right_name : data.left_name}</h1></s>) :
+           (<span><h1>{data.left_color === 'white' ? data.right_name : data.left_name}</h1></span>)}
           {ShowRedFlags(event_name, selectedRadioButton)}
           </Grid>
           <Grid item xs={4}>
@@ -172,7 +174,9 @@ function RecordResult({block_number, event_name, schedule_id}) {
                   type="submit"
           onClick={e => onSubmit(data, no_game_white_winner, block_number, event_name)}>白不戦勝</Button>
           <h3>{data.left_color === 'white' ? data.left_group_name : data.right_group_name}</h3>
-          <h1>{data.left_color === 'white' ? data.left_name : data.right_name}</h1>
+          {((data.left_color === 'white' && data.left_retire) || (data.left_color === 'red' && data.right_retire)) ?
+          (<s><h1>{data.left_color === 'white' ? data.left_name : data.right_name}</h1></s>) :
+          (<span><h1>{data.left_color === 'white' ? data.left_name : data.right_name}</h1></span>)}
           {ShowWhiteFlags(event_name, selectedRadioButton)}
           </Grid>
           <Grid item xs={3} />

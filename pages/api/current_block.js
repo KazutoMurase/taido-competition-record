@@ -27,7 +27,7 @@ export default async (req, res) => {
         let values = [result.rows[0].game_id, result.rows[0].id];
         result = await conn.query(query, values);
         let current_id = result.rows[0].game_id;
-        query = 'SELECT t1.id, t1.left_player_flag, t1.left_player_id, t1.right_player_id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t3.name AS right_name, t4.name AS left_group_name, t5.name AS right_group_name FROM ' + game_type_name + ' AS t1 LEFT JOIN players AS t2 ON t1.left_player_id = t2.' + game_type_name + '_player_id LEFT JOIN players AS t3 ON t1.right_player_id = t3.' + game_type_name + '_player_id LEFT JOIN groups AS t4 ON t2.group_id = t4.id LEFT JOIN groups AS t5 ON t3.group_id = t5.id';
+        query = 'SELECT t1.id, t1.left_player_flag, t1.left_player_id, t1.right_player_id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t3.name AS right_name, t4.name AS left_group_name, t5.name AS right_group_name, t1.left_retire, t1.right_retire FROM ' + game_type_name + ' AS t1 LEFT JOIN players AS t2 ON t1.left_player_id = t2.' + game_type_name + '_player_id LEFT JOIN players AS t3 ON t1.right_player_id = t3.' + game_type_name + '_player_id LEFT JOIN groups AS t4 ON t2.group_id = t4.id LEFT JOIN groups AS t5 ON t3.group_id = t5.id';
         const result_schedule = await conn.query(query);
         const sorted_data = result_schedule.rows.sort((a, b) => a.id - b.id);
         // set round 0, 1,...until (without final and before final)
