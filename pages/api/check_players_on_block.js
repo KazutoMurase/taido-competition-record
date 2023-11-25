@@ -24,7 +24,7 @@ export default async (req, res) => {
         const data = result.rows;
         console.log(result.rows);
 
-        query = 'SELECT t1.id, t1.next_left_id, t1.next_right_id FROM ' + event_name + ' AS t1';
+        query = 'SELECT t1.id, t1.next_left_id, t1.next_right_id, t1.left_retire, t1.right_retire FROM ' + event_name + ' AS t1';
         const result_schedule = await conn.query(query);
         const sorted_data = result_schedule.rows.sort((a, b) => a.id - b.id);
         // set round 0, 1,...until (without final and before final)
@@ -129,6 +129,7 @@ export default async (req, res) => {
                             result_array.push({'id': data[i].left_player_id,
                                                'game_id': sorted_data[j].id,
                                                'is_left': true,
+                                               'retire': sorted_data[j].left_retire,
                                                'event_id': block_result.rows[0].event_id,
                                                'name': data[i].left_name,
                                                'name_kana': data[i].left_name_kana,
@@ -155,6 +156,7 @@ export default async (req, res) => {
                             result_array.push({'id': data[i].right_player_id,
                                                'game_id': sorted_data[j].id,
                                                'is_left': false,
+                                               'retire': sorted_data[j].right_retire,
                                                'event_id': block_result.rows[0].event_id,
                                                'name': data[i].right_name,
                                                'name_kana': data[i].right_name_kana,

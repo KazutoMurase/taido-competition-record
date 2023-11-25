@@ -42,19 +42,53 @@ function onClear(id) {
 
 function CheckPlayers({block_number, schedule_id}) {
     const router = useRouter();
-    let left_retire_array = {};
-    let right_retire_array = {};
-    function onUpdate(game_id, is_left) {
-        if (is_left) {
-            left_retire_array[game_id] = true;
-        } else {
-            right_retire_array[game_id] = true;
-        }
+    function onBack() {
+        router.push("/admin/block?block_number=" + block_number);
     }
+
+    const [leftRetireStates, setLeftRetireStates] = useState([]);
+    const [rightRetireStates, setRightRetireStates] = useState([]);
+
+    const handleLeftRetireStatesChange = (id, is_retired) => {
+        setLeftRetireStates((prevRadios) => {
+        const radioExists = prevRadios.some((radio) => radio.id === id);
+        if (!radioExists) {
+            return [
+                ...prevRadios,
+                { id: id, is_retired: is_retired },
+            ];
+        }
+            return prevRadios.map((radio) =>
+                         radio.id === id
+                         ? { ...radio, is_retired: is_retired }
+                         : radio
+                                 )
+        });
+    };
+    const handleRightRetireStatesChange = (id, is_retired) => {
+        setRightRetireStates((prevRadios) => {
+        const radioExists = prevRadios.some((radio) => radio.id === id);
+        if (!radioExists) {
+            return [
+                ...prevRadios,
+                { id: id, is_retired: is_retired },
+            ];
+        }
+            return prevRadios.map((radio) =>
+                         radio.id === id
+                         ? { ...radio, is_retired: is_retired }
+                         : radio
+                                 )
+        });
+    };
+
     function onFinish(block_number, schedule_id) {
         let post = {schedule_id: schedule_id,
-                    block_number: block_number
+                    block_number: block_number,
+                    left_retire_array: leftRetireStates,
+                    right_retire_array: rightRetireStates,
                    };
+        console.log(post);
         axios.post('/api/complete_players_check', post)
             .then((response) => {
                 console.log(response);
@@ -62,15 +96,7 @@ function CheckPlayers({block_number, schedule_id}) {
             .catch((e) => { console.log(e)})
         router.push("/admin/block?block_number=" + block_number);
     }
-    function onBack() {
-        router.push("/admin/block?block_number=" + block_number);
-    }
 
-  const [selectedRadioButton, setSelectedRadioButton] = useState(null);
-
-  const handleRadioButtonChange = (event) => {
-      setSelectedRadioButton(event.target.value);
-  };
   let title;
 
   const [data, setData] = useState([]);
@@ -95,6 +121,24 @@ function CheckPlayers({block_number, schedule_id}) {
     const activeButtonStyle = {
         backgroundColor: 'purple'
     };
+
+    function CheckState(item, is_retired) {
+        if (item.is_left) {
+            for (let i = 0; i < leftRetireStates.length; i++) {
+                if (leftRetireStates[i]['id'] === item.game_id) {
+                    return (leftRetireStates[i]['is_retired'] == is_retired);
+                }
+            }
+        } else {
+            for (let i = 0; i < rightRetireStates.length; i++) {
+                if (rightRetireStates[i]['id'] === item.game_id) {
+                    return (rightRetireStates[i]['is_retired'] == is_retired);
+                }
+            }
+        }
+        let target_int = (is_retired ? 1 : 0);
+        return (item.retire !== null && item.retire === target_int);
+    }
   return (
           <div>
           <Grid container>
@@ -120,8 +164,14 @@ function CheckPlayers({block_number, schedule_id}) {
                   <tr className={checkStyles.column}>
                   <td><SquareTwoToneIcon sx={{ fontSize: 60 }} htmlColor={item['color'] === 'red' ? 'red' : 'gray'} /></td>
                   <td>{item['name']}({item['name_kana']})</td>
-                  <td className={checkStyles.elem}><input type='checkbox' className={checkStyles.large_checkbox} /></td>
-                  <td className={checkStyles.elem}><input type='checkbox' className={checkStyles.large_checkbox} onChange={onUpdate(item.game_id, item.is_left)}/></td>
+                  <td className={checkStyles.elem}>
+                  <input type='radio' name={index} className={checkStyles.large_checkbox} checked={CheckState(item, false)}
+              onChange={() => (item.is_left ? handleLeftRetireStatesChange(item.game_id, false) : handleRightRetireStatesChange(item.game_id, false))} />
+                  </td>
+                  <td className={checkStyles.elem}>
+                  <input type='radio' name={index}  className={checkStyles.large_checkbox} checked={CheckState(item, true)}
+              onChange={() => (item.is_left ? handleLeftRetireStatesChange(item.game_id, true) : handleRightRetireStatesChange(item.game_id, true))} />
+                  </td>
                   <td><Button variant="contained" type="submit" onClick={e => onSubmit(item.id,
                                                                                        block_number,
                                                                                        item.event_id)} style={!item['requested'] ? null : activeButtonStyle}>{!item['requested'] ? '　呼び出し　' : 'リクエスト済'}

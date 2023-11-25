@@ -90,6 +90,8 @@ export default async (req, res) => {
                 sorted_data[parseInt(next_right_id)-1]['round'] = update_round;
                 sorted_data[parseInt(next_right_id)-1]['prev_right_id'] = i;
             }
+        }
+        for (let i = 0; i < sorted_data.length; i++) {
             if (round_num[sorted_data[i]['round']] === undefined) {
                 round_num[sorted_data[i]['round']] = 1;
             } else {
