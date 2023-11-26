@@ -45,8 +45,63 @@ function GamesOnBlock({block_number, event_name, schedule_id}) {
       };
   }, []);
     const retireButtonStyle = {
-        backgroundColor: 'gray'
+        backgroundColor: 'gray',
+        fontSize: '10px'
     };
+
+    const [leftRetireStates, setLeftRetireStates] = useState([]);
+    const [rightRetireStates, setRightRetireStates] = useState([]);
+
+    const handleLeftRetireStatesChange = (id) => {
+        setLeftRetireStates((prevStates) => {
+            const stateExists = prevStates.some((state) => state.id === id);
+            if (!stateExists) {
+                return [
+                ...prevStates,
+                {id : id, is_retired: true},
+                ];
+            }
+            return prevStates.map((state) =>
+                                  state.id === id
+                                  ? { ...state, is_retired: !state.is_retired }
+                                  : state)
+        });
+    }
+    const handleRightRetireStatesChange = (id) => {
+        setRightRetireStates((prevStates) => {
+            const stateExists = prevStates.some((state) => state.id === id);
+            if (!stateExists) {
+                return [
+                ...prevStates,
+                {id : id, is_retired: true},
+                ];
+            }
+            return prevStates.map((state) =>
+                                  state.id === id
+                                  ? { ...state, is_retired: !state.is_retired }
+                                  : state)
+        });
+    }
+
+    const showText = (left_color,
+                      left_retire, left_text,
+                      right_retire, right_text, order_id, target_col) => {
+                          let target_states = (target_col === 'left' ? leftRetireStates : rightRetireStates);
+                          for (let i = 0; i < target_states.length; i++) {
+                              if (order_id === target_states[i].id) {
+                                  if (target_states[i]['is_retired']) {
+                                      return (<s>{left_color === 'red' ? left_text : right_text}</s>);
+                                  } else {
+                                      return (<span>{left_color === 'red' ? left_text : right_text}</span>);
+                                  }
+                              }
+                          }
+                          if ((left_color === 'red' && left_retire) ||
+                              (left_color !== 'red' && right_retire)) {
+                              return (<s>{left_color === 'red' ? left_text : right_text}</s>);
+                          }
+                          return (<span>{left_color === 'red' ? left_text : right_text}</span>);
+                      };
 
   return (
           <div>
@@ -69,32 +124,23 @@ function GamesOnBlock({block_number, event_name, schedule_id}) {
                   {event_name.includes('hokei') ? (<td>{item['round'] <= 2 ? '指定法形' : '自由法形'}</td>) : (<></>)}
                   <td>{item['left_color'] === 'red' ? item['left_group_name'] : item['right_group_name']}</td>
                   <td>
-                  {((item['left_color'] === 'red' && item['left_retire']) || (item['left_color'] !== 'red' && item['right_retire'])) ? (
-                          <s>{item['left_color'] === 'red' ? item['left_name'] : item['right_name']}</s>) :
-                   (<span>{item['left_color'] === 'red' ? item['left_name'] : item['right_name']}</span>
-                  )}
+                  {showText(item['left_color'], item['left_retire'], item['left_name'], item['right_retire'], item['right_name'], item['order_id'], 'left')}
               </td>
                   <td>
-                  {((item['left_color'] === 'red' && item['left_retire']) || (item['left_color'] !== 'red' && item['right_retire'])) ? (
-                          <s>{item['left_color'] === 'red' ? item['left_name_kana'] : item['right_name_kana']}</s>) :
-                   (<span>{item['left_color'] === 'red' ? item['left_name_kana'] : item['right_name_kana']}</span>)}
+                  {showText(item['left_color'], item['left_retire'], item['left_name_kana'], item['right_retire'], item['right_name_kana'], item['order_id'], 'left')}
               </td>
                   <td>
                   {item['left_color'] === 'red' ? item['right_group_name'] : item['left_group_name']}
               </td>
                   <td>
-                  {((item['left_color'] === 'red' && item['right_retire']) || (item['left_color'] !== 'red' && item['left_retire'])) ? (
-                          <s>{item['left_color'] === 'red' ? item['right_name'] : item['left_name']}</s>) :
-                   (<span>{item['left_color'] === 'red' ? item['right_name'] : item['left_name']}</span>)}
-                      </td>
+                  {showText(item['left_color'], item['right_retire'], item['right_name'], item['left_retire'], item['left_name'], item['order_id'], 'right')}
+              </td>
                   <td>
-                  {((item['left_color'] === 'red' && item['right_retire']) || (item['left_color'] !== 'red' && item['left_retire'])) ? (
-                          <s>{item['left_color'] === 'red' ? item['right_name_kana'] : item['left_name_kana']}</s>) :
-                   (<span>{item['left_color'] === 'red' ? item['right_name_kana'] : item['left_name_kana']}</span>)}
-                      </td>
+                  {showText(item['left_color'], item['right_retire'], item['right_name_kana'], item['left_retire'], item['left_name_kana'], item['order_id'], 'right')}
+              </td>
                   <td><Button variant="contained" type="submit" onClick={e => onMoveDown(item.order_id, block_number)}>▼</Button></td>
-                  {event_name.includes('zissen') ? (<td><Button style={retireButtonStyle} variant="contained" type="submit" onClick={e => onMoveDown(item.order_id, block_number)}>OK</Button></td>) : (<></>)}
-                  {event_name.includes('zissen') ? (<td><Button style={retireButtonStyle} variant="contained" type="submit" onClick={e => onMoveDown(item.order_id, block_number)}>OK</Button></td>) : (<></>)}
+                  {event_name.includes('zissen') ? (<td><Button size="small" style={retireButtonStyle} variant="contained" type="submit" onClick={e => handleLeftRetireStatesChange(item.order_id)}>Check</Button></td>) : (<></>)}
+                  {event_name.includes('zissen') ? (<td><Button size="small" style={retireButtonStyle} variant="contained" type="submit" onClick={e => handleRightRetireStatesChange(item.order_id)}>Check</Button></td>) : (<></>)}
                   </tr>
           ))}
           </tbody>
