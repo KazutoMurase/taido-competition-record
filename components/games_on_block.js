@@ -6,15 +6,14 @@ import Grid from '@mui/material/Grid';
 import FlagCircleRoundedIcon from '@mui/icons-material/FlagCircleRounded';
 import checkStyles from '../styles/checks.module.css';
 
-function onMoveDown(order_id, block_number) {
+function onMoveDown(order_id, block_number, function_after_post) {
     let post = {update_block: block_number,
                 target_order_id: order_id};
     axios.post('/api/change_order', post)
         .then((response) => {
-            console.log(response);
+            function_after_post();
         })
         .catch((e) => { console.log(e)})
-    window.location.reload();
 }
 
 
@@ -27,15 +26,15 @@ function GamesOnBlock({block_number, event_name, schedule_id}) {
     const router = useRouter();
 
   const [data, setData] = useState([]);
-  useEffect(() => {
-      async function fetchData() {
+  const fetchData = async () => {
       const response = await fetch('/api/get_games_on_block?block_number=' + block_number + "&schedule_id=" + schedule_id);
       const result = await response.json();
       if (result.length === 0) {
           router.push("/admin/block?block_number=" + block_number);
       }
       setData(result);
-      }
+  }
+  useEffect(() => {
     const interval = setInterval(() => {
       fetchData();
     }, 3000); // 3秒ごとに更新
@@ -44,6 +43,10 @@ function GamesOnBlock({block_number, event_name, schedule_id}) {
           clearInterval(interval);
       };
   }, []);
+
+    const forceFetchData = () => {
+        fetchData();
+    };
     const retireButtonStyle = {
         backgroundColor: 'gray',
         fontSize: '10px'
@@ -85,10 +88,10 @@ function GamesOnBlock({block_number, event_name, schedule_id}) {
 
     const showText = (left_color,
                       left_retire, left_text,
-                      right_retire, right_text, order_id, target_col) => {
+                      right_retire, right_text, id, target_col) => {
                           let target_states = (target_col === 'left' ? leftRetireStates : rightRetireStates);
                           for (let i = 0; i < target_states.length; i++) {
-                              if (order_id === target_states[i].id) {
+                              if (id === target_states[i].id) {
                                   if (target_states[i]['is_retired']) {
                                       return (<s>{left_color === 'red' ? left_text : right_text}</s>);
                                   } else {
@@ -124,23 +127,23 @@ function GamesOnBlock({block_number, event_name, schedule_id}) {
                   {event_name.includes('hokei') ? (<td>{item['round'] <= 2 ? '指定法形' : '自由法形'}</td>) : (<></>)}
                   <td>{item['left_color'] === 'red' ? item['left_group_name'] : item['right_group_name']}</td>
                   <td>
-                  {showText(item['left_color'], item['left_retire'], item['left_name'], item['right_retire'], item['right_name'], item['order_id'], 'left')}
+                  {showText(item['left_color'], item['left_retire'], item['left_name'], item['right_retire'], item['right_name'], item['id'], 'left')}
               </td>
                   <td>
-                  {showText(item['left_color'], item['left_retire'], item['left_name_kana'], item['right_retire'], item['right_name_kana'], item['order_id'], 'left')}
+                  {showText(item['left_color'], item['left_retire'], item['left_name_kana'], item['right_retire'], item['right_name_kana'], item['id'], 'left')}
               </td>
                   <td>
                   {item['left_color'] === 'red' ? item['right_group_name'] : item['left_group_name']}
               </td>
                   <td>
-                  {showText(item['left_color'], item['right_retire'], item['right_name'], item['left_retire'], item['left_name'], item['order_id'], 'right')}
+                  {showText(item['left_color'], item['right_retire'], item['right_name'], item['left_retire'], item['left_name'], item['id'], 'right')}
               </td>
                   <td>
-                  {showText(item['left_color'], item['right_retire'], item['right_name_kana'], item['left_retire'], item['left_name_kana'], item['order_id'], 'right')}
+                  {showText(item['left_color'], item['right_retire'], item['right_name_kana'], item['left_retire'], item['left_name_kana'], item['id'], 'right')}
               </td>
-                  <td><Button variant="contained" type="submit" onClick={e => onMoveDown(item.order_id, block_number)}>▼</Button></td>
-                  {event_name.includes('zissen') ? (<td><Button size="small" style={retireButtonStyle} variant="contained" type="submit" onClick={e => handleLeftRetireStatesChange(item.order_id)}>Check</Button></td>) : (<></>)}
-                  {event_name.includes('zissen') ? (<td><Button size="small" style={retireButtonStyle} variant="contained" type="submit" onClick={e => handleRightRetireStatesChange(item.order_id)}>Check</Button></td>) : (<></>)}
+                  <td><Button variant="contained" type="submit" onClick={e => onMoveDown(item.order_id, block_number, forceFetchData)}>▼</Button></td>
+                  {event_name.includes('zissen') ? (<td><Button size="small" style={retireButtonStyle} variant="contained" type="submit" onClick={e => handleLeftRetireStatesChange(item.id)}>Check</Button></td>) : (<></>)}
+                  {event_name.includes('zissen') ? (<td><Button size="small" style={retireButtonStyle} variant="contained" type="submit" onClick={e => handleRightRetireStatesChange(item.id)}>Check</Button></td>) : (<></>)}
                   </tr>
           ))}
           </tbody>
