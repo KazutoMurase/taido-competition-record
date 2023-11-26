@@ -7,26 +7,23 @@ import FlagCircleRoundedIcon from '@mui/icons-material/FlagCircleRounded';
 import SquareTwoToneIcon from '@mui/icons-material/SquareTwoTone';
 import checkStyles from '../../styles/checks.module.css';
 
-function onClearAll() {
+function onClearAll(function_after_post) {
     let post = {};
     axios.post('/api/clear_notification_request', post)
         .then((response) => {
-            console.log(response);
+            function_after_post();
         })
         .catch((e) => { console.log(e)})
-    window.location.reload();
 }
 
-function onClear(id) {
+function onClear(id, function_after_post) {
     let post = {player_id: id};
     axios.post('/api/clear_notification_request', post)
         .then((response) => {
-            console.log(response);
+            function_after_post();
         })
         .catch((e) => { console.log(e)})
-    window.location.reload();
 }
-
 
 function Home() {
   const [selectedRadioButton, setSelectedRadioButton] = useState(null);
@@ -34,18 +31,18 @@ function Home() {
   const handleRadioButtonChange = (event) => {
       setSelectedRadioButton(event.target.value);
   };
-    const router = useRouter();
-    const ToBack = () => {
-        router.push("/admin");
-    }
+  const router = useRouter();
+  const ToBack = () => {
+      router.push("/admin");
+  }
 
-  const [data, setData] = useState([]);
-  useEffect(() => {
-      async function fetchData() {
+  const fetchData = async () => {
       const response = await fetch('/api/notification_request');
       const result = await response.json();
       setData(result);
-      }
+  }
+  const [data, setData] = useState([]);
+  useEffect(() => {
     const interval = setInterval(() => {
       fetchData();
     }, 3000); // 3秒ごとに更新
@@ -54,6 +51,11 @@ function Home() {
       clearInterval(interval);
     };
   }, []);
+
+    const forceFetchData = () => {
+        fetchData();
+    };
+
   return (
           <div>
           <Grid container>
@@ -80,7 +82,7 @@ function Home() {
                   <td>{item['name']}({item['name_kana']})</td>
                   <td>{item['court_name'].replace('\'', '').replace('\'', '')}</td>
                   <td>{item['group_name'].replace('\'', '').replace('\'', '')}</td>
-                  <td><Button variant="contained" type="submit" onClick={e => onClear(item.id)}>呼び出し完了</Button></td>
+                  <td><Button variant="contained" type="submit" onClick={e => onClear(item.id, forceFetchData)}>呼び出し完了</Button></td>
               </tr>
           ))}
           </tbody>
@@ -90,7 +92,7 @@ function Home() {
           <Grid item xs={4} />
           <Grid item xs={2}>
           <br />
-          <Button variant="contained" type="submit" onClick={e => onClearAll()}>全呼び出し完了</Button>
+          <Button variant="contained" type="submit" onClick={e => onClearAll(forceFetchData)}>全呼び出し完了</Button>
           </Grid>
           </Grid>
           <br/><br/>

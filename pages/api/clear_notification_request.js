@@ -7,13 +7,13 @@ export default async (req, res) => {
             const query = `DELETE FROM notification_request WHERE 1 = 1`
             const result = await conn.query(query);
             console.log(result);
-            res.status(200).end();
+            res.json({});
         } else {
             const query = `DELETE FROM notification_request WHERE player_id = $1`
             const values = [req.body.player_id]
             const result = await conn.query(query, values);
             console.log(result);
-            res.status(200).end();
+            res.json({});
         }
     } catch (error) {
         console.log(error);

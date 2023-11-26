@@ -11,6 +11,7 @@ export default async (req, res) => {
             result = await conn.query(query);
             console.log(result);
         }
+        res.json({});
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: 'Error fetching data'});

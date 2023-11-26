@@ -8,7 +8,7 @@ import checkStyles from '../styles/checks.module.css';
 import { useRouter } from 'next/router';
 
 
-function onSubmit(id, block_number, event_id) {
+function onSubmit(id, block_number, event_id, function_after_post) {
     // TODO: FIXME
     let court_id;
     if (block_number === 'a') {
@@ -26,16 +26,16 @@ function onSubmit(id, block_number, event_id) {
                 };
     axios.post('/api/create_notification_request', post)
         .then((response) => {
-            console.log(response);
+            function_after_post();
         })
         .catch((e) => { console.log(e)})
 }
 
-function onClear(id) {
+function onClear(id, function_after_post) {
     let post = {player_id: id};
     axios.post('/api/clear_notification_request', post)
         .then((response) => {
-            console.log(response);
+            function_after_post();
         })
         .catch((e) => { console.log(e)})
 }
@@ -99,13 +99,13 @@ function CheckPlayers({block_number, schedule_id}) {
 
   let title;
 
-  const [data, setData] = useState([]);
-  useEffect(() => {
-      async function fetchData() {
+  const fetchData = async () => {
       const response = await fetch('/api/check_players_on_block?block_number=' + block_number + '&schedule_id=' + schedule_id);
       const result = await response.json();
       setData(result);
-   }
+  }
+  const [data, setData] = useState([]);
+  useEffect(() => {
     const interval = setInterval(() => {
       fetchData();
     }, 3000); // 3秒ごとに更新
@@ -114,6 +114,9 @@ function CheckPlayers({block_number, schedule_id}) {
       clearInterval(interval);
     };
   }, []);
+    const forceFetchData = () => {
+        fetchData();
+    };
 
     const waitButtonStyle = {
         backgroundColor: 'blue'
@@ -174,9 +177,11 @@ function CheckPlayers({block_number, schedule_id}) {
                   </td>
                   <td><Button variant="contained" type="submit" onClick={e => onSubmit(item.id,
                                                                                        block_number,
-                                                                                       item.event_id)} style={!item['requested'] ? null : activeButtonStyle}>{!item['requested'] ? '　呼び出し　' : 'リクエスト済'}
+                                                                                       item.event_id,
+                                                                                       forceFetchData)} style={!item['requested'] ? null : activeButtonStyle}>{!item['requested'] ? '　呼び出し　' : 'リクエスト済'}
               </Button></td>
-                  <td><Button variant="contained" type="submit" onClick={e => onClear(item.id)} disabled={!item['requested']}>キャンセル</Button></td>
+                  <td><Button variant="contained" type="submit" onClick={e => onClear(item.id,
+                                                                                      forceFetchData)} disabled={!item['requested']}>キャンセル</Button></td>
               </tr>
           ))}
           </tbody>

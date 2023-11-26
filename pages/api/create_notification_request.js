@@ -7,7 +7,7 @@ export default async (req, res) => {
         const values = [req.body.event_id, req.body.player_id, req.body.court_id];
         const result = await conn.query(query, values);
         console.log(result);
-        res.status(200).end();
+        res.json({});
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: 'Error fetching data'});

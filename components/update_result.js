@@ -146,24 +146,24 @@ function UpdateResult({event_name, id, return_url}) {
           {event_name.includes('hokei') ?
            (<><h2>白の旗</h2>
             <input class="radio-inline__input" type="radio" id="choice0" name="contact" value="0"
-            onChange={handleRadioButtonChange} defaultChecked={parseInt(selectedRadioButton)===0} />
+            onChange={handleRadioButtonChange} checked={parseInt(selectedRadioButton)===0} />
             <label class="radio-inline__label" for="choice0">0</label>
             <input class="radio-inline__input" type="radio" id="choice1" name="contact" value="1"
-            onChange={handleRadioButtonChange} defaultChecked={parseInt(selectedRadioButton)===1} />
+            onChange={handleRadioButtonChange} checked={parseInt(selectedRadioButton)===1} />
             <label class="radio-inline__label" for="choice1">1</label>
             <input class="radio-inline__input" type="radio" id="choice2" name="contact" value="2"
-            onChange={handleRadioButtonChange} defaultChecked={parseInt(selectedRadioButton)===2} />
+            onChange={handleRadioButtonChange} checked={parseInt(selectedRadioButton)===2} />
             <label class="radio-inline__label" for="choice2">2</label>
             <input class="radio-inline__input" type="radio" id="choice3" name="contact" value="3"
-            onChange={handleRadioButtonChange} defaultChecked={parseInt(selectedRadioButton)===3} />
+            onChange={handleRadioButtonChange} checked={parseInt(selectedRadioButton)===3} />
             <label class="radio-inline__label" for="choice3">3</label></>
            ) :
            (<>
             <input class="radio-inline__input" type="radio" id="choice0" name="contact" value="0"
-            onChange={handleRadioButtonChange} defaultChecked={parseInt(selectedRadioButton)===0} />
+            onChange={handleRadioButtonChange} checked={parseInt(selectedRadioButton)===0} />
             <label class="radio-inline__label" for="choice0">赤勝利</label>
             <input class="radio-inline__input" type="radio" id="choice1" name="contact" value="1"
-            onChange={handleRadioButtonChange}  defaultChecked={parseInt(selectedRadioButton)===1} />
+            onChange={handleRadioButtonChange}  checked={parseInt(selectedRadioButton)===1} />
             <label class="radio-inline__label" for="choice1">白勝利</label>
             </>)}
           <br />

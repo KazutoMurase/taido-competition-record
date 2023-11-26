@@ -41,6 +41,7 @@ export default async (req, res) => {
             query = 'update ' + block_name + ' set game_id = ' + next_game_id;
             result = await conn.query(query);
         }
+        res.json({});
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: 'Error fetching data'});
