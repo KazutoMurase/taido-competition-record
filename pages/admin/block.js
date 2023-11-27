@@ -5,6 +5,34 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import checkStyles from '../../styles/checks.module.css';
 
+function ShowDetails(item, block_number, current, ToCall, ToRecord, ToUpdate) {
+    if (item["name"].includes("団体")) {
+        return (<>
+                &nbsp;&nbsp;
+                &nbsp;&nbsp;
+                &nbsp;&nbsp;
+                &nbsp;&nbsp;
+                &nbsp;&nbsp;
+                &nbsp;&nbsp;
+                <Button variant="contained" type="submit" onClick={e => ToCall(block_number, item['id'])} disabled={item['id'] !== current.id || !item['players_checked']}>競技終了</Button>
+                &nbsp;&nbsp;
+                &nbsp;&nbsp;
+                &nbsp;&nbsp;
+                &nbsp;&nbsp;
+                &nbsp;&nbsp;
+                &nbsp;&nbsp;
+                &nbsp;&nbsp;
+                </>);
+    }
+    return (<>
+            <Button variant="contained" type="submit" onClick={e => ToCall(block_number, item['id'])} disabled={item['id'] !== current.id || !item['players_checked']}>呼び出し</Button>
+            &nbsp;&nbsp;
+            <Button variant="contained" type="submit" onClick={e => ToRecord(block_number, item['id'])} disabled={item['id'] !== current.id || !item['players_checked']}>記録</Button>
+            &nbsp;&nbsp;
+            <Button variant="contained" type="submit" onClick={e => ToUpdate(block_number, item['id'])} disabled={item['id'] > current.id || !item['players_checked']}>結果修正</Button>
+           </>);
+}
+
 export default function Home() {
     const router = useRouter();
     const { block_number } = router.query;
@@ -72,15 +100,11 @@ export default function Home() {
                     <td>{item['name'].replace('\'', '').replace('\'', '')}</td>
                     <td>{item['time_schedule'].replace('\'', '').replace('\'', '')}</td>
                     <td>{item['games_text']}</td>
-                    <td>{item['game_count'] + '試合'}</td>
+                    <td>{('game_count' in item ? item['game_count'] + '試合' : '')}</td>
                     <td>
                     <Button variant="contained" type="submit" onClick={e => ToCheck(block_number, item['id'])} style={item['players_checked'] ? doneButtonStyle : null} >{item['players_checked'] ? '点呼完了' : '　点呼　'}</Button>
                     &nbsp;&nbsp;
-                    <Button variant="contained" type="submit" onClick={e => ToCall(block_number, item['id'])} disabled={item['id'] !== current.id || !item['players_checked']}>呼び出し</Button>
-                    &nbsp;&nbsp;
-                    <Button variant="contained" type="submit" onClick={e => ToRecord(block_number, item['id'])} disabled={item['id'] !== current.id || !item['players_checked']}>記録</Button>
-                    &nbsp;&nbsp;
-                    <Button variant="contained" type="submit" onClick={e => ToUpdate(block_number, item['id'])} disabled={item['id'] > current.id || !item['players_checked']}>結果修正</Button>
+                {ShowDetails(item, block_number, current, ToCall, ToRecord, ToUpdate)}
                     </td>
                     </tr>
             ))

@@ -22,23 +22,25 @@ export default async (req, res) => {
         for (let i = 0; i < sorted_data.length; i++) {
             const games = sorted_data[i].games;
             let words = []
-            for (let j = 0; j < games.length; j++) {
-                if (j === 0) {
-                    words = [games[j]];
-                }
-                else if (j === 1) {
-                    words.push(',');
-                    words.push(games[j]);
-                }
-                else {
-                    if (games[j - 2] + 1 === games[j - 1] &&
-                        games[j - 1] + 1 === games[j]) {
-                        const length = words.length;
-                        words[length - 2] = "-";
-                        words[length - 1] = games[j];
-                    } else {
+            if (games !== undefined) {
+                for (let j = 0; j < games.length; j++) {
+                    if (j === 0) {
+                        words = [games[j]];
+                    }
+                    else if (j === 1) {
                         words.push(',');
                         words.push(games[j]);
+                    }
+                    else {
+                        if (games[j - 2] + 1 === games[j - 1] &&
+                            games[j - 1] + 1 === games[j]) {
+                            const length = words.length;
+                            words[length - 2] = "-";
+                            words[length - 1] = games[j];
+                        } else {
+                            words.push(',');
+                            words.push(games[j]);
+                        }
                     }
                 }
             }
