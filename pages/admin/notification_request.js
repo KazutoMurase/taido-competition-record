@@ -16,13 +16,25 @@ function onClearAll(function_after_post) {
         .catch((e) => { console.log(e)})
 }
 
-function onClear(id, function_after_post) {
-    let post = {player_id: id};
+function onClear(item, function_after_post) {
+    let post = {};
+    if ('name' in item) {
+        post = {player_id: item.id};
+    } else {
+        post = {group_id: item.group_id, event_id: item.event_id};
+    }
     axios.post('/api/clear_notification_request', post)
         .then((response) => {
             function_after_post();
         })
         .catch((e) => { console.log(e)})
+}
+
+function ShowName(item) {
+    if ('name' in item) {
+        return (item['name'] + '(' + item['name_kana'] + ')');
+    }
+    return item['group_name'].replace('\'', '').replace('\'', '') + 'チーム';
 }
 
 function Home() {
@@ -71,7 +83,7 @@ function Home() {
           <tbody>
           <tr className={checkStyles.column}>
           <th>競技</th>
-          <th>選手名</th>
+          <th>選手/団体名</th>
           <th>コート</th>
           <th>所属</th>
           <th></th>
@@ -79,10 +91,10 @@ function Home() {
           {data.map((item, index) => (
                   <tr className={checkStyles.column}>
                   <td>{item['event_name'].replace('\'', '').replace('\'', '')}</td>
-                  <td>{item['name']}({item['name_kana']})</td>
+                  <td>{ShowName(item)}</td>
                   <td>{item['court_name'].replace('\'', '').replace('\'', '')}</td>
-                  <td>{item['group_name'].replace('\'', '').replace('\'', '')}</td>
-                  <td><Button variant="contained" type="submit" onClick={e => onClear(item.id, forceFetchData)}>呼び出し完了</Button></td>
+                  <td>{'name' in item ? item['group_name'].replace('\'', '').replace('\'', '') : ''}</td>
+                  <td><Button variant="contained" type="submit" onClick={e => onClear(item, forceFetchData)}>呼び出し完了</Button></td>
               </tr>
           ))}
           </tbody>

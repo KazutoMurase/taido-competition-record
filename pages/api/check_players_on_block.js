@@ -18,6 +18,33 @@ export default async (req, res) => {
             event_name = 'hokei_woman';
         } else if (block_result.rows[0].event_id === 5) {
             event_name = 'hokei_sonen';
+        } else {
+            query = 'SELECT game_id FROM ' + block_name + '_games WHERE schedule_id = ' + schedule_id;
+            let result_dantai = await conn.query(query);
+            const game_id = result_dantai.rows[0].game_id;
+            query = 'SELECT t1.name, t0.group_id, t0.event_id FROM dantai as t0 LEFT JOIN groups AS t1 ON t0.group_id = t1.id WHERE t0.event_id = ' + block_result.rows[0].event_id + ' and game_id = ' + game_id;
+            result_dantai = await conn.query(query);
+            if (result_dantai.rows.length === 0) {
+                query = 'SELECT t1.name, t0.group_id, t0.event_id FROM dantai as t0 LEFT JOIN groups AS t1 ON t0.group_id = t1.id WHERE t0.event_id = ' + block_result.rows[0].event_id;
+                result_dantai = await conn.query(query);
+                for (let i = 0; i < result_dantai.rows.length; i++) {
+                    result_dantai.rows[i]['all'] = true;
+                }
+            }
+            query = `SELECT group_id, event_id FROM notification_request WHERE group_id is not null`;
+            const result_requested = await conn.query(query);
+            const requested_data = result_requested.rows;
+            for (let i = 0; i < result_dantai.rows.length; i++) {
+                for (let j = 0; j < requested_data.length; j++) {
+                    if (result_dantai.rows[i].group_id === requested_data[j].group_id &&
+                        result_dantai.rows[i].event_id === requested_data[j].event_id) {
+                        result_dantai.rows[i]['requested'] = true;
+                        break;
+                    }
+                }
+            }
+            res.json(result_dantai.rows);
+            return;
         }
         query = 'SELECT t1.id, t2.id AS left_player_id, t3.id AS right_player_id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t3.name AS right_name, t2.name_kana AS left_name_kana, t3.name_kana AS right_name_kana FROM ' + block_name + '_games AS t0 LEFT JOIN ' + event_name + ' AS t1 ON t0.game_id = t1.id LEFT JOIN players AS t2 ON t1.left_player_id = t2.' + event_name + '_player_id LEFT JOIN players AS t3 ON t1.right_player_id = t3.' + event_name + '_player_id where t0.schedule_id = $1';
         const result = await conn.query(query, [schedule_id]);
