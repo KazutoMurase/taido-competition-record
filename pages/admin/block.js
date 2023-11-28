@@ -33,6 +33,23 @@ function ShowDetails(item, block_number, current, ToCall, ToRecord, ToUpdate) {
            </>);
 }
 
+function ShowGamesText(item) {
+    let prefix = '';
+    if (item['before_final']) {
+        prefix += '三決';
+    }
+    if (item['final']) {
+        prefix += '決勝';
+    }
+    if (prefix !== '') {
+        prefix = '【' + prefix + '】';
+    }
+    if (item["name"].includes("団体展開") || item["name"].includes("団体法形")) {
+        return prefix + '';
+    }
+    return prefix + item['games_text'];
+}
+
 export default function Home() {
     const router = useRouter();
     const { block_number } = router.query;
@@ -99,7 +116,7 @@ export default function Home() {
                     <tr className={checkStyles.column} bgcolor={item['id'] === current.id ? 'yellow' : 'white'}>
                     <td>{item['name'].replace('\'', '').replace('\'', '')}</td>
                     <td>{item['time_schedule'].replace('\'', '').replace('\'', '')}</td>
-                    <td>{item['games_text']}</td>
+                    <td>{ShowGamesText(item)}</td>
                     <td>{('game_count' in item ? item['game_count'] + '試合' : '')}</td>
                     <td>
                     <Button variant="contained" type="submit" onClick={e => ToCheck(block_number, item['id'])} style={item['players_checked'] ? doneButtonStyle : null} >{item['players_checked'] ? '点呼完了' : '　点呼　'}</Button>
