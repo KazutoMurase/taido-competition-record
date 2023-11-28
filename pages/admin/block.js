@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import axios from 'axios';
 import React from 'react';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import checkStyles from '../../styles/checks.module.css';
 
-function ShowDetails(item, block_number, current, ToCall, ToRecord, ToUpdate) {
+function ShowDetails(item, block_number, current, ToCall, ToRecord, ToUpdate, ToFinish) {
     if (item["name"].includes("団体")) {
         return (<>
                 &nbsp;&nbsp;
@@ -14,7 +15,7 @@ function ShowDetails(item, block_number, current, ToCall, ToRecord, ToUpdate) {
                 &nbsp;&nbsp;
                 &nbsp;&nbsp;
                 &nbsp;&nbsp;
-                <Button variant="contained" type="submit" onClick={e => ToCall(block_number, item['id'])} disabled={item['id'] !== current.id || !item['players_checked']}>競技終了</Button>
+                <Button variant="contained" type="submit" onClick={e => ToFinish(block_number)} disabled={item['id'] !== current.id || !item['players_checked']}>競技終了</Button>
                 &nbsp;&nbsp;
                 &nbsp;&nbsp;
                 &nbsp;&nbsp;
@@ -68,12 +69,13 @@ export default function Home() {
     };
     const ToUpdate = (block_number, id) => {
         router.push("/admin/check_result?block_number=" + block_number + "&schedule_id=" + id);
-    };
+ };
     const ToBack = () => {
         router.push("/admin");
-    }
+    };
     const [data, setData] = useState([]);
     const [current, setCurrent] = useState([]);
+
   useEffect(() => {
       async function fetchData() {
       const response = await fetch('/api/get_time_schedule?block_number=' + block_number);
@@ -88,16 +90,28 @@ export default function Home() {
           clearInterval();
       };
   }, []);
-  useEffect(() => {
-      async function fetchData() {
+
+    const fetchCurrent = async () => {
       const response = await fetch('/api/current_schedule?block_number=' + block_number);
       const result = await response.json();
       setCurrent(result);
-   }
+    };
+    const forceFetchCurrent = () => {
+        fetchCurrent();
+    };
+       const ToFinish = (block_number) => {
+        let post = {update_block: block_number};
+            axios.post('/api/complete_schedule', post)
+                .then((response) => {
+                forceFetchCurrent();
+           })
+            .catch((e) => { console.log(e)})
+    };
+  useEffect(() => {
     const interval = setInterval(() => {
-      fetchData();
+      fetchCurrent();
     }, 3000); // 3秒ごとに更新
-      fetchData();
+      fetchCurrent();
       return () => {
           clearInterval();
       };
@@ -122,7 +136,7 @@ export default function Home() {
                     <td>
                     <Button variant="contained" type="submit" onClick={e => ToCheck(block_number, item['id'], item['name'])} style={item['players_checked'] ? doneButtonStyle : null} >{item['players_checked'] ? '点呼完了' : '　点呼　'}</Button>
                     &nbsp;&nbsp;
-                {ShowDetails(item, block_number, current, ToCall, ToRecord, ToUpdate)}
+                {ShowDetails(item, block_number, current, ToCall, ToRecord, ToUpdate, ToFinish)}
                     </td>
                     </tr>
             ))
