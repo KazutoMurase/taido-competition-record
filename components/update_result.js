@@ -8,11 +8,11 @@ import FlagCircleRoundedIcon from '@mui/icons-material/FlagCircleRounded';
 function ShowRedFlags(event_name, selectedRadioButton) {
     if (event_name.includes('hokei')) {
     return (<>
-        {parseInt(selectedRadioButton) <= 2 ?
+        {parseInt(selectedRadioButton) >= 1 ?
          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" /> : null}
-        {parseInt(selectedRadioButton) <= 1 ?
+        {parseInt(selectedRadioButton) >= 2 ?
          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" /> : null}
-        {parseInt(selectedRadioButton) === 0 ?
+        {parseInt(selectedRadioButton) >= 3 ?
          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" /> : null}
         </>);
     } else if (event_name.includes('zissen')) {
@@ -27,12 +27,11 @@ function ShowRedFlags(event_name, selectedRadioButton) {
 function ShowWhiteFlags(event_name, selectedRadioButton) {
     if (event_name.includes('hokei')) {
     return (<>
-          {parseInt(selectedRadioButton) >= 1 ?
-           <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="gray" /> :
-           <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="white" />}
-          {parseInt(selectedRadioButton) >= 2 ?
+          {parseInt(selectedRadioButton) <= 0 ?
            <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="gray" /> : null}
-          {parseInt(selectedRadioButton) >= 3 ?
+          {parseInt(selectedRadioButton) <= 1 ?
+           <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="gray" /> : null}
+          {parseInt(selectedRadioButton) <= 2 ?
            <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="gray" /> : null}
         </>);
     } else if (event_name.includes('zissen')) {
@@ -59,11 +58,20 @@ function UpdateResult({event_name, id, return_url}) {
          console.log(id);
          const response = await fetch('/api/get_game?event_name=' + event_name + '&id=' + id);
          const result = await response.json();
-          if (result.left_player_flag !== null) {
-              if (event_name.includes('hokei')) {
-                  setSelectedRadioButton(3 - result.left_player_flag);
-              } else if (event_name.includes('zissen')) {
-                  setSelectedRadioButton(1 - result.left_player_flag);
+          if (result.left_player_flag !== null &&
+              result.left_player_flag !== undefined) {
+              if (result.left_color === 'red') {
+                  if (event_name.includes('hokei')) {
+                      setSelectedRadioButton(result.left_player_flag);
+                  } else if (event_name.includes('zissen')) {
+                      setSelectedRadioButton(1 - result.left_player_flag);
+                  }
+              } else {
+                  if (event_name.includes('hokei')) {
+                      setSelectedRadioButton(3 - result.left_player_flag);
+                  } else if (event_name.includes('zissen')) {
+                      setSelectedRadioButton(result.left_player_flag);
+                  }
               }
           }
           setData(result);
@@ -78,7 +86,7 @@ function UpdateResult({event_name, id, return_url}) {
   const onSubmit = (data, player_flag, event_name) => {
     let left_player_flag;
     if (event_name.includes('hokei')) {
-        left_player_flag = (data.left_color === 'white' ? player_flag : 3 - player_flag);
+        left_player_flag = (data.left_color === 'white' ? 3 - player_flag : player_flag);
     } else if (event_name.includes('zissen')) {
         left_player_flag = (data.left_color === 'white' ? player_flag : 1 - player_flag);
     }
@@ -110,8 +118,8 @@ function UpdateResult({event_name, id, return_url}) {
   let no_game_red_winner;
   let no_game_white_winner;
   if (event_name.includes('hokei')) {
-      no_game_red_winner = -1;
-      no_game_white_winner = 4;
+      no_game_red_winner = 4;
+      no_game_white_winner = -1;
   } else if (event_name.includes('zissen')) {
       no_game_red_winner = -1;
       no_game_white_winner = 2;

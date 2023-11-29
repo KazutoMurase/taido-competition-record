@@ -197,6 +197,11 @@ function createText(item) {
                     </>
             );
         }
+    } else {
+        // TODO: show texts
+        return (<>
+                </>
+               );
     }
     return (<>
             </>
@@ -319,23 +324,11 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
         }
         if (left_player_flag !== null) {
             if (left_player_flag === -1) {
-                if (is_left) {
-                    item['left_out'] = true;
-                } else {
-                    item['right_out'] = true;
-                }
+                item['left_out'] = true;
             } else if (event_name.includes('hokei') && left_player_flag === 4) {
-                if (is_left) {
-                    item['right_out'] = true;
-                } else {
-                    item['left_out'] = true;
-                }
+                item['right_out'] = true;
             } else if (event_name.includes('zissen') && left_player_flag === 2) {
-                if (is_left) {
-                    item['right_out'] = true;
-                } else {
-                    item['left_out'] = true;
-                }
+                item['right_out'] = true;
             }
         }
         return (
