@@ -79,7 +79,10 @@ export default async (req, res) => {
         for (let i = 0; i < sorted_data.length; i++) {
             console.log(sorted_data[i]);
             if (sorted_data[i]['id'] === current_id) {
-                if ('round' in sorted_data[i]) {
+                if (i === sorted_data.length - 1) {
+                    sorted_data[i]['block_pos'] = 'center';
+                    sorted_data[i]['left_color'] = 'red';
+                } else if ('round' in sorted_data[i]) {
                     const round = sorted_data[i]['round'];
                     let game_id = sorted_data[i]['id'];
                     for (let j = 0; j < round - 1; j++) {
@@ -94,6 +97,7 @@ export default async (req, res) => {
                     }
                 } else {
                     sorted_data[i]['block_pos'] = 'center';
+                    sorted_data[i]['left_color'] = 'red';
                 }
                 console.log(sorted_data[i]);
                 res.json(sorted_data[i]);

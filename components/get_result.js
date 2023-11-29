@@ -291,6 +291,7 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
                     text={item['id']}
                     fill={'gray'}
                     fontSize={12}
+                    onClick={e => onUpdate(item['id'], editable)}
                     />
                     </>);
         } else {
@@ -325,6 +326,7 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
             text={item['id']}
             fill={'gray'}
             fontSize={12}
+            onClick={e => onUpdate(item['id'], editable)}
                 />
                 </>
         );
