@@ -6,7 +6,7 @@ import { Layer, Stage, Rect, Text } from "react-konva";
 import Grid from '@mui/material/Grid';
 
 // TODO: for mobile, onTap should be added in konva-text
-function createText(item) {
+function createText(item, lineWidth) {
     const is_left = (item['block_pos'] === 'left');
     const is_right = (item['block_pos'] === 'right');
     const has_left = ('has_left' in item);
@@ -197,9 +197,47 @@ function createText(item) {
                     </>
             );
         }
-    } else {
-        // TODO: show texts
+    } else if ('fake_round' in item) {
+        const x = 300 + lineWidth + (item['fake_round']-2)*30;
+        const width = ((800 - lineWidth - (item['fake_round']-2)*30) -
+                       (300 + lineWidth + (item['fake_round']-2)*30));
         return (<>
+                <Text
+                x={x - 220}
+                y={item['left_begin_y']-10}
+                text={item['left_name']}
+                fontSize={(item['left_name'] !== null && item['left_name'].length) < 8 ? 20 : 15}
+                />
+                <Text
+                x={x - 220}
+                y={item['left_begin_y']-30}
+                text={item['left_name_kana']}
+                fontSize={12}
+                    />
+                <Text
+                x={x - 90}
+                y={item['left_begin_y']-5}
+                text={item['left_group_name'] !== null ? item['left_group_name'].replace('\'', '【').replace('\'', '】') : ''}
+                fontSize={14}
+                    />
+                <Text
+                x={x + width + 10}
+                y={item['left_begin_y']-10}
+                text={item['right_name']}
+                fontSize={(item['right_name'] !== null && item['right_name'].length) < 8 ? 20 : 15}
+                    />
+                <Text
+                x={x + width + 10}
+                y={item['left_begin_y']-30}
+                text={item['right_name_kana']}
+                fontSize={12}
+                    />
+                <Text
+                x={x + width + 120}
+                y={item['left_begin_y']-5}
+                text={item['right_group_name'] !== null ? item['right_group_name'].replace('\'', '【').replace('\'', '】') : ''}
+                fontSize={14}
+                    />
                 </>
                );
     }
@@ -451,7 +489,7 @@ function GetResult({editable = false, updateInterval = 0, returnUrl = null, even
               createBlock(item, lineWidth, editable, event_name, returnUrl)
           ))}
       {sortedData.map((item, index) => (
-              createText(item)
+          createText(item, lineWidth)
           ))
           }
           </Layer>
