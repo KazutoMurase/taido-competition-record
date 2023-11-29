@@ -1,12 +1,13 @@
-import conn from '../../lib/db'
+import { db } from '@vercel/postgres';
 
 export default async (req, res) => {
     try {
+        const client = await db.connect();
         const block_name = 'block_' + req.query.block_number;
         let query = 'select t0.id, t1.name, t0.time_schedule, t0.before_final, t0.final, t0.players_checked from ' + block_name + ' as t0 left join EVENT_TYPE as t1 on t0.event_id = t1.id';
-        let result = await conn.query(query);
+        let result = await client.query(query);
         query = 'select id, schedule_id, game_id from ' + block_name + '_games';
-        let result_games = await conn.query(query);
+        let result_games = await client.query(query);
         const sorted_data = result.rows.sort((a, b) => a.id - b.id);
         const sorted_games_data = result_games.rows.sort((a, b) => a.id - b.id);
         for (let i = 0; i < sorted_games_data.length; i++) {

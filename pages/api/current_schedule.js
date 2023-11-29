@@ -1,10 +1,11 @@
-import conn from '../../lib/db'
+import { db } from '@vercel/postgres';
 
 export default async (req, res) => {
     try {
+        const client = await db.connect();
         const block_number = req.query.block_number;
         let query = 'select id, game_id from current_block_' + block_number;
-        let result = await conn.query(query);
+        let result = await client.query(query);
         res.json(result.rows[0]);
     } catch (error) {
         console.log(error);
