@@ -152,7 +152,7 @@ function UpdateResult({event_name, id, return_url}) {
           <Grid item xs={2} />
           <Grid item xs={5}>
           {event_name.includes('hokei') ?
-           (<><h2>白の旗</h2>
+           (<><h2>赤の旗</h2>
             <input class="radio-inline__input" type="radio" id="choice0" name="contact" value="0"
             onChange={handleRadioButtonChange} checked={parseInt(selectedRadioButton)===0} />
             <label class="radio-inline__label" for="choice0">0</label>
