@@ -16,6 +16,13 @@ function onMoveDown(order_id, block_number, function_after_post) {
         .catch((e) => { console.log(e)})
 }
 
+function ShowHokeiType(item, event_name) {
+    if (event_name === 'hokei_sonen') {
+        return (<td>{item['round'] <= 2 ? '勢命' : '活命/延命'}</td>);
+    }
+    return (<td>{item['round'] <= 2 ? '指定法形' : '自由法形'}</td>);
+}
+
 
 function GamesOnBlock({block_number, event_name, schedule_id}) {
   const [selectedRadioButton, setSelectedRadioButton] = useState(null);
@@ -124,7 +131,7 @@ function GamesOnBlock({block_number, event_name, schedule_id}) {
           </tr>
           {data.map((item, index) => (
                   <tr className={checkStyles.column} bgcolor={'current' in item ? 'yellow' : 'white'}>
-                  {event_name.includes('hokei') ? (<td>{item['round'] <= 2 ? '指定法形' : '自由法形'}</td>) : (<></>)}
+                  {event_name.includes('hokei') ? ShowHokeiType(item, event_name) : (<></>)}
                   <td>{item['left_color'] === 'red' ? item['left_group_name'] : item['right_group_name']}</td>
                   <td>
                   {showText(item['left_color'], item['left_retire'], item['left_name'], item['right_retire'], item['right_name'], item['id'], 'left')}
