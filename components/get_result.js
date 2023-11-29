@@ -264,20 +264,37 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
             const x = 300 + lineWidth + (item['round']-2)*30;
             const width = ((800 - lineWidth - (item['round']-2)*30) -
                            (300 + lineWidth + (item['round']-2)*30));
+            const left_player_flag = item['left_player_flag'];
+            let left_winner;
+            let right_winner;
+            if (event_name.includes('hokei')) {
+                left_winner = (left_player_flag !== null && left_player_flag >= 2);
+                right_winner = (left_player_flag !== null && left_player_flag < 2);
+            } else if (event_name.includes('zissen')) {
+                left_winner = (left_player_flag !== null && left_player_flag >= 1);
+                right_winner = (left_player_flag !== null && left_player_flag < 1);
+            }
             return (<>
                     <Rect
                     x={x}
                     y={item['left_begin_y']}
-                    width={width}
-                    height={1}
-                    fill='black'
+                    width={width / 2}
+                    height={left_winner ? 5 : 1}
+                    fill={left_winner ? 'red' : 'black'}
                     />
                     <Rect
                     x={x + width / 2}
                     y={item['left_begin_y']}
-                    width={1}
+                    width={width / 2}
+                    height={right_winner ? 5 : 1}
+                    fill={right_winner ? 'red' : 'black'}
+                    />
+                    <Rect
+                    x={x + width / 2}
+                    y={item['left_begin_y']}
+                    width={(left_winner || right_winner) ? 5 : 1}
                     height={-50}
-                    fill='black'
+                    fill={(left_winner || right_winner) ? 'red' : 'black'}
                     />
                     <Text
                     x={x + width / 2 - 20}
@@ -293,26 +310,55 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
                     fontSize={12}
                     onClick={e => onUpdate(item['id'], editable)}
                     />
+                    <Text
+                    x={x + width / 2 - 10}
+                    y={item['left_begin_y'] - 15}
+                    text={((event_name.includes('hokei') && left_player_flag !== null && left_player_flag >= 0 && left_player_flag <= 3) ? left_player_flag : "")}
+                    fill={'blue'}
+                    fontSize={15} />
+                    <Text
+                    x={x + width / 2 + 8}
+                    y={item['left_begin_y'] - 15}
+                    text={((event_name.includes('hokei') && left_player_flag !== null && left_player_flag >= 0 && left_player_flag <= 3) ? (3 - left_player_flag) : "")}
+                    fill={'blue'}
+                    fontSize={15} />
                     </>);
         } else {
             const x = 300 + lineWidth + (item['fake_round']-2)*30;
             const width = ((800 - lineWidth - (item['fake_round']-2)*30) -
                            (300 + lineWidth + (item['fake_round']-2)*30));
+            const left_player_flag = item['left_player_flag'];
+            let left_winner;
+            let right_winner;
+            if (event_name.includes('hokei')) {
+                left_winner = (left_player_flag !== null && left_player_flag >= 2);
+                right_winner = (left_player_flag !== null && left_player_flag < 2);
+            } else if (event_name.includes('zissen')) {
+                left_winner = (left_player_flag !== null && left_player_flag >= 1);
+                right_winner = (left_player_flag !== null && left_player_flag < 1);
+            }
         return (
                 <>
                 <Rect
             x={x}
             y={item['left_begin_y']}
-            width={width}
-            height={1}
-            fill='black'
+            width={width / 2}
+            height={left_winner ? 5 : 1}
+            fill={left_winner ? 'red' : 'black'}
                 />
                 <Rect
             x={x + width / 2}
             y={item['left_begin_y']}
-            width={1}
+            width={width / 2}
+            height={right_winner ? 5 : 1}
+            fill={right_winner ? 'red' : 'black'}
+                />
+                <Rect
+            x={x + width / 2}
+            y={item['left_begin_y']}
+            width={(left_winner || right_winner) ? 5 : 1}
             height={-50}
-            fill='black'
+            fill={(left_winner || right_winner) ? 'red' : 'black'}
                 />
                 <Text
             x={x + width / 2 - 20}
@@ -328,6 +374,18 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
             fontSize={12}
             onClick={e => onUpdate(item['id'], editable)}
                 />
+                <Text
+            x={x + width / 2 - 10}
+            y={item['left_begin_y'] - 15}
+            text={((event_name.includes('hokei') && left_player_flag !== null && left_player_flag >= 0 && left_player_flag <= 3) ? left_player_flag : "")}
+            fill={'blue'}
+            fontSize={15} />
+                <Text
+            x={x + width / 2 + 8}
+            y={item['left_begin_y'] - 15}
+            text={((event_name.includes('hokei') && left_player_flag !== null && left_player_flag >= 0 && left_player_flag <= 3) ? (3 - left_player_flag) : "")}
+            fill={'blue'}
+            fontSize={15} />
                 </>
         );
         }
