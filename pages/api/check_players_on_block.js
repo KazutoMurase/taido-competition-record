@@ -129,14 +129,23 @@ export default async (req, res) => {
         let result_array = [];
         for (let i = 0; i < data.length; i++) {
             for (let j = 0; j < sorted_data.length; j++) {
-                if ('round' in sorted_data[j] &&
-                   data[i].id === sorted_data[j].id) {
-                    const round = sorted_data[j]['round'];
-                    let game_id = sorted_data[j]['id'];
-                    for (let k = 0; k < round - 1; k++) {
-                        game_id -= round_num[k+1];
+                if (data[i].id === sorted_data[j].id) {
+                    let game_id;
+                    let block_pos;
+                    if (j === sorted_data.length - 1) {
+                        block_pos = 'center';
+                        game_id = 1;
+                    } else if ('round' in sorted_data[j]) {
+                        const round = sorted_data[j]['round'];
+                        game_id = sorted_data[j]['id'];
+                        for (let k = 0; k < round - 1; k++) {
+                            game_id -= round_num[k+1];
+                        }
+                        block_pos = (game_id <= round_num[round] / 2 ? 'left' : 'right');
+                    } else {
+                        block_pos = 'center';
+                        game_id = 1;
                     }
-                    const block_pos = (game_id <= round_num[round] / 2 ? 'left' : 'right');
                     if (data[i].left_player_id !== null) {
                         let duplicated = false;
                         for (let k = 0; k < result_array.length; k++) {
@@ -161,7 +170,8 @@ export default async (req, res) => {
                                                'name': data[i].left_name,
                                                'name_kana': data[i].left_name_kana,
                                                'requested': requested,
-                                               'color': (block_pos === 'left' ? 'red' : 'white')});
+                                               'color': ((block_pos === 'left' ||
+                                                          block_pos === 'center') ? 'red' : 'white')});
                         }
                     }
                     if (data[i].right_player_id !== null) {
@@ -188,7 +198,8 @@ export default async (req, res) => {
                                                'name': data[i].right_name,
                                                'name_kana': data[i].right_name_kana,
                                                'requested': requested,
-                                               'color': (block_pos === 'left' ? 'white' : 'red')});
+                                               'color': ((block_pos === 'left' ||
+                                                          block_pos === 'center') ? 'white' : 'red')});
                         }
                     }
                 }

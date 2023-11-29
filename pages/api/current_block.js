@@ -107,7 +107,10 @@ export default async (req, res) => {
                 sorted_data[i]['right_group_name'] = sorted_data[i]['right_group_name'].replace('\'', '').replace('\'', '');
             }
             if (sorted_data[i]['id'] === current_id) {
-                if ('round' in sorted_data[i]) {
+                if (i === sorted_data.length - 1) {
+                    sorted_data[i]['block_pos'] = 'center';
+                    sorted_data[i]['left_color'] = 'red';
+                } else if ('round' in sorted_data[i]) {
                     const round = sorted_data[i]['round'];
                     let game_id = sorted_data[i]['id'];
                     for (let j = 0; j < round - 1; j++) {
@@ -121,10 +124,9 @@ export default async (req, res) => {
                         sorted_data[i]['left_color'] = 'white';
                     }
                 } else {
-                    // TODO: set left color
                     sorted_data[i]['block_pos'] = 'center';
+                    sorted_data[i]['left_color'] = 'red';
                 }
-                console.log(sorted_data[i]);
                 res.json(sorted_data[i]);
                 return;
             }

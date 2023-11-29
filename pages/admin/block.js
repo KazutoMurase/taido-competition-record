@@ -121,7 +121,7 @@ export default function Home() {
     };
     return (
             <div>
-            <h1>Aコート</h1>
+            <h1>{block_number.toUpperCase()}コート</h1>
             <table border="1">
             <tbody>
             <tr className={checkStyles.column}>
