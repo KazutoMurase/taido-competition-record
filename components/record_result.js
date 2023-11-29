@@ -59,43 +59,63 @@ function onBack(data, block_number, function_after_post) {
 }
 
 function ShowRedFlags(event_name, initialRadioButton, selectedRadioButton) {
-    const targetButton = (selectedRadioButton === null) ? initialRadioButton : selectedRadioButton;
+    const flag = (selectedRadioButton === null) ? parseInt(initialRadioButton) : parseInt(selectedRadioButton);
     if (event_name.includes('hokei')) {
+        if (flag === 4) {
+            return (<></>);
+        }
     return (<>
-        {parseInt(targetButton) >= 1 ?
+        {flag >= 1 ?
          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" /> : null}
-        {parseInt(targetButton) >= 2 ?
+        {flag >= 2 ?
          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" /> : null}
-        {parseInt(targetButton) >= 3 ?
+        {flag >= 3 ?
          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" /> : null}
         </>);
     } else if (event_name.includes('zissen')) {
         return (<>
         <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="white" />
-        {parseInt(targetButton) <= 0 ?
+        {flag === 0 ?
          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" /> : null}
                 </>);
     }
 }
 
 function ShowWhiteFlags(event_name, initialRadioButton, selectedRadioButton) {
-    const targetButton = (selectedRadioButton === null) ? initialRadioButton : selectedRadioButton;
+    const flag = (selectedRadioButton === null) ? parseInt(initialRadioButton) : parseInt(selectedRadioButton);
     if (event_name.includes('hokei')) {
+        if (flag === -1) {
+            return (<></>);
+        }
     return (<>
-          {parseInt(targetButton) <= 0 ?
+          {flag <= 0 ?
            <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="gray" /> : null}
-          {parseInt(targetButton) <= 1 ?
+          {flag <= 1 ?
            <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="gray" /> : null}
-          {parseInt(targetButton) <= 2 ?
+          {flag <= 2 ?
            <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="gray" /> : null}
         </>);
     } else if (event_name.includes('zissen')) {
         return (<>
         <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="white" />
-        {parseInt(targetButton) >= 1 ?
+        {flag >= 1 ?
          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="gray" /> : null}
                 </>);
     }
+}
+
+function ShowLeftName(data) {
+    if (data.left_retire) {
+        return (<s><h1>{data.left_name}</h1></s>);
+    }
+    return (<span><h1>{data.left_name}</h1></span>);
+}
+
+function ShowRightName(data) {
+    if (data.right_retire) {
+        return (<s><h1>{data.right_name}</h1></s>);
+    }
+    return (<span><h1>{data.right_name}</h1></span>);
 }
 
 function RecordResult({block_number, event_name, schedule_id}) {
@@ -182,9 +202,7 @@ function RecordResult({block_number, event_name, schedule_id}) {
           type="submit"
           onClick={e => onSubmit(data, no_game_red_winner, block_number, event_name)}>赤不戦勝</Button>
           <h3>{data.left_color === 'white' ? data.right_group_name : data.left_group_name}</h3>
-          {((data.left_color === 'white' && data.right_retire) || (data.left_color === 'red' && data.left_retire)) ?
-           (<s><h1>{data.left_color === 'white' ? data.right_name : data.left_name}</h1></s>) :
-           (<span><h1>{data.left_color === 'white' ? data.right_name : data.left_name}</h1></span>)}
+          {data.left_color === 'white' ? ShowRightName(data) : ShowLeftName(data)}
       {ShowRedFlags(event_name, initialRadioButton, selectedRadioButton)}
           </Grid>
           <Grid item xs={4}>
@@ -192,9 +210,7 @@ function RecordResult({block_number, event_name, schedule_id}) {
                   type="submit"
           onClick={e => onSubmit(data, no_game_white_winner, block_number, event_name)}>白不戦勝</Button>
           <h3>{data.left_color === 'white' ? data.left_group_name : data.right_group_name}</h3>
-          {((data.left_color === 'white' && data.left_retire) || (data.left_color === 'red' && data.right_retire)) ?
-          (<s><h1>{data.left_color === 'white' ? data.left_name : data.right_name}</h1></s>) :
-          (<span><h1>{data.left_color === 'white' ? data.left_name : data.right_name}</h1></span>)}
+          {data.left_color === 'white' ? ShowLeftName(data) : ShowRightName(data)}
       {ShowWhiteFlags(event_name, initialRadioButton, selectedRadioButton)}
           </Grid>
           <Grid item xs={3} />
