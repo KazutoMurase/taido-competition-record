@@ -1,10 +1,9 @@
-import { db } from '@vercel/postgres';
+import conn from '../../lib/db'
 
 export default async (req, res) => {
     try {
-        const client = await db.connect();
         const query = 'update current_block_' + req.body.update_block + ' set id = id + 1, game_id = 1';
-        const result = await client.query(query);
+        const result = await conn.query(query);
         res.json({});
     } catch (error) {
         console.log(error);

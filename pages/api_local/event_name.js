@@ -1,8 +1,7 @@
-import { db } from '@vercel/postgres';
+import conn from '../../lib/db'
 
 export default async (req, res) => {
     try {
-        const client = await db.connect();
         const block_number = req.query.block_number;
         let query;
         if (req.query.schedule_id !== undefined &&
@@ -11,7 +10,7 @@ export default async (req, res) => {
         } else {
             query = 'SELECT t1.event_id FROM current_block_' + block_number + ' AS t0 LEFT JOIN block_' + block_number + ' AS t1 ON t0.id = t1.id';
         }
-        const result = await client.query(query);
+        const result = await conn.query(query);
         const event_id = result.rows[0].event_id;
         if (event_id === 1) {
             res.json(['zissen_man']);

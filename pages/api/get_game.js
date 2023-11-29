@@ -1,11 +1,12 @@
-import conn from '../../lib/db'
+import { db } from '@vercel/postgres';
 
 export default async (req, res) => {
     try {
+        const client = await db.connect();
         const current_id = parseInt(req.query.id);
         const event_name = req.query.event_name;
         let query = 'SELECT t1.id, t1.left_player_flag, t1.left_player_id, t1.right_player_id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t3.name AS right_name FROM ' + event_name + ' AS t1 LEFT JOIN players AS t2 ON t1.left_player_id = t2.' + event_name + '_player_id LEFT JOIN players AS t3 ON t1.right_player_id = t3.' + event_name + '_player_id';
-        const result_schedule = await conn.query(query);
+        const result_schedule = await client.query(query);
         const sorted_data = result_schedule.rows.sort((a, b) => a.id - b.id);
         // set round 0, 1,...until (without final and before final)
         let round_num = {};

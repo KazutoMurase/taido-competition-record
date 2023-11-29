@@ -1,14 +1,13 @@
-import { db } from '@vercel/postgres';
+import conn from '../../lib/db'
 
 export default async (req, res) => {
     try {
-        const client = await db.connect();
         const block_name = 'block_' + req.body.block_number;
         const schedule_id = req.body.schedule_id;
         let query = 'update ' + block_name + ' set players_checked = 1 where id = ' + schedule_id;
-        let result = await client.query(query);
+        let result = await conn.query(query);
         query = 'select event_id from ' + block_name + ' where id = ' + schedule_id;
-        result = await client.query(query);
+        result = await conn.query(query);
         let game_type_name;
         // TODO: set from database
         if (result.rows[0].event_id === 1) {
@@ -25,12 +24,12 @@ export default async (req, res) => {
         for (let i = 0; i < req.body.left_retire_array.length; i++) {
             let item = req.body.left_retire_array[i];
             query = 'update ' + game_type_name + ' set left_retire = ' + (item.is_retired ? 1 : 0) + ' where id = ' + item.id;
-            result = await client.query(query);
+            result = await conn.query(query);
         }
         for (let i = 0; i < req.body.right_retire_array.length; i++) {
             let item = req.body.right_retire_array[i];
             query = 'update ' + game_type_name + ' set right_retire = ' + (item.is_retired ? 1 : 0) + ' where id = ' + item.id;
-            result = await client.query(query);
+            result = await conn.query(query);
         }
         res.json({});
     } catch (error) {

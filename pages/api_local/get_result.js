@@ -1,4 +1,5 @@
-import { db } from '@vercel/postgres';
+import conn from '../../lib/db'
+
 
 function update(sorted_data, item, block_indices, value) {
     if ('prev_left_id' in item) {
@@ -20,10 +21,9 @@ function update(sorted_data, item, block_indices, value) {
 
 export default async (req, res) => {
     try {
-        const client = await db.connect();
         const event_name = req.query.event_name;
         const query = 'SELECT t1.id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t2.name_kana AS left_name_kana, t4.name AS left_group_name, t3.name AS right_name, t3.name_kana AS right_name_kana, t5.name AS right_group_name, t1.left_player_flag FROM ' + event_name + ' AS t1 LEFT JOIN players AS t2 ON t1.left_player_id = t2.' + event_name + '_player_id LEFT JOIN players AS t3 ON t1.right_player_id = t3.' + event_name + '_player_id LEFT JOIN groups AS t4 ON t2.group_id = t4.id LEFT JOIN groups AS t5 ON t3.group_id = t5.id';
-        const result_schedule = await client.query(query);
+        const result_schedule = await conn.query(query);
         const sorted_data = result_schedule.rows.sort((a, b) => a.id - b.id);
         // set round 0, 1, ...
         let round_num = {};

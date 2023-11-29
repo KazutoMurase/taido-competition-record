@@ -1,46 +1,45 @@
-import { db } from '@vercel/postgres';
+import conn from '../../lib/db'
 
 export default async (req, res) => {
     try {
-        const client = await db.connect();
         const event_name = req.body.event_name;
         let query = 'update ' + event_name + ' set left_player_flag = $2 where id = $1';
         let values = [req.body.id, req.body.left_player_flag];
-        let result = await client.query(query, values);
+        let result = await conn.query(query, values);
         let count_query = 'select count(*) from ' + event_name;
-        let count_result = await client.query(count_query);
+        let count_result = await conn.query(count_query);
         const count = count_result.rows[0]['count'];
         if (req.body.next_type === 'left') {
             query = 'update ' + event_name + ' set left_player_id = $1 where id = $2';
             values = [req.body.next_player_id, req.body.next_id];
-            result = await client.query(query, values);
+            result = await conn.query(query, values);
             if (parseInt(req.body.next_id) === parseInt(count)) {
                 values = [req.body.loser_id, req.body.next_id - 1];
-                result = await client.query(query, values);
+                result = await conn.query(query, values);
             }
         } else {
             query = 'update ' + event_name + ' set right_player_id = $1 where id = $2';
             values = [req.body.next_player_id, req.body.next_id];
-            result = await client.query(query, values);
+            result = await conn.query(query, values);
             if (parseInt(req.body.next_id) === parseInt(count)) {
                 values = [req.body.loser_id, req.body.next_id - 1];
-                result = await client.query(query, values);
+                result = await conn.query(query, values);
             }
         }
         const block_name = 'current_block_' + req.body.update_block;
         query = 'select id, game_id from ' + block_name;
-        result = await client.query(query);
+        result = await conn.query(query);
         const next_game_id = result.rows[0].game_id + 1;
         const schedule_id = result.rows[0].id;
         query = 'select id from block_' + req.body.update_block + '_games where order_id = ' + next_game_id + " and schedule_id = " + schedule_id;
-        result = await client.query(query);
+        result = await conn.query(query);
         console.log(result.rows);
         if (result.rows.length === 0) {
             query = 'update ' + block_name + ' set id = id + 1, game_id = 1';
-            result = await client.query(query);
+            result = await conn.query(query);
         } else {
             query = 'update ' + block_name + ' set game_id = ' + next_game_id;
-            result = await client.query(query);
+            result = await conn.query(query);
         }
         res.json({});
     } catch (error) {

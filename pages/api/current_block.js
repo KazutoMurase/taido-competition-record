@@ -1,10 +1,11 @@
-import conn from '../../lib/db'
+import { db } from '@vercel/postgres';
 
 export default async (req, res) => {
     try {
+        const client = await db.connect();
         const block_name = 'block_' + req.query.block_number;
         let query = 'SELECT t0.id, t0.game_id, t1.event_id from current_' + block_name + ' AS t0 LEFT JOIN ' + block_name + ' AS t1 ON t0.id = t1.id';
-        let result = await conn.query(query);
+        let result = await client.query(query);
         let game_type_name;
         // TODO: set from database
         if (result.rows[0].event_id === 1) {
@@ -25,10 +26,10 @@ export default async (req, res) => {
         }
         query = 'SELECT game_id from ' + block_name + '_games where order_id = $1 and schedule_id = $2';
         let values = [result.rows[0].game_id, result.rows[0].id];
-        result = await conn.query(query, values);
+        result = await client.query(query, values);
         let current_id = result.rows[0].game_id;
         query = 'SELECT t1.id, t1.left_player_flag, t1.left_player_id, t1.right_player_id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t3.name AS right_name, t4.name AS left_group_name, t5.name AS right_group_name, t1.left_retire, t1.right_retire FROM ' + game_type_name + ' AS t1 LEFT JOIN players AS t2 ON t1.left_player_id = t2.' + game_type_name + '_player_id LEFT JOIN players AS t3 ON t1.right_player_id = t3.' + game_type_name + '_player_id LEFT JOIN groups AS t4 ON t2.group_id = t4.id LEFT JOIN groups AS t5 ON t3.group_id = t5.id';
-        const result_schedule = await conn.query(query);
+        const result_schedule = await client.query(query);
         const sorted_data = result_schedule.rows.sort((a, b) => a.id - b.id);
         // set round 0, 1,...until (without final and before final)
         let round_num = {};

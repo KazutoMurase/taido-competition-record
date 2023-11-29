@@ -1,24 +1,24 @@
-import { db } from '@vercel/postgres';
+import conn from '../../lib/db'
 
 export default async (req, res) => {
     try {
-        const client = await db.connect();
+        console.log("req nom", req.body);
         if (req.body.player_id !== undefined) {
             const query = `DELETE FROM notification_request WHERE player_id = $1`
             const values = [req.body.player_id]
-            const result = await client.query(query, values);
+            const result = await conn.query(query, values);
             console.log(result);
             res.json({});
         }
         else if (req.body.group_id !== undefined) {
             const query = `DELETE FROM notification_request WHERE group_id = $1 and event_id = $2`
             const values = [req.body.group_id, req.body.event_id]
-            const result = await client.query(query, values);
+            const result = await conn.query(query, values);
             console.log(result);
             res.json({});
         } else {
             const query = `DELETE FROM notification_request WHERE 1 = 1`
-            const result = await client.query(query);
+            const result = await conn.query(query);
             console.log(result);
             res.json({});
         }
