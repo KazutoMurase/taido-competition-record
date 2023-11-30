@@ -11,6 +11,7 @@
     "@fontsource/roboto": "^5.0.8",
     "@mui/icons-material": "^5.14.16",
     "@mui/material": "^5.14.16",
+    "@vercel/kv": "^1.0.0",
     "@vercel/postgres": "^0.5.1",
     "axios": "^1.6.0",
     "canvas": "^2.11.2",

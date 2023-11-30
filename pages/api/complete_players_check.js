@@ -1,4 +1,5 @@
 import { db } from '@vercel/postgres';
+import { kv } from "@vercel/kv";
 
 export default async (req, res) => {
     try {
@@ -32,6 +33,9 @@ export default async (req, res) => {
             query = 'update ' + game_type_name + ' set right_retire = ' + (item.is_retired ? 1 : 0) + ' where id = ' + item.id;
             result = await client.query(query);
         }
+        const key = 'updateCompletePlayersTimestamp';
+        const timestamp = Date.now();
+        await kv.set(key, timestamp);
         res.json({});
     } catch (error) {
         console.log(error);
