@@ -205,7 +205,7 @@ function RecordResult({block_number, event_name, schedule_id}) {
           <br/>
           <Grid container>
           <Grid item xs={3} />
-          <Grid item xs={4} style={{height: '25vh' }}>
+          <Grid item xs={4} style={{height: '30vh' }}>
           <Button variant="contained"
       type="submit"
       onClick={e => onSubmit(data, no_game_red_winner, block_number, event_name)}>赤不戦勝</Button>
@@ -213,7 +213,7 @@ function RecordResult({block_number, event_name, schedule_id}) {
           {data.left_color === 'white' ? ShowRightName(data) : ShowLeftName(data)}
       {ShowRedFlags(event_name, initialRadioButton, selectedRadioButton)}
       </Grid>
-          <Grid item xs={4}>
+          <Grid item xs={4} style={{height: '30vh' }}>
           <Button variant="contained"
       type="submit"
       onClick={e => onSubmit(data, no_game_white_winner, block_number, event_name)}>白不戦勝</Button>
@@ -221,6 +221,7 @@ function RecordResult({block_number, event_name, schedule_id}) {
           {data.left_color === 'white' ? ShowLeftName(data) : ShowRightName(data)}
       {ShowWhiteFlags(event_name, initialRadioButton, selectedRadioButton)}
       </Grid>
+          <br />
           <Grid container justifyContent="center" alignItems="center" style={{ height: '8vh' }}>
           {event_name.includes('hokei') ? (<div><h2>赤の旗</h2></div>) : ''}
       </Grid>
@@ -253,6 +254,7 @@ function RecordResult({block_number, event_name, schedule_id}) {
             </>)}
           </Grid>
           </Grid>
+          <br />
           <br />
           <br />
           <Grid container justifyContent="center" alignItems="center" style={{ height: '10vh' }}>
