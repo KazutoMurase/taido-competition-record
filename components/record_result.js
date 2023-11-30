@@ -205,7 +205,7 @@ function RecordResult({block_number, event_name, schedule_id}) {
           <br/>
           <Grid container>
           <Grid item xs={3} />
-          <Grid item xs={4} style={{height: '30vh' }}>
+          <Grid item xs={4} style={{height: '220px' }}>
           <Button variant="contained"
       type="submit"
       onClick={e => onSubmit(data, no_game_red_winner, block_number, event_name)}>赤不戦勝</Button>
@@ -213,7 +213,7 @@ function RecordResult({block_number, event_name, schedule_id}) {
           {data.left_color === 'white' ? ShowRightName(data) : ShowLeftName(data)}
       {ShowRedFlags(event_name, initialRadioButton, selectedRadioButton)}
       </Grid>
-          <Grid item xs={4} style={{height: '30vh' }}>
+          <Grid item xs={4} style={{height: '220px' }}>
           <Button variant="contained"
       type="submit"
       onClick={e => onSubmit(data, no_game_white_winner, block_number, event_name)}>白不戦勝</Button>
