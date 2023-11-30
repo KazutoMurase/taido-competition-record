@@ -128,6 +128,8 @@ export default function Home() {
             <Grid container justifyContent="center" alignItems="center" style={{ height: '8vh' }}>
             <h1>{block_number.toUpperCase()}コート</h1>
             </Grid>
+            <br/>
+            <br/>
             <table border="1">
             <tbody>
             <tr className={checkStyles.column}>

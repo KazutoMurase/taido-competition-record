@@ -151,6 +151,8 @@ function CheckPlayers({block_number, schedule_id}) {
           <Grid container justifyContent="center" alignItems="center" style={{ height: '8vh' }}>
           <h2><u>コート{block_number.toUpperCase()}</u></h2>
           </Grid>
+          <br/>
+          <br/>
           <table border="1">
           <tbody>
           <tr className={checkStyles.column}>

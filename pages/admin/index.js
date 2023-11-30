@@ -19,7 +19,7 @@ export default function Home() {
             <br/>
             <Container maxWidth="md">
             <Grid container justifyContent="center" alignItems="center" style={{ height: '1vh' }}>
-            <h1><u>躰道 大会管理システム(β版)</u></h1>
+            <h1><u>躰道 大会管理システム</u></h1>
             </Grid>
             <br/><br/><br/><br/>
             <Grid container justifyContent="center" alignItems="center" style={{ height: '1vh' }}>

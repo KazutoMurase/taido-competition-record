@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
+import Box from '@mui/material/Box';
 import { Layer, Stage, Rect, Text } from "react-konva";
 import Grid from '@mui/material/Grid';
 
@@ -540,11 +542,10 @@ function GetResult({editable = false, updateInterval = 0, returnUrl = null, even
     }
   return (
           <div>
-          <Grid container>
-          <Grid ime xs={5} />
-          <Grid item xs={4}>
+          <Container maxWidth="lg">
+          <Box style={{ minWidth: '1100px' }}>
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '8vh' }}>
           <h1>{event_full_name}</h1>
-          </Grid>
           </Grid>
           <Stage width={1100} height={900}>
           <Layer>
@@ -562,6 +563,8 @@ function GetResult({editable = false, updateInterval = 0, returnUrl = null, even
            <Button variant="contained" type="submit" onClick={e => onBack()}>戻る</Button> : <></>
           }
           </Grid>
+          </Box>
+          </Container>
           </div>
   );
 }
