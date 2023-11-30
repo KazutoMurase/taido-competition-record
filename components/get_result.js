@@ -309,6 +309,7 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
                     fill={'gray'}
                     fontSize={12}
                     onClick={e => onUpdate(item['id'], editable)}
+                    onTap={e => onUpdate(item['id'], editable)}
                     />
                     <Text
                     x={x + width / 2 - 10}
@@ -373,6 +374,7 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
             fill={'gray'}
             fontSize={12}
             onClick={e => onUpdate(item['id'], editable)}
+            onTap={e => onUpdate(item['id'], editable)}
                 />
                 <Text
             x={x + width / 2 - 10}
@@ -484,6 +486,7 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
             fill={'gray'}
             fontSize={12}
             onClick={e => onUpdate(item['id'], editable)}
+            onTap={e => onUpdate(item['id'], editable)}
                 />
                 </>
         );
