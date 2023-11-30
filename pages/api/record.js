@@ -49,7 +49,6 @@ export default async (req, res) => {
             result = await client.query(query);
         }
         const key = 'latest_update_result_for_' + event_name + '_timestamp';
-        const timestamp = Date.now();
         await kv.set(key, timestamp);
         res.json({});
     } catch (error) {
