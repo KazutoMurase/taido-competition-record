@@ -196,9 +196,13 @@ function RecordResult({block_number, event_name, schedule_id}) {
           <Grid container justifyContent="center" alignItems="center" style={{ height: '8vh' }}>
           <h2><u>コート{block_number.toUpperCase()}</u></h2>
           </Grid>
+          <br/>
+          <br/>
           <Grid container justifyContent="center" alignItems="center" style={{ height: '8vh' }}>
           <h2>第{data.id}試合</h2>
           </Grid>
+          <br/>
+          <br/>
           <Grid container>
           <Grid item xs={3} />
           <Grid item xs={4}>
@@ -217,10 +221,10 @@ function RecordResult({block_number, event_name, schedule_id}) {
           {data.left_color === 'white' ? ShowLeftName(data) : ShowRightName(data)}
       {ShowWhiteFlags(event_name, initialRadioButton, selectedRadioButton)}
       </Grid>
-          <Grid container justifyContent="center" alignItems="center" style={{ height: '5vh' }}>
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '10vh' }}>
           {event_name.includes('hokei') ? (<div><h2>赤の旗</h2></div>) : ''}
           </Grid>
-          <Grid container justifyContent="center" alignItems="center" style={{ height: '8vh' }}>
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '12vh' }}>
           {event_name.includes('hokei') ?
            (<>
             <input class="radio-inline__input" type="radio" id="choice0" name="contact" value="0"
@@ -248,7 +252,7 @@ function RecordResult({block_number, event_name, schedule_id}) {
           <br />
           <br />
           </Grid>
-          <Grid container justifyContent="center" alignItems="center" style={{ height: '8vh' }}>
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '10vh' }}>
           <Button variant="contained"
       type="submit"
       onClick={e => onSubmit(data, (selectedRadioButton === null) ? initialRadioButton : selectedRadioButton,
