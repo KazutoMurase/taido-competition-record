@@ -4,7 +4,8 @@ export default async (req, res) => {
     try {
         const client = await db.connect();
         const block_name = 'block_' + req.query.block_number;
-        let query = 'SELECT t0.id, t0.game_id, t1.event_id from current_' + block_name + ' AS t0 LEFT JOIN ' + block_name + ' AS t1 ON t0.id = t1.id';
+        const current_block_name = 'current_' + block_name;
+        let query = 'SELECT t0.id, t0.game_id, t1.event_id from ' + current_block_name + ' AS t0 LEFT JOIN ' + block_name + ' AS t1 ON t0.id = t1.id';
         let result = await client.query(query);
         let game_type_name;
         if (result.rows[0].event_id === 1) {

@@ -28,21 +28,25 @@ export default async (req, res) => {
                 result = await client.query(query, values);
             }
         }
-        const block_name = 'current_block_' + req.body.update_block;
-        query = 'select id, game_id from ' + block_name;
+        const current_block_name = 'current_block_' + req.body.update_block;
+        query = 'select id, game_id from ' + current_block_name;
         result = await client.query(query);
         const next_game_id = result.rows[0].game_id + 1;
         const schedule_id = result.rows[0].id;
         query = 'select id from block_' + req.body.update_block + '_games where order_id = ' + next_game_id + " and schedule_id = " + schedule_id;
         result = await client.query(query);
         console.log(result.rows);
+        const timestamp = Date.now();
+        const update_game_id_key = 'update_game_id_for_' + current_block_name;
+        await kv.set(update_game_id_key, timestamp);
         if (result.rows.length === 0) {
-            query = 'update ' + block_name + ' set id = id + 1, game_id = 1';
+            query = 'update ' + current_block_name + ' set id = id + 1, game_id = 1';
             result = await client.query(query);
+            const update_id_key = 'update_id_for_' + current_block_name;
+            await kv.set(update_id_key, timestamp);
         } else {
-            query = 'update ' + block_name + ' set game_id = ' + next_game_id;
+            query = 'update ' + current_block_name + ' set game_id = ' + next_game_id;
             result = await client.query(query);
-
         }
         const key = 'latest_update_result_for_' + event_name + '_timestamp';
         const timestamp = Date.now();
