@@ -51,7 +51,7 @@ function ShowGamesText(item) {
     return prefix + item['games_text'];
 }
 
-const Home = ({props}) => {
+const Home = ({data}) => {
     const router = useRouter();
     const { block_number } = router.query;
     if (block_number === undefined) {
@@ -111,7 +111,7 @@ const Home = ({props}) => {
             <tr className={checkStyles.column}>
             <th>競技</th><th>時間</th><th>試合番号</th><th>試合数</th><th></th>
             </tr>
-            {props.data.map((item, index) => (
+            {data.map((item, index) => (
                     <tr className={checkStyles.column} bgcolor={item['id'] === current.id ? 'yellow' : 'white'}>
                     <td>{item['name'].replace('\'', '').replace('\'', '')}</td>
                     <td>{item['time_schedule'].replace('\'', '').replace('\'', '')}</td>
