@@ -43,7 +43,7 @@ function onClear(id, function_after_post) {
 function CheckPlayers({block_number, schedule_id}) {
     const router = useRouter();
     function onBack() {
-        router.push("/admin/block/" + block_number);
+        router.push("/admin/block?block_number=" + block_number);
     }
 
     const [leftRetireStates, setLeftRetireStates] = useState([]);
@@ -94,7 +94,7 @@ function CheckPlayers({block_number, schedule_id}) {
                 console.log(response);
             })
             .catch((e) => { console.log(e)})
-        router.push("/admin/block/" + block_number);
+        router.push("/admin/block?block_number=" + block_number);
     }
 
   let title;

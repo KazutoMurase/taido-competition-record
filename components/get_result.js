@@ -500,7 +500,7 @@ function GetResult({editable = false, updateInterval = 0, returnUrl = null, even
         returnUrl = event_name + '_result';
     }
     const onBack = () => {
-        router.push('/admin/block/' + block_number);
+        router.push('/admin/block?block_number=' + block_number);
     }
 
     const [data, setData] = useState([]);
