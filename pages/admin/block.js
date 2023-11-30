@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import React from 'react';
+import Container from '@mui/material/Container';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import checkStyles from '../../styles/checks.module.css';
@@ -121,7 +123,11 @@ export default function Home() {
     };
     return (
             <div>
+            <Container maxWidth="md">
+            <Box style={{ minWidth: '840px' }}>
+            <Grid container justifyContent="center" alignItems="center" style={{ height: '8vh' }}>
             <h1>{block_number.toUpperCase()}コート</h1>
+            </Grid>
             <table border="1">
             <tbody>
             <tr className={checkStyles.column}>
@@ -147,6 +153,8 @@ export default function Home() {
             <Grid container justifyContent="center" alignItems="center" style={{ height: '1vh' }}>
             <Button variant="contained" type="submit" onClick={e => ToBack()}>戻る</Button>
             </Grid>
+            </Box>
+            </Container>
             </div>
     )
 }

@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import Container from '@mui/material/Container';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import FlagCircleRoundedIcon from '@mui/icons-material/FlagCircleRounded';
@@ -144,15 +146,11 @@ function CheckPlayers({block_number, schedule_id}) {
     }
   return (
           <div>
-          <Grid container>
-          <Grid item xs={5} />
-          <Grid item xs={5}>
+          <Container maxWidth="md">
+          <Box style={{ minWidth: '720px' }}>
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '8vh' }}>
           <h2><u>コート{block_number.toUpperCase()}</u></h2>
           </Grid>
-          <Grid item xs={2} />
-          <Grid item xs={1} />
-          <Grid item xs={1} />
-          <Grid item xs={10}>
           <table border="1">
           <tbody>
           <tr className={checkStyles.column}>
@@ -186,16 +184,14 @@ function CheckPlayers({block_number, schedule_id}) {
           ))}
           </tbody>
           </table>
-          </Grid>
-          <Grid item xs={1} />
-          <Grid item xs={4} />
-          <Grid item xs={2}>
           <br />
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '8vh' }}>
           <Button variant="contained" type="submit" onClick={e => onFinish(block_number, schedule_id)}>決定</Button>
           &nbsp;&nbsp;
           <Button variant="contained" type="submit" onClick={e => onBack()}>戻る</Button>
           </Grid>
-          </Grid>
+          </Box>
+          </Container>
           </div>
   );
 }

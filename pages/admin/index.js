@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import React from 'react';
+import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import checkStyles from '../../styles/checks.module.css';
@@ -16,6 +17,7 @@ export default function Home() {
     return (
             <div>
             <br/>
+            <Container maxWidth="md">
             <Grid container justifyContent="center" alignItems="center" style={{ height: '1vh' }}>
             <h1><u>躰道 大会管理システム(β版)</u></h1>
             </Grid>
@@ -40,6 +42,7 @@ export default function Home() {
             <Grid container justifyContent="center" alignItems="center" style={{ height: '1vh' }}>
             <Button variant="contained" type="submit" onClick={e => ToNotificationRequest()}>司会用</Button>
             </Grid>
+            </Container>
         </div>
     );
 }
