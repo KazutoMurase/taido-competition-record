@@ -27,7 +27,6 @@ const Home = () => {
                         <RecordResult block_number={block_number} event_name={item} schedule_id={schedule_id} />
                 ))}
                 <br />
-                <hr />
                 {data.map((item, index) => (
                         <GetResult editable={true} event_name={item} returnUrl={return_url} block_number={block_number} />
                 ))}

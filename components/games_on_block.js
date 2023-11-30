@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import FlagCircleRoundedIcon from '@mui/icons-material/FlagCircleRounded';
 import checkStyles from '../styles/checks.module.css';
@@ -115,6 +117,8 @@ function GamesOnBlock({block_number, event_name, schedule_id}) {
 
   return (
           <div>
+          <Container maxWidth="md">
+          <Box style={{ minWidth: '920px' }}>
           <table border="1">
           <tbody>
           <tr className={checkStyles.column}>
@@ -155,6 +159,8 @@ function GamesOnBlock({block_number, event_name, schedule_id}) {
           ))}
           </tbody>
           </table>
+          </Box>
+          </Container>
           </div>
   );
 }

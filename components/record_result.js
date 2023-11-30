@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import FlagCircleRoundedIcon from '@mui/icons-material/FlagCircleRounded';
 
@@ -189,35 +191,38 @@ function RecordResult({block_number, event_name, schedule_id}) {
 
   return (
           <div>
-          <Grid container>
-          <Grid item xs={6} />
-          <Grid item xs={4}>
+          <Container maxWidth="md">
+          <Box style={{ minWidth: '1100px' }}>
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '8vh' }}>
           <h2><u>コート{block_number.toUpperCase()}</u></h2>
+          </Grid>
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '8vh' }}>
           <h2>第{data.id}試合</h2>
           </Grid>
-          <Grid item xs={2} />
-          <Grid item xs={4} />
+          <Grid container>
+          <Grid item xs={3} />
           <Grid item xs={4}>
           <Button variant="contained"
-          type="submit"
-          onClick={e => onSubmit(data, no_game_red_winner, block_number, event_name)}>赤不戦勝</Button>
+      type="submit"
+      onClick={e => onSubmit(data, no_game_red_winner, block_number, event_name)}>赤不戦勝</Button>
           <h3>{data.left_color === 'white' ? data.right_group_name : data.left_group_name}</h3>
           {data.left_color === 'white' ? ShowRightName(data) : ShowLeftName(data)}
       {ShowRedFlags(event_name, initialRadioButton, selectedRadioButton)}
-          </Grid>
+      </Grid>
           <Grid item xs={4}>
           <Button variant="contained"
-                  type="submit"
-          onClick={e => onSubmit(data, no_game_white_winner, block_number, event_name)}>白不戦勝</Button>
+      type="submit"
+      onClick={e => onSubmit(data, no_game_white_winner, block_number, event_name)}>白不戦勝</Button>
           <h3>{data.left_color === 'white' ? data.left_group_name : data.right_group_name}</h3>
           {data.left_color === 'white' ? ShowLeftName(data) : ShowRightName(data)}
       {ShowWhiteFlags(event_name, initialRadioButton, selectedRadioButton)}
+      </Grid>
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '5vh' }}>
+          {event_name.includes('hokei') ? (<div><h2>赤の旗</h2></div>) : ''}
           </Grid>
-          <Grid item xs={3} />
-          <Grid item xs={2} />
-          <Grid item xs={5}>
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '8vh' }}>
           {event_name.includes('hokei') ?
-           (<><h2>赤の旗</h2>
+           (<>
             <input class="radio-inline__input" type="radio" id="choice0" name="contact" value="0"
             onChange={handleRadioButtonChange} checked={updateChecked(0)} />
             <label class="radio-inline__label" for="choice0">0</label>
@@ -239,25 +244,22 @@ function RecordResult({block_number, event_name, schedule_id}) {
             onChange={handleRadioButtonChange}  checked={updateChecked(1)} />
             <label class="radio-inline__label" for="choice1">白勝利</label>
             </>)}
+          </Grid>
           <br />
           <br />
           </Grid>
-          <Grid item xs={2} />
-          <Grid item xs={6} />
-          <Grid item xs={1} >
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '8vh' }}>
           <Button variant="contained"
       type="submit"
       onClick={e => onSubmit(data, (selectedRadioButton === null) ? initialRadioButton : selectedRadioButton,
                              block_number, event_name, forceFetchData)}>決定</Button>
-          </Grid>
-          <Grid item xs={1} >
+          &nbsp;&nbsp;
           <Button variant="contained"
                   type="submit"
       onClick={e => onBack(data, block_number, forceFetchData)}>戻る</Button>
           </Grid>
-          <Grid item xs={5} />
-          <Grid item xs={3} />
-          </Grid>
+          </Box>
+          </Container>
           </div>
   );
 }

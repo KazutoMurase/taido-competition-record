@@ -26,7 +26,6 @@ const Home = () => {
                      <GamesOnBlock block_number={block_number} event_name={item} schedule_id={schedule_id} />
              ))}
             <br />
-            <hr />
             {data.map((item, index) => (
                     <GetResult updateInterval={3000} event_name={item} block_number={block_number} />
             ))}
