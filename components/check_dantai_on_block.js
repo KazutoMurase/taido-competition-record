@@ -44,7 +44,7 @@ function onClear(item, function_after_post) {
 function CheckDantai({block_number, schedule_id}) {
     const router = useRouter();
     function onBack() {
-        router.push("/admin/block?block_number=" + block_number);
+        router.push("/admin/block/" + block_number);
     }
 
     function onFinish(block_number, schedule_id) {
@@ -56,7 +56,7 @@ function CheckDantai({block_number, schedule_id}) {
                 console.log(response);
             })
             .catch((e) => { console.log(e)})
-        router.push("/admin/block?block_number=" + block_number);
+        router.push("/admin/block/" + block_number);
     }
 
   let title;

@@ -8,7 +8,7 @@ import checkStyles from '../../styles/checks.module.css';
 export default function Home() {
     const router = useRouter();
     const ToBlock = (block_number) => {
-        router.push("/admin/block?block_number=" + block_number);
+        router.push("/admin/block/" + block_number);
     }
     const ToNotificationRequest = () => {
         router.push("/admin/notification_request");

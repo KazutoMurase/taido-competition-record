@@ -37,7 +37,7 @@ function GamesOnBlock({block_number, event_name, schedule_id}) {
       const response = await fetch('/api/get_games_on_block?block_number=' + block_number + "&schedule_id=" + schedule_id);
       const result = await response.json();
       if (result.length === 0) {
-          router.push("/admin/block?block_number=" + block_number);
+          router.push("/admin/block/" + block_number);
       }
       setData(result);
   }
