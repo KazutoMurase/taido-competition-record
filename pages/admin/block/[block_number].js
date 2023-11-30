@@ -149,8 +149,7 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }) {
-    const url = 'https://taido-competition-record-two-pearl-51.vercel.app';
-    const response = await fetch(url + '/api/get_time_schedule?block_number=' + params.block_number);
+    const response = await fetch('/api/get_time_schedule?block_number=' + params.block_number);
     const data = await response.json();
     return {
         props: {
