@@ -119,6 +119,7 @@ function GamesOnBlock({block_number, event_name, schedule_id}) {
           <div>
           <Container maxWidth="md">
           <Box style={{ minWidth: '920px' }}>
+          <Grid container justifyContent="center" alignItems="center">
           <table border="1">
           <tbody>
           <tr className={checkStyles.column}>
@@ -159,6 +160,7 @@ function GamesOnBlock({block_number, event_name, schedule_id}) {
           ))}
           </tbody>
           </table>
+          </Grid>
           </Box>
           </Container>
           </div>
