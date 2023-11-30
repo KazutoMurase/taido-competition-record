@@ -15,39 +15,24 @@ export default function Home() {
             <div>
             <br/>
             <Container maxWidth="md">
-            <Grid container justifyContent="center" alignItems="center" style={{ height: '1vh' }}>
+            <Grid container justifyContent="center" alignItems="center" style={{ height: '100px' }}>
             <h1><u>躰道 第56回全日本大会 個人競技速報</u></h1>
             </Grid>
-            <br/><br/><br/><br/>
-
-            <Grid container justifyContent="center" alignItems="center" style={{ height: '1vh' }}>
+            <Grid container justifyContent="center" alignItems="center" style={{ height: '60px' }}>
             <Button variant="contained" type="submit" onClick={e => ToResult("zissen_man")}>男子個人実戦</Button>
             </Grid>
-
-            <br/><br/>
-
-            <Grid container justifyContent="center" alignItems="center" style={{ height: '1vh' }}>
+            <Grid container justifyContent="center" alignItems="center" style={{ height: '60px' }}>
             <Button variant="contained" type="submit" onClick={e => ToResult("zissen_woman")}>女子個人実戦</Button>
             </Grid>
-
-            <br/><br/>
-
-            <Grid container justifyContent="center" alignItems="center" style={{ height: '1vh' }}>
+            <Grid container justifyContent="center" alignItems="center" style={{ height: '60px' }}>
             <Button variant="contained" type="submit" onClick={e => ToResult("hokei_man")}>男子個人法形</Button>
             </Grid>
-
-            <br/><br/>
-
-            <Grid container justifyContent="center" alignItems="center" style={{ height: '1vh' }}>
+            <Grid container justifyContent="center" alignItems="center" style={{ height: '60px' }}>
             <Button variant="contained" type="submit" onClick={e => ToResult("hokei_woman")}>女子個人法形</Button>
             </Grid>
-
-            <br/><br/>
-
-            <Grid container justifyContent="center" alignItems="center" style={{ height: '1vh' }}>
-            <Button variant="contained" type="submit" onClick={e => ToResult("hokei_sonen")}>壮年法形</Button>
+            <Grid container justifyContent="center" alignItems="center" style={{ height: '60px' }}>
+            <Button variant="contained" type="submit" onClick={e => ToResult("hokei_sonen")}>　壮年法形　</Button>
             </Grid>
-
         </Container>
         </div>
     );
