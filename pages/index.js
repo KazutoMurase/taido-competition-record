@@ -1,46 +1,54 @@
-import Head from 'next/head';
-import Link from 'next/link';
-import Date from '../components/date';
-import Layout, { siteTitle } from '../components/layout';
-import utilStyles from '../styles/utils.module.css';
-import { getSortedPostsData } from '../lib/posts';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import React from 'react';
+import Container from '@mui/material/Container';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import checkStyles from '../styles/checks.module.css';
 
-export async function getStaticProps() {
-    const allPostsData = getSortedPostsData();
-    return {
-        props: {
-            allPostsData,
-        },
-    };
-}
-
-export default function Home({ allPostsData }) {
+export default function Home() {
+    const router = useRouter();
+    const ToResult = (event_name) => {
+        router.push("/results/" + event_name);
+    }
     return (
-    <Layout home>
-      <Head>
-        <title>{siteTitle}</title>
-      </Head>
-      <section className={utilStyles.headingMd}>
-            <p>Hello, I am Kazuto</p>
-        <p>
-          (This is a sample website - you’ll be building a site like this on{' '}
-          <a href="https://nextjs.org/learn">our Next.js tutorial</a>.)
-        </p>
-        </section>
-        <section className={`${utilStyles.headingMd} ${utilStyles.padding1px}`}>
-            <h2 className={utilStyles.headingLg}>Blog</h2>
-            <ul className={utilStyles.list}>
-            {allPostsData.map(({ id, date, title }) => (
-                <li className={utilStyles.listItem} key={id}>
-                    <Link href={`/posts/${id}`}>{title}</Link>
-                    <br/>
-                    <small className={utilStyles.lightText}>
-                    <Date dateString={date} />
-                    </small>
-                </li>
-            ))}
-            </ul>
-        </section>
-    </Layout>
+            <div>
+            <br/>
+            <Container maxWidth="md">
+            <Grid container justifyContent="center" alignItems="center" style={{ height: '1vh' }}>
+            <h1><u>躰道 第56回全日本大会 個人競技速報</u></h1>
+            </Grid>
+            <br/><br/><br/><br/>
+
+            <Grid container justifyContent="center" alignItems="center" style={{ height: '1vh' }}>
+            <Button variant="contained" type="submit" onClick={e => ToResult("zissen_man")}>男子個人実戦</Button>
+            </Grid>
+
+            <br/><br/>
+
+            <Grid container justifyContent="center" alignItems="center" style={{ height: '1vh' }}>
+            <Button variant="contained" type="submit" onClick={e => ToResult("zissen_woman")}>女子個人実戦</Button>
+            </Grid>
+
+            <br/><br/>
+
+            <Grid container justifyContent="center" alignItems="center" style={{ height: '1vh' }}>
+            <Button variant="contained" type="submit" onClick={e => ToResult("hokei_man")}>男子個人法形</Button>
+            </Grid>
+
+            <br/><br/>
+
+            <Grid container justifyContent="center" alignItems="center" style={{ height: '1vh' }}>
+            <Button variant="contained" type="submit" onClick={e => ToResult("hokei_woman")}>女子個人法形</Button>
+            </Grid>
+
+            <br/><br/>
+
+            <Grid container justifyContent="center" alignItems="center" style={{ height: '1vh' }}>
+            <Button variant="contained" type="submit" onClick={e => ToResult("hokei_sonen")}>壮年法形</Button>
+            </Grid>
+
+        </Container>
+        </div>
     );
 }
