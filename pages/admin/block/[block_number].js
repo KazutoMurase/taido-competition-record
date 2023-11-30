@@ -135,10 +135,22 @@ const Home = ({data}) => {
     )
 }
 
-export async function getServerSideProps({ params }) {
-    //const url = 'https://taido-competition-record-two-pearl-51.vercel.app';
-    //const response = await fetch(url + '/api/get_time_schedule?block_number=' + params.block_number);
-    const response = await fetch('/api/get_time_schedule?block_number=' + params.block_number);
+export async function getStaticPaths() {
+    const paths = [
+        {params: {block_number: 'a'} },
+        {params: {block_number: 'b'} },
+        {params: {block_number: 'c'} },
+        {params: {block_number: 'd'} },
+    ];
+    return {
+        paths,
+        fallback: false,
+    };
+}
+
+export async function getStaticProps({ params }) {
+    const url = 'https://taido-competition-record-two-pearl-51.vercel.app';
+    const response = await fetch(url + '/api/get_time_schedule?block_number=' + params.block_number);
     const data = await response.json();
     return {
         props: {
