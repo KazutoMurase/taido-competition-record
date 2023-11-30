@@ -206,7 +206,7 @@ function UpdateResult({event_name, id, return_url}) {
             </>)}
       </Grid>
           </Grid>
-          <Grid container justifyContent="center" alignItems="center" style={{ height: '10vh' }}>
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '100px' }}>
           <Button variant="contained"
                   type="submit"
       onClick={e => onSubmit(data, selectedRadioButton, event_name)}>決定</Button>
