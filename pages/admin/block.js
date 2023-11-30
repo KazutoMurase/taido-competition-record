@@ -82,7 +82,13 @@ export default function Home() {
       const result = await response.json();
       setData(result);
       }
+    const interval = setInterval(() => {
       fetchData();
+    }, 3000); // 3秒ごとに更新
+      fetchData();
+      return () => {
+          clearInterval();
+      };
   }, []);
 
     const fetchCurrent = async () => {
