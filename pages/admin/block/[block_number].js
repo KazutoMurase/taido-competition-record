@@ -4,7 +4,7 @@ import axios from 'axios';
 import React from 'react';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
-import checkStyles from '../../styles/checks.module.css';
+import checkStyles from '../../../styles/checks.module.css';
 
 function ShowDetails(item, block_number, current, ToCall, ToRecord, ToUpdate, ToFinish) {
     if (item["name"].includes("団体")) {
@@ -51,7 +51,7 @@ function ShowGamesText(item) {
     return prefix + item['games_text'];
 }
 
-export default function Home() {
+const Home = ({props}) => {
     const router = useRouter();
     const { block_number } = router.query;
     if (block_number === undefined) {
@@ -73,17 +73,7 @@ export default function Home() {
     const ToBack = () => {
         router.push("/admin");
     };
-    const [data, setData] = useState([]);
     const [current, setCurrent] = useState([]);
-
-  useEffect(() => {
-      async function fetchData() {
-      const response = await fetch('/api/get_time_schedule?block_number=' + block_number);
-      const result = await response.json();
-      setData(result);
-      }
-      fetchData();
-  }, []);
 
     const fetchCurrent = async () => {
       const response = await fetch('/api/current_schedule?block_number=' + block_number);
@@ -121,7 +111,7 @@ export default function Home() {
             <tr className={checkStyles.column}>
             <th>競技</th><th>時間</th><th>試合番号</th><th>試合数</th><th></th>
             </tr>
-            {data.map((item, index) => (
+            {props.data.map((item, index) => (
                     <tr className={checkStyles.column} bgcolor={item['id'] === current.id ? 'yellow' : 'white'}>
                     <td>{item['name'].replace('\'', '').replace('\'', '')}</td>
                     <td>{item['time_schedule'].replace('\'', '').replace('\'', '')}</td>
@@ -144,3 +134,29 @@ export default function Home() {
             </div>
     )
 }
+
+export async function getStaticPaths() {
+    const paths = [
+        {params: {block_number: 'a'} },
+        {params: {block_number: 'b'} },
+        {params: {block_number: 'c'} },
+        {params: {block_number: 'd'} },
+    ];
+    return {
+        paths,
+        fallback: false,
+    };
+}
+
+export async function getStaticProps({ params }) {
+    const response = await fetch('/api/get_time_schedule?block_number=' + params.block_number);
+    const data = await response.json();
+    return {
+        props: {
+            data
+        },
+    };
+}
+
+
+export default Home;
