@@ -1,4 +1,5 @@
 import { db } from '@vercel/postgres';
+import { kv } from "@vercel/kv";
 
 export default async (req, res) => {
     try {
@@ -41,7 +42,11 @@ export default async (req, res) => {
         } else {
             query = 'update ' + block_name + ' set game_id = ' + next_game_id;
             result = await client.query(query);
+
         }
+        const key = 'latest_update_result_for_' + event_name + '_timestamp';
+        const timestamp = Date.now();
+        await kv.set(key, timestamp);
         res.json({});
     } catch (error) {
         console.log(error);
