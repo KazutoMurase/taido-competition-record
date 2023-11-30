@@ -53,24 +53,20 @@ async function GetFromDB(req, res) {
 export default async (req, res) => {
     try {
         // try to use cache
-        const latestUpdateKey = 'updateCompletePlayersTimestamp';
-        const cacheKey = 'timeScheduleCacheData';
-        const cacheTimestampKey = 'timeSceduleCacheTimestamp';
+        const block_name = 'Block' + req.query.block_number.toUpperCase();
+        const latestUpdateKey = 'updateCompletePlayersFor' + block_name + 'Timestamp';
+        const cacheKey = 'timeScheduleFor' + block_name + 'CacheData';
         const latestUpdateTimestamp = await kv.get(latestUpdateKey) || 0;
-        const cachedTimestamp = await kv.get(cacheTimestampKey) || 0;
-        if (latestUpdateTimestamp < cachedTimestamp) {
-            const cachedData = await kv.get(cacheKey);
-            if (cachedData) {
-                console.log("using cache");
-                return res.json(cachedData);
-            }
+        const cachedData = await kv.get(cacheKey);
+        if (cachedData &&
+            latestUpdateTimestamp < cachedData.timestamp) {
+            console.log("using cache");
+            return res.json(cachedData.data);
         }
         console.log("get new data");
         const data = await GetFromDB(req, res);
         console.log(data);
-        await kv.set(cacheKey, data);
-        const newCachedTimestamp = Date.now();
-        await kv.set(cacheTimestampKey, newCachedTimestamp);
+        await kv.set(cacheKey, {data: data, timestamp: Date.now()});
         res.json(data);
     } catch (error) {
         console.log(error);

@@ -33,7 +33,7 @@ export default async (req, res) => {
             query = 'update ' + game_type_name + ' set right_retire = ' + (item.is_retired ? 1 : 0) + ' where id = ' + item.id;
             result = await client.query(query);
         }
-        const key = 'updateCompletePlayersTimestamp';
+        const key = 'updateCompletePlayersForBlock' + req.body.block_number.toUpperCase() + 'Timestamp';
         const timestamp = Date.now();
         await kv.set(key, timestamp);
         res.json({});
