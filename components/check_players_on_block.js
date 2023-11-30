@@ -148,11 +148,9 @@ function CheckPlayers({block_number, schedule_id}) {
           <div>
           <Container maxWidth="md">
           <Box style={{ minWidth: '720px' }}>
-          <Grid container justifyContent="center" alignItems="center" style={{ height: '8vh' }}>
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '80px' }}>
           <h2><u>コート{block_number.toUpperCase()}</u></h2>
           </Grid>
-          <br/>
-          <br/>
           <table border="1">
           <tbody>
           <tr className={checkStyles.column}>
@@ -186,8 +184,7 @@ function CheckPlayers({block_number, schedule_id}) {
           ))}
           </tbody>
           </table>
-          <br />
-          <Grid container justifyContent="center" alignItems="center" style={{ height: '8vh' }}>
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '100px' }}>
           <Button variant="contained" type="submit" onClick={e => onFinish(block_number, schedule_id)}>決定</Button>
           &nbsp;&nbsp;
           <Button variant="contained" type="submit" onClick={e => onBack()}>戻る</Button>

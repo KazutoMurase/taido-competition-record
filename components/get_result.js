@@ -544,11 +544,9 @@ function GetResult({editable = false, updateInterval = 0, returnUrl = null, even
           <div>
           <Container maxWidth="lg">
           <Box style={{ minWidth: '1100px' }}>
-          <Grid container justifyContent="center" alignItems="center" style={{ height: '8vh' }}>
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '100px' }}>
           <h1>{event_full_name}</h1>
           </Grid>
-          <br/>
-          <br/>
           <Stage width={1100} height={900}>
           <Layer>
           {sortedData.map((item, index) => (
@@ -560,7 +558,7 @@ function GetResult({editable = false, updateInterval = 0, returnUrl = null, even
           }
           </Layer>
           </Stage>
-          <Grid container justifyContent="center" alignItems="center" style={{ height: '1vh' }}>
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '10px' }}>
           {block_number !== null ?
            <Button variant="contained" type="submit" onClick={e => onBack()}>戻る</Button> : <></>
           }

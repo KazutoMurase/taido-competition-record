@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
 import FlagCircleRoundedIcon from '@mui/icons-material/FlagCircleRounded';
 
 function ShowRedFlags(event_name, selectedRadioButton) {
@@ -153,32 +155,34 @@ function UpdateResult({event_name, id, return_url}) {
 
   return (
           <div>
-          <Grid container>
-          <Grid item xs={4} />
-          <Grid item xs={4}>
+          <Container maxWidth="md">
+          <Box style={{ minWidth: '900px' }}>
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '80px' }}>
           <h2>第{data.id}試合</h2>
           </Grid>
-          <Grid item xs={4} />
-          <Grid item xs={1} />
-          <Grid item xs={5}>
+          <Grid container>
+          <Grid item xs={3} />
+          <Grid item xs={4} style={{height: '220px' }}>
           <Button variant="contained"
-          type="submit"
+      type="submit"
       onClick={e => onSubmit(data, no_game_red_winner, event_name)}>赤不戦勝</Button>
           <h1>{data.left_color === 'white' ? ShowRightName(data) : ShowLeftName(data)}</h1>
           {ShowRedFlags(event_name, selectedRadioButton)}
-          </Grid>
-          <Grid item xs={5}>
+      </Grid>
+          <Grid item xs={4} style={{height: '220px' }}>
           <Button variant="contained"
                   type="submit"
       onClick={e => onSubmit(data, no_game_white_winner, event_name)}>白不戦勝</Button>
           <h1>{data.left_color === 'white' ? ShowLeftName(data) : ShowRightName(data)}</h1>
           {ShowWhiteFlags(event_name, selectedRadioButton)}
-          </Grid>
-          <Grid item xs={1} />
-          <Grid item xs={2} />
-          <Grid item xs={5}>
+      </Grid>
+          <br />
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '60px' }}>
+          {event_name.includes('hokei') ? (<div><h2>赤の旗</h2></div>) : ''}
+      </Grid>
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '60px' }}>
           {event_name.includes('hokei') ?
-           (<><h2>赤の旗</h2>
+           (<>
             <input class="radio-inline__input" type="radio" id="choice0" name="contact" value="0"
             onChange={handleRadioButtonChange} checked={parseInt(selectedRadioButton)===0} />
             <label class="radio-inline__label" for="choice0">0</label>
@@ -200,24 +204,19 @@ function UpdateResult({event_name, id, return_url}) {
             onChange={handleRadioButtonChange}  checked={parseInt(selectedRadioButton)===1} />
             <label class="radio-inline__label" for="choice1">白勝利</label>
             </>)}
-          <br />
-          <br />
+      </Grid>
           </Grid>
-          <Grid item xs={5} />
-          <Grid item xs={4} />
-          <Grid item xs={1} >
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '10vh' }}>
           <Button variant="contained"
                   type="submit"
-          onClick={e => onSubmit(data, selectedRadioButton, event_name)}>決定</Button>
-          </Grid>
-          <Grid item xs={1} >
+      onClick={e => onSubmit(data, selectedRadioButton, event_name)}>決定</Button>
+          &nbsp;&nbsp;
           <Button variant="contained"
                   type="submit"
           onClick={onBack}>戻る</Button>
           </Grid>
-          <Grid item xs={5} />
-          <Grid item xs={3} />
-          </Grid>
+          </Box>
+          </Container>
           </div>
   );
 }

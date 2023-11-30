@@ -193,16 +193,12 @@ function RecordResult({block_number, event_name, schedule_id}) {
           <div>
           <Container maxWidth="md">
           <Box style={{ minWidth: '1100px' }}>
-          <Grid container justifyContent="center" alignItems="center" style={{ height: '8vh' }}>
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '50px' }}>
           <h2><u>コート{block_number.toUpperCase()}</u></h2>
           </Grid>
-          <br/>
-          <br/>
-          <Grid container justifyContent="center" alignItems="center" style={{ height: '8vh' }}>
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '80px' }}>
           <h2>第{data.id}試合</h2>
           </Grid>
-          <br/>
-          <br/>
           <Grid container>
           <Grid item xs={3} />
           <Grid item xs={4} style={{height: '220px' }}>
@@ -222,13 +218,10 @@ function RecordResult({block_number, event_name, schedule_id}) {
       {ShowWhiteFlags(event_name, initialRadioButton, selectedRadioButton)}
       </Grid>
           <br />
-          <Grid container justifyContent="center" alignItems="center" style={{ height: '8vh' }}>
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '60px' }}>
           {event_name.includes('hokei') ? (<div><h2>赤の旗</h2></div>) : ''}
       </Grid>
-          <br/>
-          <br/>
-          <br/>
-          <Grid container justifyContent="center" alignItems="center" style={{ height: '8vh' }}>
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '60px' }}>
           {event_name.includes('hokei') ?
            (<>
             <input class="radio-inline__input" type="radio" id="choice0" name="contact" value="0"
@@ -254,9 +247,6 @@ function RecordResult({block_number, event_name, schedule_id}) {
             </>)}
           </Grid>
           </Grid>
-          <br />
-          <br />
-          <br />
           <Grid container justifyContent="center" alignItems="center" style={{ height: '10vh' }}>
           <Button variant="contained"
       type="submit"

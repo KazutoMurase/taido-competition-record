@@ -125,11 +125,9 @@ export default function Home() {
             <div>
             <Container maxWidth="md">
             <Box style={{ minWidth: '840px' }}>
-            <Grid container justifyContent="center" alignItems="center" style={{ height: '8vh' }}>
+            <Grid container justifyContent="center" alignItems="center" style={{ height: '80px' }}>
             <h1>{block_number.toUpperCase()}コート</h1>
             </Grid>
-            <br/>
-            <br/>
             <table border="1">
             <tbody>
             <tr className={checkStyles.column}>
@@ -151,8 +149,7 @@ export default function Home() {
             }
             </tbody>
             </table>
-            <br/><br/>
-            <Grid container justifyContent="center" alignItems="center" style={{ height: '1vh' }}>
+            <Grid container justifyContent="center" alignItems="center" style={{ height: '100px' }}>
             <Button variant="contained" type="submit" onClick={e => ToBack()}>戻る</Button>
             </Grid>
             </Box>
