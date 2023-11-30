@@ -28,6 +28,14 @@ export default async (req, res) => {
                 result = await client.query(query, values);
             }
         }
+        const key = 'latest_update_result_for_' + event_name + '_timestamp';
+        const timestamp = Date.now();
+        await kv.set(key, timestamp);
+        if (req.body.update_block === undefined ||
+            req.body.update_block === null) {
+            res.json({});
+            return;
+        }
         const current_block_name = 'current_block_' + req.body.update_block;
         query = 'select id, game_id from ' + current_block_name;
         result = await client.query(query);
@@ -36,7 +44,6 @@ export default async (req, res) => {
         query = 'select id from block_' + req.body.update_block + '_games where order_id = ' + next_game_id + " and schedule_id = " + schedule_id;
         result = await client.query(query);
         console.log(result.rows);
-        const timestamp = Date.now();
         const update_game_id_key = 'update_game_id_for_' + current_block_name;
         await kv.set(update_game_id_key, timestamp);
         if (result.rows.length === 0) {
@@ -48,8 +55,6 @@ export default async (req, res) => {
             query = 'update ' + current_block_name + ' set game_id = ' + next_game_id;
             result = await client.query(query);
         }
-        const key = 'latest_update_result_for_' + event_name + '_timestamp';
-        await kv.set(key, timestamp);
         res.json({});
     } catch (error) {
         console.log(error);

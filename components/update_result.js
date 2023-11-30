@@ -138,9 +138,9 @@ function UpdateResult({event_name, id, return_url}) {
     axios.post('/api/record', post)
           .then((response) => {
               console.log(response);
+               router.push('/' + return_url);
           })
           .catch((e) => { console.log(e)})
-    router.push('/' + return_url);
   }
 
   let no_game_red_winner;
