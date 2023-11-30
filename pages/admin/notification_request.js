@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import FlagCircleRoundedIcon from '@mui/icons-material/FlagCircleRounded';
 import SquareTwoToneIcon from '@mui/icons-material/SquareTwoTone';
@@ -70,15 +72,11 @@ function Home() {
 
   return (
           <div>
-          <Grid container>
-          <Grid item xs={4} />
-          <Grid item xs={6}>
+          <Container maxWidth="md">
+          <Box style={{ minWidth: '720px' }}>
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '80px' }}>
           <h2><u>呼び出しリスト</u></h2>
           </Grid>
-          <Grid item xs={2} />
-          <Grid item xs={1} />
-          <Grid item xs={1} />
-          <Grid item xs={10}>
           <table border="1">
           <tbody>
           <tr className={checkStyles.column}>
@@ -99,18 +97,14 @@ function Home() {
           ))}
           </tbody>
           </table>
-          </Grid>
-          <Grid item xs={1} />
-          <Grid item xs={4} />
-          <Grid item xs={2}>
           <br />
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '100px' }}>
           <Button variant="contained" type="submit" onClick={e => onClearAll(forceFetchData)}>全呼び出し完了</Button>
-          </Grid>
-          </Grid>
-          <br/><br/>
-          <Grid container justifyContent="center" alignItems="center" style={{ height: '1vh' }}>
+          &nbsp;&nbsp;
           <Button variant="contained" type="submit" onClick={e => ToBack()}>戻る</Button>
           </Grid>
+          </Box>
+          </Container>
           </div>
   );
 }
