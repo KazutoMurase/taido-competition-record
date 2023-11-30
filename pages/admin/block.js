@@ -87,7 +87,7 @@ export default function Home() {
     }, 3000); // 3秒ごとに更新
       fetchData();
       return () => {
-          clearInterval();
+          clearInterval(interval);
       };
   }, []);
 
@@ -113,7 +113,7 @@ export default function Home() {
     }, 3000); // 3秒ごとに更新
       fetchCurrent();
       return () => {
-          clearInterval();
+          clearInterval(interval);
       };
   }, []);
     const doneButtonStyle = {
