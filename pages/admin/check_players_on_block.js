@@ -5,20 +5,20 @@ import { useRouter } from 'next/router';
 
 const Home = () => {
     const router = useRouter();
-    const { block_number, schedule_id, dantai } = router.query;
+    const { block_number, schedule_id, dantai, event_id } = router.query;
     if (block_number === undefined) {
         return (<></>);
     }
     if (dantai === '0') {
         return (
                 <>
-                <CheckPlayers block_number={block_number} schedule_id={schedule_id} />
+                <CheckPlayers block_number={block_number} schedule_id={schedule_id} event_id={event_id} />
                 </>
         );
     } else {
         return (
                 <>
-                <CheckDantai block_number={block_number} schedule_id={schedule_id} />
+                <CheckDantai block_number={block_number} schedule_id={schedule_id} event_id={event_id} />
                 </>
         );
     }

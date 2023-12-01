@@ -41,7 +41,7 @@ function onClear(item, function_after_post) {
         .catch((e) => { console.log(e)})
 }
 
-function CheckDantai({block_number, schedule_id}) {
+function CheckDantai({block_number, schedule_id, event_id}) {
     const router = useRouter();
     function onBack() {
         router.push("/admin/block?block_number=" + block_number);
@@ -62,7 +62,7 @@ function CheckDantai({block_number, schedule_id}) {
   let title;
 
   const fetchData = async () => {
-      const response = await fetch('/api/check_players_on_block?block_number=' + block_number + '&schedule_id=' + schedule_id);
+      const response = await fetch('/api/check_players_on_block?block_number=' + block_number + '&schedule_id=' + schedule_id + '&event_id=' + event_id);
       const result = await response.json();
       setData(result);
   }

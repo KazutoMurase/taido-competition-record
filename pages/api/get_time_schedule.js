@@ -4,8 +4,8 @@ import { kv } from "@vercel/kv";
 async function GetFromDB(req, res) {
     const client = await db.connect();
     const block_name = 'block_' + req.query.block_number;
-    let query = 'select t0.id, t1.name, t0.time_schedule, t0.before_final, t0.final, t0.players_checked from ' + block_name + ' as t0 left join EVENT_TYPE as t1 on t0.event_id = t1.id';
-    let result = await client.query(query);
+    let query = 'select t0.id, t0.event_id, t1.name, t0.time_schedule, t0.before_final, t0.final, t0.players_checked from ' + block_name + ' as t0 left join EVENT_TYPE as t1 on t0.event_id = t1.id';
+    const result = await client.query(query);
     query = 'select id, schedule_id, game_id from ' + block_name + '_games';
     let result_games = await client.query(query);
     const sorted_data = result.rows.sort((a, b) => a.id - b.id);

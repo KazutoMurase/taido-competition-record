@@ -59,9 +59,9 @@ export default function Home() {
     if (block_number === undefined) {
         return (<></>);
     }
-    const ToCheck = (block_number, id, name) => {
+    const ToCheck = (block_number, id, name, event_id) => {
         const dantai = (name.includes("団体") ? 1 : 0);
-        router.push("/admin/check_players_on_block?block_number=" + block_number + "&schedule_id=" + id + "&dantai=" + dantai);
+        router.push("/admin/check_players_on_block?block_number=" + block_number + "&schedule_id=" + id + "&dantai=" + dantai + "&event_id=" + event_id);
     };
     const ToCall = (block_number, id) => {
         router.push("/admin/games_on_block?block_number=" + block_number + "&schedule_id=" + id);
@@ -140,7 +140,7 @@ export default function Home() {
                     <td>{ShowGamesText(item)}</td>
                     <td>{('game_count' in item ? item['game_count'] + '試合' : '')}</td>
                     <td>
-                    <Button variant="contained" type="submit" onClick={e => ToCheck(block_number, item['id'], item['name'])} style={item['players_checked'] ? doneButtonStyle : null} >{item['players_checked'] ? '点呼完了' : '　点呼　'}</Button>
+                    <Button variant="contained" type="submit" onClick={e => ToCheck(block_number, item['id'], item['name'], item['event_id'])} style={item['players_checked'] ? doneButtonStyle : null} >{item['players_checked'] ? '点呼完了' : '　点呼　'}</Button>
                     &nbsp;&nbsp;
                 {ShowDetails(item, block_number, current, ToCall, ToRecord, ToUpdate, ToFinish)}
                     </td>

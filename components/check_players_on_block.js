@@ -42,7 +42,7 @@ function onClear(id, function_after_post) {
         .catch((e) => { console.log(e)})
 }
 
-function CheckPlayers({block_number, schedule_id}) {
+function CheckPlayers({block_number, schedule_id, event_id}) {
     const router = useRouter();
     function onBack() {
         router.push("/admin/block?block_number=" + block_number);
@@ -102,7 +102,7 @@ function CheckPlayers({block_number, schedule_id}) {
   let title;
 
   const fetchData = async () => {
-      const response = await fetch('/api/check_players_on_block?block_number=' + block_number + '&schedule_id=' + schedule_id);
+      const response = await fetch('/api/check_players_on_block?block_number=' + block_number + '&schedule_id=' + schedule_id + '&event_id=' + event_id);
       const result = await response.json();
       setData(result);
   }
@@ -175,7 +175,7 @@ function CheckPlayers({block_number, schedule_id}) {
                   </td>
                   <td><Button variant="contained" type="submit" onClick={e => onSubmit(item.id,
                                                                                        block_number,
-                                                                                       item.event_id,
+                                                                                       event_id,
                                                                                        forceFetchData)} style={!item['requested'] ? null : activeButtonStyle}>{!item['requested'] ? '　呼び出し　' : 'リクエスト済'}
               </Button></td>
                   <td><Button variant="contained" type="submit" onClick={e => onClear(item.id,
