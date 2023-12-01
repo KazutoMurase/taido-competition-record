@@ -499,7 +499,7 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
     );
 }
 
-function GetResult({editable = false, updateInterval = 0, returnUrl = null, event_name = null, block_number = null}) {
+function GetResult({editable = false, updateInterval = 0, returnUrl = null, event_name = null, block_number = null, freeze = 0}) {
     const router = useRouter();
     if (returnUrl === null) {
         returnUrl = event_name + '_result';
@@ -511,7 +511,7 @@ function GetResult({editable = false, updateInterval = 0, returnUrl = null, even
     const [data, setData] = useState([]);
     useEffect(() => {
       async function fetchData() {
-          const response = await fetch('/api/get_result?event_name=' + event_name);
+          const response = await fetch('/api/get_result?event_name=' + event_name + '&freeze=' + freeze);
           const result = await response.json();
           setData(result);
       }

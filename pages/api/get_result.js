@@ -199,6 +199,18 @@ export default async (req, res) => {
     try {
         // try to use cache
         const event_name = req.query.event_name;
+        const freeze = req.query.freeze;
+        if (freeze != undefined && parseInt(freeze) === 1) {
+            const freezedKey = 'get_freezed_result_for_' + event_name;
+            const freezedData = await kv.get(freezedKey);
+            if (freezedData) {
+                return res.json(freezedData.data);
+            } else {
+                const data = await GetFromDB(req, res);
+                await kv.set(freezedKey, {data: data, timestamp: Date.now()});
+                return res.json(data);
+            }
+        }
         const latestUpdateKey = 'latest_update_result_for_' + event_name + '_timestamp';
         const cacheKey = 'get_result_for_' + event_name + '_cache_data';
         const cachedData = await kv.get(cacheKey);
