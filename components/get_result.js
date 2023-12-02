@@ -7,7 +7,6 @@ import Box from '@mui/material/Box';
 import { Layer, Stage, Rect, Text } from "react-konva";
 import Grid from '@mui/material/Grid';
 
-// TODO: for mobile, onTap should be added in konva-text
 function createText(item, lineWidth) {
     const is_left = (item['block_pos'] === 'left');
     const is_right = (item['block_pos'] === 'right');
@@ -453,20 +452,21 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
                 item['right_out'] = true;
             }
         }
+        item['round']
         return (
                 <>
                 <Rect
             x={pointX + (has_left ? lineWidth + (item['round']-2)*30 : 0) * (is_left ? 1 : -1)}
             y={item['left_begin_y']}
-            fill={left_winner ? 'red' : 'black'}
+            fill={(left_winner || (has_left && right_winner)) ? 'red' : 'black'}
             width={(has_left ? 30 : lineWidth + (item['round']-1)*30) * (is_left ? 1 : -1)}
-            height={left_winner ? 5 : 1} />
+            height={(left_winner || (has_left && right_winner)) ? 5 : 1} />
                 <Rect
             x={pointX + (has_right ? lineWidth + (item['round']-2)*30 : 0) * (is_left ? 1 : -1)}
             y={item['right_begin_y']}
-            fill={right_winner ? 'red' : 'black'}
+            fill={(right_winner || (has_right && left_winner)) ? 'red' : 'black'}
             width={(has_right ? 30 : lineWidth + (item['round']-1)*30) * (is_left ? 1 : -1)}
-            height={right_winner ? 5 : 1} />
+            height={(right_winner || (has_right && left_winner)) ? 5 : 1} />
                 <Text
             x={is_left ?
                pointX + lineWidth + (item['round']-1)*30 - 10:
