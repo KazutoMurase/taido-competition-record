@@ -19,7 +19,7 @@ export default async (req, res) => {
                 result = await client.query(query);
             }
         }
-        if ('right_retire_array' in req.body){
+        if ('right_retire_array' in req.body) {
             for (let i = 0; i < req.body.right_retire_array.length; i++) {
                 let item = req.body.right_retire_array[i];
                 query = 'update ' + event_name + ' set right_retire = ' + (item.is_retired ? 1 : 0) + ' where id = ' + item.id;

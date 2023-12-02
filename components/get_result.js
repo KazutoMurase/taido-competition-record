@@ -527,6 +527,18 @@ function GetResult({editable = false, updateInterval = 0, returnUrl = null, even
     }, []);
     const sortedData = data.sort((a, b) => a.id - b.id);
     const lineWidth = 60;
+    let maxHeight = 0;
+    console.log(data);
+    for (let i = 0; i < data.length; i++) {
+        if ('left_begin_y' in data[i] &&
+            maxHeight < data[i]['left_begin_y']) {
+            maxHeight = data[i]['left_begin_y'];
+        }
+        if ('right_begin_y' in data[i] &&
+            maxHeight < data[i]['right_begin_y']) {
+            maxHeight = data[i]['right_begin_y'];
+        }
+    }
     // TODO: from DB
     let event_full_name;
     if (event_name === 'hokei_man') {
@@ -547,7 +559,7 @@ function GetResult({editable = false, updateInterval = 0, returnUrl = null, even
           <Grid container justifyContent="center" alignItems="center" style={{ height: '100px' }}>
           <h1>{event_full_name}</h1>
           </Grid>
-          <Stage width={1100} height={900}>
+          <Stage width={1100} height={maxHeight + 200}>
           <Layer>
           {sortedData.map((item, index) => (
               createBlock(item, lineWidth, editable, event_name, returnUrl)
@@ -558,7 +570,7 @@ function GetResult({editable = false, updateInterval = 0, returnUrl = null, even
           }
           </Layer>
           </Stage>
-          <Grid container justifyContent="center" alignItems="center" style={{ height: '10px' }}>
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '50px' }}>
           {block_number !== null ?
            <Button variant="contained" type="submit" onClick={e => onBack()}>戻る</Button> : <></>
           }
