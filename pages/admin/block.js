@@ -140,9 +140,11 @@ export default function Home() {
                     <td>{ShowGamesText(item)}</td>
                     <td>{('game_count' in item ? item['game_count'] + '試合' : '')}</td>
                     <td>
-                    <Button variant="contained" type="submit" onClick={e => ToCheck(block_number, item['id'], item['name'], item['event_id'])} style={item['players_checked'] ? doneButtonStyle : null} >{item['players_checked'] ? '点呼完了' : '　点呼　'}</Button>
+                    {item['event_id'] > 0 ?
+                     (<Button variant="contained" type="submit" onClick={e => ToCheck(block_number, item['id'], item['name'], item['event_id'])} style={item['players_checked'] ? doneButtonStyle : null} >{item['players_checked'] ? '点呼完了' : '　点呼　'}</Button>)
+                     : (<></>)}
                     &nbsp;&nbsp;
-                {ShowDetails(item, block_number, current, ToCall, ToRecord, ToUpdate, ToFinish)}
+                {item['event_id'] > 0 ? ShowDetails(item, block_number, current, ToCall, ToRecord, ToUpdate, ToFinish) : (<></>)}
                     </td>
                     </tr>
             ))
