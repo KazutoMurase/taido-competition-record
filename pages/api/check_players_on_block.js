@@ -209,13 +209,17 @@ async function GetDantaiFromDB(req, res, event_id) {
 export default async (req, res) => {
     try {
         const event_id = parseInt(req.query.event_id);
-        const cacheKey = 'check_players_on_block_' + req.query.block_number + '_for_' + req.query.schedule_id;
+        const block_name = 'block_' + req.query.block_number;
+        const cacheKey = 'check_players_on_' + block_name + '_for_' + req.query.schedule_id;
         const cachedData = await kv.get(cacheKey);
         const latestNotificationUpdateKey = 'latest_update_for_notification_request';
         const latestNotificationUpdateTimestamp = await kv.get(latestNotificationUpdateKey) || 0;
+        const latestCompletePlayersKey = 'update_complete_players_for_' + block_name;
+        const latestCompletePlayersTimestamp = await kv.get(latestCompletePlayersKey) || 0;
         if (event_id > 5) {
             if (cachedData &&
-                latestNotificationUpdateTimestamp < cachedData.timestamp) {
+                latestNotificationUpdateTimestamp < cachedData.timestamp &&
+                latestCompletePlayersTimestamp < cachedData.timestamp) {
                 console.log("using cache");
                 return res.json(cachedData.data);
             }
@@ -229,7 +233,8 @@ export default async (req, res) => {
         const latestResultUpdateTimestamp = await kv.get(latestResultUpdateKey) || 0;
         if (cachedData &&
             latestResultUpdateTimestamp < cachedData.timestamp &&
-            latestNotificationUpdateTimestamp < cachedData.timestamp) {
+            latestNotificationUpdateTimestamp < cachedData.timestamp &&
+            latestCompletePlayersTimestamp < cachedData.timestamp) {
             console.log("using cache");
             return res.json(cachedData.data);
         }
