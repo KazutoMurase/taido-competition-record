@@ -24,9 +24,9 @@ function createText(item, lineWidth) {
                     fontSize={10}
                     />
                     <Rect
-                    x={is_left ? 0 : 620}
+                    x={is_left ? 0 : 625}
                     y={item['left_begin_y']-16}
-                    width={['left_name_kana'].length*120}
+                    width={['left_name_kana'].length*110}
                     height={1}
                     fill='black'
                     visible={'left_out' in item}
@@ -35,13 +35,12 @@ function createText(item, lineWidth) {
                     x={is_left ? 10 : 630}
                     y={item['left_begin_y']-5}
                     text={item['left_name']}
-                    fontFamily="Noto Sans JP, sans-serif"
                     fontSize={item['left_name'].length < 8 ? 18 : 14}
                     />
                     <Rect
-                    x={is_left ? 0 : 620}
+                    x={is_left ? 0 : 625}
                     y={item['left_begin_y']+2}
-                    width={['left_name'].length*120}
+                    width={['left_name'].length*110}
                     height={1}
                     fill='black'
                     visible={'left_out' in item}
@@ -67,9 +66,9 @@ function createText(item, lineWidth) {
                     fontSize={10}
                     />
                     <Rect
-                    x={is_left ? 0 : 620}
+                    x={is_left ? 0 : 625}
                     y={item['right_begin_y']-18}
-                    width={['right_name_kana'].length*120}
+                    width={['right_name_kana'].length*110}
                     height={1}
                     fill='black'
                     visible={'right_out' in item}
@@ -81,9 +80,9 @@ function createText(item, lineWidth) {
                     fontSize={item['right_name'].length < 8 ? 18 : 14}
                     />
                     <Rect
-                    x={is_left ? 0 : 620}
+                    x={is_left ? 0 : 625}
                     y={item['right_begin_y']}
-                    width={['right_name'].length*120}
+                    width={['right_name'].length*110}
                     height={1}
                     fill='black'
                     visible={'right_out' in item}
@@ -115,9 +114,9 @@ function createText(item, lineWidth) {
                 fontSize={10}
                     />
                     <Rect
-                x={is_left ? 0 : 620}
+                x={is_left ? 0 : 625}
                 y={item['left_begin_y']-16}
-                width={['left_name_kana'].length*120}
+                width={['left_name_kana'].length*110}
                 height={1}
                 fill='black'
                 visible={'left_out' in item}
@@ -129,9 +128,9 @@ function createText(item, lineWidth) {
                 fontSize={item['left_name'].length < 8 ? 18 : 14}
                     />
                     <Rect
-                    x={is_left ? 0 : 620}
+                    x={is_left ? 0 : 625}
                     y={item['left_begin_y']+2}
-                    width={['left_name'].length*120}
+                    width={['left_name'].length*110}
                     height={1}
                     fill='black'
                     visible={'left_out' in item}
@@ -163,9 +162,9 @@ function createText(item, lineWidth) {
                 fontSize={10}
                     />
                     <Rect
-                    x={is_left ? 0 : 620}
+                    x={is_left ? 0 : 625}
                     y={item['right_begin_y']-16}
-                    width={['right_name_kana'].length*120}
+                    width={['right_name_kana'].length*110}
                     height={1}
                     fill='black'
                     visible={'right_out' in item}
@@ -177,9 +176,9 @@ function createText(item, lineWidth) {
                 fontSize={item['right_name'].length < 8 ? 18 : 14}
                     />
                     <Rect
-                    x={is_left ? 0 : 620}
+                    x={is_left ? 0 : 625}
                     y={item['right_begin_y']+2}
-                    width={['right_name'].length*120}
+                    width={['right_name'].length*110}
                     height={1}
                     fill='black'
                     visible={'right_out' in item}

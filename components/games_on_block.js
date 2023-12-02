@@ -114,11 +114,11 @@ function GamesOnBlock({block_number, event_name, schedule_id}) {
                           }
                           return (<span>{left_color === 'red' ? left_text : right_text}</span>);
                       };
-
+  const last_order_id = data.length;
   return (
           <div>
           <Container maxWidth="md">
-          <Box style={{ minWidth: '960px' }}>
+          <Box style={{ minWidth: '1000px' }}>
           <Grid container justifyContent="flex-start" alignItems="center">
           <table border="1">
           <tbody>
@@ -153,7 +153,7 @@ function GamesOnBlock({block_number, event_name, schedule_id}) {
                   <td>
                   {showText(item['left_color'], item['right_retire'], item['right_name_kana'], item['left_retire'], item['left_name_kana'], item['id'], 'right')}
               </td>
-                  <td><Button variant="contained" type="submit" onClick={e => onMoveDown(item.order_id, block_number, forceFetchData)}>▼</Button></td>
+                  <td><Button variant="contained" type="submit" disabled={last_order_id===item['order_id']} onClick={e => onMoveDown(item.order_id, block_number, forceFetchData)}>▼</Button></td>
                   {event_name.includes('zissen') ? (<td><Button size="small" style={retireButtonStyle} variant="contained" type="submit" onClick={e => handleLeftRetireStatesChange(item.id)}>Check</Button></td>) : (<></>)}
                   {event_name.includes('zissen') ? (<td><Button size="small" style={retireButtonStyle} variant="contained" type="submit" onClick={e => handleRightRetireStatesChange(item.id)}>Check</Button></td>) : (<></>)}
                   </tr>
