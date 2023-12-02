@@ -28,11 +28,11 @@ function ShowDetails(item, block_number, current, ToCall, ToRecord, ToUpdate, To
                 </>);
     }
     return (<>
-            <Button variant="contained" type="submit" onClick={e => ToCall(block_number, item['id'])} disabled={item['id'] !== current.id || !item['players_checked']}>呼び出し</Button>
+            <Button variant="contained" type="submit" onClick={e => ToCall(block_number, item['id'], item['event_id'])} disabled={item['id'] !== current.id || !item['players_checked']}>呼び出し</Button>
             &nbsp;&nbsp;
-            <Button variant="contained" type="submit" onClick={e => ToRecord(block_number, item['id'])} disabled={item['id'] !== current.id || !item['players_checked']}>記録</Button>
+            <Button variant="contained" type="submit" onClick={e => ToRecord(block_number, item['id'], item['event_id'])} disabled={item['id'] !== current.id || !item['players_checked']}>記録</Button>
             &nbsp;&nbsp;
-            <Button variant="contained" type="submit" onClick={e => ToUpdate(block_number, item['id'])} disabled={item['id'] > current.id || !item['players_checked']}>結果修正</Button>
+            <Button variant="contained" type="submit" onClick={e => ToUpdate(block_number, item['id'], item['event_id'])} disabled={item['id'] > current.id || !item['players_checked']}>結果修正</Button>
            </>);
 }
 
@@ -63,15 +63,15 @@ export default function Home() {
         const dantai = (name.includes("団体") ? 1 : 0);
         router.push("/admin/check_players_on_block?block_number=" + block_number + "&schedule_id=" + id + "&dantai=" + dantai + "&event_id=" + event_id);
     };
-    const ToCall = (block_number, id) => {
-        router.push("/admin/games_on_block?block_number=" + block_number + "&schedule_id=" + id);
+    const ToCall = (block_number, id, event_id) => {
+        router.push("/admin/games_on_block?block_number=" + block_number + "&schedule_id=" + id + '&event_id=' + event_id);
     };
-    const ToRecord = (block_number, id) => {
-        router.push("/admin/record_result?block_number=" + block_number + "&schedule_id=" + id);
+    const ToRecord = (block_number, id, event_id) => {
+        router.push("/admin/record_result?block_number=" + block_number + "&schedule_id=" + id + '&event_id=' + event_id);
     };
-    const ToUpdate = (block_number, id) => {
-        router.push("/admin/check_result?block_number=" + block_number + "&schedule_id=" + id);
- };
+    const ToUpdate = (block_number, id, event_id) => {
+        router.push("/admin/check_result?block_number=" + block_number + "&schedule_id=" + id + '&event_id=' + event_id);
+    };
     const ToBack = () => {
         router.push("/admin");
     };

@@ -3,32 +3,20 @@ import { useEffect, useState } from 'react';
 import GamesOnBlock from '../../components/games_on_block';
 import GetResult from '../../components/get_result';
 import { useRouter } from 'next/router';
+import { GetEventName } from '../../lib/get_event_name';
 
 const Home = () => {
     const router = useRouter();
-    const { block_number, schedule_id } = router.query;
+    const { block_number, schedule_id, event_id } = router.query;
     if (block_number === undefined) {
         return (<></>);
     }
-    const [data, setData] = useState([]);
-    useEffect(() => {
-        async function fetchData() {
-            let url = '/api/event_name?block_number=' + block_number;
-            const response = await fetch(url);
-            const result = await response.json();
-            setData(result);
-        }
-      fetchData();
-    }, []);
+    const event_name = GetEventName(event_id);
     return (
             <>
-            {data.map((item, index) => (
-                     <GamesOnBlock block_number={block_number} event_name={item} schedule_id={schedule_id} />
-             ))}
+            <GamesOnBlock block_number={block_number} event_name={event_name} schedule_id={schedule_id} />
             <br />
-            {data.map((item, index) => (
-                    <GetResult updateInterval={3000} event_name={item} block_number={block_number} />
-            ))}
+            <GetResult updateInterval={3000} event_name={event_name} block_number={block_number} />
             </>
     );
 }

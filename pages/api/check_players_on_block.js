@@ -1,5 +1,6 @@
 import { db } from '@vercel/postgres';
 import { kv } from "@vercel/kv";
+import { GetEventName } from '../../lib/get_event_name';
 
 
 async function GetFromDB(req, res,  event_name) {
@@ -217,19 +218,7 @@ export default async (req, res) => {
             await kv.set(cacheKey, {data: data, timestamp: Date.now()});
             return res.json(data);
         }
-        let event_name;
-        // TODO: set from database
-        if (event_id === 1) {
-            event_name = 'zissen_man';
-        } else if (event_id === 2) {
-            event_name = 'hokei_man';
-        } else if (event_id === 3) {
-            event_name = 'zissen_woman';
-        } else if (event_id === 4) {
-            event_name = 'hokei_woman';
-        } else if (event_id === 5) {
-            event_name = 'hokei_sonen';
-        }
+        const event_name = GetEventName(event_id);
         const latestResultUpdateKey = 'latest_update_result_for_' + event_name + '_timestamp';
         const latestResultUpdateTimestamp = await kv.get(latestResultUpdateKey) || 0;
         if (cachedData &&
