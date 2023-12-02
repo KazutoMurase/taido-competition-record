@@ -111,6 +111,9 @@ async function GetFromDB(req, res,  event_name) {
                     for (let k = 0; k < result_array.length; k++) {
                         if (result_array[k]['id'] == data[i].left_player_id) {
                             duplicated = true;
+                            if (result_array[k]['retire'] === null) {
+                                result_array[k]['retire'] = data[i].left_retire;
+                            }
                             break;
                         }
                     }
@@ -138,6 +141,9 @@ async function GetFromDB(req, res,  event_name) {
                     for (let k = 0; k < result_array.length; k++) {
                         if (result_array[k]['id'] == data[i].right_player_id) {
                             duplicated = true;
+                            if (result_array[k]['retire'] === null) {
+                                result_array[k]['retire'] = data[i].right_retire;
+                            }
                             break;
                         }
                     }
