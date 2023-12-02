@@ -1,5 +1,6 @@
 import { db } from '@vercel/postgres';
 import { kv } from "@vercel/kv";
+import { GetEventName } from '../../lib/get_event_name';
 
 
 async function GetFromDB(req, res) {
@@ -8,19 +9,7 @@ async function GetFromDB(req, res) {
     const current_block_name = 'current_' + block_name;
     let query = 'SELECT t0.id, t0.game_id, t1.event_id from ' + current_block_name + ' AS t0 LEFT JOIN ' + block_name + ' AS t1 ON t0.id = t1.id';
     let result = await client.query(query);
-    let event_name;
-    // TODO: set from database
-    if (result.rows[0].event_id === 1) {
-        event_name = 'zissen_man';
-    } else if (result.rows[0].event_id === 2) {
-        event_name = 'hokei_man';ge
-    } else if (result.rows[0].event_id === 3) {
-        event_name = 'zissen_woman';
-    } else if (result.rows[0].event_id === 4) {
-        event_name = 'hokei_woman';
-    } else if (result.rows[0].event_id === 5) {
-        event_name = 'hokei_sonen';
-    }
+    const event_name = GetEventName(result.rows[0].event_id);
     if (req.query.schedule_id !== undefined &&
         parseInt(req.query.schedule_id) !== result.rows[0].id) {
         return [];
