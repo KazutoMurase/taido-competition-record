@@ -114,7 +114,14 @@ function GamesOnBlock({block_number, event_name, schedule_id}) {
                           }
                           return (<span>{left_color === 'red' ? left_text : right_text}</span>);
                       };
-  const last_order_id = data.length;
+    const last_order_id = data.length;
+    let current_order_id = -1;
+    for (let i = 0; i < data.length; i++) {
+        if ('current' in data[i]) {
+            current_order_id = i + 1;
+            break;
+        }
+    }
   return (
           <div>
           <Container maxWidth="md">
@@ -153,7 +160,7 @@ function GamesOnBlock({block_number, event_name, schedule_id}) {
                   <td>
                   {showText(item['left_color'], item['right_retire'], item['right_name_kana'], item['left_retire'], item['left_name_kana'], item['id'], 'right')}
               </td>
-                  <td><Button variant="contained" type="submit" disabled={last_order_id===item['order_id']} onClick={e => onMoveDown(item.order_id, block_number, forceFetchData)}>▼</Button></td>
+                  <td><Button variant="contained" type="submit" disabled={current_order_id > item['order_id'] || last_order_id===item['order_id']} onClick={e => onMoveDown(item.order_id, block_number, forceFetchData)}>▼</Button></td>
                   {event_name.includes('zissen') ? (<td><Button size="small" style={retireButtonStyle} variant="contained" type="submit" onClick={e => handleLeftRetireStatesChange(item.id)}>Check</Button></td>) : (<></>)}
                   {event_name.includes('zissen') ? (<td><Button size="small" style={retireButtonStyle} variant="contained" type="submit" onClick={e => handleRightRetireStatesChange(item.id)}>Check</Button></td>) : (<></>)}
                   </tr>
