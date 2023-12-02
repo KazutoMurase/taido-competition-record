@@ -202,27 +202,46 @@ async function GetDantaiFromDB(req, res, event_id) {
 export default async (req, res) => {
     try {
         const event_id = parseInt(req.query.event_id);
+        const cacheKey = 'check_players_on_block_' + req.query.block_number + '_for_' + req.query.schedule_id;
+        const cachedData = await kv.get(cacheKey);
+        const latestNotificationUpdateKey = 'latest_update_for_notification_request';
+        const latestNotificationUpdateTimestamp = await kv.get(latestNotificationUpdateKey) || 0;
         if (event_id > 5) {
-            const data = await GetDantaiFromDB(req, res, event_id);
-            res.json(data);
-        } else {
-            let event_name;
-            // TODO: set from database
-            if (event_id === 1) {
-                event_name = 'zissen_man';
-            } else if (event_id === 2) {
-                event_name = 'hokei_man';
-            } else if (event_id === 3) {
-                event_name = 'zissen_woman';
-            } else if (event_id === 4) {
-                event_name = 'hokei_woman';
-            } else if (event_id === 5) {
-                event_name = 'hokei_sonen';
+            if (cachedData &&
+                latestNotificationUpdateTimestamp < cachedData.timestamp) {
+                console.log("using cache");
+                return res.json(cachedData.data);
             }
-            const data = await GetFromDB(req, res, event_name);
-            console.log(data);
-            res.json(data);
+            console.log("get new data");
+            const data = await GetDantaiFromDB(req, res, event_id);
+            await kv.set(cacheKey, {data: data, timestamp: Date.now()});
+            return res.json(data);
         }
+        let event_name;
+        // TODO: set from database
+        if (event_id === 1) {
+            event_name = 'zissen_man';
+        } else if (event_id === 2) {
+            event_name = 'hokei_man';
+        } else if (event_id === 3) {
+            event_name = 'zissen_woman';
+        } else if (event_id === 4) {
+            event_name = 'hokei_woman';
+        } else if (event_id === 5) {
+            event_name = 'hokei_sonen';
+        }
+        const latestResultUpdateKey = 'latest_update_result_for_' + event_name + '_timestamp';
+        const latestResultUpdateTimestamp = await kv.get(latestResultUpdateKey) || 0;
+        if (cachedData &&
+            latestResultUpdateTimestamp < cachedData.timestamp &&
+            latestNotificationUpdateTimestamp < cachedData.timestamp) {
+            console.log("using cache");
+            return res.json(cachedData.data);
+        }
+        console.log("get new data");
+        const data = await GetFromDB(req, res, event_name);
+        await kv.set(cacheKey, {data: data, timestamp: Date.now()});
+        return res.json(data);
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: 'Error fetching data'});

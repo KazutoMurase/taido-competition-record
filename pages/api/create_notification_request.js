@@ -1,4 +1,5 @@
 import { db } from '@vercel/postgres';
+import { kv } from "@vercel/kv";
 
 export default async (req, res) => {
     try {
@@ -13,6 +14,8 @@ export default async (req, res) => {
             values = [req.body.event_id, req.body.group_id, req.body.court_id];
             result = await client.query(query, values);
         }
+        const key = 'latest_update_for_notification_request';
+        kv.set(key, Date.now());
         res.json({});
     } catch (error) {
         console.log(error);
