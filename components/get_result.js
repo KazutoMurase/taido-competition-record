@@ -591,17 +591,40 @@ function GetResult({editable = false, updateInterval = 0, returnUrl = null, even
     }
     // TODO: from DB
     let event_full_name;
+    let event_description = [];
     if (event_name === 'hokei_man') {
         event_full_name = '男子個人法形競技';
+        event_description = ['1 ・ 2 回戦：旋体の法形 / 3 回戦以降：体の法形から自由選択'];
     } else if (event_name === 'zissen_man') {
         event_full_name = '男子個人実戦競技';
+        event_description = ['試合時間  予選1分30秒　三決・決勝２分  (準決・三決・決勝は1分1回のみ延長あり)',
+                             '胴プロテクター着用厳守'];
     } else if (event_name === 'hokei_woman') {
         event_full_name = '女子個人法形競技';
+        event_description = ['1 ・ 2 回戦：旋陰の法形 / 3 回戦以降：陰の法形から自由選択'];
     } else if (event_name === 'zissen_woman') {
         event_full_name = '女子個人実戦競技';
+        event_description = ['試合時間  予選1分30秒　三決・決勝２分  (準決・三決・決勝は1分1回のみ延長あり)',
+                             '胴プロテクター着用厳守'];
     } else if (event_name === 'hokei_sonen') {
         event_full_name = '壮年法形競技';
+        event_description = ['1.2 回戦勢命（表のみ）、3 回戦以降　活命・延命から選択'];
     }
+    // calc num of players
+    let num_of_players = 0;
+    for (let i = 0; i < sortedData.length; i++) {
+        const item = sortedData[i];
+        if (item['block_pos'] === 'left' ||
+            item['block_pos'] === 'right') {
+            if (!('has_left' in item)) {
+                num_of_players++;
+            }
+            if (!('has_right' in item)) {
+                num_of_players++;
+            }
+        }
+    }
+    // set winner
     const final_data = sortedData[sortedData.length - 1];
     const before_final_data = sortedData[sortedData.length - 2];
     let winner1 = null;
@@ -684,9 +707,15 @@ function GetResult({editable = false, updateInterval = 0, returnUrl = null, even
           <div>
           <Container maxWidth="md">
           <Box style={{ minWidth: '850px' }}>
-          <Grid container justifyContent="center" alignItems="center" style={{ height: '100px' }}>
-          <h1>{event_full_name}</h1>
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '70px' }}>
+          <h1><u>{event_full_name + (num_of_players > 0 ? '　' + num_of_players + '人' : '')}</u></h1>
           </Grid>
+          {event_description.map((text, index) => (
+                  <Grid container justifyContent="center" alignItems="center" style={{ height: '20px' }}>
+                  {text}
+                  </Grid>
+          ))}
+      <br/>
           <Stage width={850} height={maxHeight + 50}>
           <Layer>
           {sortedData.map((item, index) => (
