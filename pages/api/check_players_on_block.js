@@ -9,7 +9,7 @@ async function GetFromDB(req, res,  event_name) {
     const schedule_id = req.query.schedule_id;
     let query = 'SELECT t1.id, t2.id AS left_player_id, t3.id AS right_player_id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t3.name AS right_name, t2.name_kana AS left_name_kana, t3.name_kana AS right_name_kana FROM ' + block_name + '_games AS t0 LEFT JOIN ' + event_name + ' AS t1 ON t0.game_id = t1.id LEFT JOIN players AS t2 ON t1.left_player_id = t2.' + event_name + '_player_id LEFT JOIN players AS t3 ON t1.right_player_id = t3.' + event_name + '_player_id where t0.schedule_id = $1';
     const result = await client.query(query, [schedule_id]);
-    const data = result.rows;
+    const data = result.rows.sort((a, b) => a.id - b.id);
 
     query = 'SELECT t1.id, t1.next_left_id, t1.next_right_id, t1.left_retire, t1.right_retire FROM ' + event_name + ' AS t1';
     const result_schedule = await client.query(query);
