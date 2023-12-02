@@ -17,7 +17,7 @@ function ShowDetails(item, block_number, current, ToCall, ToRecord, ToUpdate, To
                 &nbsp;&nbsp;
                 &nbsp;&nbsp;
                 &nbsp;&nbsp;
-                <Button variant="contained" type="submit" onClick={e => ToFinish(block_number)} disabled={item['id'] !== current.id || !item['players_checked']}>競技終了</Button>
+                <Button variant="contained" type="submit" onClick={e => ToFinish(item['id'], block_number)} disabled={item['id'] !== current.id || !item['players_checked']}>競技終了</Button>
                 &nbsp;&nbsp;
                 &nbsp;&nbsp;
                 &nbsp;&nbsp;
@@ -101,8 +101,9 @@ export default function Home() {
     const forceFetchCurrent = () => {
         fetchCurrent();
     };
-       const ToFinish = (block_number) => {
-        let post = {update_block: block_number};
+      const ToFinish = (id, block_number) => {
+          let post = {id: id,
+                      update_block: block_number};
             axios.post('/api/complete_schedule', post)
                 .then((response) => {
                 forceFetchCurrent();

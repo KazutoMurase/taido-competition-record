@@ -4,8 +4,9 @@ import { kv } from "@vercel/kv";
 export default async (req, res) => {
     try {
         const client = await db.connect();
+        const next_id = req.body.id + 1;
         const current_block_name = 'current_block_' + req.body.update_block;
-        const query = 'update ' + current_block_name + ' set id = id + 1, game_id = 1';
+        const query = 'update ' + current_block_name + ' set id = ' + next_id + ', game_id = 1';
         const result = await client.query(query);
         const timestamp = Date.now();
         const update_game_id_key = 'update_game_id_for_' + current_block_name;
