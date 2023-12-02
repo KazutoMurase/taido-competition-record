@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import React from "react";
+React.useLayoutEffect = React.useEffect;
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import Button from '@mui/material/Button';
@@ -592,7 +594,7 @@ function GetResult({editable = false, updateInterval = 0, returnUrl = null, even
           <Grid container justifyContent="center" alignItems="center" style={{ height: '100px' }}>
           <h1>{event_full_name}</h1>
           </Grid>
-          <Stage width={850} height={maxHeight + 200}>
+          <Stage width={850} height={maxHeight + 50}>
           <Layer>
           {sortedData.map((item, index) => (
               createBlock(item, lineWidth, editable, event_name, returnUrl)
@@ -603,7 +605,19 @@ function GetResult({editable = false, updateInterval = 0, returnUrl = null, even
           }
           </Layer>
           </Stage>
-          <Grid container justifyContent="center" alignItems="center" style={{ height: '50px' }}>
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '120px' }}>
+          <table border="1" style={{ width: '800px' }}>
+          <tbody>
+          <tr style={{ fontSize: '12px'}}>
+          <td>優勝　</td>
+          <td>第2位</td>
+          <td>第3位</td>
+          <td>第4位</td></tr>
+          <tr style={{ height: '60px' }}><td></td><td></td><td></td><td></td></tr>
+          </tbody>
+          </table>
+          </Grid>
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '70px' }}>
           {block_number !== null ?
            <Button variant="contained" type="submit" onClick={e => onBack()}>戻る</Button> : <></>
           }
