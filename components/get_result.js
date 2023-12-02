@@ -313,6 +313,16 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
                     onClick={e => onUpdate(item['id'], editable)}
                     onTap={e => onUpdate(item['id'], editable)}
                     />
+                    <Rect
+                    x={x + width / 2 - 16}
+                    y={item['left_begin_y'] - 5}
+                    width={30}
+                    height={30}
+                    strokeWidth={2}
+                    cornerRadius={5}
+                    onClick={e => onUpdate(item['id'], editable)}
+                    onTap={e => onUpdate(item['id'], editable)}
+                    />
                     <Text
                     x={x + width / 2 - 10}
                     y={item['left_begin_y'] - 15}
@@ -368,6 +378,16 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
             y={item['left_begin_y'] - 70}
             text={'三決'}
             fontSize={20}
+                />
+                <Rect
+            x={x + width / 2 - 16}
+            y={item['left_begin_y'] - 5}
+            width={30}
+            height={30}
+            strokeWidth={2}
+            cornerRadius={5}
+            onClick={e => onUpdate(item['id'], editable)}
+            onTap={e => onUpdate(item['id'], editable)}
                 />
                 <Text
             x={x + width / 2 - 8}
@@ -479,6 +499,18 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
             fill={lower_focus ? 'red' : 'black'}
             width={lower_focus ? 5 : 1}
             height={(item['left_begin_y'] - item['right_begin_y']) * 0.5 * (is_left ? -1 : 1) + (lower_focus ? 4 : 0) - ('offset_y' in item ? item['offset_y'] : 0)} />
+                <Rect
+            x={is_left ?
+               pointX + lineWidth + (item['round']-1)*30 - 22 :
+               pointX - lineWidth - (item['round']-1)*30 - 3}
+            y={(item['left_begin_y'] + item['right_begin_y']) * 0.5 - 5 + ('offset_y' in item ? item['offset_y'] : 0) - 10}
+            width={30}
+            height={30}
+            strokeWidth={2}
+            cornerRadius={5}
+            onClick={e => onUpdate(item['id'], editable)}
+            onTap={e => onUpdate(item['id'], editable)}
+                />
                 <Text
             x={is_left ?
                pointX + lineWidth + (item['round']-1)*30 - 15 :
