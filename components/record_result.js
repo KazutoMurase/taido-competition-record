@@ -45,9 +45,9 @@ function onSubmit(data, player_flag, block_number, event_name, function_after_po
     }
     axios.post('/api/record', post)
         .then((response) => {
+            window.location.reload();
         })
         .catch((e) => { console.log(e)})
-    window.location.reload();
 }
 
 function onBack(data, block_number, function_after_post) {

@@ -94,9 +94,9 @@ function CheckPlayers({block_number, schedule_id, event_id}) {
         axios.post('/api/complete_players_check', post)
             .then((response) => {
                 console.log(response);
+                router.push("/admin/block?block_number=" + block_number);
             })
             .catch((e) => { console.log(e)})
-        router.push("/admin/block?block_number=" + block_number);
     }
 
   let title;
