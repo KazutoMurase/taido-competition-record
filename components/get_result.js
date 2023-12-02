@@ -534,6 +534,22 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
     );
 }
 
+function ShowWinner(item) {
+    return (
+            <>
+            <div style={{ fontSize: '10px' }}>
+            {item['name_kana']}
+        </div>
+            <b style={{ fontSize: '16px' }}>
+            {item['name']}
+        </b>
+            <div style={{ fontSize: '12px' }}>
+            {item['group'].replace('\'', '【').replace('\'', '】')}
+        </div>
+            </>
+    );
+}
+
 function GetResult({editable = false, updateInterval = 0, returnUrl = null, event_name = null, block_number = null, freeze = 0}) {
     const router = useRouter();
     if (returnUrl === null) {
@@ -587,6 +603,84 @@ function GetResult({editable = false, updateInterval = 0, returnUrl = null, even
     } else if (event_name === 'hokei_sonen') {
         event_full_name = '壮年法形競技';
     }
+    const final_data = sortedData[sortedData.length - 1];
+    const before_final_data = sortedData[sortedData.length - 2];
+    let winner1 = null;
+    let winner2 = null;
+    let winner3 = null;
+    let winner4 = null;
+    if (final_data !== undefined &&
+        final_data.left_player_flag !== null) {
+        if (event_name.includes('hokei')) {
+            if (final_data.left_player_flag >= 2) {
+                winner1 = {'name': final_data.left_name,
+                           'name_kana': final_data.left_name_kana,
+                           'group': final_data.left_group_name};
+                winner2 = {'name': final_data.right_name,
+                           'name_kana': final_data.right_name_kana,
+                           'group': final_data.right_group_name};
+            } else {
+                winner1 = {'name': final_data.right_name,
+                           'name_kana': final_data.right_name_kana,
+                           'group': final_data.right_group_name};
+                winner2 = {'name': final_data.left_name,
+                           'name_kana': final_data.left_name_kana,
+                           'group': final_data.left_group_name};
+            }
+        } else if (event_name.includes('zissen')) {
+            if (final_data.left_player_flag >= 1) {
+                winner1 = {'name': final_data.left_name,
+                           'name_kana': final_data.left_name_kana,
+                           'group': final_data.left_group_name};
+                winner2 = {'name': final_data.right_name,
+                           'name_kana': final_data.right_name_kana,
+                           'group': final_data.right_group_name};
+            } else {
+                winner1 = {'name': final_data.right_name,
+                           'name_kana': final_data.right_name_kana,
+                           'group': final_data.right_group_name};
+                winner2 = {'name': final_data.left_name,
+                           'name_kana': final_data.left_name_kana,
+                           'group': final_data.left_group_name};
+            }
+        }
+    }
+    if (before_final_data !== undefined &&
+        before_final_data.left_player_flag !== null) {
+        if (event_name.includes('hokei')) {
+            if (before_final_data.left_player_flag >= 2) {
+                winner3 = {'name': before_final_data.left_name,
+                           'name_kana': before_final_data.left_name_kana,
+                           'group': before_final_data.left_group_name};
+                winner4 = {'name': before_final_data.right_name,
+                           'name_kana': before_final_data.right_name_kana,
+                           'group': before_final_data.right_group_name};
+            } else {
+                winner3 = {'name': before_final_data.right_name,
+                           'name_kana': before_final_data.right_name_kana,
+                           'group': before_final_data.right_group_name};
+                winner4 = {'name': before_final_data.left_name,
+                           'name_kana': before_final_data.left_name_kana,
+                           'group': before_final_data.left_group_name};
+            }
+        } else if (event_name.includes('zissen')) {
+            if (before_final_data.left_player_flag >= 1) {
+                winner3 = {'name': before_final_data.left_name,
+                           'name_kana': before_final_data.left_name_kana,
+                           'group': before_final_data.left_group_name};
+                winner4 = {'name': before_final_data.right_name,
+                           'name_kana': before_final_data.right_name_kana,
+                           'group': before_final_data.right_group_name};
+            } else {
+                winner3 = {'name': before_final_data.right_name,
+                           'name_kana': before_final_data.right_name_kana,
+                           'group': before_final_data.right_group_name};
+                winner4 = {'name': before_final_data.left_name,
+                           'name_kana': before_final_data.left_name_kana,
+                           'group': before_final_data.left_group_name};
+            }
+        }
+    }
   return (
           <div>
           <Container maxWidth="md">
@@ -606,18 +700,23 @@ function GetResult({editable = false, updateInterval = 0, returnUrl = null, even
           </Layer>
           </Stage>
           <Grid container justifyContent="center" alignItems="center" style={{ height: '120px' }}>
-          <table border="1" style={{ width: '800px' }}>
+          <table border="1" style={{ width: '800px', 'table-layout': 'fixed' }}>
           <tbody>
           <tr style={{ fontSize: '12px'}}>
           <td>優勝　</td>
           <td>第2位</td>
           <td>第3位</td>
           <td>第4位</td></tr>
-          <tr style={{ height: '60px' }}><td></td><td></td><td></td><td></td></tr>
+          <tr style={{ height: '80px' }}>
+          <td>{winner1 !== null ? ShowWinner(winner1) : ''}</td>
+          <td>{winner2 !== null ? ShowWinner(winner2) : ''}</td>
+          <td>{winner3 !== null ? ShowWinner(winner3) : ''}</td>
+          <td>{winner4 !== null ? ShowWinner(winner4) : ''}</td>
+          </tr>
           </tbody>
           </table>
           </Grid>
-          <Grid container justifyContent="center" alignItems="center" style={{ height: '70px' }}>
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '80px' }}>
           {block_number !== null ?
            <Button variant="contained" type="submit" onClick={e => onBack()}>戻る</Button> : <></>
           }
