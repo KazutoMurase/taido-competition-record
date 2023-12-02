@@ -16,13 +16,13 @@ function createText(item, lineWidth) {
         if (!has_left && !has_right) {
             return (<>
                     <Text
-                    x={is_left ? 80 : 820}
+                    x={is_left ? 10 : 630}
                     y={item['left_begin_y']-20}
                     text={item['left_name_kana']}
-                    fontSize={12}
+                    fontSize={10}
                     />
                     <Rect
-                    x={is_left ? 80-10 : 820-10}
+                    x={is_left ? 0 : 620}
                     y={item['left_begin_y']-16}
                     width={['left_name_kana'].length*120}
                     height={1}
@@ -30,13 +30,14 @@ function createText(item, lineWidth) {
                     visible={'left_out' in item}
                     />
                     <Text
-                    x={is_left ? 80 : 820}
+                    x={is_left ? 10 : 630}
                     y={item['left_begin_y']-5}
                     text={item['left_name']}
-                    fontSize={item['left_name'].length < 8 ? 20 : 15}
+                    fontFamily="Noto Sans JP, sans-serif"
+                    fontSize={item['left_name'].length < 8 ? 18 : 14}
                     />
                     <Rect
-                    x={is_left ? 80-10 : 820-10}
+                    x={is_left ? 0 : 620}
                     y={item['left_begin_y']+2}
                     width={['left_name'].length*120}
                     height={1}
@@ -44,13 +45,13 @@ function createText(item, lineWidth) {
                     visible={'left_out' in item}
                     />
                     <Text
-                    x={is_left ? 210 : 950}
+                    x={is_left ? 130 : 750}
                     y={item['left_begin_y']}
                     text={item['left_group_name'].replace('\'', '【').replace('\'', '】')}
                     fontSize={14}
                     />
                     <Rect
-                    x={is_left ? 210 : 950}
+                    x={is_left ? 130 : 750}
                     y={item['left_begin_y']+5}
                     width={['left_group_name'].length*80}
                     height={1}
@@ -58,13 +59,13 @@ function createText(item, lineWidth) {
                     visible={'left_out' in item}
                     />
                     <Text
-                    x={is_left ? 80 : 820}
+                    x={is_left ? 10 : 630}
                     y={item['right_begin_y']-20}
                     text={item['right_name_kana']}
-                    fontSize={12}
+                    fontSize={10}
                     />
                     <Rect
-                    x={is_left ? 80-10 : 820-10}
+                    x={is_left ? 0 : 620}
                     y={item['right_begin_y']-18}
                     width={['right_name_kana'].length*120}
                     height={1}
@@ -72,13 +73,13 @@ function createText(item, lineWidth) {
                     visible={'right_out' in item}
                     />
                     <Text
-                    x={is_left ? 80 : 820}
+                    x={is_left ? 10 : 630}
                     y={item['right_begin_y']-5}
                     text={item['right_name']}
-                    fontSize={item['right_name'].length < 8 ? 20 : 15}
+                    fontSize={item['right_name'].length < 8 ? 18 : 14}
                     />
                     <Rect
-                    x={is_left ? 80-10 : 820-10}
+                    x={is_left ? 0 : 620}
                     y={item['right_begin_y']}
                     width={['right_name'].length*120}
                     height={1}
@@ -86,13 +87,13 @@ function createText(item, lineWidth) {
                     visible={'right_out' in item}
                     />
                     <Text
-                    x={is_left ? 210 : 950}
+                    x={is_left ? 130 : 750}
                     y={item['right_begin_y']}
                     text={item['right_group_name'].replace('\'', '【').replace('\'', '】')}
                     fontSize={14}
                     />
                     <Rect
-                    x={is_left ? 210 : 950}
+                    x={is_left ? 130 : 750}
                     y={item['right_begin_y']+5}
                     width={['right_group_name'].length*80}
                     height={1}
@@ -106,13 +107,13 @@ function createText(item, lineWidth) {
             return (
                     <>
                     <Text
-                x={is_left ? 80 : 820}
+                x={is_left ? 10 : 630}
                 y={item['left_begin_y']-20}
                 text={item['left_name_kana']}
-                fontSize={12}
+                fontSize={10}
                     />
                     <Rect
-                x={is_left ? 80-10 : 820-10}
+                x={is_left ? 0 : 620}
                 y={item['left_begin_y']-16}
                 width={['left_name_kana'].length*120}
                 height={1}
@@ -120,13 +121,13 @@ function createText(item, lineWidth) {
                 visible={'left_out' in item}
                     />
                     <Text
-                x={is_left ? 80 : 820}
+                x={is_left ? 10 : 630}
                 y={item['left_begin_y']-5}
                 text={item['left_name']}
-                fontSize={item['left_name'].length < 8 ? 20 : 15}
+                fontSize={item['left_name'].length < 8 ? 18 : 14}
                     />
                     <Rect
-                    x={is_left ? 80-10 : 820-10}
+                    x={is_left ? 0 : 620}
                     y={item['left_begin_y']+2}
                     width={['left_name'].length*120}
                     height={1}
@@ -134,13 +135,13 @@ function createText(item, lineWidth) {
                     visible={'left_out' in item}
                     />
                     <Text
-                x={is_left ? 210 : 950}
+                x={is_left ? 130 : 750}
                 y={item['left_begin_y']}
                 text={item['left_group_name'].replace('\'', '【').replace('\'', '】')}
                 fontSize={14}
                     />
                     <Rect
-                    x={is_left ? 210 : 950}
+                    x={is_left ? 130 : 750}
                     y={item['left_begin_y']+5}
                     width={['left_group_name'].length*80}
                     height={1}
@@ -154,13 +155,13 @@ function createText(item, lineWidth) {
             return (
                     <>
                     <Text
-                x={is_left ? 80 : 820}
+                x={is_left ? 10 : 630}
                 y={item['right_begin_y']-20}
                 text={item['right_name_kana']}
-                fontSize={12}
+                fontSize={10}
                     />
                     <Rect
-                    x={is_left ? 80-10 : 820-10}
+                    x={is_left ? 0 : 620}
                     y={item['right_begin_y']-16}
                     width={['right_name_kana'].length*120}
                     height={1}
@@ -168,13 +169,13 @@ function createText(item, lineWidth) {
                     visible={'right_out' in item}
                     />
                     <Text
-                x={is_left ? 80 : 820}
+                x={is_left ? 10 : 630}
                 y={item['right_begin_y']-5}
                 text={item['right_name']}
-                fontSize={item['right_name'].length < 8 ? 20 : 15}
+                fontSize={item['right_name'].length < 8 ? 18 : 14}
                     />
                     <Rect
-                    x={is_left ? 80-10 : 820-10}
+                    x={is_left ? 0 : 620}
                     y={item['right_begin_y']+2}
                     width={['right_name'].length*120}
                     height={1}
@@ -182,13 +183,13 @@ function createText(item, lineWidth) {
                     visible={'right_out' in item}
                     />
                     <Text
-                x={is_left ? 210 : 950}
+                x={is_left ? 130 : 750}
                 y={item['right_begin_y']}
                 text={item['right_group_name'].replace('\'', '【').replace('\'', '】')}
                 fontSize={14}
                     />
                     <Rect
-                    x={is_left ? 210 : 950}
+                    x={is_left ? 130 : 750}
                     y={item['right_begin_y']+5}
                     width={['right_group_name'].length*80}
                     height={1}
@@ -199,18 +200,18 @@ function createText(item, lineWidth) {
             );
         }
     } else if ('fake_round' in item) {
-        const x = 300 + lineWidth + (item['fake_round']-2)*30;
-        const width = ((800 - lineWidth - (item['fake_round']-2)*30) -
-                       (300 + lineWidth + (item['fake_round']-2)*30));
+        const x = 220 + lineWidth + (item['fake_round']-2)*30;
+        const width = ((620 - lineWidth - (item['fake_round']-2)*30) -
+                       (220 + lineWidth + (item['fake_round']-2)*30));
         return (<>
                 <Text
-                x={x - 220}
+                x={x - 200}
                 y={item['left_begin_y']-10}
                 text={item['left_name']}
-                fontSize={(item['left_name'] !== null && item['left_name'].length) < 8 ? 20 : 15}
+                fontSize={(item['left_name'] !== null && item['left_name'].length) < 8 ? 18 : 14}
                 />
                 <Text
-                x={x - 220}
+                x={x - 200}
                 y={item['left_begin_y']-30}
                 text={item['left_name_kana']}
                 fontSize={12}
@@ -225,7 +226,7 @@ function createText(item, lineWidth) {
                 x={x + width + 10}
                 y={item['left_begin_y']-10}
                 text={item['right_name']}
-                fontSize={(item['right_name'] !== null && item['right_name'].length) < 8 ? 20 : 15}
+                fontSize={(item['right_name'] !== null && item['right_name'].length) < 8 ? 18 : 14}
                     />
                 <Text
                 x={x + width + 10}
@@ -234,7 +235,7 @@ function createText(item, lineWidth) {
                 fontSize={12}
                     />
                 <Text
-                x={x + width + 140}
+                x={x + width + 130}
                 y={item['left_begin_y']-5}
                 text={item['right_group_name'] !== null ? item['right_group_name'].replace('\'', '【').replace('\'', '】') : ''}
                 fontSize={14}
@@ -258,13 +259,13 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
 
     const is_left = (item['block_pos'] === 'left');
     const is_right = (item['block_pos'] === 'right');
-    const pointX = (is_left ? 300 : 800);
+    const pointX = (is_left ? 220 : 620);
     if (!is_left && !is_right) {
         if ('left_begin_y' in item &&
             'right_begin_y' in item) {
-            const x = 300 + lineWidth + (item['round']-2)*30;
-            const width = ((800 - lineWidth - (item['round']-2)*30) -
-                           (300 + lineWidth + (item['round']-2)*30));
+            const x = 220 + lineWidth + (item['round']-2)*30;
+            const width = ((620 - lineWidth - (item['round']-2)*30) -
+                           (220 + lineWidth + (item['round']-2)*30));
             const left_player_flag = item['left_player_flag'];
             let left_winner;
             let right_winner;
@@ -301,7 +302,7 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
                     x={x + width / 2 - 20}
                     y={item['left_begin_y'] - 70}
                     text={'決勝'}
-                    fontSize={20}
+                    fontSize={18}
                     />
                     <Text
                     x={x + width / 2 - 8}
@@ -336,9 +337,9 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
                     fontSize={15} />
                     </>);
         } else {
-            const x = 300 + lineWidth + (item['fake_round']-2)*30;
-            const width = ((800 - lineWidth - (item['fake_round']-2)*30) -
-                           (300 + lineWidth + (item['fake_round']-2)*30));
+            const x = 220 + lineWidth + (item['fake_round']-2)*30;
+            const width = ((620 - lineWidth - (item['fake_round']-2)*30) -
+                           (220 + lineWidth + (item['fake_round']-2)*30));
             const left_player_flag = item['left_player_flag'];
             let left_winner;
             let right_winner;
@@ -376,7 +377,7 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
             x={x + width / 2 - 20}
             y={item['left_begin_y'] - 70}
             text={'三決'}
-            fontSize={20}
+            fontSize={18}
                 />
                 <Rect
             x={x + width / 2 - 16}
@@ -558,7 +559,7 @@ function GetResult({editable = false, updateInterval = 0, returnUrl = null, even
       }
     }, []);
     const sortedData = data.sort((a, b) => a.id - b.id);
-    const lineWidth = 60;
+    const lineWidth = 50;
     let maxHeight = 0;
     console.log(data);
     for (let i = 0; i < data.length; i++) {
@@ -586,12 +587,12 @@ function GetResult({editable = false, updateInterval = 0, returnUrl = null, even
     }
   return (
           <div>
-          <Container maxWidth="lg">
-          <Box style={{ minWidth: '1100px' }}>
+          <Container maxWidth="md">
+          <Box style={{ minWidth: '850px' }}>
           <Grid container justifyContent="center" alignItems="center" style={{ height: '100px' }}>
           <h1>{event_full_name}</h1>
           </Grid>
-          <Stage width={1100} height={maxHeight + 200}>
+          <Stage width={850} height={maxHeight + 200}>
           <Layer>
           {sortedData.map((item, index) => (
               createBlock(item, lineWidth, editable, event_name, returnUrl)
