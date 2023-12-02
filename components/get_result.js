@@ -235,7 +235,7 @@ function createText(item, lineWidth) {
                 fontSize={12}
                     />
                 <Text
-                x={x + width + 120}
+                x={x + width + 140}
                 y={item['left_begin_y']-5}
                 text={item['right_group_name'] !== null ? item['right_group_name'].replace('\'', '【').replace('\'', '】') : ''}
                 fontSize={14}

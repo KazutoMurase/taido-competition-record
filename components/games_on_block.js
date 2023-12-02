@@ -118,7 +118,7 @@ function GamesOnBlock({block_number, event_name, schedule_id}) {
   return (
           <div>
           <Container maxWidth="md">
-          <Box style={{ minWidth: '920px' }}>
+          <Box style={{ minWidth: '960px' }}>
           <Grid container justifyContent="center" alignItems="center">
           <table border="1">
           <tbody>

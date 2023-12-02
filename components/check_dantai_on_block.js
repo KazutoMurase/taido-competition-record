@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import FlagCircleRoundedIcon from '@mui/icons-material/FlagCircleRounded';
 import SquareTwoToneIcon from '@mui/icons-material/SquareTwoTone';
@@ -89,16 +91,14 @@ function CheckDantai({block_number, schedule_id, event_id}) {
 
   return (
           <div>
-          <Grid container>
-          <Grid item xs={5} />
-          <Grid item xs={5}>
+          <Container maxWidth="md">
+          <Box style={{ minWidth: '720px' }}>
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '80px' }}>
           <h2><u>コート{block_number.toUpperCase()}</u></h2>
           </Grid>
-          <Grid item xs={2} />
-          <Grid item xs={1} />
-          <Grid item xs={1} />
-          <Grid item xs={10}>
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '80px' }}>
           <h3 className={checkStyles.warn}>{(data.length > 0 && 'all' in data[0]) ? '※全団体が表示されていますので、点呼するべき団体を確認して下さい': ''}</h3>
+          </Grid>
           <table border="1">
           <tbody>
           <tr className={checkStyles.column}>
@@ -131,16 +131,13 @@ function CheckDantai({block_number, schedule_id, event_id}) {
           ))}
           </tbody>
           </table>
-          </Grid>
-          <Grid item xs={1} />
-          <Grid item xs={4} />
-          <Grid item xs={2}>
-          <br />
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '100px' }}>
           <Button variant="contained" type="submit" onClick={e => onFinish(block_number, schedule_id)}>決定</Button>
           &nbsp;&nbsp;
           <Button variant="contained" type="submit" onClick={e => onBack()}>戻る</Button>
           </Grid>
-          </Grid>
+          </Box>
+          </Container>
           </div>
   );
 }
