@@ -10,7 +10,7 @@ const Home = () => {
     }
     return (
             <>
-            <Block block_number={block_number} />
+            <Block block_number={block_number} update_interval={3000} />
             </>
     );
 }

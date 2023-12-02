@@ -53,7 +53,7 @@ function ShowGamesText(item) {
     return prefix + item['games_text'];
 }
 
-function Block({block_number}) {
+function Block({block_number, update_interval}) {
     const router = useRouter();
     const ToCheck = (block_number, id, name, event_id) => {
         const dantai = (name.includes("団体") ? 1 : 0);
@@ -82,7 +82,7 @@ function Block({block_number}) {
       }
     const interval = setInterval(() => {
       fetchData();
-    }, 3000); // 3秒ごとに更新
+    }, update_interval);
       fetchData();
       return () => {
           clearInterval(interval);
