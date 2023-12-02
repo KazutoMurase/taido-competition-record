@@ -1,5 +1,4 @@
 import React from 'react';
-import { useEffect, useState } from 'react';
 import RecordResult from '../../components/record_result';
 import GetResult from '../../components/get_result';
 import { GetEventName } from '../../lib/get_event_name';
