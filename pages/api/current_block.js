@@ -7,9 +7,9 @@ async function GetFromDB(req, res) {
     const client = await db.connect();
     const block_name = 'block_' + req.query.block_number;
     const current_block_name = 'current_' + block_name;
-    let query = 'SELECT t0.id, t0.game_id, t1.event_id from ' + current_block_name + ' AS t0 LEFT JOIN ' + block_name + ' AS t1 ON t0.id = t1.id';
+    let query = 'SELECT t0.id, t0.game_id from ' + current_block_name + ' AS t0 LEFT JOIN ' + block_name + ' AS t1 ON t0.id = t1.id';
     let result = await client.query(query);
-    const event_name = GetEventName(result.rows[0].event_id);
+    const event_name = req.query.event_name;
     if (req.query.schedule_id !== undefined &&
         parseInt(req.query.schedule_id) !== result.rows[0].id) {
         return [];
@@ -126,7 +126,36 @@ async function GetFromDB(req, res) {
 
 export default async (req, res) => {
     try {
+        const block_name = 'block_' + req.query.block_number;
+        const current_block_name = 'current_' + block_name;
+        const event_name = req.query.event_name;
+        const cacheKey = 'current_' + block_name;
+        const cachedData = await kv.get(cacheKey);
+
+        // 'update_id_for_' +current_block_name can be checked,
+        // but only game id should be enough in the current logic
+        const latestGameIdUpdateKey = 'update_game_id_for_' + current_block_name;
+        const latestChangeOrderKey = 'change_order_for_' + block_name;
+        const latestUpdateResultKey = 'latest_update_result_for_' + event_name + '_timestamp';
+        const latestCompletePlayersKey = 'update_complete_players_for_' + block_name;
+
+        const latestGameIdUpdateTimestamp = await kv.get(latestGameIdUpdateKey) || 0;
+        const latestChangeOrderTimestamp = await kv.get(latestChangeOrderKey) || 0;
+        const latestUpdateResultTimestamp = await kv.get(latestUpdateResultKey) || 0;
+        const latestCompletePlayersTimestamp = await kv.get(latestCompletePlayersKey) || 0;
+        if (cachedData &&
+            latestGameIdUpdateTimestamp < cachedData.timestamp &&
+            latestChangeOrderTimestamp < cachedData.timestamp &&
+            latestUpdateResultTimestamp < cachedData.timestamp &&
+            latestCompletePlayersTimestamp < cachedData.timestamp) {
+            console.log("using cache");
+            return res.json(cachedData.data);
+        }
+        console.log("get new data");
         const data = await GetFromDB(req, res);
+        if (data.length !== 0) {
+            await kv.set(cacheKey, {data: data, timestamp: Date.now()});
+        }
         res.json(data);
     } catch (error) {
         console.log(error);
