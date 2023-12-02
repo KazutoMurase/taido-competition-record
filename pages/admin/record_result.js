@@ -12,7 +12,7 @@ const Home = () => {
         return (<></>);
     }
     const event_name = GetEventName(event_id);
-    const return_url = ("admin/record_result?block_number=" + block_number + "%26schedule_id=" + schedule_id);
+    const return_url = ("admin/record_result?block_number=" + block_number + "%26schedule_id=" + schedule_id + "%26event_id=" + event_id);
         return (
                 <>
                 <RecordResult block_number={block_number} event_name={event_name} schedule_id={schedule_id} />
