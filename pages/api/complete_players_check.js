@@ -12,15 +12,19 @@ export default async (req, res) => {
         query = 'select event_id from ' + block_name + ' where id = ' + schedule_id;
         result = await client.query(query);
         const event_name = GetEventName(result.rows[0].event_id);
-        for (let i = 0; i < req.body.left_retire_array.length; i++) {
-            let item = req.body.left_retire_array[i];
-            query = 'update ' + event_name + ' set left_retire = ' + (item.is_retired ? 1 : 0) + ' where id = ' + item.id;
-            result = await client.query(query);
+        if ('left_retire_array' in req.body){
+            for (let i = 0; i < req.body.left_retire_array.length; i++) {
+                let item = req.body.left_retire_array[i];
+                query = 'update ' + event_name + ' set left_retire = ' + (item.is_retired ? 1 : 0) + ' where id = ' + item.id;
+                result = await client.query(query);
+            }
         }
-        for (let i = 0; i < req.body.right_retire_array.length; i++) {
-            let item = req.body.right_retire_array[i];
-            query = 'update ' + event_name + ' set right_retire = ' + (item.is_retired ? 1 : 0) + ' where id = ' + item.id;
-            result = await client.query(query);
+        if ('right_retire_array' in req.body){
+            for (let i = 0; i < req.body.right_retire_array.length; i++) {
+                let item = req.body.right_retire_array[i];
+                query = 'update ' + event_name + ' set right_retire = ' + (item.is_retired ? 1 : 0) + ' where id = ' + item.id;
+                result = await client.query(query);
+            }
         }
         const key = 'update_complete_players_for_block_' + req.body.block_number;
         const timestamp = Date.now();
