@@ -577,6 +577,8 @@ function GetResult({editable = false, updateInterval = 0, returnUrl = null, even
           </Grid>
           </Box>
           </Container>
+          <br/>
+          <br/>
           </div>
   );
 }
