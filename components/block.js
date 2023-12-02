@@ -53,23 +53,23 @@ function ShowGamesText(item) {
     return prefix + item['games_text'];
 }
 
-function Block({block_number, update_interval}) {
+function Block({block_number, update_interval, return_url}) {
     const router = useRouter();
     const ToCheck = (block_number, id, name, event_id) => {
         const dantai = (name.includes("団体") ? 1 : 0);
-        router.push("/admin/check_players_on_block?block_number=" + block_number + "&schedule_id=" + id + "&dantai=" + dantai + "&event_id=" + event_id);
+        router.push(return_url + "/check_players_on_block?block_number=" + block_number + "&schedule_id=" + id + "&dantai=" + dantai + "&event_id=" + event_id);
     };
     const ToCall = (block_number, id, event_id) => {
-        router.push("/admin/games_on_block?block_number=" + block_number + "&schedule_id=" + id + '&event_id=' + event_id);
+        router.push(return_url + "/games_on_block?block_number=" + block_number + "&schedule_id=" + id + '&event_id=' + event_id);
     };
     const ToRecord = (block_number, id, event_id) => {
-        router.push("/admin/record_result?block_number=" + block_number + "&schedule_id=" + id + '&event_id=' + event_id);
+        router.push(return_url + "/record_result?block_number=" + block_number + "&schedule_id=" + id + '&event_id=' + event_id);
     };
     const ToUpdate = (block_number, id, event_id) => {
-        router.push("/admin/check_result?block_number=" + block_number + "&schedule_id=" + id + '&event_id=' + event_id);
+        router.push(return_url + "/check_result?block_number=" + block_number + "&schedule_id=" + id + '&event_id=' + event_id);
     };
     const ToBack = () => {
-        router.push("/admin");
+        router.push(return_url);
     };
     const [data, setData] = useState([]);
     const [current, setCurrent] = useState([]);
