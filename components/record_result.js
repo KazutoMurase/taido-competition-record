@@ -192,7 +192,7 @@ function RecordResult({block_number, event_name, schedule_id}) {
   return (
           <div>
           <Container maxWidth="md">
-          <Box style={{ minWidth: '1100px' }}>
+          <Box style={{ minWidth: '850px' }}>
           <Grid container justifyContent="center" alignItems="center" style={{ height: '50px' }}>
           <h2><u>コート{block_number.toUpperCase()}</u></h2>
           </Grid>
