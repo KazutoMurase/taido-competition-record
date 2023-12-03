@@ -19,11 +19,14 @@ function onClearAll(is_test, function_after_post) {
 }
 
 function onClear(item, is_test, function_after_post) {
-    let post = {is_test: is_test};
+    let post = {};
     if ('name' in item) {
-        post = {player_id: item.id};
+        post = {player_id: item.id,
+                is_test: is_test};
     } else {
-        post = {group_id: item.group_id, event_id: item.event_id};
+        post = {group_id: item.group_id,
+                is_test: is_test,
+                event_id: item.event_id};
     }
     axios.post('/api/clear_notification_request', post)
         .then((response) => {
