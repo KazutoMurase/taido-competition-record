@@ -10,7 +10,7 @@ import checkStyles from '../styles/checks.module.css';
 import { useRouter } from 'next/router';
 
 
-function onSubmit(id, block_number, event_id, function_after_post) {
+function onSubmit(id, block_number, event_id, is_test, function_after_post) {
     // TODO: FIXME
     let court_id;
     if (block_number === 'a') {
@@ -21,11 +21,16 @@ function onSubmit(id, block_number, event_id, function_after_post) {
         court_id = 3;
     } else if (block_number === 'd') {
         court_id = 4;
+    } else if (block_number === 'x') {
+        court_id = 100;
+    } else if (block_number === 'y') {
+        court_id = 101;
     }
     let post = {event_id: event_id,
                 player_id: id,
-                court_id: court_id
-                };
+                court_id: court_id,
+                is_test: is_test
+               };
     axios.post('/api/create_notification_request', post)
         .then((response) => {
             function_after_post();
@@ -33,8 +38,9 @@ function onSubmit(id, block_number, event_id, function_after_post) {
         .catch((e) => { console.log(e)})
 }
 
-function onClear(id, function_after_post) {
-    let post = {player_id: id};
+function onClear(id, is_test, function_after_post) {
+    let post = {player_id: id,
+                is_test: is_test};
     axios.post('/api/clear_notification_request', post)
         .then((response) => {
             function_after_post();
@@ -42,10 +48,10 @@ function onClear(id, function_after_post) {
         .catch((e) => { console.log(e)})
 }
 
-function CheckPlayers({block_number, schedule_id, event_id}) {
+function CheckPlayers({block_number, schedule_id, event_id, is_test = false}) {
     const router = useRouter();
     function onBack() {
-        router.push("/admin/block?block_number=" + block_number);
+        router.push("block?block_number=" + block_number);
     }
 
     const [leftRetireStates, setLeftRetireStates] = useState([]);
@@ -84,17 +90,18 @@ function CheckPlayers({block_number, schedule_id, event_id}) {
         });
     };
 
-    function onFinish(block_number, schedule_id) {
+    function onFinish(block_number, schedule_id, is_test) {
         let post = {schedule_id: schedule_id,
                     block_number: block_number,
                     left_retire_array: leftRetireStates,
                     right_retire_array: rightRetireStates,
+                    is_test: is_test
                    };
         console.log(post);
         axios.post('/api/complete_players_check', post)
             .then((response) => {
                 console.log(response);
-                router.push("/admin/block?block_number=" + block_number);
+                router.push("block?block_number=" + block_number);
             })
             .catch((e) => { console.log(e)})
     }
@@ -102,7 +109,7 @@ function CheckPlayers({block_number, schedule_id, event_id}) {
   let title;
 
   const fetchData = async () => {
-      const response = await fetch('/api/check_players_on_block?block_number=' + block_number + '&schedule_id=' + schedule_id + '&event_id=' + event_id);
+      const response = await fetch('/api/check_players_on_block?block_number=' + block_number + '&schedule_id=' + schedule_id + '&event_id=' + event_id + '&is_test=' + is_test);
       const result = await response.json();
       setData(result);
   }
@@ -176,16 +183,18 @@ function CheckPlayers({block_number, schedule_id, event_id}) {
                   <td><Button variant="contained" type="submit" onClick={e => onSubmit(item.id,
                                                                                        block_number,
                                                                                        event_id,
+                                                                                       is_test,
                                                                                        forceFetchData)} style={!item['requested'] ? null : activeButtonStyle}>{!item['requested'] ? '　呼び出し　' : 'リクエスト済'}
               </Button></td>
                   <td><Button variant="contained" type="submit" onClick={e => onClear(item.id,
+                                                                                      is_test,
                                                                                       forceFetchData)} disabled={!item['requested']}>キャンセル</Button></td>
               </tr>
           ))}
           </tbody>
           </table>
           <Grid container justifyContent="center" alignItems="center" style={{ height: '100px' }}>
-          <Button variant="contained" type="submit" onClick={e => onFinish(block_number, schedule_id)}>決定</Button>
+          <Button variant="contained" type="submit" onClick={e => onFinish(block_number, schedule_id, is_test)}>決定</Button>
           &nbsp;&nbsp;
           <Button variant="contained" type="submit" onClick={e => onBack()}>戻る</Button>
           </Grid>

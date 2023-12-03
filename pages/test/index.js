@@ -22,20 +22,11 @@ export default function Home() {
             </Grid>
             <br/><br/><br/><br/>
             <Grid container justifyContent="center" alignItems="center" style={{ height: '1vh' }}>
-            <Button variant="contained" type="submit" onClick={e => ToBlock("w")}>Wコート</Button>
-            </Grid>
-            <br/><br/>
-            <Grid container justifyContent="center" alignItems="center" style={{ height: '1vh' }}>
             <Button variant="contained" type="submit" onClick={e => ToBlock("x")}>Xコート</Button>
             </Grid>
             <br/><br/>
             <Grid container justifyContent="center" alignItems="center" style={{ height: '1vh' }}>
             <Button variant="contained" type="submit" onClick={e => ToBlock("y")}>Yコート</Button>
-            </Grid>
-            <br/><br/>
-            <Grid container justifyContent="center" alignItems="center" style={{ height: '1vh' }}>
-            <br/><br/>
-            <Button variant="contained" type="submit" onClick={e => ToBlock("z")}>Zコート</Button>
             </Grid>
             <br/><br/><br/><br/>
             <Grid container justifyContent="center" alignItems="center" style={{ height: '1vh' }}>

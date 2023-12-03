@@ -12,15 +12,16 @@ async function GetFromDB(req, res, event_name) {
         parseInt(req.query.schedule_id) !== result.rows[0].id) {
         return [];
     }
+    const players_name = (event_name.includes("test")) ? "test_players" : "players";
     let schedule_id = result.rows[0].id;
     query = 'SELECT game_id from ' + block_name + '_games where order_id = $1 and schedule_id = $2';
     let values = [result.rows[0].game_id, result.rows[0].id];
     result = await client.query(query, values);
     const current_id = (result.rows.length === 0 ? -1 : result.rows[0].game_id);
     //console.log(current_id, schedule_id);
-    query = 'SELECT t0.order_id, t1.id, t1.left_retire, t1.right_retire, t2.name AS left_name, t2.name_kana AS left_name_kana, t3.name AS right_name, t3.name_kana AS right_name_kana, t4.name AS left_group_name, t5.name AS right_group_name FROM ' + block_name + '_games AS t0 LEFT JOIN ' + event_name + ' AS t1 ON t0.game_id = t1.id LEFT JOIN players AS t2 ON t1.left_player_id = t2.' + event_name + '_player_id LEFT JOIN players AS t3 ON t1.right_player_id = t3.' + event_name + '_player_id LEFT JOIN groups AS t4 ON t2.group_id = t4.id LEFT JOIN groups AS t5 ON t3.group_id = t5.id where t0.schedule_id = $1';
+    query = 'SELECT t0.order_id, t1.id, t1.left_retire, t1.right_retire, t2.name AS left_name, t2.name_kana AS left_name_kana, t3.name AS right_name, t3.name_kana AS right_name_kana, t4.name AS left_group_name, t5.name AS right_group_name FROM ' + block_name + '_games AS t0 LEFT JOIN ' + event_name + ' AS t1 ON t0.game_id = t1.id LEFT JOIN '+ players_name + ' AS t2 ON t1.left_player_id = t2.' + event_name + '_player_id LEFT JOIN ' + players_name + ' AS t3 ON t1.right_player_id = t3.' + event_name + '_player_id LEFT JOIN groups AS t4 ON t2.group_id = t4.id LEFT JOIN groups AS t5 ON t3.group_id = t5.id where t0.schedule_id = $1';
     const result_block = await client.query(query, [schedule_id]);
-    query = 'SELECT t1.id, t1.left_player_id, t1.right_player_id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t3.name AS right_name FROM ' + event_name + ' AS t1 LEFT JOIN players AS t2 ON t1.left_player_id = t2.' + event_name + '_player_id LEFT JOIN players AS t3 ON t1.right_player_id = t3.' + event_name + '_player_id';
+    query = 'SELECT t1.id, t1.left_player_id, t1.right_player_id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t3.name AS right_name FROM ' + event_name + ' AS t1 LEFT JOIN ' + players_name + ' AS t2 ON t1.left_player_id = t2.' + event_name + '_player_id LEFT JOIN ' + players_name + ' AS t3 ON t1.right_player_id = t3.' + event_name + '_player_id';
     const result_schedule = await client.query(query);
     const sorted_data = result_schedule.rows.sort((a, b) => a.id - b.id);
     let sorted_block_data = result_block.rows.sort((a, b) => a.order_id - b.order_id);

@@ -5,16 +5,19 @@ export default async (req, res) => {
     try {
         const client = await db.connect();
         let query, values, result;
+        console.log(req.body.is_test);
+        const notification_request_name = (req.body.is_test === true) ? 'test_notification_request' : 'notification_request';
+        console.log(notification_request_name);
         if ('player_id' in req.body) {
-            query = `INSERT INTO notification_request(event_id, player_id, court_id) values ($1, $2, $3)`;
+            query = 'INSERT INTO ' + notification_request_name + '(event_id, player_id, court_id) values ($1, $2, $3)';
             values = [req.body.event_id, req.body.player_id, req.body.court_id];
             result = await client.query(query, values);
         } else if ('group_id' in req.body) {
-            query = `INSERT INTO notification_request(event_id, group_id, court_id) values ($1, $2, $3)`;
+            query = 'INSERT INTO ' + notification_request_name + '(event_id, group_id, court_id) values ($1, $2, $3)';
             values = [req.body.event_id, req.body.group_id, req.body.court_id];
             result = await client.query(query, values);
         }
-        const key = 'latest_update_for_notification_request';
+        const key = 'latest_update_for_' + notification_request_name;
         kv.set(key, Date.now());
         res.json({});
     } catch (error) {

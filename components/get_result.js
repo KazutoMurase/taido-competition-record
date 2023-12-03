@@ -254,7 +254,7 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
 
     const onUpdate = (id, editable) => {
         if (editable) {
-            router.push('/admin/update_result?event_name=' + event_name + '&id=' + id + '&return_url=' + returnUrl);
+            router.push('update_result?event_name=' + event_name + '&id=' + id + '&return_url=' + returnUrl);
         }
     }
 
@@ -555,7 +555,7 @@ function GetResult({editable = false, updateInterval = 0, returnUrl = null, even
         returnUrl = event_name + '_result';
     }
     const onBack = () => {
-        router.push('/admin/block?block_number=' + block_number);
+        router.push('block?block_number=' + block_number);
     }
 
     const [data, setData] = useState([]);
@@ -592,21 +592,21 @@ function GetResult({editable = false, updateInterval = 0, returnUrl = null, even
     // TODO: from DB
     let event_full_name;
     let event_description = [];
-    if (event_name === 'hokei_man') {
+    if (event_name.includes('hokei_man')) {
         event_full_name = '男子個人法形競技';
         event_description = ['1 ・ 2 回戦：旋体の法形 / 3 回戦以降：体の法形から自由選択'];
-    } else if (event_name === 'zissen_man') {
+    } else if (event_name.includes('zissen_man')) {
         event_full_name = '男子個人実戦競技';
         event_description = ['試合時間  予選1分30秒　三決・決勝２分  (準決・三決・決勝は1分1回のみ延長あり)',
                              '胴プロテクター着用厳守'];
-    } else if (event_name === 'hokei_woman') {
+    } else if (event_name.includes('hokei_woman')) {
         event_full_name = '女子個人法形競技';
         event_description = ['1 ・ 2 回戦：旋陰の法形 / 3 回戦以降：陰の法形から自由選択'];
-    } else if (event_name === 'zissen_woman') {
+    } else if (event_name.includes('zissen_woman')) {
         event_full_name = '女子個人実戦競技';
         event_description = ['試合時間  予選1分30秒　三決・決勝２分  (準決・三決・決勝は1分1回のみ延長あり)',
                              '胴プロテクター着用厳守'];
-    } else if (event_name === 'hokei_sonen') {
+    } else if (event_name.includes('hokei_sonen')) {
         event_full_name = '壮年法形競技';
         event_description = ['1.2 回戦勢命（表のみ）、3 回戦以降　活命・延命から選択'];
     }

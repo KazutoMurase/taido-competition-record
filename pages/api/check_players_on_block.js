@@ -3,11 +3,11 @@ import { kv } from "@vercel/kv";
 import { GetEventName } from '../../lib/get_event_name';
 
 
-async function GetFromDB(req, res,  event_name) {
+async function GetFromDB(req, res, event_name, players_name, notification_request_name) {
     const client = await db.connect();
     const block_name = 'block_' + req.query.block_number;
     const schedule_id = req.query.schedule_id;
-    let query = 'SELECT t1.id, t2.id AS left_player_id, t3.id AS right_player_id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t3.name AS right_name, t2.name_kana AS left_name_kana, t3.name_kana AS right_name_kana FROM ' + block_name + '_games AS t0 LEFT JOIN ' + event_name + ' AS t1 ON t0.game_id = t1.id LEFT JOIN players AS t2 ON t1.left_player_id = t2.' + event_name + '_player_id LEFT JOIN players AS t3 ON t1.right_player_id = t3.' + event_name + '_player_id where t0.schedule_id = $1';
+    let query = 'SELECT t1.id, t2.id AS left_player_id, t3.id AS right_player_id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t3.name AS right_name, t2.name_kana AS left_name_kana, t3.name_kana AS right_name_kana FROM ' + block_name + '_games AS t0 LEFT JOIN ' + event_name + ' AS t1 ON t0.game_id = t1.id LEFT JOIN ' + players_name + ' AS t2 ON t1.left_player_id = t2.' + event_name + '_player_id LEFT JOIN ' + players_name + ' AS t3 ON t1.right_player_id = t3.' + event_name + '_player_id where t0.schedule_id = $1';
     const result = await client.query(query, [schedule_id]);
     const data = result.rows.sort((a, b) => a.id - b.id);
 
@@ -82,7 +82,7 @@ async function GetFromDB(req, res,  event_name) {
             round_num[sorted_data[i]['round']] += 1;
         }
     }
-    query = `SELECT player_id FROM notification_request`;
+    query = 'SELECT player_id FROM ' + notification_request_name;
     const result_requested = await client.query(query);
     const requested_data = result_requested.rows;
     // select item
@@ -172,7 +172,7 @@ async function GetFromDB(req, res,  event_name) {
     return result_array;
 }
 
-async function GetDantaiFromDB(req, res, event_id) {
+async function GetDantaiFromDB(req, res, event_id, notification_request_name) {
     const client = await db.connect();
     const block_name = 'block_' + req.query.block_number;
     const schedule_id = req.query.schedule_id;
@@ -191,7 +191,7 @@ async function GetDantaiFromDB(req, res, event_id) {
             result_dantai.rows[i]['all'] = true;
         }
     }
-    query = `SELECT group_id, event_id FROM notification_request WHERE group_id is not null`;
+    query = 'SELECT group_id, event_id FROM ' + notification_request_name + ' WHERE group_id is not null';
     const result_requested = await client.query(query);
     const requested_data = result_requested.rows;
     for (let i = 0; i < result_dantai.rows.length; i++) {
@@ -208,11 +208,13 @@ async function GetDantaiFromDB(req, res, event_id) {
 
 export default async (req, res) => {
     try {
+        const is_test = (req.query.is_test === 'true');
         const event_id = parseInt(req.query.event_id);
         const block_name = 'block_' + req.query.block_number;
         const cacheKey = 'check_players_on_' + block_name + '_for_' + req.query.schedule_id;
         const cachedData = await kv.get(cacheKey);
-        const latestNotificationUpdateKey = 'latest_update_for_notification_request';
+        const notification_request_name = (is_test ? 'test_notification_request' : 'notification_request');
+        const latestNotificationUpdateKey = 'latest_update_for_' + notification_request_name;
         const latestNotificationUpdateTimestamp = await kv.get(latestNotificationUpdateKey) || 0;
         const latestCompletePlayersKey = 'update_complete_players_for_' + block_name;
         const latestCompletePlayersTimestamp = await kv.get(latestCompletePlayersKey) || 0;
@@ -224,11 +226,12 @@ export default async (req, res) => {
                 return res.json(cachedData.data);
             }
             console.log("get new data");
-            const data = await GetDantaiFromDB(req, res, event_id);
+            const data = await GetDantaiFromDB(req, res, event_id, notification_request_name);
             await kv.set(cacheKey, {data: data, timestamp: Date.now()});
             return res.json(data);
         }
-        const event_name = GetEventName(event_id);
+        const event_name = (is_test ? "test_" : "") + GetEventName(event_id);
+        const players_name = (is_test ? "test_players" : "players");
         const latestResultUpdateKey = 'latest_update_result_for_' + event_name + '_timestamp';
         const latestResultUpdateTimestamp = await kv.get(latestResultUpdateKey) || 0;
         if (cachedData &&
@@ -239,7 +242,7 @@ export default async (req, res) => {
             return res.json(cachedData.data);
         }
         console.log("get new data");
-        const data = await GetFromDB(req, res, event_name);
+        const data = await GetFromDB(req, res, event_name, players_name, notification_request_name);
         await kv.set(cacheKey, {data: data, timestamp: Date.now()});
         return res.json(data);
     } catch (error) {

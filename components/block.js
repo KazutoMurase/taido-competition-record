@@ -109,7 +109,7 @@ function Block({block_number, update_interval, return_url}) {
   useEffect(() => {
     const interval = setInterval(() => {
       fetchCurrent();
-    }, 3000); // 3秒ごとに更新
+    }, update_interval);
       fetchCurrent();
       return () => {
           clearInterval(interval);

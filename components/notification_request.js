@@ -9,8 +9,8 @@ import FlagCircleRoundedIcon from '@mui/icons-material/FlagCircleRounded';
 import SquareTwoToneIcon from '@mui/icons-material/SquareTwoTone';
 import checkStyles from '../styles/checks.module.css';
 
-function onClearAll(function_after_post) {
-    let post = {};
+function onClearAll(is_test, function_after_post) {
+    let post = {is_test: is_test};
     axios.post('/api/clear_notification_request', post)
         .then((response) => {
             function_after_post();
@@ -18,8 +18,8 @@ function onClearAll(function_after_post) {
         .catch((e) => { console.log(e)})
 }
 
-function onClear(item, function_after_post) {
-    let post = {};
+function onClear(item, is_test, function_after_post) {
+    let post = {is_test: is_test};
     if ('name' in item) {
         post = {player_id: item.id};
     } else {
@@ -39,7 +39,7 @@ function ShowName(item) {
     return item['group_name'].replace('\'', '').replace('\'', '') + 'チーム';
 }
 
-function NotificationRequest({update_interval, return_url}) {
+function NotificationRequest({update_interval, return_url, is_test = false}) {
   const [selectedRadioButton, setSelectedRadioButton] = useState(null);
 
   const handleRadioButtonChange = (event) => {
@@ -51,7 +51,7 @@ function NotificationRequest({update_interval, return_url}) {
   }
 
   const fetchData = async () => {
-      const response = await fetch('/api/notification_request');
+      const response = await fetch('/api/notification_request?is_test=' + is_test);
       const result = await response.json();
       setData(result);
   }
@@ -92,14 +92,14 @@ function NotificationRequest({update_interval, return_url}) {
                   <td>{ShowName(item)}</td>
                   <td>{item['court_name'].replace('\'', '').replace('\'', '')}</td>
                   <td>{'name' in item ? item['group_name'].replace('\'', '').replace('\'', '') : ''}</td>
-                  <td><Button variant="contained" type="submit" onClick={e => onClear(item, forceFetchData)}>呼び出し完了</Button></td>
+                  <td><Button variant="contained" type="submit" onClick={e => onClear(item, is_test, forceFetchData)}>呼び出し完了</Button></td>
               </tr>
           ))}
           </tbody>
           </table>
           <br />
           <Grid container justifyContent="center" alignItems="center" style={{ height: '100px' }}>
-          <Button variant="contained" type="submit" onClick={e => onClearAll(forceFetchData)}>全呼び出し完了</Button>
+          <Button variant="contained" type="submit" onClick={e => onClearAll(is_test, forceFetchData)}>全呼び出し完了</Button>
           &nbsp;&nbsp;
           <Button variant="contained" type="submit" onClick={e => ToBack()}>戻る</Button>
           </Grid>
