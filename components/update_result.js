@@ -121,12 +121,22 @@ function UpdateResult({event_name, id, return_url}) {
     let post = {id: data.id,
                 event_name: event_name,
                 left_player_flag: left_player_flag};
-    if (parseInt(left_player_flag) > 1) {
-        post['next_player_id'] = data.left_player_id;
-        post['loser_id'] = data.right_player_id;
-    } else {
-        post['next_player_id'] = data.right_player_id;
-        post['loser_id'] = data.left_player_id;
+    if (event_name.includes('hokei')) {
+        if (parseInt(left_player_flag) > 1) {
+            post['next_player_id'] = data.left_player_id;
+            post['loser_id'] = data.right_player_id;
+        } else {
+            post['next_player_id'] = data.right_player_id;
+            post['loser_id'] = data.left_player_id;
+        }
+    } else if (event_name.includes('zissen')) {
+        if (parseInt(left_player_flag) > 0) {
+            post['next_player_id'] = data.left_player_id;
+            post['loser_id'] = data.right_player_id;
+        } else {
+            post['next_player_id'] = data.right_player_id;
+            post['loser_id'] = data.left_player_id;
+        }
     }
     if (data.next_left_id !== null) {
         post['next_id'] = data.next_left_id;
