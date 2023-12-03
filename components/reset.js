@@ -24,7 +24,7 @@ const PopupComponent = ({ onClose, event_names, block_names }) => {
 
   return (
     <div className="popup">
-      <p><b>本当に初期化しますか？辞める場合は×を押して下さい</b></p>
+      <p><b>本当に初期化しますか？<br/>辞める場合はwindowを閉じて下さい</b></p>
       <button onClick={handleDecision}>本当に初期化する</button>
     </div>
   );
@@ -32,7 +32,7 @@ const PopupComponent = ({ onClose, event_names, block_names }) => {
 
 function ResetButton({event_names, block_names, text}) {
     const handlePopup = () => {
-        const popupWindow = window.open('', '_blank', 'width=450,height=10');
+        const popupWindow = window.open('', '_blank', 'width=350,height=50');
 
         popupWindow.document.body.innerHTML = `
       <div id="popup-container"></div>
