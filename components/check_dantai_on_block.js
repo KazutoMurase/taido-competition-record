@@ -10,7 +10,7 @@ import checkStyles from '../styles/checks.module.css';
 import { useRouter } from 'next/router';
 
 
-function onSubmit(block_number, group_id, event_id, function_after_post) {
+function onSubmit(block_number, group_id, event_id, is_test, function_after_post) {
     // TODO: FIXME
     let court_id;
     if (block_number === 'a') {
@@ -21,10 +21,15 @@ function onSubmit(block_number, group_id, event_id, function_after_post) {
         court_id = 3;
     } else if (block_number === 'd') {
         court_id = 4;
+    } else if (block_number === 'x') {
+        court_id = 100;
+    } else if (block_number === 'y') {
+        court_id = 101;
     }
     let post = {event_id: event_id,
                 group_id: group_id,
-                court_id: court_id
+                court_id: court_id,
+                is_test: is_test
                 };
     axios.post('/api/create_notification_request', post)
         .then((response) => {
@@ -33,9 +38,10 @@ function onSubmit(block_number, group_id, event_id, function_after_post) {
         .catch((e) => { console.log(e)})
 }
 
-function onClear(item, function_after_post) {
+function onClear(item, is_test, function_after_post) {
     let post = {group_id: item.group_id,
-                event_id: item.event_id};
+                event_id: item.event_id,
+                is_test: is_test};
     axios.post('/api/clear_notification_request', post)
         .then((response) => {
             function_after_post();
@@ -43,20 +49,21 @@ function onClear(item, function_after_post) {
         .catch((e) => { console.log(e)})
 }
 
-function CheckDantai({block_number, schedule_id, event_id}) {
+function CheckDantai({block_number, schedule_id, event_id, is_test = false}) {
     const router = useRouter();
     function onBack() {
-        router.push("/admin/block?block_number=" + block_number);
+        router.push("block?block_number=" + block_number);
     }
 
-    function onFinish(block_number, schedule_id) {
+    function onFinish(block_number, schedule_id, is_test) {
         let post = {schedule_id: schedule_id,
-                    block_number: block_number};
+                    block_number: block_number,
+                    is_test: is_test};
         console.log(post);
         axios.post('/api/complete_players_check', post)
             .then((response) => {
                 console.log(response);
-                router.push("/admin/block?block_number=" + block_number);
+                router.push("block?block_number=" + block_number);
             })
             .catch((e) => { console.log(e)})
     }
@@ -64,7 +71,7 @@ function CheckDantai({block_number, schedule_id, event_id}) {
   let title;
 
   const fetchData = async () => {
-      const response = await fetch('/api/check_players_on_block?block_number=' + block_number + '&schedule_id=' + schedule_id + '&event_id=' + event_id);
+      const response = await fetch('/api/check_players_on_block?block_number=' + block_number + '&schedule_id=' + schedule_id + '&event_id=' + event_id + '&is_test=' + is_test);
       const result = await response.json();
       setData(result);
   }
@@ -124,9 +131,10 @@ function CheckDantai({block_number, schedule_id, event_id}) {
                   <td><Button variant="contained" type="submit" onClick={e => onSubmit(block_number,
                                                                                        item.group_id,
                                                                                        item.event_id,
+                                                                                       is_test,
                                                                                        forceFetchData)} style={!item['requested'] ? null : activeButtonStyle}>{!item['requested'] ? '　呼び出し　' : 'リクエスト済'}
               </Button></td>
-                  <td><Button variant="contained" type="submit" onClick={e => onClear(item, forceFetchData)} disabled={!item['requested']}>キャンセル</Button></td>
+                  <td><Button variant="contained" type="submit" onClick={e => onClear(item, is_test, forceFetchData)} disabled={!item['requested']}>キャンセル</Button></td>
               </tr>
           ))}
           </tbody>

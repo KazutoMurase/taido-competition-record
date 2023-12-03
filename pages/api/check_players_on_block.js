@@ -172,9 +172,10 @@ async function GetFromDB(req, res, event_name, players_name, notification_reques
     return result_array;
 }
 
-async function GetDantaiFromDB(req, res, event_id, notification_request_name) {
+async function GetDantaiFromDB(req, res, event_id, is_test, notification_request_name) {
     const client = await db.connect();
     const block_name = 'block_' + req.query.block_number;
+    const event_name = (is_test ? 'test_dantai' : 'dantai');
     const schedule_id = req.query.schedule_id;
     let query = 'SELECT game_id FROM ' + block_name + '_games WHERE schedule_id = ' + schedule_id;
     let result_dantai = await client.query(query);
@@ -182,10 +183,10 @@ async function GetDantaiFromDB(req, res, event_id, notification_request_name) {
     const sorted_dantai = result_dantai.rows.sort((a, b) => a.game_id - b.game_id);
     const game_id = sorted_dantai[0].game_id;
     console.log(game_id);
-    query = 'SELECT t1.name, t0.group_id, t0.event_id FROM dantai as t0 LEFT JOIN groups AS t1 ON t0.group_id = t1.id WHERE t0.event_id = ' + event_id + ' and game_id = ' + game_id;
+    query = 'SELECT t1.name, t0.group_id, t0.event_id FROM ' + event_name + ' as t0 LEFT JOIN groups AS t1 ON t0.group_id = t1.id WHERE t0.event_id = ' + event_id + ' and game_id = ' + game_id;
     result_dantai = await client.query(query);
     if (result_dantai.rows.length === 0) {
-        query = 'SELECT t1.name, t0.group_id, t0.event_id FROM dantai as t0 LEFT JOIN groups AS t1 ON t0.group_id = t1.id WHERE t0.event_id = ' + event_id;
+        query = 'SELECT t1.name, t0.group_id, t0.event_id FROM ' + event_name + ' as t0 LEFT JOIN groups AS t1 ON t0.group_id = t1.id WHERE t0.event_id = ' + event_id;
         result_dantai = await client.query(query);
         for (let i = 0; i < result_dantai.rows.length; i++) {
             result_dantai.rows[i]['all'] = true;
@@ -226,7 +227,7 @@ export default async (req, res) => {
                 return res.json(cachedData.data);
             }
             console.log("get new data");
-            const data = await GetDantaiFromDB(req, res, event_id, notification_request_name);
+            const data = await GetDantaiFromDB(req, res, event_id, is_test, notification_request_name);
             await kv.set(cacheKey, {data: data, timestamp: Date.now()});
             return res.json(data);
         }
