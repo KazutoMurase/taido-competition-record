@@ -8,8 +8,9 @@ import Grid from '@mui/material/Grid';
 import FlagCircleRoundedIcon from '@mui/icons-material/FlagCircleRounded';
 import checkStyles from '../styles/checks.module.css';
 
-function onMoveDown(order_id, block_number, function_after_post) {
+function onMoveDown(order_id, block_number, schedule_id, function_after_post) {
     let post = {update_block: block_number,
+                schedule_id: schedule_id,
                 target_order_id: order_id};
     axios.post('/api/change_order', post)
         .then((response) => {
@@ -160,7 +161,7 @@ function GamesOnBlock({block_number, event_name, schedule_id, update_interval}) 
                   <td>
                   {showText(item['left_color'], item['right_retire'], item['right_name_kana'], item['left_retire'], item['left_name_kana'], item['id'], 'right')}
               </td>
-                  <td><Button variant="contained" type="submit" disabled={current_order_id > item['order_id'] || last_order_id===item['order_id']} onClick={e => onMoveDown(item.order_id, block_number, forceFetchData)}>▼</Button></td>
+                  <td><Button variant="contained" type="submit" disabled={current_order_id > item['order_id'] || last_order_id===item['order_id']} onClick={e => onMoveDown(item.order_id, block_number, schedule_id, forceFetchData)}>▼</Button></td>
                   {event_name.includes('zissen') ? (<td><Button size="small" style={retireButtonStyle} variant="contained" type="submit" onClick={e => handleLeftRetireStatesChange(item.id)}>Check</Button></td>) : (<></>)}
                   {event_name.includes('zissen') ? (<td><Button size="small" style={retireButtonStyle} variant="contained" type="submit" onClick={e => handleRightRetireStatesChange(item.id)}>Check</Button></td>) : (<></>)}
                   </tr>
