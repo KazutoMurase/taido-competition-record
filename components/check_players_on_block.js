@@ -48,7 +48,7 @@ function onClear(id, is_test, function_after_post) {
         .catch((e) => { console.log(e)})
 }
 
-function CheckPlayers({block_number, schedule_id, event_id, is_test = false}) {
+function CheckPlayers({block_number, schedule_id, event_id, update_interval, is_test = false}) {
     const router = useRouter();
     function onBack() {
         router.push("block?block_number=" + block_number);
@@ -117,7 +117,7 @@ function CheckPlayers({block_number, schedule_id, event_id, is_test = false}) {
   useEffect(() => {
     const interval = setInterval(() => {
       fetchData();
-    }, 3000); // 3秒ごとに更新
+    }, update_interval);
       fetchData();
     return () => {
       clearInterval(interval);

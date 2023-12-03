@@ -26,7 +26,7 @@ function ShowHokeiType(item, event_name) {
 }
 
 
-function GamesOnBlock({block_number, event_name, schedule_id}) {
+function GamesOnBlock({block_number, event_name, schedule_id, update_interval}) {
   const [selectedRadioButton, setSelectedRadioButton] = useState(null);
 
   const handleRadioButtonChange = (event) => {
@@ -46,7 +46,7 @@ function GamesOnBlock({block_number, event_name, schedule_id}) {
   useEffect(() => {
     const interval = setInterval(() => {
       fetchData();
-    }, 3000); // 3秒ごとに更新
+    }, update_interval);
       fetchData();
       return () => {
           clearInterval(interval);

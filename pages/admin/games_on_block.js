@@ -13,7 +13,7 @@ const Home = () => {
     const event_name = GetEventName(event_id);
     return (
             <>
-            <GamesOnBlock block_number={block_number} event_name={event_name} schedule_id={schedule_id} />
+            <GamesOnBlock block_number={block_number} event_name={event_name} schedule_id={schedule_id} update_interval={3000} />
             <br />
             <GetResult updateInterval={3000} event_name={event_name} block_number={block_number} />
             </>

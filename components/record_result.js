@@ -120,7 +120,7 @@ function ShowRightName(data) {
     return (<span><h1>{data.right_name}</h1></span>);
 }
 
-function RecordResult({block_number, event_name, schedule_id}) {
+function RecordResult({block_number, event_name, schedule_id, update_interval}) {
   const [initialRadioButton, setInitialRadioButton] = useState(null);
   const [selectedRadioButton, setSelectedRadioButton] = useState(null);
 
@@ -157,7 +157,7 @@ function RecordResult({block_number, event_name, schedule_id}) {
   useEffect(() => {
     const interval = setInterval(() => {
       fetchData();
-    }, 3000); // 3秒ごとに更新
+    }, update_interval);
       fetchData();
       return () => {
           clearInterval(interval);

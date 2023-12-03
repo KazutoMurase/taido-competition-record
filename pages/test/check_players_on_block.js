@@ -12,13 +12,13 @@ const Home = () => {
     if (dantai === '0') {
         return (
                 <>
-                <CheckPlayers block_number={block_number} schedule_id={schedule_id} event_id={event_id} is_test={true} />
+                <CheckPlayers block_number={block_number} schedule_id={schedule_id} event_id={event_id} update_interval={6000} is_test={true} />
                 </>
         );
     } else {
         return (
                 <>
-                <CheckDantai block_number={block_number} schedule_id={schedule_id} event_id={event_id} is_test={true} />
+                <CheckDantai block_number={block_number} schedule_id={schedule_id} event_id={event_id} update_interval={6000} is_test={true} />
                 </>
         );
     }

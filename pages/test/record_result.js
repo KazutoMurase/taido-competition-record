@@ -14,7 +14,7 @@ const Home = () => {
     const return_url = ("test/record_result?block_number=" + block_number + "%26schedule_id=" + schedule_id + "%26event_id=" + event_id);
         return (
                 <>
-                <RecordResult block_number={block_number} event_name={event_name} schedule_id={schedule_id} />
+                <RecordResult block_number={block_number} event_name={event_name} schedule_id={schedule_id} update_interval={6000} />
                 <br />
                 <GetResult editable={true} event_name={event_name} returnUrl={return_url} block_number={block_number} />
             </>
