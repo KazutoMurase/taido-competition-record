@@ -134,7 +134,7 @@ function RecordResult({block_number, event_name, schedule_id}) {
       const response = await fetch('/api/current_block?block_number=' + block_number + "&schedule_id=" + schedule_id + "&event_name=" + event_name);
       const result = await response.json();
       if (result.length === 0) {
-          router.push("/admin/block?block_number=" + block_number);
+          router.push("block?block_number=" + block_number);
       }
       setData(result);
       if (result.left_player_flag !== null &&
