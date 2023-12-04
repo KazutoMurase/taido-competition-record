@@ -127,7 +127,7 @@ function GamesOnBlock({block_number, event_name, schedule_id, update_interval}) 
   return (
           <div>
           <Container maxWidth="md">
-          <Box style={{ minWidth: '1000px' }}>
+          <Box style={{ minWidth: '950px' }}>
           <Grid container justifyContent="flex-start" alignItems="center">
           <table border="1">
           <tbody>
@@ -160,7 +160,7 @@ function GamesOnBlock({block_number, event_name, schedule_id, update_interval}) 
                         item['left_retire'],
                         item['left_name_kana'] !== null ? "(" + item['left_name_kana'] + ")" : "",
                         item['right_retire'],
-                        item["right_name_kana"] == null ? "(" + item['right_name_kana'] + ")" : "",
+                        item["right_name_kana"] !== null ? "(" + item['right_name_kana'] + ")" : "",
                         item['id'], 'left')}
               </td>
                   <td>
