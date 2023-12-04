@@ -6,6 +6,7 @@ import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import FlagCircleRoundedIcon from '@mui/icons-material/FlagCircleRounded';
+import SquareTwoToneIcon from '@mui/icons-material/SquareTwoTone';
 import checkStyles from '../styles/checks.module.css';
 
 function onMoveDown(order_id, block_number, schedule_id, function_after_post) {
@@ -132,12 +133,12 @@ function GamesOnBlock({block_number, event_name, schedule_id, update_interval}) 
           <tbody>
           <tr className={checkStyles.column}>
           {event_name.includes('hokei') ? (<th>種類</th>) : (<></>)}
+          <th>色</th>
           <th>地区</th>
-          <th>選手(赤)</th>
-          <th>カナ</th>
+          <th>選手(カナ)</th>
+          <th>色</th>
           <th>地区</th>
-          <th>選手(白)</th>
-          <th>カナ</th>
+          <th>選手(カナ)</th>
           <th>順序変更</th>
           {event_name.includes('zissen') ? (<th>赤棄権</th>) : (<></>)}
           {event_name.includes('zissen') ? (<th>白棄権</th>) : (<></>)}
@@ -145,21 +146,42 @@ function GamesOnBlock({block_number, event_name, schedule_id, update_interval}) 
           {data.map((item, index) => (
                   <tr className={checkStyles.column} bgcolor={'current' in item ? 'yellow' : 'white'}>
                   {event_name.includes('hokei') ? ShowHokeiType(item, event_name) : (<></>)}
+                  <td>
+                  <SquareTwoToneIcon sx={{ fontSize: 30 }} htmlColor={'red'} />
+                  </td>
                   <td>{item['left_color'] === 'red' ? item['left_group_name'] : item['right_group_name']}</td>
                   <td>
-                  {showText(item['left_color'], item['left_retire'], item['left_name'], item['right_retire'], item['right_name'], item['id'], 'left')}
+                  {showText(item['left_color'],
+                            item['left_retire'],
+                            item['left_name'],
+                            item['right_retire'],
+                            item['right_name'], item['id'], 'left')}
+              {showText(item['left_color'],
+                        item['left_retire'],
+                        item['left_name_kana'] !== null ? "(" + item['left_name_kana'] + ")" : "",
+                        item['right_retire'],
+                        item["right_name_kana"] == null ? "(" + item['right_name_kana'] + ")" : "",
+                        item['id'], 'left')}
               </td>
                   <td>
-                  {showText(item['left_color'], item['left_retire'], item['left_name_kana'], item['right_retire'], item['right_name_kana'], item['id'], 'left')}
+                  <SquareTwoToneIcon sx={{ fontSize: 30 }} htmlColor={'gray'} />
               </td>
                   <td>
                   {item['left_color'] === 'red' ? item['right_group_name'] : item['left_group_name']}
               </td>
                   <td>
-                  {showText(item['left_color'], item['right_retire'], item['right_name'], item['left_retire'], item['left_name'], item['id'], 'right')}
-              </td>
-                  <td>
-                  {showText(item['left_color'], item['right_retire'], item['right_name_kana'], item['left_retire'], item['left_name_kana'], item['id'], 'right')}
+                  {showText(item['left_color'],
+                            item['right_retire'],
+                            item['right_name'],
+                            item['left_retire'],
+                            item['left_name'],
+                            item['id'], 'right')}
+              {showText(item['left_color'],
+                        item['right_retire'],
+                        item["right_name_kana"] !== null ? "(" + item['right_name_kana'] + ")" : "",
+                        item['left_retire'],
+                        item['left_name_kana'] !== null ? "(" + item['left_name_kana'] + ")" : "",
+                        item['id'], 'right')}
               </td>
                   <td><Button variant="contained" type="submit" disabled={current_order_id > item['order_id'] || last_order_id===item['order_id']} onClick={e => onMoveDown(item.order_id, block_number, schedule_id, forceFetchData)}>▼</Button></td>
                   {event_name.includes('zissen') ? (<td><Button size="small" style={retireButtonStyle} variant="contained" type="submit" onClick={e => handleLeftRetireStatesChange(item.id)}>Check</Button></td>) : (<></>)}
