@@ -1,4 +1,4 @@
-import { db } from '@vercel/postgres';
+import GetClient from '../../lib/db_client';
 import { kv } from "@vercel/kv";
 import fs from 'fs';
 //import { parse } from 'csv-parse';
@@ -67,7 +67,7 @@ async function UpdateBlockFromCSV(client, block_name) {
 
 export default async (req, res) => {
     try {
-        const client = await db.connect();
+        const client = await GetClient();
         for (let i = 0; i < req.body.event_names.length; i++) {
             console.log("reset " + req.body.event_names[i]);
             await UpdateEventFromCSV(client, req.body.event_names[i]);

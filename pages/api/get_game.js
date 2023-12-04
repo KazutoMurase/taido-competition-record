@@ -1,8 +1,8 @@
-import { db } from '@vercel/postgres';
+import GetClient from '../../lib/db_client';
 
 export default async (req, res) => {
     try {
-        const client = await db.connect();
+        const client = await GetClient();
         const current_id = parseInt(req.query.id);
         const event_name = req.query.event_name;
         const players_name = (event_name.includes("test")) ? "test_players" : "players";

@@ -1,9 +1,9 @@
-import { db } from '@vercel/postgres';
 import { kv } from "@vercel/kv";
+import GetClient from '../../lib/db_client';
 import { GetEventName } from '../../lib/get_event_name';
 
 async function GetFromDB(req, res, event_name) {
-    const client = await db.connect();
+    const client = await GetClient();
     const block_name = 'block_' + req.query.block_number;
     const current_block_name = 'current_' + block_name;
     let query = 'SELECT t0.id, t0.game_id from ' + current_block_name + ' AS t0 LEFT JOIN ' + block_name + ' AS t1 ON t0.id = t1.id';

@@ -1,5 +1,5 @@
-import { db } from '@vercel/postgres';
 import { kv } from "@vercel/kv";
+import GetClient from '../../lib/db_client';
 
 function update(sorted_data, item, block_indices, value) {
     if ('prev_left_id' in item) {
@@ -20,7 +20,7 @@ function update(sorted_data, item, block_indices, value) {
 }
 
 async function GetFromDB(req, res) {
-    const client = await db.connect();
+    const client = await GetClient();
     const event_name = req.query.event_name;
     const players_name = (event_name.includes("test")) ? "test_players" : "players";
     const query = 'SELECT t1.id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t2.name_kana AS left_name_kana, t4.name AS left_group_name, t3.name AS right_name, t3.name_kana AS right_name_kana, t5.name AS right_group_name, t1.left_player_flag FROM ' + event_name + ' AS t1 LEFT JOIN ' + players_name + ' AS t2 ON t1.left_player_id = t2.' + event_name + '_player_id LEFT JOIN ' + players_name + ' AS t3 ON t1.right_player_id = t3.' + event_name + '_player_id LEFT JOIN groups AS t4 ON t2.group_id = t4.id LEFT JOIN groups AS t5 ON t3.group_id = t5.id';

@@ -1,9 +1,9 @@
-import { db } from '@vercel/postgres';
 import { kv } from "@vercel/kv";
+import GetClient from '../../lib/db_client';
 
 export default async (req, res) => {
     try {
-        const client = await db.connect();
+        const client = await GetClient();
         const next_id = req.body.id + 1;
         const current_block_name = 'current_block_' + req.body.update_block;
         const query = 'update ' + current_block_name + ' set id = ' + next_id + ', game_id = 1';

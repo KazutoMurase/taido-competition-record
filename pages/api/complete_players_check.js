@@ -1,10 +1,10 @@
-import { db } from '@vercel/postgres';
 import { kv } from "@vercel/kv";
+import GetClient from '../../lib/db_client';
 import { GetEventName } from '../../lib/get_event_name';
 
 export default async (req, res) => {
     try {
-        const client = await db.connect();
+        const client = await GetClient();
         const block_name = 'block_' + req.body.block_number;
         const schedule_id = req.body.schedule_id;
         const is_test = req.body.is_test;

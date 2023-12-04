@@ -1,9 +1,9 @@
-import { db } from '@vercel/postgres';
 import { kv } from "@vercel/kv";
+import GetClient from '../../lib/db_client';
 
 export default async (req, res) => {
     try {
-        const client = await db.connect();
+        const client = await GetClient();
         const notification_request_name = (req.body.is_test === true) ? 'test_notification_request' : 'notification_request';
         if (req.body.player_id !== undefined) {
             const query = 'DELETE FROM ' + notification_request_name + ' WHERE player_id = $1';

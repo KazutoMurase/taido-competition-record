@@ -1,9 +1,9 @@
-import { db } from '@vercel/postgres';
 import { kv } from "@vercel/kv";
+import GetClient from '../../lib/db_client';
 
 export default async (req, res) => {
     try {
-        const client = await db.connect();
+        const client = await GetClient();
         let query, values, result;
         console.log(req.body.is_test);
         const notification_request_name = (req.body.is_test === true) ? 'test_notification_request' : 'notification_request';

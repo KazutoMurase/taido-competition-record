@@ -1,9 +1,9 @@
-import { db } from '@vercel/postgres';
 import { kv } from "@vercel/kv";
+import GetClient from '../../lib/db_client';
 
 export default async (req, res) => {
     try {
-        const client = await db.connect();
+        const client = await GetClient();
         const event_name = req.body.event_name;
         let query = 'update ' + event_name + ' set left_player_flag = $2 where id = $1';
         let values = [req.body.id, req.body.left_player_flag];

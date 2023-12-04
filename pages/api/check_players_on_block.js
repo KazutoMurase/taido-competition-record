@@ -1,10 +1,10 @@
-import { db } from '@vercel/postgres';
 import { kv } from "@vercel/kv";
+import GetClient from '../../lib/db_client';
 import { GetEventName } from '../../lib/get_event_name';
 
 
 async function GetFromDB(req, res, event_name, players_name, notification_request_name) {
-    const client = await db.connect();
+    const client = await GetClient();
     const block_name = 'block_' + req.query.block_number;
     const schedule_id = req.query.schedule_id;
     let query = 'SELECT t1.id, t2.id AS left_player_id, t3.id AS right_player_id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t3.name AS right_name, t2.name_kana AS left_name_kana, t3.name_kana AS right_name_kana FROM ' + block_name + '_games AS t0 LEFT JOIN ' + event_name + ' AS t1 ON t0.game_id = t1.id LEFT JOIN ' + players_name + ' AS t2 ON t1.left_player_id = t2.' + event_name + '_player_id LEFT JOIN ' + players_name + ' AS t3 ON t1.right_player_id = t3.' + event_name + '_player_id where t0.schedule_id = $1';
@@ -173,7 +173,7 @@ async function GetFromDB(req, res, event_name, players_name, notification_reques
 }
 
 async function GetDantaiFromDB(req, res, event_id, is_test, notification_request_name) {
-    const client = await db.connect();
+    const client = await GetClient();
     const block_name = 'block_' + req.query.block_number;
     const event_name = (is_test ? 'test_dantai' : 'dantai');
     const schedule_id = req.query.schedule_id;
