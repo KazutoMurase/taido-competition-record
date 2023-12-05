@@ -58,6 +58,7 @@ function CheckDantai({block_number, schedule_id, event_id, update_interval, is_t
     function onFinish(block_number, schedule_id, is_test) {
         let post = {schedule_id: schedule_id,
                     block_number: block_number,
+                    all_checked: true,
                     is_test: is_test};
         console.log(post);
         axios.post('/api/complete_players_check', post)

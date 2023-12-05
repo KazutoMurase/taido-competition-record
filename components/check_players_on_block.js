@@ -90,11 +90,23 @@ function CheckPlayers({block_number, schedule_id, event_id, update_interval, is_
         });
     };
 
-    function onFinish(block_number, schedule_id, is_test) {
+    function onFinish(block_number, schedule_id, data, is_test) {
+        const num_players = data.length;
+        let num_checked = 0;
+        for (let i = 0; i < num_players; i++) {
+            const item = data[i];
+            if (CheckState(item, true)) {
+                num_checked += 1;
+            }
+            if (CheckState(item, false)) {
+                num_checked += 1;
+            }
+        }
         let post = {schedule_id: schedule_id,
                     block_number: block_number,
                     left_retire_array: leftRetireStates,
                     right_retire_array: rightRetireStates,
+                    all_checked: (num_checked === num_players),
                     is_test: is_test
                    };
         console.log(post);
@@ -194,7 +206,7 @@ function CheckPlayers({block_number, schedule_id, event_id, update_interval, is_
           </tbody>
           </table>
           <Grid container justifyContent="center" alignItems="center" style={{ height: '100px' }}>
-          <Button variant="contained" type="submit" onClick={e => onFinish(block_number, schedule_id, is_test)}>決定</Button>
+          <Button variant="contained" type="submit" onClick={e => onFinish(block_number, schedule_id, data, is_test)}>決定</Button>
           &nbsp;&nbsp;
           <Button variant="contained" type="submit" onClick={e => onBack()}>戻る</Button>
           </Grid>
