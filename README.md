@@ -8,7 +8,7 @@ cd data/2023 && psql "postgres://(****)" < generate_tables.sql
 
 ```bash
 cd data/2023 && psql "postgres://(****)" < reset_database.sql
-cd data/2023 && redis-cli --tls -u redis://(****)" < reset_redis.txt
+curl http://(SERVER_NAME)/api/reset_cache
 ```
 
 # Get final player ids
