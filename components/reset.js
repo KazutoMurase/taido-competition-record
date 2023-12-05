@@ -10,7 +10,7 @@ import ReactDOM from 'react-dom';
 function onSubmit(event_names, block_names) {
     let post = {event_names: event_names,
                 block_names: block_names};
-    axios.post('/api/reset_db', post)
+    axios.post('/api/reset_test_db', post)
         .then((response) => {
         })
         .catch((e) => { console.log(e)})
