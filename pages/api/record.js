@@ -1,5 +1,5 @@
-import { kv } from "@vercel/kv";
 import GetClient from '../../lib/db_client';
+import { Set } from '../../lib/redis_client';
 
 export default async (req, res) => {
     try {
@@ -30,7 +30,7 @@ export default async (req, res) => {
         }
         const key = 'latest_update_result_for_' + event_name + '_timestamp';
         const timestamp = Date.now();
-        await kv.set(key, timestamp);
+        await Set(key, timestamp);
         if (req.body.update_block === undefined ||
             req.body.update_block === null) {
             res.json({});
@@ -45,12 +45,12 @@ export default async (req, res) => {
         result = await client.query(query);
         console.log(result.rows);
         const update_game_id_key = 'update_game_id_for_' + current_block_name;
-        await kv.set(update_game_id_key, timestamp);
+        await Set(update_game_id_key, timestamp);
         if (result.rows.length === 0) {
             query = 'update ' + current_block_name + ' set id = id + 1, game_id = 1';
             result = await client.query(query);
             const update_id_key = 'update_id_for_' + current_block_name;
-            await kv.set(update_id_key, timestamp);
+            await Set(update_id_key, timestamp);
         } else {
             query = 'update ' + current_block_name + ' set game_id = ' + next_game_id;
             result = await client.query(query);

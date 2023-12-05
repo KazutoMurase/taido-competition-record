@@ -1,5 +1,5 @@
-import { kv } from "@vercel/kv";
 import GetClient from '../../lib/db_client';
+import { Get, Set } from '../../lib/redis_client';
 import { GetEventName } from '../../lib/get_event_name';
 
 
@@ -131,7 +131,7 @@ export default async (req, res) => {
         const current_block_name = 'current_' + block_name;
         const event_name = req.query.event_name;
         const cacheKey = 'current_' + block_name;
-        const cachedData = await kv.get(cacheKey);
+        const cachedData = await Get(cacheKey);
 
         // 'update_id_for_' +current_block_name can be checked,
         // but only game id should be enough in the current logic
@@ -140,10 +140,10 @@ export default async (req, res) => {
         const latestUpdateResultKey = 'latest_update_result_for_' + event_name + '_timestamp';
         const latestCompletePlayersKey = 'update_complete_players_for_' + block_name;
 
-        const latestGameIdUpdateTimestamp = await kv.get(latestGameIdUpdateKey) || 0;
-        const latestChangeOrderTimestamp = await kv.get(latestChangeOrderKey) || 0;
-        const latestUpdateResultTimestamp = await kv.get(latestUpdateResultKey) || 0;
-        const latestCompletePlayersTimestamp = await kv.get(latestCompletePlayersKey) || 0;
+        const latestGameIdUpdateTimestamp = await Get(latestGameIdUpdateKey) || 0;
+        const latestChangeOrderTimestamp = await Get(latestChangeOrderKey) || 0;
+        const latestUpdateResultTimestamp = await Get(latestUpdateResultKey) || 0;
+        const latestCompletePlayersTimestamp = await Get(latestCompletePlayersKey) || 0;
         if (cachedData &&
             latestGameIdUpdateTimestamp < cachedData.timestamp &&
             latestChangeOrderTimestamp < cachedData.timestamp &&
@@ -155,7 +155,7 @@ export default async (req, res) => {
         console.log("get new data");
         const data = await GetFromDB(req, res);
         if (data.length !== 0) {
-            await kv.set(cacheKey, {data: data, timestamp: Date.now()});
+            await Set(cacheKey, {data: data, timestamp: Date.now()});
         }
         res.json(data);
     } catch (error) {

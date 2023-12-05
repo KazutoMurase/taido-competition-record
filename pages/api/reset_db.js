@@ -1,5 +1,5 @@
 import GetClient from '../../lib/db_client';
-import { kv } from "@vercel/kv";
+import { Get, Set } from '../../lib/redis_client';
 import fs from 'fs';
 //import { parse } from 'csv-parse';
 import path from 'path';
@@ -82,15 +82,15 @@ export default async (req, res) => {
         const timestamp = Date.now();
         for (let i = 0; i < req.body.event_names.length; i++) {
             const event_name = req.body.event_names[i];
-            await kv.set("latest_update_result_for_" + event_name + "_timestamp", timestamp);
+            await Set("latest_update_result_for_" + event_name + "_timestamp", timestamp);
         }
         for (let i = 0; i < req.body.block_names.length; i++) {
             const block_name = req.body.block_names[i];
-            await kv.set("update_id_for_current_" + block_name, timestamp);
-            await kv.set("update_game_id_for_current_" + block_name, timestamp);
-            await kv.set("update_complete_players_for_" + block_name, timestamp);
+            await Set("update_id_for_current_" + block_name, timestamp);
+            await Set("update_game_id_for_current_" + block_name, timestamp);
+            await Set("update_complete_players_for_" + block_name, timestamp);
         }
-        await kv.set("latest_update_for_test_notification_request", timestamp);
+        await Set("latest_update_for_test_notification_request", timestamp);
         res.json([]);
     } catch (error) {
         console.log(error);

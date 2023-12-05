@@ -1,5 +1,5 @@
-import { kv } from "@vercel/kv";
 import GetClient from '../../lib/db_client';
+import { Get, Set } from '../../lib/redis_client';
 import { GetEventName } from '../../lib/get_event_name';
 
 
@@ -213,12 +213,12 @@ export default async (req, res) => {
         const event_id = parseInt(req.query.event_id);
         const block_name = 'block_' + req.query.block_number;
         const cacheKey = 'check_players_on_' + block_name + '_for_' + req.query.schedule_id;
-        const cachedData = await kv.get(cacheKey);
+        const cachedData = await Get(cacheKey);
         const notification_request_name = (is_test ? 'test_notification_request' : 'notification_request');
         const latestNotificationUpdateKey = 'latest_update_for_' + notification_request_name;
-        const latestNotificationUpdateTimestamp = await kv.get(latestNotificationUpdateKey) || 0;
+        const latestNotificationUpdateTimestamp = await Get(latestNotificationUpdateKey) || 0;
         const latestCompletePlayersKey = 'update_complete_players_for_' + block_name;
-        const latestCompletePlayersTimestamp = await kv.get(latestCompletePlayersKey) || 0;
+        const latestCompletePlayersTimestamp = await Get(latestCompletePlayersKey) || 0;
         if (event_id > 5) {
             if (cachedData &&
                 latestNotificationUpdateTimestamp < cachedData.timestamp &&
@@ -228,13 +228,13 @@ export default async (req, res) => {
             }
             console.log("get new data");
             const data = await GetDantaiFromDB(req, res, event_id, is_test, notification_request_name);
-            await kv.set(cacheKey, {data: data, timestamp: Date.now()});
+            await Set(cacheKey, {data: data, timestamp: Date.now()});
             return res.json(data);
         }
         const event_name = (is_test ? "test_" : "") + GetEventName(event_id);
         const players_name = (is_test ? "test_players" : "players");
         const latestResultUpdateKey = 'latest_update_result_for_' + event_name + '_timestamp';
-        const latestResultUpdateTimestamp = await kv.get(latestResultUpdateKey) || 0;
+        const latestResultUpdateTimestamp = await Get(latestResultUpdateKey) || 0;
         if (cachedData &&
             latestResultUpdateTimestamp < cachedData.timestamp &&
             latestNotificationUpdateTimestamp < cachedData.timestamp &&
@@ -244,7 +244,7 @@ export default async (req, res) => {
         }
         console.log("get new data");
         const data = await GetFromDB(req, res, event_name, players_name, notification_request_name);
-        await kv.set(cacheKey, {data: data, timestamp: Date.now()});
+        await Set(cacheKey, {data: data, timestamp: Date.now()});
         return res.json(data);
     } catch (error) {
         console.log(error);

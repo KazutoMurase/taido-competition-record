@@ -1,5 +1,5 @@
-import { kv } from "@vercel/kv";
 import GetClient from '../../lib/db_client';
+import { Get, Set } from '../../lib/redis_client';
 
 async function GetFromDB(req, res, notification_request_name) {
     const client = await GetClient();
@@ -17,9 +17,9 @@ export default async (req, res) => {
         console.log(is_test);
         const notification_request_name = (is_test ? 'test_notification_request' : 'notification_request');
         const cacheKey = 'get_' + notification_request_name;
-        const cachedData = await kv.get(cacheKey);
+        const cachedData = await Get(cacheKey);
         const latestNotificationUpdateKey = 'latest_update_for_' + notification_request_name;
-        const latestNotificationUpdateTimestamp = await kv.get(latestNotificationUpdateKey) || 0;
+        const latestNotificationUpdateTimestamp = await Get(latestNotificationUpdateKey) || 0;
         if (cachedData &&
             latestNotificationUpdateTimestamp < cachedData.timestamp) {
             console.log("using cache");
@@ -27,7 +27,7 @@ export default async (req, res) => {
         }
         console.log("get new data");
         const data = await GetFromDB(req, res, notification_request_name);
-        await kv.set(cacheKey, {data: data, timestamp: Date.now()});
+        await Set(cacheKey, {data: data, timestamp: Date.now()});
         res.json(data);
     } catch (error) {
         console.log(error);

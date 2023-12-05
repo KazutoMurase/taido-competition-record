@@ -1,6 +1,5 @@
-import { kv } from "@vercel/kv";
 import GetClient from '../../lib/db_client';
-
+import { Set } from '../../lib/redis_client';
 
 export default async (req, res) => {
     try {
@@ -11,7 +10,7 @@ export default async (req, res) => {
         const result = await client.query(query, values);
         const key = 'change_order_for_' + block_name;
         const timestamp = Date.now();
-        await kv.set(key, timestamp);
+        await Set(key, timestamp);
         res.json({});
     } catch (error) {
         console.log(error);

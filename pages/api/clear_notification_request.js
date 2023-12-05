@@ -1,5 +1,5 @@
-import { kv } from "@vercel/kv";
 import GetClient from '../../lib/db_client';
+import { Set } from '../../lib/redis_client';
 
 export default async (req, res) => {
     try {
@@ -22,7 +22,7 @@ export default async (req, res) => {
             console.log(result);
         }
         const key = 'latest_update_for_' + notification_request_name;
-        kv.set(key, Date.now());
+        Set(key, Date.now());
         res.json({});
     } catch (error) {
         console.log(error);

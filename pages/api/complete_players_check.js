@@ -1,5 +1,5 @@
-import { kv } from "@vercel/kv";
 import GetClient from '../../lib/db_client';
+import { Get, Set } from '../../lib/redis_client';
 import { GetEventName } from '../../lib/get_event_name';
 
 export default async (req, res) => {
@@ -29,7 +29,7 @@ export default async (req, res) => {
         }
         const key = 'update_complete_players_for_block_' + req.body.block_number;
         const timestamp = Date.now();
-        await kv.set(key, timestamp);
+        await Set(key, timestamp);
         res.json({});
     } catch (error) {
         console.log(error);

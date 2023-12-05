@@ -1,5 +1,5 @@
-import { kv } from "@vercel/kv";
 import GetClient from '../../lib/db_client';
+import { Get, Set } from '../../lib/redis_client';
 
 function update(sorted_data, item, block_indices, value) {
     if ('prev_left_id' in item) {
@@ -203,19 +203,19 @@ export default async (req, res) => {
         const freeze = req.query.freeze;
         if (freeze != undefined && parseInt(freeze) === 1) {
             const freezedKey = 'get_freezed_result_for_' + event_name;
-            const freezedData = await kv.get(freezedKey);
+            const freezedData = await Get(freezedKey);
             if (freezedData) {
                 return res.json(freezedData.data);
             } else {
                 const data = await GetFromDB(req, res);
-                await kv.set(freezedKey, {data: data, timestamp: Date.now()});
+                await Set(freezedKey, {data: data, timestamp: Date.now()});
                 return res.json(data);
             }
         }
         const latestUpdateKey = 'latest_update_result_for_' + event_name + '_timestamp';
         const cacheKey = 'get_result_for_' + event_name + '_cache_data';
-        const cachedData = await kv.get(cacheKey);
-        const latestUpdateTimestamp = await kv.get(latestUpdateKey) || 0;
+        const cachedData = await Get(cacheKey);
+        const latestUpdateTimestamp = await Get(latestUpdateKey) || 0;
         if (cachedData &&
             latestUpdateTimestamp < cachedData.timestamp) {
             console.log("using cache");
@@ -224,7 +224,7 @@ export default async (req, res) => {
         console.log("get new data");
         const data = await GetFromDB(req, res);
         console.log(data);
-        await kv.set(cacheKey, {data: data, timestamp: Date.now()});
+        await Set(cacheKey, {data: data, timestamp: Date.now()});
         res.json(data);
     } catch (error) {
         console.log(error);

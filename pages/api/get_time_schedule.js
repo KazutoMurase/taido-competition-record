@@ -1,5 +1,5 @@
-import { kv } from "@vercel/kv";
 import GetClient from '../../lib/db_client';
+import { Get, Set } from '../../lib/redis_client';
 
 async function GetFromDB(req, res) {
     const client = await GetClient();
@@ -56,8 +56,8 @@ export default async (req, res) => {
         const block_name = 'block_' + req.query.block_number;
         const latest_update_key = 'update_complete_players_for_' + block_name;
         const cache_key = 'time_schedule_for_' + block_name;
-        const latest_update_timestamp = await kv.get(latest_update_key) || 0;
-        const cached_data = await kv.get(cache_key);
+        const latest_update_timestamp = await Get(latest_update_key) || 0;
+        const cached_data = await Get(cache_key);
         if (cached_data &&
             latest_update_timestamp < cached_data.timestamp) {
             console.log("using cache");
@@ -66,7 +66,7 @@ export default async (req, res) => {
         console.log("get new data");
         const data = await GetFromDB(req, res);
         console.log(data);
-        await kv.set(cache_key, {data: data, timestamp: Date.now()});
+        await Set(cache_key, {data: data, timestamp: Date.now()});
         res.json(data);
     } catch (error) {
         console.log(error);
