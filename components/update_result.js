@@ -33,7 +33,7 @@ function ShowRedFlags(event_name, selectedRadioButton) {
 function ShowWhiteFlags(event_name, selectedRadioButton) {
     const flag = parseInt(selectedRadioButton);
     if (event_name.includes('hokei')) {
-        if (flag === -1) {
+        if (flag === -1 || flag === -2) {
             return (<></>);
         }
         return (<>
@@ -55,7 +55,7 @@ function ShowWhiteFlags(event_name, selectedRadioButton) {
 
 function ShowLeftName(data) {
     const flag = parseInt(data.left_player_flag);
-    if (flag === -1) {
+    if (flag === -1 || flag === -2) {
         return (<s>{data.left_name}</s>);
     } else {
         return (<span>{data.left_name}</span>);
@@ -64,7 +64,7 @@ function ShowLeftName(data) {
 
 function ShowRightName(data) {
     const flag = parseInt(data.left_player_flag);
-    if (flag === 4) {
+    if (flag === 4 || flag === -2) {
         return (<s>{data.right_name}</s>);
     } else {
         return (<span>{data.right_name}</span>);
@@ -113,7 +113,9 @@ function UpdateResult({event_name, id, return_url}) {
   }
   const onSubmit = (data, player_flag, event_name) => {
     let left_player_flag;
-    if (event_name.includes('hokei')) {
+    if (player_flag === -2) {
+        left_player_flag = -2;
+    } else if (event_name.includes('hokei')) {
         left_player_flag = (data.left_color === 'white' ? 3 - player_flag : player_flag);
     } else if (event_name.includes('zissen')) {
         left_player_flag = (data.left_color === 'white' ? player_flag : 1 - player_flag);
@@ -121,7 +123,9 @@ function UpdateResult({event_name, id, return_url}) {
     let post = {id: data.id,
                 event_name: event_name,
                 left_player_flag: left_player_flag};
-    if (event_name.includes('hokei')) {
+    if (player_flag === -2) {
+        post['next_player_id'] = null;
+    } else if (event_name.includes('hokei')) {
         if (parseInt(left_player_flag) > 1) {
             post['next_player_id'] = data.left_player_id;
             post['loser_id'] = data.right_player_id;
@@ -169,6 +173,11 @@ function UpdateResult({event_name, id, return_url}) {
           <Box style={{ minWidth: '900px' }}>
           <Grid container justifyContent="center" alignItems="center" style={{ height: '80px' }}>
           <h2>第{data.id}試合</h2>
+          </Grid>
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '80px' }}>
+          <Button variant="contained"
+      type="submit"
+      onClick={e => onSubmit(data, -2, event_name)} style={{ backgroundColor: 'gray' }}>両者棄権</Button>
           </Grid>
           <Grid container>
           <Grid item xs={3} />

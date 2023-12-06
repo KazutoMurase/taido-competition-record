@@ -10,7 +10,9 @@ import FlagCircleRoundedIcon from '@mui/icons-material/FlagCircleRounded';
 
 function onSubmit(data, player_flag, block_number, event_name, function_after_post) {
     let left_player_flag;
-    if (event_name.includes('hokei')) {
+    if (player_flag === -2) {
+        left_player_flag = -2;
+    } else if (event_name.includes('hokei')) {
         left_player_flag = (data.left_color === 'white' ? 3 - player_flag : player_flag);
     } else if (event_name.includes('zissen')) {
         left_player_flag = (data.left_color === 'white' ? player_flag : 1 - player_flag);
@@ -19,7 +21,9 @@ function onSubmit(data, player_flag, block_number, event_name, function_after_po
                 event_name: event_name,
                 left_player_flag: left_player_flag,
                 update_block: block_number};
-    if (event_name.includes('hokei')) {
+    if (player_flag === -2) {
+        post['next_player_id'] = null;
+    } else if (event_name.includes('hokei')) {
         if (parseInt(left_player_flag) > 1) {
             post['next_player_id'] = data.left_player_id;
             post['loser_id'] = data.right_player_id;
@@ -86,7 +90,7 @@ function ShowRedFlags(event_name, initialRadioButton, selectedRadioButton) {
 function ShowWhiteFlags(event_name, initialRadioButton, selectedRadioButton) {
     const flag = (selectedRadioButton === null) ? parseInt(initialRadioButton) : parseInt(selectedRadioButton);
     if (event_name.includes('hokei')) {
-        if (flag === -1) {
+        if (flag === -1 || flag === -2) {
             return (<></>);
         }
     return (<>
@@ -198,6 +202,11 @@ function RecordResult({block_number, event_name, schedule_id, update_interval}) 
           </Grid>
           <Grid container justifyContent="center" alignItems="center" style={{ height: '80px' }}>
           <h2>第{data.id}試合</h2>
+          </Grid>
+          <Grid container justifyContent="center" alignItems="center" style={{ height: '80px' }}>
+          <Button variant="contained"
+      type="submit"
+      onClick={e => onSubmit(data, -2, block_number, event_name)} style={{ backgroundColor: 'gray' }}>両者棄権</Button>
           </Grid>
           <Grid container>
           <Grid item xs={3} />

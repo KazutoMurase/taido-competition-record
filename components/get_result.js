@@ -422,7 +422,10 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
         const left_player_flag = item['left_player_flag'];
         let left_winner;
         let right_winner;
-        if (event_name.includes('hokei')) {
+        if (left_player_flag === -2) {
+            left_winner = false;
+            right_winner = false;
+        } else if (event_name.includes('hokei')) {
             left_winner = (left_player_flag !== null && left_player_flag >= 2);
             right_winner = (left_player_flag !== null && left_player_flag < 2);
         } else if (event_name.includes('zissen')) {
@@ -446,7 +449,10 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
             }
         }
         if (left_player_flag !== null) {
-            if (left_player_flag === -1) {
+            if (left_player_flag === -2) {
+                item['left_out'] = true;
+                item['right_out'] = true;
+            } else if (left_player_flag === -1) {
                 item['left_out'] = true;
             } else if (event_name.includes('hokei') && left_player_flag === 4) {
                 item['right_out'] = true;
@@ -454,21 +460,20 @@ function createBlock(item, lineWidth, editable, event_name, returnUrl) {
                 item['right_out'] = true;
             }
         }
-        item['round']
         return (
                 <>
                 <Rect
             x={pointX + (has_left ? lineWidth + (item['round']-2)*30 : 0) * (is_left ? 1 : -1)}
             y={item['left_begin_y']}
-            fill={(left_winner || (has_left && right_winner)) ? 'red' : 'black'}
+            fill={(left_winner || (has_left && right_winner && item['left_name'] !== null)) ? 'red' : 'black'}
             width={(has_left ? 30 : lineWidth + (item['round']-1)*30) * (is_left ? 1 : -1)}
-            height={(left_winner || (has_left && right_winner)) ? 5 : 1} />
+            height={(left_winner || (has_left && right_winner && item['left_name'] !== null)) ? 5 : 1} />
                 <Rect
             x={pointX + (has_right ? lineWidth + (item['round']-2)*30 : 0) * (is_left ? 1 : -1)}
             y={item['right_begin_y']}
-            fill={(right_winner || (has_right && left_winner)) ? 'red' : 'black'}
+            fill={(right_winner || (has_right && left_winner && item['right_name'] !== null)) ? 'red' : 'black'}
             width={(has_right ? 30 : lineWidth + (item['round']-1)*30) * (is_left ? 1 : -1)}
-            height={(right_winner || (has_right && left_winner)) ? 5 : 1} />
+            height={(right_winner || (has_right && left_winner && item['right_name'] !== null)) ? 5 : 1} />
                 <Text
             x={is_left ?
                pointX + lineWidth + (item['round']-1)*30 - 10:
