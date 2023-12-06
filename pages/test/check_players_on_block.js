@@ -12,7 +12,7 @@ const Home = () => {
         return (<></>);
     }
     if (dantai === '0') {
-        const event_name = GetEventName(event_id);
+        const event_name = "test_" + GetEventName(event_id);
         return (
                 <>
                 <CheckPlayers block_number={block_number} schedule_id={schedule_id} event_id={event_id} update_interval={6000} is_test={true} />
