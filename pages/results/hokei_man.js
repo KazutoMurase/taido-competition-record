@@ -4,7 +4,7 @@ import GetResult from '../../components/get_result';
 const Home = () => {
     return (
             <>
-            <GetResult event_name='hokei_man' updateInterval={60000} freeze={0} />
+            <GetResult event_name='hokei_man' freeze={0} />
             </>
     );
 }
