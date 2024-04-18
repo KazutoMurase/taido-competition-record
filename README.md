@@ -1,29 +1,5 @@
-# Prerequisites
 
-Install Docker
-
-Build docker image
-```bash
-docker build -t taido-competition-record .
-```
-
-Run docker container and setup servers
-```bash
-docker run --net host --volume `pwd`:/ws -it taido-competition-record:latest bash
-
-# inside container
-
-useradd test_user
-echo 'test_user:test_pass' | chpasswd
-/etc/init.d/postgresql start
-sudo -u postgres psql -t -c "create user test_user with password 'test_pass' login superuser createdb"
-sudo -u test_user createdb taido_record
-cd /ws/data/2023 && sudo -u test_user psql -d taido_record < generate_tables.sql
-
-systemctl start redis-server.service
-
-cd /ws/ && npm run dev
-```
+[ドキュメント](doc/README.md)
 
 # Generate initial database
 
