@@ -8,16 +8,22 @@ on:
     - "doc/**.md"
     - "book.toml"
     - ".github/actions/build/Dockerfile"
+    - ".github/workflows/main.yml"
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v1
-    - name: Build
-      uses: ./.github/actions/build
+    - uses: actions/checkout@v2
+    - name: Setup mdBook
+      uses: peaceiris/actions-mdbook@v2
+      with:
+        mdbook-version: '0.4.10'
+
+    - run: mdbook build
+
     - name: Deploy
-      uses: peaceiris/actions-gh-pages@v2
+      uses: peaceiris/actions-gh-pages@v3
       env:
         ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
         EXTERNAL_REPOSITORY: KazutoMurase/KazutoMurase.github.io
