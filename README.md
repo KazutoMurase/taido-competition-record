@@ -1,5 +1,5 @@
 
-[ドキュメント](doc/README.md)
+[ドキュメント](https://kazutomurase.github.io/)
 
 # Generate initial database
 
