@@ -9,11 +9,16 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v1
-    - name: Build
-      uses: ./.github/actions/build
+    - uses: actions/checkout@v2
+    - name: Setup mdBook
+      uses: peaceiris/actions-mdbook@v2
+      with:
+        mdbook-version: '0.4.10'
+
+    - run: mdbook build
+
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v2
       env:
