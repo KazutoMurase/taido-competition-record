@@ -24,8 +24,8 @@ jobs:
 
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
-      env:
-        ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-        EXTERNAL_REPOSITORY: KazutoMurase/KazutoMurase.github.io
-        PUBLISH_BRANCH: master
-        PUBLISH_DIR: ./book
+      with:
+        github_token: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+        external_reository: KazutoMurase/KazutoMurase.github.io
+        publish_branch: master
+        publish_dir: ./book
