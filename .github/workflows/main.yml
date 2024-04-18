@@ -3,9 +3,11 @@ on:
   push:
     branches:
     - master
+    - fix-deploy-doc
     paths:
     - "doc/**.md"
     - "book.toml"
+    - ".github/actions/build/Dockerfile"
 
 jobs:
   deploy:
