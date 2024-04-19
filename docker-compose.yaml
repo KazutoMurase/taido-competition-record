@@ -1,0 +1,11 @@
+version: "2.4"
+
+services:
+  web:
+    image: "taido-competition-record:latest"
+    network_mode: "host"
+    volumes:
+      - "./:/ws"
+    environment:
+      - PATH=/root/.nvm/versions/node/v20.8.1/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    command: /ws/tools/setup.bash
