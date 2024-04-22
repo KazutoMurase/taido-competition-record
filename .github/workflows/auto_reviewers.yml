@@ -4,10 +4,10 @@ on:
     types: [opened, ready_for_review]
 jobs:
   add-reviews:
-    if: contains(github.event.pull_request.labels.*.name, 'gremlins') && contains(github.event.pull_request.labels.*.name, 'review request')
+    if: contains(github.event.pull_request.labels.*.name, 'review request')
     runs-on: ubuntu-latest
     steps:
       - uses: kentaro-m/auto-assign-action@v1.1.0
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
-          configuration-path: ".github/auto_assign_gremlins.yml"
+          configuration-path: ".github/auto_assign.yml"
