@@ -1,4 +1,4 @@
-name: auto-assign
+name: "Auto reviewers"
 on:
   pull_request:
     types: [opened, ready_for_review]
