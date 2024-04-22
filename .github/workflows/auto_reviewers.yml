@@ -1,7 +1,13 @@
 name: "Auto reviewers"
+
 on:
   pull_request:
     types: [opened, ready_for_review]
+
+permissions:
+  pull-requests: write
+  repository-projects: read
+
 jobs:
   add-reviews:
     runs-on: ubuntu-latest
