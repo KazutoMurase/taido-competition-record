@@ -3,8 +3,10 @@ version: "2.4"
 services:
   web:
     image: "taido-competition-record:latest"
+    env_file:
+      - .env
     ports:
-      - 3000:3000
+      - ${PORT}:${PORT}
     volumes:
       - "./:/ws"
     environment:
