@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM --platform=amd64 ubuntu:22.04
 
 SHELL ["/usr/bin/bash", "-l", "-c"]
 
