@@ -1,7 +1,7 @@
 version: "2.4"
 
 services:
-  web:
+  app:
     image: "taido-competition-record:latest"
     env_file:
       - .env

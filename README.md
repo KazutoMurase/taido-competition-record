@@ -1,19 +1,6 @@
 
 [ドキュメント](https://kazutomurase.github.io/)
 
-# Generate initial database
-
-```bash
-cd data/2023 && psql "postgres://(****)" < generate_tables.sql
-```
-
-# Reset database and cache
-
-```bash
-cd data/2023 && psql "postgres://(****)" < reset_database.sql
-curl http://(SERVER_NAME)/api/reset_cache
-```
-
 # Get final player ids
 
 ```bash
