@@ -52,4 +52,4 @@ USER root
 EXPOSE 5432
 
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-RUN source /root/.nvm/nvm.sh && nvm install v20.8.1
+RUN source /root/.nvm/nvm.sh && nvm install v20.13.1
