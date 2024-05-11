@@ -3,6 +3,7 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
+    "lint": "next lint",
     "start": "next start"
   },
   "dependencies": {
@@ -35,6 +36,9 @@
   "devDependencies": {
     "@types/node": "20.8.6",
     "@types/react": "18.2.28",
+    "eslint": "8.57.0",
+    "eslint-config-next": "14.2.3",
+    "eslint-config-prettier": "^9.1.0",
     "typescript": "5.2.2"
   }
 }
