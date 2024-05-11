@@ -1,242 +1,383 @@
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
-import axios from 'axios';
-import Button from '@mui/material/Button';
-import Container from '@mui/material/Container';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import FlagCircleRoundedIcon from '@mui/icons-material/FlagCircleRounded';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import axios from "axios";
+import Button from "@mui/material/Button";
+import Container from "@mui/material/Container";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import FlagCircleRoundedIcon from "@mui/icons-material/FlagCircleRounded";
 
 function ShowRedFlags(event_name, selectedRadioButton) {
-    const flag = parseInt(selectedRadioButton);
-    if (event_name.includes('hokei')) {
+  const flag = parseInt(selectedRadioButton);
+  if (event_name.includes("hokei")) {
     if (flag === 4) {
-        return (<></>);
+      return <></>;
     }
-    return (<>
-        {flag >= 1 ?
-         <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" /> : null}
-        {flag >= 2 ?
-         <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" /> : null}
-        {flag >= 3 ?
-         <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" /> : null}
-        </>);
-    } else if (event_name.includes('zissen')) {
-        return (<>
+    return (
+      <>
+        {flag >= 1 ? (
+          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" />
+        ) : null}
+        {flag >= 2 ? (
+          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" />
+        ) : null}
+        {flag >= 3 ? (
+          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" />
+        ) : null}
+      </>
+    );
+  } else if (event_name.includes("zissen")) {
+    return (
+      <>
         <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="white" />
-        {flag === 0 ?
-         <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" /> : null}
-                </>);
-    }
+        {flag === 0 ? (
+          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" />
+        ) : null}
+      </>
+    );
+  }
 }
 
 function ShowWhiteFlags(event_name, selectedRadioButton) {
-    const flag = parseInt(selectedRadioButton);
-    if (event_name.includes('hokei')) {
-        if (flag === -1 || flag === -2) {
-            return (<></>);
-        }
-        return (<>
-                {flag <= 0 ?
-                 <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="gray" /> : null}
-                {flag <= 1 ?
-                 <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="gray" /> : null}
-                {flag <= 2 ?
-                 <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="gray" /> : null}
-                </>);
-    } else if (event_name.includes('zissen')) {
-        return (<>
-                <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="white" />
-                {flag === 1 ?
-                 <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="gray" /> : null}
-                </>);
+  const flag = parseInt(selectedRadioButton);
+  if (event_name.includes("hokei")) {
+    if (flag === -1 || flag === -2) {
+      return <></>;
     }
+    return (
+      <>
+        {flag <= 0 ? (
+          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="gray" />
+        ) : null}
+        {flag <= 1 ? (
+          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="gray" />
+        ) : null}
+        {flag <= 2 ? (
+          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="gray" />
+        ) : null}
+      </>
+    );
+  } else if (event_name.includes("zissen")) {
+    return (
+      <>
+        <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="white" />
+        {flag === 1 ? (
+          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="gray" />
+        ) : null}
+      </>
+    );
+  }
 }
 
 function ShowLeftName(data) {
-    const flag = parseInt(data.left_player_flag);
-    if (flag === -1 || flag === -2) {
-        return (<s>{data.left_name}</s>);
-    } else {
-        return (<span>{data.left_name}</span>);
-    }
+  const flag = parseInt(data.left_player_flag);
+  if (flag === -1 || flag === -2) {
+    return <s>{data.left_name}</s>;
+  } else {
+    return <span>{data.left_name}</span>;
+  }
 }
 
 function ShowRightName(data) {
-    const flag = parseInt(data.left_player_flag);
-    if (flag === 4 || flag === -2) {
-        return (<s>{data.right_name}</s>);
-    } else {
-        return (<span>{data.right_name}</span>);
-    }
+  const flag = parseInt(data.left_player_flag);
+  if (flag === 4 || flag === -2) {
+    return <s>{data.right_name}</s>;
+  } else {
+    return <span>{data.right_name}</span>;
+  }
 }
 
-function UpdateResult({event_name, id, return_url}) {
+function UpdateResult({ event_name, id, return_url }) {
   const [selectedRadioButton, setSelectedRadioButton] = useState(null);
 
   const handleRadioButtonChange = (event) => {
-      setSelectedRadioButton(event.target.value);
+    setSelectedRadioButton(event.target.value);
   };
 
   const [data, setData] = useState([]);
 
   useEffect(() => {
-      async function fetchData() {
+    async function fetchData() {
       if (id !== undefined) {
-         console.log(id);
-         const response = await fetch('/api/get_game?event_name=' + event_name + '&id=' + id);
-         const result = await response.json();
-          if (result.left_player_flag !== null &&
-              result.left_player_flag !== undefined) {
-              if (result.left_color === 'red') {
-                  if (event_name.includes('hokei')) {
-                      setSelectedRadioButton(result.left_player_flag);
-                  } else if (event_name.includes('zissen')) {
-                      setSelectedRadioButton(1 - result.left_player_flag);
-                  }
-              } else {
-                  if (event_name.includes('hokei')) {
-                      setSelectedRadioButton(3 - result.left_player_flag);
-                  } else if (event_name.includes('zissen')) {
-                      setSelectedRadioButton(result.left_player_flag);
-                  }
-              }
+        console.log(id);
+        const response = await fetch(
+          "/api/get_game?event_name=" + event_name + "&id=" + id,
+        );
+        const result = await response.json();
+        if (
+          result.left_player_flag !== null &&
+          result.left_player_flag !== undefined
+        ) {
+          if (result.left_color === "red") {
+            if (event_name.includes("hokei")) {
+              setSelectedRadioButton(result.left_player_flag);
+            } else if (event_name.includes("zissen")) {
+              setSelectedRadioButton(1 - result.left_player_flag);
+            }
+          } else {
+            if (event_name.includes("hokei")) {
+              setSelectedRadioButton(3 - result.left_player_flag);
+            } else if (event_name.includes("zissen")) {
+              setSelectedRadioButton(result.left_player_flag);
+            }
           }
-          setData(result);
+        }
+        setData(result);
       }
     }
     fetchData();
   }, [id]);
   const router = useRouter();
   const onBack = () => {
-      router.push('/' + return_url);
-  }
+    router.push("/" + return_url);
+  };
   const onSubmit = (data, player_flag, event_name) => {
     let left_player_flag;
     if (player_flag === -2) {
-        left_player_flag = -2;
-    } else if (event_name.includes('hokei')) {
-        left_player_flag = (data.left_color === 'white' ? 3 - player_flag : player_flag);
-    } else if (event_name.includes('zissen')) {
-        left_player_flag = (data.left_color === 'white' ? player_flag : 1 - player_flag);
+      left_player_flag = -2;
+    } else if (event_name.includes("hokei")) {
+      left_player_flag =
+        data.left_color === "white" ? 3 - player_flag : player_flag;
+    } else if (event_name.includes("zissen")) {
+      left_player_flag =
+        data.left_color === "white" ? player_flag : 1 - player_flag;
     }
-    let post = {id: data.id,
-                event_name: event_name,
-                left_player_flag: left_player_flag};
+    let post = {
+      id: data.id,
+      event_name: event_name,
+      left_player_flag: left_player_flag,
+    };
     if (player_flag === -2) {
-        post['next_player_id'] = null;
-    } else if (event_name.includes('hokei')) {
-        if (parseInt(left_player_flag) > 1) {
-            post['next_player_id'] = data.left_player_id;
-            post['loser_id'] = data.right_player_id;
-        } else {
-            post['next_player_id'] = data.right_player_id;
-            post['loser_id'] = data.left_player_id;
-        }
-    } else if (event_name.includes('zissen')) {
-        if (parseInt(left_player_flag) > 0) {
-            post['next_player_id'] = data.left_player_id;
-            post['loser_id'] = data.right_player_id;
-        } else {
-            post['next_player_id'] = data.right_player_id;
-            post['loser_id'] = data.left_player_id;
-        }
+      post["next_player_id"] = null;
+    } else if (event_name.includes("hokei")) {
+      if (parseInt(left_player_flag) > 1) {
+        post["next_player_id"] = data.left_player_id;
+        post["loser_id"] = data.right_player_id;
+      } else {
+        post["next_player_id"] = data.right_player_id;
+        post["loser_id"] = data.left_player_id;
+      }
+    } else if (event_name.includes("zissen")) {
+      if (parseInt(left_player_flag) > 0) {
+        post["next_player_id"] = data.left_player_id;
+        post["loser_id"] = data.right_player_id;
+      } else {
+        post["next_player_id"] = data.right_player_id;
+        post["loser_id"] = data.left_player_id;
+      }
     }
     if (data.next_left_id !== null) {
-        post['next_id'] = data.next_left_id;
-        post['next_type'] = 'left';
+      post["next_id"] = data.next_left_id;
+      post["next_type"] = "left";
     } else {
-        post['next_id'] = data.next_right_id;
-        post['next_type'] = 'right';
+      post["next_id"] = data.next_right_id;
+      post["next_type"] = "right";
     }
-    axios.post('/api/record', post)
-          .then((response) => {
-              console.log(response);
-               router.push('/' + return_url);
-          })
-          .catch((e) => { console.log(e)})
-  }
+    axios
+      .post("/api/record", post)
+      .then((response) => {
+        console.log(response);
+        router.push("/" + return_url);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
 
   let no_game_red_winner;
   let no_game_white_winner;
-  if (event_name.includes('hokei')) {
-      no_game_red_winner = 4;
-      no_game_white_winner = -1;
-  } else if (event_name.includes('zissen')) {
-      no_game_red_winner = -1;
-      no_game_white_winner = 2;
+  if (event_name.includes("hokei")) {
+    no_game_red_winner = 4;
+    no_game_white_winner = -1;
+  } else if (event_name.includes("zissen")) {
+    no_game_red_winner = -1;
+    no_game_white_winner = 2;
   }
 
   return (
-          <div>
-          <Container maxWidth="md">
-          <Box style={{ minWidth: '900px' }}>
-          <Grid container justifyContent="center" alignItems="center" style={{ height: '80px' }}>
-          <h2>第{data.id}試合</h2>
+    <div>
+      <Container maxWidth="md">
+        <Box style={{ minWidth: "900px" }}>
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            style={{ height: "80px" }}
+          >
+            <h2>第{data.id}試合</h2>
           </Grid>
-          <Grid container justifyContent="center" alignItems="center" style={{ height: '80px' }}>
-          <Button variant="contained"
-      type="submit"
-      onClick={e => onSubmit(data, -2, event_name)} style={{ backgroundColor: 'gray' }}>両者棄権</Button>
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            style={{ height: "80px" }}
+          >
+            <Button
+              variant="contained"
+              type="submit"
+              onClick={(e) => onSubmit(data, -2, event_name)}
+              style={{ backgroundColor: "gray" }}
+            >
+              両者棄権
+            </Button>
           </Grid>
           <Grid container>
-          <Grid item xs={3} />
-          <Grid item xs={4} style={{height: '220px' }}>
-          <Button variant="contained"
-      type="submit"
-      onClick={e => onSubmit(data, no_game_red_winner, event_name)}>赤不戦勝</Button>
-          <h1>{data.left_color === 'white' ? ShowRightName(data) : ShowLeftName(data)}</h1>
-          {ShowRedFlags(event_name, selectedRadioButton)}
-      </Grid>
-          <Grid item xs={4} style={{height: '220px' }}>
-          <Button variant="contained"
-                  type="submit"
-      onClick={e => onSubmit(data, no_game_white_winner, event_name)}>白不戦勝</Button>
-          <h1>{data.left_color === 'white' ? ShowLeftName(data) : ShowRightName(data)}</h1>
-          {ShowWhiteFlags(event_name, selectedRadioButton)}
-      </Grid>
-          <br />
-          <Grid container justifyContent="center" alignItems="center" style={{ height: '60px' }}>
-          {event_name.includes('hokei') ? (<div><h2>赤の旗</h2></div>) : ''}
-      </Grid>
-          <Grid container justifyContent="center" alignItems="center" style={{ height: '60px' }}>
-          {event_name.includes('hokei') ?
-           (<>
-            <input class="radio-inline__input" type="radio" id="choice0" name="contact" value="0"
-            onChange={handleRadioButtonChange} checked={parseInt(selectedRadioButton)===0} />
-            <label class="radio-inline__label" for="choice0">0</label>
-            <input class="radio-inline__input" type="radio" id="choice1" name="contact" value="1"
-            onChange={handleRadioButtonChange} checked={parseInt(selectedRadioButton)===1} />
-            <label class="radio-inline__label" for="choice1">1</label>
-            <input class="radio-inline__input" type="radio" id="choice2" name="contact" value="2"
-            onChange={handleRadioButtonChange} checked={parseInt(selectedRadioButton)===2} />
-            <label class="radio-inline__label" for="choice2">2</label>
-            <input class="radio-inline__input" type="radio" id="choice3" name="contact" value="3"
-            onChange={handleRadioButtonChange} checked={parseInt(selectedRadioButton)===3} />
-            <label class="radio-inline__label" for="choice3">3</label></>
-           ) :
-           (<>
-            <input class="radio-inline__input" type="radio" id="choice0" name="contact" value="0"
-            onChange={handleRadioButtonChange} checked={parseInt(selectedRadioButton)===0} />
-            <label class="radio-inline__label" for="choice0">赤勝利</label>
-            <input class="radio-inline__input" type="radio" id="choice1" name="contact" value="1"
-            onChange={handleRadioButtonChange}  checked={parseInt(selectedRadioButton)===1} />
-            <label class="radio-inline__label" for="choice1">白勝利</label>
-            </>)}
-      </Grid>
+            <Grid item xs={3} />
+            <Grid item xs={4} style={{ height: "220px" }}>
+              <Button
+                variant="contained"
+                type="submit"
+                onClick={(e) => onSubmit(data, no_game_red_winner, event_name)}
+              >
+                赤不戦勝
+              </Button>
+              <h1>
+                {data.left_color === "white"
+                  ? ShowRightName(data)
+                  : ShowLeftName(data)}
+              </h1>
+              {ShowRedFlags(event_name, selectedRadioButton)}
+            </Grid>
+            <Grid item xs={4} style={{ height: "220px" }}>
+              <Button
+                variant="contained"
+                type="submit"
+                onClick={(e) =>
+                  onSubmit(data, no_game_white_winner, event_name)
+                }
+              >
+                白不戦勝
+              </Button>
+              <h1>
+                {data.left_color === "white"
+                  ? ShowLeftName(data)
+                  : ShowRightName(data)}
+              </h1>
+              {ShowWhiteFlags(event_name, selectedRadioButton)}
+            </Grid>
+            <br />
+            <Grid
+              container
+              justifyContent="center"
+              alignItems="center"
+              style={{ height: "60px" }}
+            >
+              {event_name.includes("hokei") ? (
+                <div>
+                  <h2>赤の旗</h2>
+                </div>
+              ) : (
+                ""
+              )}
+            </Grid>
+            <Grid
+              container
+              justifyContent="center"
+              alignItems="center"
+              style={{ height: "60px" }}
+            >
+              {event_name.includes("hokei") ? (
+                <>
+                  <input
+                    class="radio-inline__input"
+                    type="radio"
+                    id="choice0"
+                    name="contact"
+                    value="0"
+                    onChange={handleRadioButtonChange}
+                    checked={parseInt(selectedRadioButton) === 0}
+                  />
+                  <label class="radio-inline__label" for="choice0">
+                    0
+                  </label>
+                  <input
+                    class="radio-inline__input"
+                    type="radio"
+                    id="choice1"
+                    name="contact"
+                    value="1"
+                    onChange={handleRadioButtonChange}
+                    checked={parseInt(selectedRadioButton) === 1}
+                  />
+                  <label class="radio-inline__label" for="choice1">
+                    1
+                  </label>
+                  <input
+                    class="radio-inline__input"
+                    type="radio"
+                    id="choice2"
+                    name="contact"
+                    value="2"
+                    onChange={handleRadioButtonChange}
+                    checked={parseInt(selectedRadioButton) === 2}
+                  />
+                  <label class="radio-inline__label" for="choice2">
+                    2
+                  </label>
+                  <input
+                    class="radio-inline__input"
+                    type="radio"
+                    id="choice3"
+                    name="contact"
+                    value="3"
+                    onChange={handleRadioButtonChange}
+                    checked={parseInt(selectedRadioButton) === 3}
+                  />
+                  <label class="radio-inline__label" for="choice3">
+                    3
+                  </label>
+                </>
+              ) : (
+                <>
+                  <input
+                    class="radio-inline__input"
+                    type="radio"
+                    id="choice0"
+                    name="contact"
+                    value="0"
+                    onChange={handleRadioButtonChange}
+                    checked={parseInt(selectedRadioButton) === 0}
+                  />
+                  <label class="radio-inline__label" for="choice0">
+                    赤勝利
+                  </label>
+                  <input
+                    class="radio-inline__input"
+                    type="radio"
+                    id="choice1"
+                    name="contact"
+                    value="1"
+                    onChange={handleRadioButtonChange}
+                    checked={parseInt(selectedRadioButton) === 1}
+                  />
+                  <label class="radio-inline__label" for="choice1">
+                    白勝利
+                  </label>
+                </>
+              )}
+            </Grid>
           </Grid>
-          <Grid container justifyContent="center" alignItems="center" style={{ height: '100px' }}>
-          <Button variant="contained"
-                  type="submit"
-      onClick={e => onSubmit(data, selectedRadioButton, event_name)}>決定</Button>
-          &nbsp;&nbsp;
-          <Button variant="contained"
-                  type="submit"
-          onClick={onBack}>戻る</Button>
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            style={{ height: "100px" }}
+          >
+            <Button
+              variant="contained"
+              type="submit"
+              onClick={(e) => onSubmit(data, selectedRadioButton, event_name)}
+            >
+              決定
+            </Button>
+            &nbsp;&nbsp;
+            <Button variant="contained" type="submit" onClick={onBack}>
+              戻る
+            </Button>
           </Grid>
-          </Box>
-          </Container>
-          </div>
+        </Box>
+      </Container>
+    </div>
   );
 }
 
