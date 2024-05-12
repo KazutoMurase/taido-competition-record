@@ -7,7 +7,7 @@ import Grid from "@mui/material/Grid";
 import checkStyles from "../styles/checks.module.css";
 
 export default function Home() {
-     const router = useRouter();
+  const router = useRouter();
   const ToResult = (event_name) => {
     router.push("/results/" + event_name);
   };
