@@ -1,8 +1,12 @@
 # next.js build output
 .next
+next-env.d.ts
 
 # Dependency directories
 node_modules/
 
 # vercel output
 .vercel
+
+# mdbook output
+book/
