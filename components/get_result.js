@@ -926,6 +926,7 @@ function GetResult({
           </Grid>
           {event_description.map((text, index) => (
             <Grid
+              key={index}
               container
               justifyContent="center"
               alignItems="center"
