@@ -1,0 +1,31 @@
+name: Check format
+
+on:
+  pull_request:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Cache CDK Dependency
+        uses: actions/cache@v3
+        id: cache_cdk_dependency_id
+        env:
+          cache-name: cache-cdk-dependency
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: ${{ runner.os }}-build-${{ env.cache-name }}-
+
+      - name: Install Dependency
+        if: ${{ steps.cache_cdk_dependency_id.outputs.cache-hit != 'true' }}
+        run: npm ci --no-audit --progress=false --silent
+
+      - name: Lint & Format
+        run: |
+          npm run check-format
