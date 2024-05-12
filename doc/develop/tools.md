@@ -18,3 +18,13 @@ tools/format.bash
 ```bash
 tools/reset.bash
 ```
+
+## 静的解析
+
+[開発環境構築](./develop.md)の手順に従いイメージを作成しておく必要がある。
+
+本レポジトリのルートで以下を実行する。
+
+```bash
+tools/lint.bash
+```
