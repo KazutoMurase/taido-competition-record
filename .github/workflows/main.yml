@@ -2,7 +2,7 @@ name: CI/CD
 on:
   push:
     branches:
-    - master
+    - main
     paths:
     - "doc/**.md"
     - "book.toml"
@@ -24,5 +24,5 @@ jobs:
       env:
         ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
         EXTERNAL_REPOSITORY: KazutoMurase/KazutoMurase.github.io
-        PUBLISH_BRANCH: master
+        PUBLISH_BRANCH: main
         PUBLISH_DIR: ./book
