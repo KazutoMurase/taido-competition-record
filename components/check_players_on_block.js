@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
@@ -125,7 +125,7 @@ function CheckPlayers({
 
   let title;
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     const response = await fetch(
       "/api/check_players_on_block?block_number=" +
         block_number +
@@ -138,7 +138,7 @@ function CheckPlayers({
     );
     const result = await response.json();
     setData(result);
-  };
+  }, [block_number, schedule_id, event_id, is_test]);
   const [data, setData] = useState([]);
   useEffect(() => {
     const interval = setInterval(() => {
@@ -148,7 +148,7 @@ function CheckPlayers({
     return () => {
       clearInterval(interval);
     };
-  }, []);
+  }, [fetchData, update_interval]);
   const forceFetchData = () => {
     fetchData();
   };

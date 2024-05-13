@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -96,7 +96,7 @@ function CheckDantai({
 
   let title;
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     const response = await fetch(
       "/api/check_players_on_block?block_number=" +
         block_number +
@@ -109,7 +109,8 @@ function CheckDantai({
     );
     const result = await response.json();
     setData(result);
-  };
+  }, [block_number, schedule_id, event_id, is_test]);
+
   const [data, setData] = useState([]);
   useEffect(() => {
     const interval = setInterval(() => {
@@ -119,7 +120,7 @@ function CheckDantai({
     return () => {
       clearInterval(interval);
     };
-  }, []);
+  }, [fetchData, update_interval]);
   const forceFetchData = () => {
     fetchData();
   };

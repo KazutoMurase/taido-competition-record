@@ -738,7 +738,7 @@ function GetResult({
         clearInterval(interval);
       };
     }
-  }, []);
+  }, [event_name, freeze, updateInterval]);
   const sortedData = data.sort((a, b) => a.id - b.id);
   const lineWidth = 50;
   let maxHeight = 0;

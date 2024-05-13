@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
 import Box from "@mui/material/Box";
@@ -191,7 +191,7 @@ function RecordResult({
   const router = useRouter();
 
   const [data, setData] = useState([]);
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     const response = await fetch(
       "/api/current_block?block_number=" +
         block_number +
@@ -223,7 +223,7 @@ function RecordResult({
         }
       }
     }
-  };
+  }, [block_number, schedule_id, event_name, router]);
   useEffect(() => {
     const interval = setInterval(() => {
       fetchData();
@@ -232,7 +232,7 @@ function RecordResult({
     return () => {
       clearInterval(interval);
     };
-  }, []);
+  }, [fetchData, update_interval]);
   const forceFetchData = () => {
     fetchData();
     setSelectedRadioButton(null);
