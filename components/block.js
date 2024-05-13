@@ -212,7 +212,7 @@ function Block({ block_number, update_interval, return_url }) {
               </tr>
               {data.map((item, index) => (
                 <tr
-                  key={index}
+                  key={item["id"]}
                   className={checkStyles.column}
                   bgcolor={item["id"] === current.id ? "yellow" : "white"}
                 >

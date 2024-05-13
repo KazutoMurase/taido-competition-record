@@ -162,7 +162,7 @@ function GamesOnBlock({
                 </tr>
                 {data.map((item, index) => (
                   <tr
-                    key={index}
+                    key={item["id"]}
                     className={checkStyles.column}
                     bgcolor={"current" in item ? "yellow" : "white"}
                   >

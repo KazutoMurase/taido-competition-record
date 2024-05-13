@@ -202,7 +202,7 @@ function CheckPlayers({
                 <th></th>
               </tr>
               {data.map((item, index) => (
-                <tr key={index} className={checkStyles.column}>
+                <tr key={item["id"]} className={checkStyles.column}>
                   <td>
                     <SquareTwoToneIcon
                       sx={{ fontSize: 60 }}
