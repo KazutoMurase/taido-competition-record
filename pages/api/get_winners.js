@@ -1,6 +1,6 @@
 import GetClient from "../../lib/db_client";
 
-export default async (req, res) => {
+const GetWinners = async (req, res) => {
   try {
     const client = await GetClient();
     const event_name = req.query.event_name;
@@ -91,3 +91,5 @@ export default async (req, res) => {
     res.status(500).json({ error: "Error fetching data" });
   }
 };
+
+export default GetWinners;

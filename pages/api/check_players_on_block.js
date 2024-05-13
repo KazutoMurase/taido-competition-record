@@ -289,7 +289,7 @@ async function GetDantaiFromDB(
   return result_dantai.rows;
 }
 
-export default async (req, res) => {
+const CheckPlayersOnBlock = async (req, res) => {
   try {
     const is_test = req.query.is_test === "true";
     const event_id = parseInt(req.query.event_id);
@@ -357,3 +357,5 @@ export default async (req, res) => {
     res.status(500).json({ error: "Error fetching data" });
   }
 };
+
+export default CheckPlayersOnBlock;

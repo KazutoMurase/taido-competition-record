@@ -1,7 +1,7 @@
 import GetClient from "../../lib/db_client";
 import { Get, Set } from "../../lib/redis_client";
 
-export default async (req, res) => {
+const CompleteSchedule = async (req, res) => {
   try {
     const client = await GetClient();
     const next_id = req.body.id + 1;
@@ -20,3 +20,5 @@ export default async (req, res) => {
     res.status(500).json({ error: "Error fetching data" });
   }
 };
+
+export default CompleteSchedule;

@@ -1,7 +1,7 @@
 import GetClient from "../../lib/db_client";
 import { Set } from "../../lib/redis_client";
 
-export default async (req, res) => {
+const Back = async (req, res) => {
   try {
     const client = await GetClient();
     const current_block_name = "current_block_" + req.body.update_block;
@@ -20,3 +20,5 @@ export default async (req, res) => {
     res.status(500).json({ error: "Error fetching data" });
   }
 };
+
+export default Back;

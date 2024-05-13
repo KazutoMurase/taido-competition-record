@@ -1,7 +1,7 @@
 import GetClient from "../../lib/db_client";
 import { Get, Set } from "../../lib/redis_client";
 
-export default async (req, res) => {
+const CreateNotificationRequest = async (req, res) => {
   try {
     const client = await GetClient();
     let query, values, result;
@@ -34,3 +34,5 @@ export default async (req, res) => {
     res.status(500).json({ error: "Error fetching data" });
   }
 };
+
+export default CreateNotificationRequest;

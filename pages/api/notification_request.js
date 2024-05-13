@@ -21,7 +21,7 @@ async function GetFromDB(req, res, notification_request_name) {
   return [...result.rows, ...result_group.rows];
 }
 
-export default async (req, res) => {
+const NotificationRequest = async (req, res) => {
   try {
     const is_test = req.query.is_test === "true";
     console.log(is_test);
@@ -50,3 +50,5 @@ export default async (req, res) => {
     res.status(500).json({ error: "Error fetching data" });
   }
 };
+
+export default NotificationRequest;

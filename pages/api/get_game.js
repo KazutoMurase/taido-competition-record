@@ -1,6 +1,6 @@
 import GetClient from "../../lib/db_client";
 
-export default async (req, res) => {
+const GetGame = async (req, res) => {
   try {
     const client = await GetClient();
     const current_id = parseInt(req.query.id);
@@ -156,3 +156,5 @@ export default async (req, res) => {
     res.status(500).json({ error: "Error fetching data" });
   }
 };
+
+export default GetGame;
