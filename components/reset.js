@@ -4,7 +4,7 @@ import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 
 function onSubmit(event_names, block_names) {
   let post = { event_names: event_names, block_names: block_names };
@@ -50,13 +50,13 @@ function ResetButton({ event_names, block_names, text }) {
       popupWindow.close();
     };
 
-    ReactDOM.render(
+    const root = createRoot(popupContainer);
+    root.render(
       <PopupComponent
         onClose={handleClose}
         event_names={event_names}
         block_names={block_names}
       />,
-      popupContainer,
     );
   };
   return (

@@ -168,7 +168,7 @@ function CheckDantai({
                 <th></th>
               </tr>
               {data.map((item, index) => (
-                <tr className={checkStyles.column}>
+                <tr key={item["id"]} className={checkStyles.column}>
                   <td>{item["name"].replace("'", "").replace("'", "")}</td>
                   <td className={checkStyles.elem}>
                     <input

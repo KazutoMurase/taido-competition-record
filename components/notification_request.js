@@ -106,7 +106,7 @@ function NotificationRequest({ update_interval, return_url, is_test = false }) {
                 <th></th>
               </tr>
               {data.map((item, index) => (
-                <tr className={checkStyles.column}>
+                <tr key={item["id"]} className={checkStyles.column}>
                   <td>
                     {item["event_name"].replace("'", "").replace("'", "")}
                   </td>

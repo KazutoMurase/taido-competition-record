@@ -9,7 +9,7 @@ import Box from "@mui/material/Box";
 import { Layer, Stage, Rect, Text } from "react-konva";
 import Grid from "@mui/material/Grid";
 
-function createText(item, lineWidth) {
+function CreateText(item, lineWidth) {
   const is_left = item["block_pos"] === "left";
   const is_right = item["block_pos"] === "right";
   const has_left = "has_left" in item;
@@ -272,7 +272,7 @@ function createText(item, lineWidth) {
   return <></>;
 }
 
-function createBlock(item, lineWidth, editable, event_name, returnUrl) {
+function CreateBlock(item, lineWidth, editable, event_name, returnUrl) {
   const router = useRouter();
 
   const onUpdate = (id, editable) => {
@@ -926,6 +926,7 @@ function GetResult({
           </Grid>
           {event_description.map((text, index) => (
             <Grid
+              key={index}
               container
               justifyContent="center"
               alignItems="center"
@@ -938,9 +939,9 @@ function GetResult({
           <Stage width={850} height={maxHeight + 50}>
             <Layer>
               {sortedData.map((item, index) =>
-                createBlock(item, lineWidth, editable, event_name, returnUrl),
+                CreateBlock(item, lineWidth, editable, event_name, returnUrl),
               )}
-              {sortedData.map((item, index) => createText(item, lineWidth))}
+              {sortedData.map((item, index) => CreateText(item, lineWidth))}
             </Layer>
           </Stage>
           <Grid
