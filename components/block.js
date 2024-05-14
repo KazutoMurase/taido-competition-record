@@ -154,7 +154,7 @@ function Block({ block_number, update_interval, return_url }) {
     return () => {
       clearInterval(interval);
     };
-  }, [block_number, update_interval]);
+  }, [block_number]);
 
   const fetchCurrent = useCallback(async () => {
     const response = await fetch(
