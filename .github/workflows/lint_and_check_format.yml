@@ -1,4 +1,4 @@
-name: Check format
+name: Lint and check format
 
 on:
   pull_request:
