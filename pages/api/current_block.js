@@ -175,7 +175,7 @@ async function GetFromDB(req, res) {
   return [];
 }
 
-export default async (req, res) => {
+const CurrentBlock = async (req, res) => {
   try {
     const block_name = "block_" + req.query.block_number;
     const current_block_name = "current_" + block_name;
@@ -218,3 +218,5 @@ export default async (req, res) => {
     res.status(500).json({ error: "Error fetching data" });
   }
 };
+
+export default CurrentBlock;

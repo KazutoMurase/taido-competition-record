@@ -258,7 +258,7 @@ async function GetFromDB(req, res) {
   return sorted_data;
 }
 
-export default async (req, res) => {
+const GetResult = async (req, res) => {
   try {
     // try to use cache
     const event_name = req.query.event_name;
@@ -293,3 +293,5 @@ export default async (req, res) => {
     res.status(500).json({ error: "Error fetching data" });
   }
 };
+
+export default GetResult;

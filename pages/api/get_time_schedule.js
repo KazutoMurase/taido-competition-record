@@ -54,7 +54,7 @@ async function GetFromDB(req, res) {
   return sorted_data;
 }
 
-export default async (req, res) => {
+const GetTimeSchedule = async (req, res) => {
   try {
     // try to use cache
     const block_name = "block_" + req.query.block_number;
@@ -76,3 +76,5 @@ export default async (req, res) => {
     res.status(500).json({ error: "Error fetching data" });
   }
 };
+
+export default GetTimeSchedule;

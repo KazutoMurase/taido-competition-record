@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
 import Box from "@mui/material/Box";
@@ -60,13 +60,13 @@ function NotificationRequest({ update_interval, return_url, is_test = false }) {
     router.push(return_url);
   };
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     const response = await fetch(
       "/api/notification_request?is_test=" + is_test,
     );
     const result = await response.json();
     setData(result);
-  };
+  }, [is_test]);
   const [data, setData] = useState([]);
   useEffect(() => {
     const interval = setInterval(() => {
@@ -76,7 +76,7 @@ function NotificationRequest({ update_interval, return_url, is_test = false }) {
     return () => {
       clearInterval(interval);
     };
-  }, []);
+  }, [fetchData, update_interval]);
 
   const forceFetchData = () => {
     fetchData();

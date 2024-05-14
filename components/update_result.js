@@ -126,7 +126,7 @@ function UpdateResult({ event_name, id, return_url }) {
       }
     }
     fetchData();
-  }, [id]);
+  }, [id, event_name]);
   const router = useRouter();
   const onBack = () => {
     router.push("/" + return_url);

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
 import Box from "@mui/material/Box";
@@ -46,7 +46,7 @@ function GamesOnBlock({
   const router = useRouter();
 
   const [data, setData] = useState([]);
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     const response = await fetch(
       "/api/get_games_on_block?block_number=" +
         block_number +
@@ -60,7 +60,7 @@ function GamesOnBlock({
       router.push("block?block_number=" + block_number);
     }
     setData(result);
-  };
+  }, [block_number, schedule_id, event_name, router]);
   useEffect(() => {
     const interval = setInterval(() => {
       fetchData();
@@ -69,7 +69,7 @@ function GamesOnBlock({
     return () => {
       clearInterval(interval);
     };
-  }, []);
+  }, [fetchData, update_interval]);
 
   const forceFetchData = () => {
     fetchData();

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
 import React from "react";
@@ -154,15 +154,15 @@ function Block({ block_number, update_interval, return_url }) {
     return () => {
       clearInterval(interval);
     };
-  }, []);
+  }, [block_number, update_interval]);
 
-  const fetchCurrent = async () => {
+  const fetchCurrent = useCallback(async () => {
     const response = await fetch(
       "/api/current_schedule?block_number=" + block_number,
     );
     const result = await response.json();
     setCurrent(result);
-  };
+  }, [block_number]);
   const forceFetchCurrent = () => {
     fetchCurrent();
   };
@@ -185,7 +185,7 @@ function Block({ block_number, update_interval, return_url }) {
     return () => {
       clearInterval(interval);
     };
-  }, []);
+  }, [fetchCurrent, update_interval]);
   const doneButtonStyle = {
     backgroundColor: "purple",
   };

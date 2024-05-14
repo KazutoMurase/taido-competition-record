@@ -1,6 +1,6 @@
 import { Set } from "../../lib/redis_client";
 
-export default async (req, res) => {
+const ResetCache = async (req, res) => {
   try {
     const event_names = [
       "hokei_man",
@@ -32,3 +32,5 @@ export default async (req, res) => {
     res.status(500).json({ error: "Error fetching data" });
   }
 };
+
+export default ResetCache;

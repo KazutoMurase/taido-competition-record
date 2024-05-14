@@ -2,7 +2,7 @@ import GetClient from "../../lib/db_client";
 import { Get, Set } from "../../lib/redis_client";
 import { GetEventName } from "../../lib/get_event_name";
 
-export default async (req, res) => {
+const CompletePlayersCheck = async (req, res) => {
   try {
     const client = await GetClient();
     const block_name = "block_" + req.body.block_number;
@@ -56,3 +56,5 @@ export default async (req, res) => {
     res.status(500).json({ error: "Error fetching data" });
   }
 };
+
+export default CompletePlayersCheck;

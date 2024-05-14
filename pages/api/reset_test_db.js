@@ -74,7 +74,7 @@ async function UpdateBlockFromCSV(client, block_name) {
   await client.query(query);
 }
 
-export default async (req, res) => {
+const ResetTestDb = async (req, res) => {
   try {
     const client = await GetClient();
     for (let i = 0; i < req.body.event_names.length; i++) {
@@ -109,3 +109,5 @@ export default async (req, res) => {
     res.status(500).json({ error: "Error fetching data" });
   }
 };
+
+export default ResetTestDb;

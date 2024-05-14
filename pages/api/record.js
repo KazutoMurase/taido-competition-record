@@ -1,7 +1,7 @@
 import GetClient from "../../lib/db_client";
 import { Set } from "../../lib/redis_client";
 
-export default async (req, res) => {
+const Record = async (req, res) => {
   try {
     const client = await GetClient();
     const event_name = req.body.event_name;
@@ -68,3 +68,5 @@ export default async (req, res) => {
     res.status(500).json({ error: "Error fetching data" });
   }
 };
+
+export default Record;
