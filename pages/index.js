@@ -81,7 +81,7 @@ export default function Home() {
             女子個人法形
           </Button>
         </Grid>
-        <Grid
+        {/* <Grid
           container
           justifyContent="center"
           alignItems="center"
@@ -92,7 +92,21 @@ export default function Home() {
             type="submit"
             onClick={(e) => ToResult("hokei_sonen")}
           >
-            　壮年法形　
+            壮年法形　　
+          </Button>
+        </Grid> */}
+        <Grid
+          container
+          justifyContent="center"
+          alignItems="center"
+          style={{ height: "60px" }}
+        >
+          <Button
+            variant="contained"
+            type="submit"
+            onClick={(e) => ToResult("hokei_newcommer")}
+          >
+            新人運足八法
           </Button>
         </Grid>
       </Container>
