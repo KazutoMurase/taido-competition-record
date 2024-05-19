@@ -239,7 +239,7 @@ function Block({ block_number, update_interval, return_url }) {
                         }
                         style={item["players_checked"] ? doneButtonStyle : null}
                       >
-                        {item["players_checked"] ? "点呼完了" : "　点呼　"}
+                        {item["players_checked"] ? "点呼完了" : "点呼　　"}
                       </Button>
                     ) : (
                       <></>

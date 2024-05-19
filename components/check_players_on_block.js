@@ -253,7 +253,7 @@ function CheckPlayers({
                       }
                       style={!item["requested"] ? null : activeButtonStyle}
                     >
-                      {!item["requested"] ? "　呼び出し　" : "リクエスト済"}
+                      {!item["requested"] ? "呼び出し　　" : "リクエスト済"}
                     </Button>
                   </td>
                   <td>
