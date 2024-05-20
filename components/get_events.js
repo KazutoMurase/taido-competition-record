@@ -21,7 +21,7 @@ function GetEvents() {
     fetchData();
   }, []);
 
-  const events = data.map((item) => {
+  const events = data.map((item, index) => {
     const event_name = GetEventName(item["id"]);
     // TODO: event_type テーブルに existence を追加して、existence が 1 のもののみ表示する
     if (event_name === "dantai") {
@@ -29,6 +29,7 @@ function GetEvents() {
     }
     return (
       <Grid
+        key={index}
         container
         justifyContent="center"
         alignItems="center"
