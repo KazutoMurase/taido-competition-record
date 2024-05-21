@@ -1,7 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import GetClient from "../../lib/db_client";
-import internal from "stream";
-// import { Get, Set } from "../../lib/redis_client";
 
 export interface GetCurrentProgressRequest extends NextApiRequest {
   query: {
@@ -9,14 +7,17 @@ export interface GetCurrentProgressRequest extends NextApiRequest {
   };
 }
 
+// TODO: 実大会競技名が固まったら別ファイルにMap作成
 const event_id_vs_table_name: Map<number, string> = new Map([
   [1, "test_zissen_man"],
   [2, "test_hokei_man"],
   [3, "test_zissen_woman"],
   [4, "test_hokei_woman"],
   [5, "test_hokei_sonen"],
+  // TODO: change to dantai_zissen
   [6, "test_dantai"],
 ]);
+
 interface OneScheduleInfo {
   eventName: string;
   timeSpan: string;
@@ -64,18 +65,13 @@ const GetFromDB = async (req: GetCurrentProgressRequest) => {
   });
 
   // 各時程総当たり
-  // TODO: 現況を見つけたらbreakするのではなく、他の情報も必要なので全部for回して取ってくる
   let idx = 0;
   for (const ids of schedule_and_event_ids_in_block) {
-    // block_name.event_idで対応させられそうな気もするが、event_type.csvには和名のみでテーブル名が書いていない→手動対応させる
     const table_name = event_id_vs_table_name.get(ids.event_id);
     if (table_name === undefined || table_name == "test_dantai") {
       // 全日程終了→テーブル無し, 団体→未実装
       continue;
     }
-    console.log(
-      `checking schedule_id = ${ids.schedule_id}, table_name = ${table_name}`,
-    );
     query =
       "select t1.id, t1.left_player_flag FROM " +
       block_name +
@@ -95,11 +91,12 @@ const GetFromDB = async (req: GetCurrentProgressRequest) => {
     if (current_progress.currentScheduleIdx !== undefined) continue;
     for (const game of game_states_in_schedule) {
       // 負け側の旗数が記録されていない→試合未実施
+      // TODO: check "left_group_flag" if dantai
       if (game.left_player_flag === null) {
         // schedule_idは1スタートで1ずつ増えると仮定
-        console.log(
-          `current schedule on block ${block_name} is game ${game.game_id} in ${table_name}`,
-        );
+        // console.log(
+        //   `current schedule on block ${block_name} is game ${game.game_id} in ${table_name}`,
+        // );
         current_progress.currentScheduleIdx = ids.schedule_id - 1;
         current_progress.currentGameId = game.game_id;
         break;
