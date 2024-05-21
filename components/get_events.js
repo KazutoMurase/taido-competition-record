@@ -24,7 +24,7 @@ function GetEvents() {
   const events = data.map((item, index) => {
     const event_name = GetEventName(item["id"]);
     // TODO: event_type テーブルに existence を追加して、existence が 1 のもののみ表示する
-    if (event_name === "dantai") {
+    if (event_name === "dantai" || !item["existence"]) {
       return <></>;
     }
     return (

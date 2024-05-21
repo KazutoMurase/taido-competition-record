@@ -6,7 +6,8 @@ primary key(id));
 create table event_type
 (id integer not null,
  name text not null,
-primary key(id));
+ existence integer not null,
+ primary key(id));
 
 create table court_type
 (id integer not null,
@@ -26,7 +27,6 @@ hokei_sonen_player_id integer unique,
 hokei_newcommer_player_id integer unique,
 primary key(id),
 foreign key (group_id) references groups(id));
-
 
 create table notification_request
 (id serial not null,
