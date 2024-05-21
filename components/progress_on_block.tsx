@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 
 import Typography from "@mui/material/Typography";
 
-import { CurrentProgressInfo } from "../pages/api/get_current_progress";
+import { CurrentProgressInfo } from "../pages/api/get_current_progress_on_block";
 
 const ProgressOnBlock: React.FC<{
   block_number: string;
@@ -13,7 +13,7 @@ const ProgressOnBlock: React.FC<{
   const [scheduleTables, setScheduleTables] = useState<JSX.Element[]>([]);
 
   const fetchData = useCallback(async () => {
-    fetch("/api/get_current_progress?block_number=" + block_number)
+    fetch("/api/get_current_progress_on_block?block_number=" + block_number)
       .then((response) => response.json())
       .then((data) => {
         setProgressInfo(data);
@@ -42,7 +42,13 @@ const ProgressOnBlock: React.FC<{
         >
           <td>{schedule.timeSpan.replace(/['"]+/g, "")}</td>
           <td>{schedule.eventName.replace(/['"]+/g, "")}</td>
-          <td>{schedule.gameIds.join(",")}</td>
+          <td>
+            {schedule.gameIds
+              .sort((a, b) => {
+                return a - b;
+              })
+              .join(",")}
+          </td>
           <td>{isCurrentSchedule ? progressInfo.currentGameId : "-"}</td>
         </tr>,
       );

@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import GetClient from "../../lib/db_client";
+import { Get, Set } from "../../lib/redis_client";
 
 export interface GetCurrentProgressRequest extends NextApiRequest {
   query: {
@@ -107,13 +108,32 @@ const GetFromDB = async (req: GetCurrentProgressRequest) => {
   return current_progress;
 };
 
-const GetCurrentProgress = async (
+const GetCurrentProgressOnBlock = async (
   req: GetCurrentProgressRequest,
   res: NextApiResponse,
 ) => {
-  // TODO: use cache
-  const data = await GetFromDB(req);
-  res.json(data);
+  try {
+    const cacheKey = "get_current_progress_on_" + req.query.block_number;
+    const cachedData = await Get(cacheKey);
+
+    // check game result update history
+    const latestGameIdUpdateKey =
+      "update_game_id_for_current_block_" + req.query.block_number;
+    const latestGameIdUpdateTimestamp = (await Get(latestGameIdUpdateKey)) || 0;
+    if (cachedData && latestGameIdUpdateTimestamp < cachedData.timestamp) {
+      console.log(`using cache for ${cacheKey}`);
+      return res.json(cachedData.data);
+    }
+    console.log(`get new data for ${cacheKey}`);
+    const data = await GetFromDB(req);
+    if (data) {
+      await Set(cacheKey, { data: data, timestamp: Date.now() });
+    }
+    res.json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Error fetching data" });
+  }
 };
 
-export default GetCurrentProgress;
+export default GetCurrentProgressOnBlock;
