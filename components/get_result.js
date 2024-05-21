@@ -967,10 +967,18 @@ function GetResult({
                   <td>第4位</td>
                 </tr>
                 <tr style={{ height: "80px" }}>
-                  <td>{winner1 !== null ? ShowWinner(winner1) : ""}</td>
-                  <td>{winner2 !== null ? ShowWinner(winner2) : ""}</td>
-                  <td>{winner3 !== null ? ShowWinner(winner3) : ""}</td>
-                  <td>{winner4 !== null ? ShowWinner(winner4) : ""}</td>
+                  <td>
+                    {winner1 ? (winner1.name ? ShowWinner(winner1) : "") : ""}
+                  </td>
+                  <td>
+                    {winner2 ? (winner2.name ? ShowWinner(winner2) : "") : ""}
+                  </td>
+                  <td>
+                    {winner3 ? (winner3.name ? ShowWinner(winner3) : "") : ""}
+                  </td>
+                  <td>
+                    {winner4 ? (winner4.name ? ShowWinner(winner4) : "") : ""}
+                  </td>
                 </tr>
               </tbody>
             </table>
