@@ -23,7 +23,6 @@ hokei_man_player_id integer unique,
 zissen_woman_player_id integer unique,
 hokei_woman_player_id integer unique,
 hokei_sonen_player_id integer unique,
-hokei_newcommer_player_id integer unique,
 primary key(id),
 foreign key (group_id) references groups(id));
 
@@ -110,25 +109,11 @@ foreign key (left_player_id) references players(zissen_woman_player_id),
 foreign key (right_player_id) references players(zissen_woman_player_id),
 primary key(id));
 
-create table hokei_newcommer
-(id integer not null,
-left_player_id integer,
-right_player_id integer,
-next_left_id integer,
-next_right_id integer,
-left_player_flag integer,
-left_retire integer,
-right_retire integer,
-foreign key (left_player_id) references players(hokei_newcommer_player_id),
-foreign key (right_player_id) references players(hokei_newcommer_player_id),
-primary key(id));
-
 \copy hokei_man from 'hokei_man.csv' csv header;
 \copy zissen_man from 'zissen_man.csv' csv header;
 \copy hokei_woman from 'hokei_woman.csv' csv header;
 \copy zissen_woman from 'zissen_woman.csv' csv header;
 \copy hokei_sonen from 'hokei_sonen.csv' csv header;
-\copy hokei_newcommer from 'hokei_newcommer.csv' csv header;
 
 create table dantai_zissen_man_groups
 (id integer not null,
