@@ -19,3 +19,7 @@ docker-compose up
 ```
 
 ポート被りが無ければ、http://localhost:3000 でアクセスできる。
+ポート番号は .env の PORT で指定できる。
+
+.env の COMPETITION_NAME を変更することで、コンテナを立ち上げた際にDBにinsertするデータを変更できる。
+COMPETITION_NAME には data/ 直下のディレクトリ名を指定する。
