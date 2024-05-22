@@ -30,6 +30,11 @@ function ShowHokeiType(item, event_name) {
     return <td>{item["round"] <= 2 ? "勢命" : "活命/延命"}</td>;
   } else if (event_name === "hokei_newcommer") {
     return <td>-</td>;
+  } else if (
+    event_name === "hokei_kyuui_man" ||
+    event_name === "hokei_kyuui_woman"
+  ) {
+    return <td>自由法形</td>;
   }
   return <td>{item["round"] <= 2 ? "指定法形" : "自由法形"}</td>;
 }
