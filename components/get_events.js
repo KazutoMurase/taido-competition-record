@@ -23,7 +23,6 @@ function GetEvents() {
 
   const events = data.map((item, index) => {
     const event_name = GetEventName(item["id"]);
-    // TODO: event_type テーブルに existence を追加して、existence が 1 のもののみ表示する
     if (event_name === "dantai" || !item["existence"]) {
       return <></>;
     }
@@ -38,7 +37,7 @@ function GetEvents() {
         <Button
           variant="contained"
           type="submit"
-          onClick={(e) => ToResult("zissen_man")}
+          onClick={(e) => ToResult(event_name)}
         >
           {item["name"].replace("'", "").replace("'", "")}
         </Button>
