@@ -7,15 +7,26 @@ import { GetEventName } from "../../lib/get_event_name";
 
 const Home = () => {
   const router = useRouter();
-  const { block_number, schedule_id, dantai, event_id } = router.query;
+  const { block_number, schedule_id, event_id } = router.query;
   if (block_number === undefined) {
     return <></>;
   }
-  if (dantai === "0") {
-    const event_name = GetEventName(event_id);
+  const event_name = GetEventName(event_id);
+  if (event_name === "dantai") {
     return (
       <>
-        <CheckPlayers
+        <CheckDantai
+          block_number={block_number}
+          schedule_id={schedule_id}
+          event_id={event_id}
+          update_interval={3000}
+        />
+      </>
+    );
+  } else if (event_name.includes("dantai")) {
+    return (
+      <>
+        <CheckDantai
           block_number={block_number}
           schedule_id={schedule_id}
           event_id={event_id}
@@ -31,11 +42,16 @@ const Home = () => {
   } else {
     return (
       <>
-        <CheckDantai
+        <CheckPlayers
           block_number={block_number}
           schedule_id={schedule_id}
           event_id={event_id}
           update_interval={3000}
+        />
+        <GetResult
+          updateInterval={3000}
+          event_name={event_name}
+          block_number={block_number}
         />
       </>
     );
