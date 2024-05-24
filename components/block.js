@@ -87,15 +87,12 @@ function ShowGamesText(item) {
 function Block({ block_number, update_interval, return_url }) {
   const router = useRouter();
   const ToCheck = (block_number, id, name, event_id) => {
-    const dantai = name.includes("団体") ? 1 : 0;
     router.push(
       return_url +
         "/check_players_on_block?block_number=" +
         block_number +
         "&schedule_id=" +
         id +
-        "&dantai=" +
-        dantai +
         "&event_id=" +
         event_id,
     );

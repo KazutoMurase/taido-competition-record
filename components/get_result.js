@@ -9,6 +9,123 @@ import Box from "@mui/material/Box";
 import { Layer, Stage, Rect, Text } from "react-konva";
 import Grid from "@mui/material/Grid";
 
+function CreateDantaiText(item, lineWidth) {
+  const is_left = item["block_pos"] === "left";
+  const is_right = item["block_pos"] === "right";
+  const has_left = "has_left" in item;
+  const has_right = "has_right" in item;
+  if (is_left || is_right) {
+    if (!has_left && !has_right) {
+      return (
+        <>
+          <Text
+            x={is_left ? 140 : 630}
+            y={item["left_begin_y"] - 5}
+            text={item["left_group_name"].replace("'", "").replace("'", "")}
+            fontSize={item["left_group_name"].length < 8 ? 18 : 14}
+          />
+          <Rect
+            x={is_left ? 130 : 625}
+            y={item["left_begin_y"] + 2}
+            width={["left_group_name"].length * 110}
+            height={1}
+            fill="black"
+            visible={"left_out" in item}
+          />
+          <Text
+            x={is_left ? 140 : 630}
+            y={item["right_begin_y"] - 5}
+            text={item["right_group_name"].replace("'", "").replace("'", "")}
+            fontSize={item["right_group_name"].length < 8 ? 18 : 14}
+          />
+          <Rect
+            x={is_left ? 130 : 625}
+            y={item["right_begin_y"]}
+            width={["right_group_name"].length * 110}
+            height={1}
+            fill="black"
+            visible={"right_out" in item}
+          />
+        </>
+      );
+    }
+    if (!has_left) {
+      return (
+        <>
+          <Text
+            x={is_left ? 140 : 630}
+            y={item["left_begin_y"] - 5}
+            text={item["left_group_name"].replace("'", "").replace("'", "")}
+            fontSize={item["left_group_name"].length < 8 ? 18 : 14}
+          />
+          <Rect
+            x={is_left ? 130 : 625}
+            y={item["left_begin_y"] + 2}
+            width={["left_group_name"].length * 110}
+            height={1}
+            fill="black"
+            visible={"left_out" in item}
+          />
+        </>
+      );
+    }
+    if (!has_right) {
+      return (
+        <>
+          <Text
+            x={is_left ? 140 : 630}
+            y={item["right_begin_y"] - 5}
+            text={item["right_group_name"].replace("'", "").replace("'", "")}
+            fontSize={item["right_group_name"].length < 8 ? 18 : 14}
+          />
+          <Rect
+            x={is_left ? 130 : 625}
+            y={item["right_begin_y"] + 2}
+            width={["right_group_name"].length * 110}
+            height={1}
+            fill="black"
+            visible={"right_out" in item}
+          />
+        </>
+      );
+    }
+  } else if ("fake_round" in item) {
+    const x = 220 + lineWidth + (item["fake_round"] - 2) * 30;
+    const width =
+      620 -
+      lineWidth -
+      (item["fake_round"] - 2) * 30 -
+      (220 + lineWidth + (item["fake_round"] - 2) * 30);
+    return (
+      <>
+        <Text
+          x={x - 200}
+          y={item["left_begin_y"] - 10}
+          text={item["left_group_name"]?.replace("'", "").replace("'", "")}
+          fontSize={
+            (item["left_group_name"] !== null &&
+              item["left_group_name"].length) < 8
+              ? 18
+              : 14
+          }
+        />
+        <Text
+          x={x + width + 10}
+          y={item["left_begin_y"] - 10}
+          text={item["right_group_name"]?.replace("'", "").replace("'", "")}
+          fontSize={
+            (item["right_group_name"] !== null &&
+              item["right_group_name"].length) < 8
+              ? 18
+              : 14
+          }
+        />
+      </>
+    );
+  }
+  return <></>;
+}
+
 function CreateText(item, lineWidth) {
   const is_left = item["block_pos"] === "left";
   const is_right = item["block_pos"] === "right";
@@ -754,7 +871,13 @@ function GetResult({
   // TODO: from DB
   let event_full_name;
   let event_description = [];
-  if (event_name.includes("hokei_man")) {
+  if (event_name.includes("dantai_zissen_woman")) {
+    event_full_name = "女子団体実戦競技";
+    event_description = ["試合時間 1分30秒"];
+  } else if (event_name.includes("dantai_zissen_man")) {
+    event_full_name = "男子団体実戦競技";
+    event_description = ["試合時間 1分30秒"];
+  } else if (event_name.includes("hokei_man")) {
     event_full_name = "男子個人法形競技";
     event_description = [
       "1 ・ 2 回戦：旋体の法形 / 3 回戦以降：体の法形から自由選択",
@@ -925,7 +1048,11 @@ function GetResult({
             <h1>
               <u>
                 {event_full_name +
-                  (num_of_players > 0 ? "　" + num_of_players + "人" : "")}
+                  (num_of_players > 0
+                    ? "　" +
+                      num_of_players +
+                      (event_name.includes("dantai") ? "チーム" : "人")
+                    : "")}
               </u>
             </h1>
           </Grid>
@@ -946,7 +1073,11 @@ function GetResult({
               {sortedData.map((item, index) =>
                 CreateBlock(item, lineWidth, editable, event_name, returnUrl),
               )}
-              {sortedData.map((item, index) => CreateText(item, lineWidth))}
+              {sortedData.map((item, index) =>
+                event_name.includes("dantai")
+                  ? CreateDantaiText(item, lineWidth)
+                  : CreateText(item, lineWidth),
+              )}
             </Layer>
           </Stage>
           <Grid
