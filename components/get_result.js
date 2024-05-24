@@ -904,6 +904,11 @@ function GetResult({
     event_description = [
       "1.2 回戦勢命（表のみ）、3 回戦以降　活命・延命から選択",
     ];
+  } else if (event_name.includes("hokei_newcommer")) {
+    event_full_name = "新人運足八法競技";
+    event_description = [
+      "", // TODO: 何か書くべきことがあれば
+    ];
   }
   // calc num of players
   let num_of_players = 0;
