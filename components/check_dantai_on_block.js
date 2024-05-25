@@ -203,8 +203,8 @@ function CheckDantai({
                       onClick={(e) =>
                         onSubmit(
                           block_number,
-                          item.group_id,
-                          item.event_id,
+                          item.id,
+                          event_id,
                           is_test,
                           forceFetchData,
                         )
