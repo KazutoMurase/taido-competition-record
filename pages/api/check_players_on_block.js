@@ -308,7 +308,7 @@ const CheckPlayersOnBlock = async (req, res) => {
       "update_complete_players_for_" + block_name;
     const latestCompletePlayersTimestamp =
       (await Get(latestCompletePlayersKey)) || 0;
-    if (GetEventName(event_id) === "dantai") {
+    if (GetEventName(event_id).includes("dantai")) {
       if (
         cachedData &&
         latestNotificationUpdateTimestamp < cachedData.timestamp &&
