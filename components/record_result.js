@@ -7,46 +7,51 @@ import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import FlagCircleRoundedIcon from "@mui/icons-material/FlagCircleRounded";
 
-function onSubmit(
-  data,
-  player_flag,
-  block_number,
-  event_name,
-  function_after_post,
-) {
-  let left_player_flag;
-  if (player_flag === -2) {
-    left_player_flag = -2;
+function onSubmit(data, flag, block_number, event_name, function_after_post) {
+  let left_flag;
+  if (flag === -2) {
+    left_flag = -2;
   } else if (event_name.includes("hokei")) {
-    left_player_flag =
-      data.left_color === "white" ? 3 - player_flag : player_flag;
+    left_flag = data.left_color === "white" ? 3 - flag : flag;
   } else if (event_name.includes("zissen")) {
-    left_player_flag =
-      data.left_color === "white" ? player_flag : 1 - player_flag;
+    left_flag = data.left_color === "white" ? flag : 1 - flag;
   }
   let post = {
     id: data.id,
     event_name: event_name,
-    left_player_flag: left_player_flag,
     update_block: block_number,
   };
-  if (player_flag === -2) {
-    post["next_player_id"] = null;
+  if (event_name.includes("dantai")) {
+    post["left_group_flag"] = left_flag;
+  } else {
+    post["left_player_flag"] = left_flag;
+  }
+  const left_id = event_name.includes("dantai")
+    ? data.left_group_id
+    : data.left_player_id;
+  const right_id = event_name.includes("dantai")
+    ? data.right_group_id
+    : data.right_player_id;
+  const next_id_name = event_name.includes("dantai")
+    ? "next_group_id"
+    : "next_player_id";
+  if (flag === -2) {
+    post[next_id_name] = null;
   } else if (event_name.includes("hokei")) {
-    if (parseInt(left_player_flag) > 1) {
-      post["next_player_id"] = data.left_player_id;
-      post["loser_id"] = data.right_player_id;
+    if (parseInt(left_flag) > 1) {
+      post[next_id_name] = left_id;
+      post["loser_id"] = right_id;
     } else {
-      post["next_player_id"] = data.right_player_id;
-      post["loser_id"] = data.left_player_id;
+      post[next_id_name] = right_id;
+      post["loser_id"] = left_id;
     }
   } else if (event_name.includes("zissen")) {
-    if (parseInt(left_player_flag) > 0) {
-      post["next_player_id"] = data.left_player_id;
-      post["loser_id"] = data.right_player_id;
+    if (parseInt(left_flag) > 0) {
+      post[next_id_name] = left_id;
+      post["loser_id"] = right_id;
     } else {
-      post["next_player_id"] = data.right_player_id;
-      post["loser_id"] = data.left_player_id;
+      post[next_id_name] = right_id;
+      post["loser_id"] = left_id;
     }
   }
   if (data.next_left_id !== null) {
@@ -56,6 +61,7 @@ function onSubmit(
     post["next_id"] = data.next_right_id;
     post["next_type"] = "right";
   }
+  console.log(post);
   axios
     .post("/api/record", post)
     .then((response) => {
@@ -205,21 +211,21 @@ function RecordResult({
       router.push("block?block_number=" + block_number);
     }
     setData(result);
-    if (
-      result.left_player_flag !== null &&
-      result.left_player_flag !== undefined
-    ) {
+    const left_flag = event_name.includes("dantai")
+      ? result.left_group_flag
+      : result.left_player_flag;
+    if (left_flag !== null && left_flag !== undefined) {
       if (result.left_color === "red") {
         if (event_name.includes("hokei")) {
-          setInitialRadioButton(result.left_player_flag);
+          setInitialRadioButton(left_flag);
         } else if (event_name.includes("zissen")) {
-          setInitialRadioButton(1 - result.left_player_flag);
+          setInitialRadioButton(1 - left_flag);
         }
       } else {
         if (event_name.includes("hokei")) {
-          setInitialRadioButton(3 - result.left_player_flag);
+          setInitialRadioButton(3 - left_flag);
         } else if (event_name.includes("zissen")) {
-          setInitialRadioButton(result.left_player_flag);
+          setInitialRadioButton(left_flag);
         }
       }
     }

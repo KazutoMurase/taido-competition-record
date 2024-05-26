@@ -5,16 +5,24 @@ const Record = async (req, res) => {
   try {
     const client = await GetClient();
     const event_name = req.body.event_name;
+    const type = event_name.includes("dantai") ? "group" : "player";
     let query =
-      "update " + event_name + " set left_player_flag = $2 where id = $1";
-    let values = [req.body.id, req.body.left_player_flag];
+      "update " + event_name + " set left_" + type + "_flag = $2 where id = $1";
+    let values = [
+      req.body.id,
+      type === "group" ? req.body.left_group_flag : req.body.left_player_flag,
+    ];
     let result = await client.query(query, values);
     let count_query = "select count(*) from " + event_name;
     let count_result = await client.query(count_query);
     const count = count_result.rows[0]["count"];
     if (req.body.next_type === "left") {
-      query = "update " + event_name + " set left_player_id = $1 where id = $2";
-      values = [req.body.next_player_id, req.body.next_id];
+      query =
+        "update " + event_name + " set left_" + type + "_id = $1 where id = $2";
+      values = [
+        type === "group" ? req.body.next_group_id : req.body.next_player_id,
+        req.body.next_id,
+      ];
       result = await client.query(query, values);
       if (parseInt(req.body.next_id) === parseInt(count)) {
         values = [req.body.loser_id, req.body.next_id - 1];
@@ -22,8 +30,15 @@ const Record = async (req, res) => {
       }
     } else {
       query =
-        "update " + event_name + " set right_player_id = $1 where id = $2";
-      values = [req.body.next_player_id, req.body.next_id];
+        "update " +
+        event_name +
+        " set right_" +
+        type +
+        "_id = $1 where id = $2";
+      values = [
+        type === "group" ? req.body.next_group_id : req.body.next_player_id,
+        req.body.next_id,
+      ];
       result = await client.query(query, values);
       if (parseInt(req.body.next_id) === parseInt(count)) {
         values = [req.body.loser_id, req.body.next_id - 1];
