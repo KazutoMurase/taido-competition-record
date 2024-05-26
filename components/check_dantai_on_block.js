@@ -12,6 +12,7 @@ import { useRouter } from "next/router";
 function onSubmit(
   block_number,
   group_id,
+  group_name,
   event_id,
   is_test,
   function_after_post,
@@ -34,6 +35,7 @@ function onSubmit(
   let post = {
     event_id: event_id,
     group_id: group_id,
+    group_name: group_name,
     court_id: court_id,
     is_test: is_test,
   };
@@ -203,8 +205,9 @@ function CheckDantai({
                       onClick={(e) =>
                         onSubmit(
                           block_number,
-                          item.group_id,
-                          item.event_id,
+                          item.id,
+                          item.name,
+                          event_id,
                           is_test,
                           forceFetchData,
                         )

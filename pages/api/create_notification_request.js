@@ -22,8 +22,13 @@ const CreateNotificationRequest = async (req, res) => {
       query =
         "INSERT INTO " +
         notification_request_name +
-        "(event_id, group_id, court_id) values ($1, $2, $3)";
-      values = [req.body.event_id, req.body.group_id, req.body.court_id];
+        "(event_id, group_id, group_name, court_id) values ($1, $2, $3, $4)";
+      values = [
+        req.body.event_id,
+        req.body.group_id,
+        req.body.group_name,
+        req.body.court_id,
+      ];
       result = await client.query(query, values);
     }
     const key = "latest_update_for_" + notification_request_name;

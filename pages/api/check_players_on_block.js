@@ -11,21 +11,39 @@ async function GetFromDB(
 ) {
   const client = await GetClient();
   const block_name = "block_" + req.query.block_number;
+  const groups_name = event_name + "_groups";
   const schedule_id = req.query.schedule_id;
-  let query =
-    "SELECT t1.id, t2.id AS left_player_id, t3.id AS right_player_id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t3.name AS right_name, t2.name_kana AS left_name_kana, t3.name_kana AS right_name_kana FROM " +
-    block_name +
-    "_games AS t0 LEFT JOIN " +
-    event_name +
-    " AS t1 ON t0.game_id = t1.id LEFT JOIN " +
-    players_name +
-    " AS t2 ON t1.left_player_id = t2." +
-    event_name +
-    "_player_id LEFT JOIN " +
-    players_name +
-    " AS t3 ON t1.right_player_id = t3." +
-    event_name +
-    "_player_id where t0.schedule_id = $1";
+  const is_dantai = event_name.includes("dantai");
+  let query;
+  if (is_dantai) {
+    query =
+      "SELECT t1.id, t2.id AS left_group_id, t3.id AS right_group_id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t3.name AS right_name FROM " +
+      block_name +
+      "_games AS t0 LEFT JOIN " +
+      event_name +
+      " AS t1 ON t0.game_id = t1.id LEFT JOIN " +
+      groups_name +
+      " AS t2 ON t1.left_group_id = t2.id" +
+      " LEFT JOIN " +
+      groups_name +
+      " AS t3 ON t1.right_group_id = t3.id" +
+      " where t0.schedule_id = $1";
+  } else {
+    query =
+      "SELECT t1.id, t2.id AS left_player_id, t3.id AS right_player_id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t3.name AS right_name, t2.name_kana AS left_name_kana, t3.name_kana AS right_name_kana FROM " +
+      block_name +
+      "_games AS t0 LEFT JOIN " +
+      event_name +
+      " AS t1 ON t0.game_id = t1.id LEFT JOIN " +
+      players_name +
+      " AS t2 ON t1.left_player_id = t2." +
+      event_name +
+      "_player_id LEFT JOIN " +
+      players_name +
+      " AS t3 ON t1.right_player_id = t3." +
+      event_name +
+      "_player_id where t0.schedule_id = $1";
+  }
   const result = await client.query(query, [schedule_id]);
   const data = result.rows.sort((a, b) => a.id - b.id);
 
@@ -129,7 +147,11 @@ async function GetFromDB(
       round_num[sorted_data[i]["round"]] += 1;
     }
   }
-  query = "SELECT player_id FROM " + notification_request_name;
+  query =
+    "SELECT " +
+    (is_dantai ? "group" : "player") +
+    "_id FROM " +
+    notification_request_name;
   const result_requested = await client.query(query);
   const requested_data = result_requested.rows;
   // select item
@@ -153,10 +175,16 @@ async function GetFromDB(
           block_pos = "center";
           game_id = 1;
         }
-        if (data[i].left_player_id !== null) {
+        const left_id = is_dantai
+          ? data[i].left_group_id
+          : data[i].left_player_id;
+        const right_id = is_dantai
+          ? data[i].right_group_id
+          : data[i].right_player_id;
+        if (left_id !== null) {
           let duplicated = false;
           for (let k = 0; k < result_array.length; k++) {
-            if (result_array[k]["id"] == data[i].left_player_id) {
+            if (result_array[k]["id"] == left_id) {
               duplicated = true;
               if (result_array[k]["retire"] === null) {
                 result_array[k]["retire"] = data[i].left_retire;
@@ -167,13 +195,16 @@ async function GetFromDB(
           if (!duplicated) {
             let requested = false;
             for (let k = 0; k < requested_data.length; k++) {
-              if (requested_data[k]["player_id"] === data[i].left_player_id) {
+              const requested_id = is_dantai
+                ? requested_data[k]["group_id"]
+                : requested_data[k]["player_id"];
+              if (requested_id === left_id) {
                 requested = true;
                 break;
               }
             }
             result_array.push({
-              id: data[i].left_player_id,
+              id: left_id,
               game_id: sorted_data[j].id,
               is_left: true,
               retire: sorted_data[j].left_retire,
@@ -187,10 +218,10 @@ async function GetFromDB(
             });
           }
         }
-        if (data[i].right_player_id !== null) {
+        if (right_id !== null) {
           let duplicated = false;
           for (let k = 0; k < result_array.length; k++) {
-            if (result_array[k]["id"] == data[i].right_player_id) {
+            if (result_array[k]["id"] == right_id) {
               duplicated = true;
               if (result_array[k]["retire"] === null) {
                 result_array[k]["retire"] = data[i].right_retire;
@@ -201,13 +232,16 @@ async function GetFromDB(
           if (!duplicated) {
             let requested = false;
             for (let k = 0; k < requested_data.length; k++) {
-              if (requested_data[k]["player_id"] === data[i].right_player_id) {
+              const requested_id = is_dantai
+                ? requested_data[k]["group_id"]
+                : requested_data[k]["player_id"];
+              if (requested_id === right_id) {
                 requested = true;
                 break;
               }
             }
             result_array.push({
-              id: data[i].right_player_id,
+              id: right_id,
               game_id: sorted_data[j].id,
               is_left: false,
               retire: sorted_data[j].right_retire,
@@ -251,7 +285,7 @@ async function GetDantaiFromDB(
   const game_id = sorted_dantai[0].game_id;
   console.log(game_id);
   query =
-    "SELECT t1.name, t0.group_id, t0.event_id FROM " +
+    "SELECT t1.name, t0.group_id AS id, t0.event_id FROM " +
     event_name +
     " as t0 LEFT JOIN groups AS t1 ON t0.group_id = t1.id WHERE t0.event_id = " +
     event_id +
@@ -260,7 +294,7 @@ async function GetDantaiFromDB(
   result_dantai = await client.query(query);
   if (result_dantai.rows.length === 0) {
     query =
-      "SELECT t1.name, t0.group_id, t0.event_id FROM " +
+      "SELECT t1.name, t0.group_id AS id, t0.event_id FROM " +
       event_name +
       " as t0 LEFT JOIN groups AS t1 ON t0.group_id = t1.id WHERE t0.event_id = " +
       event_id;
@@ -278,7 +312,7 @@ async function GetDantaiFromDB(
   for (let i = 0; i < result_dantai.rows.length; i++) {
     for (let j = 0; j < requested_data.length; j++) {
       if (
-        result_dantai.rows[i].group_id === requested_data[j].group_id &&
+        result_dantai.rows[i].id === requested_data[j].group_id &&
         result_dantai.rows[i].event_id === requested_data[j].event_id
       ) {
         result_dantai.rows[i]["requested"] = true;
