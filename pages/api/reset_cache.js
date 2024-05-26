@@ -9,6 +9,10 @@ const ResetCache = async (req, res) => {
       "zissen_woman",
       "hokei_sonen",
       "hokei_newcommer",
+      "hokei_kyuui_man",
+      "hokei_kyuui_woman",
+      "zissen_kyuui_man",
+      "zissen_kyuui_woman",
     ];
     const block_names = ["block_a", "block_b", "block_c", "block_d"];
     // update timestamp to current
