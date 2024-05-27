@@ -158,11 +158,19 @@ function GamesOnBlock({
                 <tr className={checkStyles.column}>
                   {event_name.includes("hokei") ? <th>種類</th> : <></>}
                   <th>色</th>
-                  <th>地区</th>
-                  <th>選手(カナ)</th>
+                  {event_name.includes("dantai") ? <></> : <th>地区</th>}
+                  {event_name.includes("dantai") ? (
+                    <th>団体名</th>
+                  ) : (
+                    <th>選手(カナ)</th>
+                  )}
                   <th>色</th>
-                  <th>地区</th>
-                  <th>選手(カナ)</th>
+                  {event_name.includes("dantai") ? <></> : <th>地区</th>}
+                  {event_name.includes("dantai") ? (
+                    <th>団体名</th>
+                  ) : (
+                    <th>選手(カナ)</th>
+                  )}
                   <th>順序変更</th>
                   {event_name.includes("zissen") ? <th>赤棄権</th> : <></>}
                   {event_name.includes("zissen") ? <th>白棄権</th> : <></>}
@@ -184,11 +192,15 @@ function GamesOnBlock({
                         htmlColor={"red"}
                       />
                     </td>
-                    <td>
-                      {item["left_color"] === "red"
-                        ? item["left_group_name"]
-                        : item["right_group_name"]}
-                    </td>
+                    {event_name.includes("dantai") ? (
+                      <></>
+                    ) : (
+                      <td>
+                        {item["left_color"] === "red"
+                          ? item["left_group_name"]
+                          : item["right_group_name"]}
+                      </td>
+                    )}
                     <td>
                       {showText(
                         item["left_color"],
@@ -202,11 +214,11 @@ function GamesOnBlock({
                       {showText(
                         item["left_color"],
                         item["left_retire"],
-                        item["left_name_kana"] !== null
+                        item["left_name_kana"]
                           ? "(" + item["left_name_kana"] + ")"
                           : "",
                         item["right_retire"],
-                        item["right_name_kana"] !== null
+                        item["right_name_kana"]
                           ? "(" + item["right_name_kana"] + ")"
                           : "",
                         item["id"],
@@ -219,11 +231,15 @@ function GamesOnBlock({
                         htmlColor={"gray"}
                       />
                     </td>
-                    <td>
-                      {item["left_color"] === "red"
-                        ? item["right_group_name"]
-                        : item["left_group_name"]}
-                    </td>
+                    {event_name.includes("dantai") ? (
+                      <></>
+                    ) : (
+                      <td>
+                        {item["left_color"] === "red"
+                          ? item["right_group_name"]
+                          : item["left_group_name"]}
+                      </td>
+                    )}
                     <td>
                       {showText(
                         item["left_color"],
@@ -237,11 +253,11 @@ function GamesOnBlock({
                       {showText(
                         item["left_color"],
                         item["right_retire"],
-                        item["right_name_kana"] !== null
+                        item["right_name_kana"]
                           ? "(" + item["right_name_kana"] + ")"
                           : "",
                         item["left_retire"],
-                        item["left_name_kana"] !== null
+                        item["left_name_kana"]
                           ? "(" + item["left_name_kana"] + ")"
                           : "",
                         item["id"],
