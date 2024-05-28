@@ -27,7 +27,7 @@ function CreateDantaiText(item, lineWidth) {
           <Rect
             x={is_left ? 130 : 625}
             y={item["left_begin_y"] + 2}
-            width={["left_group_name"].length * 110}
+            width={["left_group_name"].length * 80}
             height={1}
             fill="black"
             visible={"left_out" in item}
@@ -41,7 +41,7 @@ function CreateDantaiText(item, lineWidth) {
           <Rect
             x={is_left ? 130 : 625}
             y={item["right_begin_y"]}
-            width={["right_group_name"].length * 110}
+            width={["right_group_name"].length * 80}
             height={1}
             fill="black"
             visible={"right_out" in item}
@@ -61,7 +61,7 @@ function CreateDantaiText(item, lineWidth) {
           <Rect
             x={is_left ? 130 : 625}
             y={item["left_begin_y"] + 2}
-            width={["left_group_name"].length * 110}
+            width={["left_group_name"].length * 80}
             height={1}
             fill="black"
             visible={"left_out" in item}
@@ -81,7 +81,7 @@ function CreateDantaiText(item, lineWidth) {
           <Rect
             x={is_left ? 130 : 625}
             y={item["right_begin_y"] + 2}
-            width={["right_group_name"].length * 110}
+            width={["right_group_name"].length * 80}
             height={1}
             fill="black"
             visible={"right_out" in item}
@@ -99,7 +99,7 @@ function CreateDantaiText(item, lineWidth) {
     return (
       <>
         <Text
-          x={x - 200}
+          x={x - 80}
           y={item["left_begin_y"] - 10}
           text={item["left_group_name"]?.replace("'", "").replace("'", "")}
           fontSize={
@@ -416,15 +416,17 @@ function CreateBlock(item, lineWidth, editable, event_name, returnUrl) {
         lineWidth -
         (item["round"] - 2) * 30 -
         (220 + lineWidth + (item["round"] - 2) * 30);
-      const left_player_flag = item["left_player_flag"];
+      const left_flag = event_name.includes("dantai")
+        ? item["left_group_flag"]
+        : item["left_player_flag"];
       let left_winner;
       let right_winner;
       if (event_name.includes("hokei")) {
-        left_winner = left_player_flag !== null && left_player_flag >= 2;
-        right_winner = left_player_flag !== null && left_player_flag < 2;
+        left_winner = left_flag !== null && left_flag >= 2;
+        right_winner = left_flag !== null && left_flag < 2;
       } else if (event_name.includes("zissen")) {
-        left_winner = left_player_flag !== null && left_player_flag >= 1;
-        right_winner = left_player_flag !== null && left_player_flag < 1;
+        left_winner = left_flag !== null && left_flag >= 1;
+        right_winner = left_flag !== null && left_flag < 1;
       }
       return (
         <>
@@ -479,10 +481,10 @@ function CreateBlock(item, lineWidth, editable, event_name, returnUrl) {
             y={item["left_begin_y"] - 15}
             text={
               event_name.includes("hokei") &&
-              left_player_flag !== null &&
-              left_player_flag >= 0 &&
-              left_player_flag <= 3
-                ? left_player_flag
+              left_flag !== null &&
+              left_flag >= 0 &&
+              left_flag <= 3
+                ? left_flag
                 : ""
             }
             fill={"blue"}
@@ -493,10 +495,10 @@ function CreateBlock(item, lineWidth, editable, event_name, returnUrl) {
             y={item["left_begin_y"] - 15}
             text={
               event_name.includes("hokei") &&
-              left_player_flag !== null &&
-              left_player_flag >= 0 &&
-              left_player_flag <= 3
-                ? 3 - left_player_flag
+              left_flag !== null &&
+              left_flag >= 0 &&
+              left_flag <= 3
+                ? 3 - left_flag
                 : ""
             }
             fill={"blue"}
@@ -511,15 +513,17 @@ function CreateBlock(item, lineWidth, editable, event_name, returnUrl) {
         lineWidth -
         (item["fake_round"] - 2) * 30 -
         (220 + lineWidth + (item["fake_round"] - 2) * 30);
-      const left_player_flag = item["left_player_flag"];
+      const left_flag = event_name.includes("dantai")
+        ? item["left_group_flag"]
+        : item["left_player_flag"];
       let left_winner;
       let right_winner;
       if (event_name.includes("hokei")) {
-        left_winner = left_player_flag !== null && left_player_flag >= 2;
-        right_winner = left_player_flag !== null && left_player_flag < 2;
+        left_winner = left_flag !== null && left_flag >= 2;
+        right_winner = left_flag !== null && left_flag < 2;
       } else if (event_name.includes("zissen")) {
-        left_winner = left_player_flag !== null && left_player_flag >= 1;
-        right_winner = left_player_flag !== null && left_player_flag < 1;
+        left_winner = left_flag !== null && left_flag >= 1;
+        right_winner = left_flag !== null && left_flag < 1;
       }
       return (
         <>
@@ -574,10 +578,10 @@ function CreateBlock(item, lineWidth, editable, event_name, returnUrl) {
             y={item["left_begin_y"] - 15}
             text={
               event_name.includes("hokei") &&
-              left_player_flag !== null &&
-              left_player_flag >= 0 &&
-              left_player_flag <= 3
-                ? left_player_flag
+              left_flag !== null &&
+              left_flag >= 0 &&
+              left_flag <= 3
+                ? left_flag
                 : ""
             }
             fill={"blue"}
@@ -588,10 +592,10 @@ function CreateBlock(item, lineWidth, editable, event_name, returnUrl) {
             y={item["left_begin_y"] - 15}
             text={
               event_name.includes("hokei") &&
-              left_player_flag !== null &&
-              left_player_flag >= 0 &&
-              left_player_flag <= 3
-                ? 3 - left_player_flag
+              left_flag !== null &&
+              left_flag >= 0 &&
+              left_flag <= 3
+                ? 3 - left_flag
                 : ""
             }
             fill={"blue"}
@@ -604,18 +608,20 @@ function CreateBlock(item, lineWidth, editable, event_name, returnUrl) {
   if ("left_begin_y" in item && "right_begin_y" in item) {
     const has_left = "has_left" in item;
     const has_right = "has_right" in item;
-    const left_player_flag = item["left_player_flag"];
+    const left_flag = event_name.includes("dantai")
+      ? item["left_group_flag"]
+      : item["left_player_flag"];
     let left_winner;
     let right_winner;
-    if (left_player_flag === -2) {
+    if (left_flag === -2) {
       left_winner = false;
       right_winner = false;
     } else if (event_name.includes("hokei")) {
-      left_winner = left_player_flag !== null && left_player_flag >= 2;
-      right_winner = left_player_flag !== null && left_player_flag < 2;
+      left_winner = left_flag !== null && left_flag >= 2;
+      right_winner = left_flag !== null && left_flag < 2;
     } else if (event_name.includes("zissen")) {
-      left_winner = left_player_flag !== null && left_player_flag >= 1;
-      right_winner = left_player_flag !== null && left_player_flag < 1;
+      left_winner = left_flag !== null && left_flag >= 1;
+      right_winner = left_flag !== null && left_flag < 1;
     }
     let upper_focus = false;
     let lower_focus = false;
@@ -633,15 +639,15 @@ function CreateBlock(item, lineWidth, editable, event_name, returnUrl) {
         upper_focus = true;
       }
     }
-    if (left_player_flag !== null) {
-      if (left_player_flag === -2) {
+    if (left_flag !== null) {
+      if (left_flag === -2) {
         item["left_out"] = true;
         item["right_out"] = true;
-      } else if (left_player_flag === -1) {
+      } else if (left_flag === -1) {
         item["left_out"] = true;
-      } else if (event_name.includes("hokei") && left_player_flag === 4) {
+      } else if (event_name.includes("hokei") && left_flag === 4) {
         item["right_out"] = true;
-      } else if (event_name.includes("zissen") && left_player_flag === 2) {
+      } else if (event_name.includes("zissen") && left_flag === 2) {
         item["right_out"] = true;
       }
     }
@@ -704,10 +710,10 @@ function CreateBlock(item, lineWidth, editable, event_name, returnUrl) {
           y={is_left ? item["left_begin_y"] - 15 : item["left_begin_y"] + 4}
           text={
             event_name.includes("hokei") &&
-            left_player_flag !== null &&
-            left_player_flag >= 0 &&
-            left_player_flag <= 3
-              ? left_player_flag
+            left_flag !== null &&
+            left_flag >= 0 &&
+            left_flag <= 3
+              ? left_flag
               : ""
           }
           fill={"blue"}
@@ -722,10 +728,10 @@ function CreateBlock(item, lineWidth, editable, event_name, returnUrl) {
           y={is_left ? item["right_begin_y"] + 4 : item["right_begin_y"] - 15}
           text={
             event_name.includes("hokei") &&
-            left_player_flag !== null &&
-            left_player_flag >= 0 &&
-            left_player_flag <= 3
-              ? 3 - left_player_flag
+            left_flag !== null &&
+            left_flag >= 0 &&
+            left_flag <= 3
+              ? 3 - left_flag
               : ""
           }
           fill={"blue"}
@@ -810,15 +816,23 @@ function CreateBlock(item, lineWidth, editable, event_name, returnUrl) {
 }
 
 function ShowWinner(item) {
-  return (
-    <>
-      <div style={{ fontSize: "10px" }}>{item["name_kana"]}</div>
-      <b style={{ fontSize: "16px" }}>{item["name"]}</b>
-      <div style={{ fontSize: "12px" }}>
-        {item["group"].replace("'", "【").replace("'", "】")}
+  if (item["name"] !== undefined) {
+    return (
+      <>
+        <div style={{ fontSize: "10px" }}>{item["name_kana"]}</div>
+        <b style={{ fontSize: "16px" }}>{item["name"]}</b>
+        <div style={{ fontSize: "12px" }}>
+          {item["group"].replace("'", "【").replace("'", "】")}
+        </div>
+      </>
+    );
+  } else {
+    return (
+      <div style={{ fontSize: "16px" }}>
+        {item["group"].replace("'", "").replace("'", "")}
       </div>
-    </>
-  );
+    );
+  }
 }
 
 function GetResult({
@@ -932,9 +946,18 @@ function GetResult({
   let winner2 = null;
   let winner3 = null;
   let winner4 = null;
-  if (final_data !== undefined && final_data.left_player_flag !== null) {
+  let final_left_flag = null;
+  let before_final_left_flag = null;
+  if (event_name.includes("dantai")) {
+    final_left_flag = final_data?.left_group_flag;
+    before_final_left_flag = before_final_data?.left_group_flag;
+  } else {
+    final_left_flag = final_data?.left_player_flag;
+    before_final_left_flag = before_final_data?.left_player_flag;
+  }
+  if (final_data !== undefined && final_left_flag !== null) {
     if (event_name.includes("hokei")) {
-      if (final_data.left_player_flag >= 2) {
+      if (final_left_flag >= 2) {
         winner1 = {
           name: final_data.left_name,
           name_kana: final_data.left_name_kana,
@@ -958,7 +981,7 @@ function GetResult({
         };
       }
     } else if (event_name.includes("zissen")) {
-      if (final_data.left_player_flag >= 1) {
+      if (final_left_flag >= 1) {
         winner1 = {
           name: final_data.left_name,
           name_kana: final_data.left_name_kana,
@@ -983,12 +1006,9 @@ function GetResult({
       }
     }
   }
-  if (
-    before_final_data !== undefined &&
-    before_final_data.left_player_flag !== null
-  ) {
+  if (before_final_data !== undefined && before_final_left_flag !== null) {
     if (event_name.includes("hokei")) {
-      if (before_final_data.left_player_flag >= 2) {
+      if (before_final_left_flag >= 2) {
         winner3 = {
           name: before_final_data.left_name,
           name_kana: before_final_data.left_name_kana,
@@ -1012,7 +1032,7 @@ function GetResult({
         };
       }
     } else if (event_name.includes("zissen")) {
-      if (before_final_data.left_player_flag >= 1) {
+      if (before_final_left_flag >= 1) {
         winner3 = {
           name: before_final_data.left_name,
           name_kana: before_final_data.left_name_kana,
@@ -1101,16 +1121,16 @@ function GetResult({
                 </tr>
                 <tr style={{ height: "80px" }}>
                   <td>
-                    {winner1 ? (winner1.name ? ShowWinner(winner1) : "") : ""}
+                    {winner1 ? (winner1.group ? ShowWinner(winner1) : "") : ""}
                   </td>
                   <td>
-                    {winner2 ? (winner2.name ? ShowWinner(winner2) : "") : ""}
+                    {winner2 ? (winner2.group ? ShowWinner(winner2) : "") : ""}
                   </td>
                   <td>
-                    {winner3 ? (winner3.name ? ShowWinner(winner3) : "") : ""}
+                    {winner3 ? (winner3.group ? ShowWinner(winner3) : "") : ""}
                   </td>
                   <td>
-                    {winner4 ? (winner4.name ? ShowWinner(winner4) : "") : ""}
+                    {winner4 ? (winner4.group ? ShowWinner(winner4) : "") : ""}
                   </td>
                 </tr>
               </tbody>

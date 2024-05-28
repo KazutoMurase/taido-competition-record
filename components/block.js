@@ -7,6 +7,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import checkStyles from "../styles/checks.module.css";
+import { GetEventName } from "../lib/get_event_name";
 
 function ShowDetails(
   item,
@@ -17,7 +18,7 @@ function ShowDetails(
   ToUpdate,
   ToFinish,
 ) {
-  if (item["name"].includes("団体")) {
+  if (GetEventName(item["event_id"]) === "dantai") {
     return (
       <>
         &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;
