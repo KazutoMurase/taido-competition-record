@@ -8,6 +8,7 @@ import FlagCircleRoundedIcon from "@mui/icons-material/FlagCircleRounded";
 import SquareTwoToneIcon from "@mui/icons-material/SquareTwoTone";
 import checkStyles from "../styles/checks.module.css";
 import { useRouter } from "next/router";
+import { GetEventName } from "../lib/get_event_name";
 
 function onSubmit(
   block_number,
@@ -77,13 +78,56 @@ function CheckDantai({
     router.push("block?block_number=" + block_number);
   }
 
-  function onFinish(block_number, schedule_id, is_test) {
+  const [leftRetireStates, setLeftRetireStates] = useState([]);
+  const [rightRetireStates, setRightRetireStates] = useState([]);
+
+  const handleLeftRetireStatesChange = (id, is_retired) => {
+    setLeftRetireStates((prevRadios) => {
+      const radioExists = prevRadios.some((radio) => radio.id === id);
+      if (!radioExists) {
+        return [...prevRadios, { id: id, is_retired: is_retired }];
+      }
+      return prevRadios.map((radio) =>
+        radio.id === id ? { ...radio, is_retired: is_retired } : radio,
+      );
+    });
+  };
+  const handleRightRetireStatesChange = (id, is_retired) => {
+    setRightRetireStates((prevRadios) => {
+      const radioExists = prevRadios.some((radio) => radio.id === id);
+      if (!radioExists) {
+        return [...prevRadios, { id: id, is_retired: is_retired }];
+      }
+      return prevRadios.map((radio) =>
+        radio.id === id ? { ...radio, is_retired: is_retired } : radio,
+      );
+    });
+  };
+
+  function onFinish(block_number, schedule_id, data, is_test) {
+    const num_players = data.length;
+    let num_checked = 0;
+    for (let i = 0; i < num_players; i++) {
+      const item = data[i];
+      if (CheckState(item, true)) {
+        num_checked += 1;
+      }
+      if (CheckState(item, false)) {
+        num_checked += 1;
+      }
+    }
     let post = {
       schedule_id: schedule_id,
       block_number: block_number,
-      all_checked: true,
-      is_test: is_test,
     };
+    if (GetEventName(event_id) !== "dantai") {
+      post["left_retire_array"] = leftRetireStates;
+      post["right_retire_array"] = rightRetireStates;
+      post["all_checked"] = num_checked === num_players;
+      post["is_test"] = is_test;
+    } else {
+      post["all_checked"] = true;
+    }
     console.log(post);
     axios
       .post("/api/complete_players_check", post)
@@ -134,6 +178,23 @@ function CheckDantai({
     backgroundColor: "purple",
   };
 
+  function CheckState(item, is_retired) {
+    if (item.is_left) {
+      for (let i = 0; i < leftRetireStates.length; i++) {
+        if (leftRetireStates[i]["id"] === item.game_id) {
+          return leftRetireStates[i]["is_retired"] == is_retired;
+        }
+      }
+    } else {
+      for (let i = 0; i < rightRetireStates.length; i++) {
+        if (rightRetireStates[i]["id"] === item.game_id) {
+          return rightRetireStates[i]["is_retired"] == is_retired;
+        }
+      }
+    }
+    let target_int = is_retired ? 1 : 0;
+    return item.retire !== null && item.retire === target_int;
+  }
   return (
     <div>
       <Container maxWidth="md">
@@ -178,6 +239,16 @@ function CheckDantai({
                       type="radio"
                       name={index}
                       className={checkStyles.large_checkbox}
+                      checked={
+                        GetEventName(event_id) === "dantai"
+                          ? null
+                          : CheckState(item, false)
+                      }
+                      onChange={() =>
+                        item.is_left
+                          ? handleLeftRetireStatesChange(item.game_id, false)
+                          : handleRightRetireStatesChange(item.game_id, false)
+                      }
                     />
                   </td>
                   <td className={checkStyles.elem}>
@@ -185,6 +256,16 @@ function CheckDantai({
                       type="radio"
                       name={index}
                       className={checkStyles.large_checkbox}
+                      checked={
+                        GetEventName(event_id) === "dantai"
+                          ? null
+                          : CheckState(item, true)
+                      }
+                      onChange={() =>
+                        item.is_left
+                          ? handleLeftRetireStatesChange(item.game_id, true)
+                          : handleRightRetireStatesChange(item.game_id, true)
+                      }
                     />
                   </td>
                   <td>
@@ -240,7 +321,9 @@ function CheckDantai({
             <Button
               variant="contained"
               type="submit"
-              onClick={(e) => onFinish(block_number, schedule_id)}
+              onClick={(e) =>
+                onFinish(block_number, schedule_id, data, is_test)
+              }
             >
               決定
             </Button>
