@@ -1,5 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
-
+import Button from "@mui/material/Button";
+import checkStyles from "../styles/checks.module.css";
+import Container from "@mui/material/Container";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 
 import { StaticGameData } from "../pages/api/get_static_games_on_block";
@@ -32,6 +36,10 @@ const test_event_id_vs_event_name: Map<number, string> = new Map([
   [5, "壮年法形"],
   [6, "女子団体実戦"],
   [7, "男子団体実戦"],
+  [8, "男子団体法形"],
+  [9, "女子団体法形"],
+  [10, "男子団体展開"],
+  [11, "女子団体展開"],
 ]);
 
 const ProgressOnBlock: React.FC<{
@@ -80,16 +88,12 @@ const ProgressOnBlock: React.FC<{
       tables.push(
         <tr
           key={schedule.id}
-          style={{ backgroundColor: isCurrentEvent ? "#FFEDB3" : "#FFFFFF" }}
+          className={checkStyles.column}
+          style={{ backgroundColor: isCurrentEvent ? "yellow" : "white" }}
         >
           <td>{schedule.time_schedule.replace(/['"]+/g, "")}</td>
           <td>{test_event_id_vs_event_name.get(schedule.event_id)}</td>
-          <td>
-            {games
-              .filter((game) => game.schedule_id === schedule.id)
-              .map((game) => game.game_id)
-              .join(",")}
-          </td>
+          <td>{schedule.games_text}</td>
           <td>
             {isCurrentEvent
               ? games.find(
@@ -114,18 +118,29 @@ const ProgressOnBlock: React.FC<{
         alignContent: "center",
       }}
     >
-      <Typography variant="h4">{block_number + "コート"}</Typography>
-      <table align="center">
-        <thead>
-          <tr>
-            <td>時間</td>
-            <td>競技</td>
-            <td>試合一覧</td>
-            <td>次の試合</td>
-          </tr>
-        </thead>
-        <tbody>{scheduleTables}</tbody>
-      </table>
+      <Container maxWidth="md">
+        <Box style={{ minWidth: "840px" }}>
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            style={{ height: "80px" }}
+          >
+            <h1>{block_number.toUpperCase() + "コート"}</h1>
+          </Grid>
+          <table align="center" border="1">
+            <thead>
+              <tr className={checkStyles.column}>
+                <th>時間</th>
+                <th>競技</th>
+                <th>試合一覧</th>
+                <th>次の試合</th>
+              </tr>
+            </thead>
+            <tbody>{scheduleTables}</tbody>
+          </table>
+        </Box>
+      </Container>
     </div>
   );
 };
