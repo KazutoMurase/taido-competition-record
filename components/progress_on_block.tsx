@@ -91,7 +91,7 @@ const ProgressOnBlock: React.FC<{
           className={checkStyles.column}
           style={{ backgroundColor: isCurrentEvent ? "yellow" : "white" }}
         >
-          <td>{schedule.time_schedule.replace(/['"]+/g, "")}</td>
+          <td>{schedule.time_schedule?.replace(/['"]+/g, "")}</td>
           <td>{test_event_id_vs_event_name.get(schedule.event_id)}</td>
           <td>{schedule.games_text}</td>
           <td>

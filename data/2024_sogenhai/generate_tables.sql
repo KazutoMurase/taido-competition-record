@@ -243,6 +243,7 @@ create table block_a
  before_final integer not null,
  final integer not null,
  players_checked integer not null,
+ next_unused_num integer not null,
  foreign key (event_id) references event_type(id),
 primary key(id));
 
@@ -266,6 +267,7 @@ create table block_b
  before_final integer not null,
  final integer not null,
  players_checked integer not null,
+ next_unused_num integer not null,
  foreign key (event_id) references event_type(id),
 primary key(id));
 
@@ -289,6 +291,7 @@ create table block_c
  before_final integer not null,
  final integer not null,
  players_checked integer not null,
+ next_unused_num integer not null,
  foreign key (event_id) references event_type(id),
 primary key(id));
 
@@ -312,6 +315,7 @@ create table block_d
  before_final integer not null,
  final integer not null,
  players_checked integer not null,
+ next_unused_num integer not null,
  foreign key (event_id) references event_type(id),
 primary key(id));
 

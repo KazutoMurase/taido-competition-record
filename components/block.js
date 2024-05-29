@@ -69,6 +69,9 @@ function ShowDetails(
 }
 
 function ShowGamesText(item) {
+  if (!item["games_text"]) {
+    return "";
+  }
   let prefix = "";
   if (item["before_final"]) {
     prefix += "三決";
@@ -79,7 +82,10 @@ function ShowGamesText(item) {
   if (prefix !== "") {
     prefix = "【" + prefix + "】";
   }
-  if (item["name"].includes("団体展開") || item["name"].includes("団体法形")) {
+  if (
+    item["name"]?.includes("団体展開") ||
+    item["name"]?.includes("団体法形")
+  ) {
     return prefix + "";
   }
   return prefix + item["games_text"];
@@ -214,10 +220,8 @@ function Block({ block_number, update_interval, return_url }) {
                   className={checkStyles.column}
                   bgcolor={item["id"] === current.id ? "yellow" : "white"}
                 >
-                  <td>{item["name"].replace("'", "").replace("'", "")}</td>
-                  <td>
-                    {item["time_schedule"].replace("'", "").replace("'", "")}
-                  </td>
+                  <td>{item["name"]?.replace(/['"]+/g, "")}</td>
+                  <td>{item["time_schedule"]?.replace(/['"]+/g, "")}</td>
                   <td>{ShowGamesText(item)}</td>
                   <td>
                     {"game_count" in item ? item["game_count"] + "試合" : ""}

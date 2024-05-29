@@ -5,7 +5,7 @@ async function GetFromDB(req, res) {
   const client = await GetClient();
   const block_name = "block_" + req.query.block_number;
   let query =
-    "select t0.id, t0.event_id, t1.name, t0.time_schedule, t0.before_final, t0.final, t0.players_checked from " +
+    "select t0.id, t0.event_id, t1.name, t0.time_schedule, t0.before_final, t0.final, t0.players_checked, t0.next_unused_num from " +
     block_name +
     " as t0 left join EVENT_TYPE as t1 on t0.event_id = t1.id";
   const result = await client.query(query);
@@ -50,6 +50,13 @@ async function GetFromDB(req, res) {
       }
     }
     sorted_data[i]["games_text"] = words.join("");
+  }
+  // insert empty rows
+  for (let i = sorted_data.length - 1; i >= 0; i--) {
+    if (sorted_data[i].next_unused_num > 0) {
+      const items = Array(sorted_data[i].next_unused_num).fill({});
+      sorted_data.splice(i + 1, 0, ...items);
+    }
   }
   return sorted_data;
 }
