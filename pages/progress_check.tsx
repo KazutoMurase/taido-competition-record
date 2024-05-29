@@ -5,7 +5,7 @@ import ProgressOnBlock from "../components/progress_on_block";
 
 const ProgressCheck: React.FC = () => {
   return (
-    <>
+    <div style={{ width: "1900px" }}>
       <Grid container>
         <Grid item xs={3}>
           <ProgressOnBlock
@@ -36,7 +36,7 @@ const ProgressCheck: React.FC = () => {
           />
         </Grid>
       </Grid>
-    </>
+    </div>
   );
 };
 
