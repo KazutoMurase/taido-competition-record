@@ -69,8 +69,10 @@ function ShowWhiteFlags(event_name, selectedRadioButton) {
   }
 }
 
-function ShowLeftName(data) {
-  const flag = parseInt(data.left_player_flag);
+function ShowLeftName(data, is_dantai) {
+  const flag = parseInt(
+    is_dantai ? data.left_group_flag : data.left_player_flag,
+  );
   if (flag === -1 || flag === -2) {
     return <s>{data.left_name}</s>;
   } else {
@@ -78,8 +80,10 @@ function ShowLeftName(data) {
   }
 }
 
-function ShowRightName(data) {
-  const flag = parseInt(data.left_player_flag);
+function ShowRightName(data, is_dantai) {
+  const flag = parseInt(
+    is_dantai ? data.left_group_flag : data.left_player_flag,
+  );
   if (flag === 4 || flag === -2) {
     return <s>{data.right_name}</s>;
   } else {
@@ -104,21 +108,21 @@ function UpdateResult({ event_name, id, return_url }) {
           "/api/get_game?event_name=" + event_name + "&id=" + id,
         );
         const result = await response.json();
-        if (
-          result.left_player_flag !== null &&
-          result.left_player_flag !== undefined
-        ) {
+        const left_flag = event_name.includes("dantai")
+          ? result.left_group_flag
+          : result.left_player_flag;
+        if (left_flag !== undefined && left_flag !== null) {
           if (result.left_color === "red") {
             if (event_name.includes("hokei")) {
-              setSelectedRadioButton(result.left_player_flag);
+              setSelectedRadioButton(left_flag);
             } else if (event_name.includes("zissen")) {
-              setSelectedRadioButton(1 - result.left_player_flag);
+              setSelectedRadioButton(1 - left_flag);
             }
           } else {
             if (event_name.includes("hokei")) {
-              setSelectedRadioButton(3 - result.left_player_flag);
+              setSelectedRadioButton(3 - left_flag);
             } else if (event_name.includes("zissen")) {
-              setSelectedRadioButton(result.left_player_flag);
+              setSelectedRadioButton(left_flag);
             }
           }
         }
@@ -131,39 +135,50 @@ function UpdateResult({ event_name, id, return_url }) {
   const onBack = () => {
     router.push("/" + return_url);
   };
-  const onSubmit = (data, player_flag, event_name) => {
-    let left_player_flag;
-    if (player_flag === -2) {
-      left_player_flag = -2;
+  const onSubmit = (data, flag, event_name) => {
+    let left_flag;
+    if (flag === -2) {
+      left_flag = -2;
     } else if (event_name.includes("hokei")) {
-      left_player_flag =
-        data.left_color === "white" ? 3 - player_flag : player_flag;
+      left_flag = data.left_color === "white" ? 3 - flag : flag;
     } else if (event_name.includes("zissen")) {
-      left_player_flag =
-        data.left_color === "white" ? player_flag : 1 - player_flag;
+      left_flag = data.left_color === "white" ? flag : 1 - flag;
     }
     let post = {
       id: data.id,
       event_name: event_name,
-      left_player_flag: left_player_flag,
     };
-    if (player_flag === -2) {
-      post["next_player_id"] = null;
+    if (event_name.includes("dantai")) {
+      post["left_group_flag"] = left_flag;
+    } else {
+      post["left_player_flag"] = left_flag;
+    }
+    const left_id = event_name.includes("dantai")
+      ? data.left_group_id
+      : data.left_player_id;
+    const right_id = event_name.includes("dantai")
+      ? data.right_group_id
+      : data.right_player_id;
+    const next_id_name = event_name.includes("dantai")
+      ? "next_group_id"
+      : "next_player_id";
+    if (left_flag === -2) {
+      post[next_id_name] = null;
     } else if (event_name.includes("hokei")) {
-      if (parseInt(left_player_flag) > 1) {
-        post["next_player_id"] = data.left_player_id;
-        post["loser_id"] = data.right_player_id;
+      if (parseInt(left_flag) > 1) {
+        post[next_id_name] = left_id;
+        post["loser_id"] = right_id;
       } else {
-        post["next_player_id"] = data.right_player_id;
-        post["loser_id"] = data.left_player_id;
+        post[next_id_name] = right_id;
+        post["loser_id"] = left_id;
       }
     } else if (event_name.includes("zissen")) {
-      if (parseInt(left_player_flag) > 0) {
-        post["next_player_id"] = data.left_player_id;
-        post["loser_id"] = data.right_player_id;
+      if (parseInt(left_flag) > 0) {
+        post[next_id_name] = left_id;
+        post["loser_id"] = right_id;
       } else {
-        post["next_player_id"] = data.right_player_id;
-        post["loser_id"] = data.left_player_id;
+        post[next_id_name] = right_id;
+        post["loser_id"] = left_id;
       }
     }
     if (data.next_left_id !== null) {
@@ -233,8 +248,8 @@ function UpdateResult({ event_name, id, return_url }) {
               </Button>
               <h1>
                 {data.left_color === "white"
-                  ? ShowRightName(data)
-                  : ShowLeftName(data)}
+                  ? ShowRightName(data, event_name.includes("dantai"))
+                  : ShowLeftName(data, event_name.includes("dantai"))}
               </h1>
               {ShowRedFlags(event_name, selectedRadioButton)}
             </Grid>
@@ -250,8 +265,8 @@ function UpdateResult({ event_name, id, return_url }) {
               </Button>
               <h1>
                 {data.left_color === "white"
-                  ? ShowLeftName(data)
-                  : ShowRightName(data)}
+                  ? ShowLeftName(data, event_name.includes("dantai"))
+                  : ShowRightName(data, event_name.includes("dantai"))}
               </h1>
               {ShowWhiteFlags(event_name, selectedRadioButton)}
             </Grid>
