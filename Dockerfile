@@ -47,6 +47,7 @@ RUN /etc/init.d/postgresql start && \
         psql -c "create user test_user with password 'test_pass' login superuser createdb"
 RUN echo "host all all 0.0.0.0/0 md5" >> /etc/postgresql/16/main/pg_hba.conf
 RUN echo "listen_addresses='*'" >> /etc/postgresql/16/main/postgresql.conf
+RUN /etc/init.d/postgresql restart
 USER root
 
 EXPOSE 5432
