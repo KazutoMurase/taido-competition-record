@@ -20,10 +20,6 @@ RUN apt-get update && apt-get install -y \
     vim \
     wget
 
-# Setup user
-RUN useradd test_user
-RUN echo 'test_user:test_pass' | chpasswd
-
 # Setup postrgresql
 ENV TZ=Asia/Tokyo
 ENV LANG=ja_JP.UTF-8
@@ -43,11 +39,9 @@ RUN /etc/init.d/postgresql start && \
         psql -c "create database docker owner docker;" && \
         psql -d docker -c "create schema authorization docker;" && \
         psql -c "create role readonly with login password 'readonly';" && \
-        psql -c "grant pg_read_all_data to readonly;" && \
-        psql -c "create user test_user with password 'test_pass' login superuser createdb"
+        psql -c "grant pg_read_all_data to readonly;"
 RUN echo "host all all 0.0.0.0/0 md5" >> /etc/postgresql/16/main/pg_hba.conf
 RUN echo "listen_addresses='*'" >> /etc/postgresql/16/main/postgresql.conf
-RUN sed -i "s/local.*all.*all.*peer/local all all md5/g" /etc/postgresql/16/main/pg_hba.conf
 USER root
 
 EXPOSE 5432
