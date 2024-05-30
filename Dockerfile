@@ -46,7 +46,6 @@ RUN /etc/init.d/postgresql start && \
         psql -c "grant pg_read_all_data to readonly;" && \
         psql -c "create user test_user with password 'test_pass' login superuser createdb"
 RUN echo "host all all 0.0.0.0/0 md5" >> /etc/postgresql/16/main/pg_hba.conf
-RUN sed -i "s/peer/md5/g" /etc/postgresql/16/main/pg_hba.conf
 RUN echo "listen_addresses='*'" >> /etc/postgresql/16/main/postgresql.conf
 USER root
 
