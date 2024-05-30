@@ -53,3 +53,17 @@ EXPOSE 5432
 
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
 RUN source /root/.nvm/nvm.sh && nvm install v20.13.1
+
+COPY . /ws
+
+EXPOSE 3000
+
+ENV PORT 3000
+
+ENV HOSTNAME "0.0.0.0"
+
+ENV PATH /root/.nvm/versions/node/v20.13.1/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+ENV COMPETITION_NAME "2023"
+
+CMD ["bash", "-c" , "/ws/tools/setup.bash ${COMPETITION_NAME}"]
