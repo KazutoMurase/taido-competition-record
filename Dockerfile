@@ -20,10 +20,6 @@ RUN apt-get update && apt-get install -y \
     vim \
     wget
 
-# Setup user
-RUN useradd test_user
-RUN echo 'test_user:test_pass' | chpasswd
-
 # Setup postrgresql
 ENV TZ=Asia/Tokyo
 ENV LANG=ja_JP.UTF-8
@@ -43,8 +39,7 @@ RUN /etc/init.d/postgresql start && \
         psql -c "create database docker owner docker;" && \
         psql -d docker -c "create schema authorization docker;" && \
         psql -c "create role readonly with login password 'readonly';" && \
-        psql -c "grant pg_read_all_data to readonly;" && \
-        psql -c "create user test_user with password 'test_pass' login superuser createdb"
+        psql -c "grant pg_read_all_data to readonly;"
 RUN echo "host all all 0.0.0.0/0 md5" >> /etc/postgresql/16/main/pg_hba.conf
 RUN echo "listen_addresses='*'" >> /etc/postgresql/16/main/postgresql.conf
 USER root
@@ -53,3 +48,17 @@ EXPOSE 5432
 
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
 RUN source /root/.nvm/nvm.sh && nvm install v20.13.1
+
+COPY . /ws
+
+EXPOSE 3000
+
+ENV PORT 3000
+
+ENV HOSTNAME "0.0.0.0"
+
+ENV PATH /root/.nvm/versions/node/v20.13.1/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+ENV COMPETITION_NAME "2023"
+
+CMD ["bash", "-c" , "/ws/tools/setup.bash ${COMPETITION_NAME}"]
