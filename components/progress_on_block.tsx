@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { Link } from "next/link";
 import Button from "@mui/material/Button";
 import checkStyles from "../styles/checks.module.css";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
-
+import { GetEventName } from "../lib/get_event_name";
 import { StaticGameData } from "../pages/api/get_static_games_on_block";
 
 interface CurrentScheduleData {
@@ -47,7 +48,7 @@ const ProgressOnBlock: React.FC<{
   block_number: string;
   update_interval: number;
   return_url: string;
-}> = ({ block_number }) => {
+}> = ({ block_number, update_interval }) => {
   const [currentScheduleData, setCurrentScheduleData] =
     useState<CurrentScheduleData>();
   const [timeSchedules, setTimeSchedules] = useState<TimeScheduleData[]>([]);
@@ -55,11 +56,6 @@ const ProgressOnBlock: React.FC<{
   const [scheduleTables, setScheduleTables] = useState<JSX.Element[]>([]);
 
   const fetchData = useCallback(async () => {
-    fetch("/api/current_schedule?block_number=" + block_number)
-      .then((response) => response.json())
-      .then((data) => {
-        setCurrentScheduleData(data);
-      });
     fetch("/api/get_time_schedule?block_number=" + block_number)
       .then((response) => response.json())
       .then((data) => {
@@ -70,9 +66,29 @@ const ProgressOnBlock: React.FC<{
       .then((data) => setGames(data));
   }, [block_number]);
 
+  const fetchCurentSchedule = useCallback(async () => {
+    fetch("/api/current_schedule?block_number=" + block_number)
+      .then((response) => response.json())
+      .then((data) => {
+        setCurrentScheduleData(data);
+      });
+  }, [block_number]);
+
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  useEffect(() => {
+    fetchCurentSchedule();
+    if (update_interval > 0) {
+      const interval = setInterval(() => {
+        fetchCurentSchedule();
+      }, update_interval);
+      return () => {
+        clearInterval(interval);
+      };
+    }
+  }, [fetchCurentSchedule, update_interval]);
 
   useEffect(() => {
     if (
@@ -93,7 +109,11 @@ const ProgressOnBlock: React.FC<{
           style={{ backgroundColor: isCurrentEvent ? "yellow" : "white" }}
         >
           <td>{schedule.time_schedule?.replace(/['"]+/g, "")}</td>
-          <td>{test_event_id_vs_event_name.get(schedule.event_id)}</td>
+          <td>
+            <a href={"results/" + GetEventName(schedule.event_id)}>
+              {test_event_id_vs_event_name.get(schedule.event_id)}
+            </a>
+          </td>
           <td>{schedule.games_text}</td>
           <td>
             {isCurrentEvent
@@ -108,7 +128,7 @@ const ProgressOnBlock: React.FC<{
       );
     });
     setScheduleTables(tables);
-  }, [block_number, fetchData, currentScheduleData, timeSchedules, games]);
+  }, [block_number, currentScheduleData, timeSchedules, games]);
 
   return (
     <div

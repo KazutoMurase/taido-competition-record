@@ -10,28 +10,28 @@ const ProgressCheck: React.FC = () => {
         <Grid item xs={3}>
           <ProgressOnBlock
             block_number="a"
-            update_interval={1000}
+            update_interval={10000}
             return_url="/"
           />
         </Grid>
         <Grid item xs={3}>
           <ProgressOnBlock
             block_number="b"
-            update_interval={1000}
+            update_interval={10000}
             return_url="/"
           />
         </Grid>
         <Grid item xs={3}>
           <ProgressOnBlock
             block_number="c"
-            update_interval={1000}
+            update_interval={10000}
             return_url="/"
           />
         </Grid>
         <Grid item xs={3}>
           <ProgressOnBlock
             block_number="d"
-            update_interval={1000}
+            update_interval={10000}
             return_url="/"
           />
         </Grid>

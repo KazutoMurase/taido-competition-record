@@ -1,13 +1,12 @@
-import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import React from "react";
 import Container from "@mui/material/Container";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
-import checkStyles from "../styles/checks.module.css";
 import GetEvents from "../components/get_events";
 
 export default function Home() {
+  const router = useRouter();
   return (
     <div>
       <br />
@@ -19,10 +18,41 @@ export default function Home() {
           style={{ height: "100px" }}
         >
           <h1>
-            <u>躰道 第56回全日本大会 個人競技速報</u>
+            <u>躰道 第56回全日本大会</u>
           </h1>
         </Grid>
-        <GetEvents />
+        <Grid
+          container
+          justifyContent="center"
+          alignItems="center"
+          style={{ height: "60px" }}
+        >
+          <Button
+            variant="contained"
+            type="submit"
+            onClick={(e) => {
+              router.push("/progress_check");
+            }}
+          >
+            時程表
+          </Button>
+        </Grid>
+        <Grid
+          container
+          justifyContent="center"
+          alignItems="center"
+          style={{ height: "60px" }}
+        >
+          <Button
+            variant="contained"
+            type="submit"
+            onClick={(e) => {
+              router.push("/results");
+            }}
+          >
+            競技結果一覧
+          </Button>
+        </Grid>
       </Container>
     </div>
   );
