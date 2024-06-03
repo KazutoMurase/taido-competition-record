@@ -61,4 +61,8 @@ ENV PATH /root/.nvm/versions/node/v20.13.1/bin:/usr/local/sbin:/usr/local/bin:/u
 
 ENV COMPETITION_NAME "2023"
 
+WORKDIR /ws
+
+RUN npm install && npm run build
+
 CMD ["bash", "-c" , "/ws/tools/setup.bash ${COMPETITION_NAME}"]

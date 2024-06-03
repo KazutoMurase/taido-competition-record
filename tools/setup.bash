@@ -14,5 +14,5 @@ if [ -z "${PRODUCTION}" ]; then
     fi
     cd /ws && npm install && npm run dev
 else
-    cd /ws && npm install && npm run build && npm run start
+    cd /ws && npm run start
 fi
