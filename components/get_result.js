@@ -837,7 +837,7 @@ function ShowWinner(item) {
 
 function GetResult({
   editable = false,
-  updateInterval = 0,
+  updateInterval = 10000,
   returnUrl = null,
   event_name = null,
   block_number = null,
