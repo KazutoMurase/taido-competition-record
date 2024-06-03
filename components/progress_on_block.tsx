@@ -21,6 +21,7 @@ interface TimeScheduleData {
   event_id: number;
   name: string;
   time_schedule: string;
+  games_text: string;
   before_final: number;
   final: number;
   players_checked: number;
@@ -128,7 +129,7 @@ const ProgressOnBlock: React.FC<{
           >
             <h1>{block_number.toUpperCase() + "コート"}</h1>
           </Grid>
-          <table align="center" border="1">
+          <table align="center" border={1}>
             <thead>
               <tr className={checkStyles.column}>
                 <th>時間</th>
