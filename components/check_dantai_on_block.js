@@ -224,6 +224,7 @@ function CheckDantai({
           <table border="1">
             <tbody>
               <tr className={checkStyles.column}>
+                {GetEventName(event_id) === "dantai" ? <></> : <th>色</th>}
                 <th>団体名</th>
                 <th>点呼完了</th>
                 <th>棄権</th>
@@ -233,6 +234,16 @@ function CheckDantai({
               </tr>
               {data.map((item, index) => (
                 <tr key={item["id"]} className={checkStyles.column}>
+                  {GetEventName(event_id) === "dantai" ? (
+                    <></>
+                  ) : (
+                    <td>
+                      <SquareTwoToneIcon
+                        sx={{ fontSize: 60 }}
+                        htmlColor={item["color"] === "red" ? "red" : "gray"}
+                      />
+                    </td>
+                  )}
                   <td>{item["name"].replace("'", "").replace("'", "")}</td>
                   <td className={checkStyles.elem}>
                     <input
