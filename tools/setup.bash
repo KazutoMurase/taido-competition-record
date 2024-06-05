@@ -12,7 +12,7 @@ if [ -z "${PRODUCTION}" ]; then
         cd /ws/data/$competition_name && sudo -u postgres psql -d taido_record < generate_tables.sql
         cd /ws/data/test && sudo -u postgres psql -d taido_record < generate_tables.sql
     fi
-    cd /ws && npm install && npm run dev
+    cd /ws && npm install && npm run build && npm run dev
 else
     cd /ws && npm run start
 fi

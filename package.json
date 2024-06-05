@@ -6,6 +6,7 @@
     "dev": "next dev",
     "format": "prettier --write --ignore-path .gitignore './**/*.{js,jsx,ts,tsx,css}'",
     "lint": "next lint --max-warnings 0",
+    "ts": "tsc --noEmit --incremental",
     "start": "next start"
   },
   "dependencies": {

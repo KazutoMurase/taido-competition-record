@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
+import { Link } from "next/link";
 import Button from "@mui/material/Button";
 import checkStyles from "../styles/checks.module.css";
 import Container from "@mui/material/Container";
