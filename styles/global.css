@@ -26,6 +26,10 @@ a:hover {
   text-decoration: underline;
 }
 
+.color-disabled {
+  color: #000000;
+}
+
 * {
   box-sizing: border-box;
 }
