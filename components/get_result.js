@@ -848,7 +848,7 @@ function GetResult({
     returnUrl = event_name + "_result";
   }
   const onBack = () => {
-    router.push("block?block_number=" + block_number);
+    router.back();
   };
 
   const [data, setData] = useState([]);
@@ -1142,17 +1142,9 @@ function GetResult({
             alignItems="center"
             style={{ height: "80px" }}
           >
-            {block_number !== null ? (
-              <Button
-                variant="contained"
-                type="submit"
-                onClick={(e) => onBack()}
-              >
-                戻る
-              </Button>
-            ) : (
-              <></>
-            )}
+            <Button variant="contained" type="submit" onClick={(e) => onBack()}>
+              戻る
+            </Button>
           </Grid>
         </Box>
       </Container>

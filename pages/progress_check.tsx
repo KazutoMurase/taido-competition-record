@@ -1,9 +1,15 @@
 import React from "react";
+import { useRouter } from "next/router";
+import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 
 import ProgressOnBlock from "../components/progress_on_block";
 
 const ProgressCheck: React.FC = () => {
+  const router = useRouter();
+  const onBack = () => {
+    router.back();
+  };
   return (
     <div style={{ width: "1900px" }}>
       <Grid container>
@@ -35,6 +41,16 @@ const ProgressCheck: React.FC = () => {
             return_url="/"
           />
         </Grid>
+      </Grid>
+      <Grid
+        container
+        justifyContent="center"
+        alignItems="center"
+        style={{ height: "100px" }}
+      >
+        <Button variant="contained" type="submit" onClick={(e) => onBack()}>
+          戻る
+        </Button>
       </Grid>
     </div>
   );

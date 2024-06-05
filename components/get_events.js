@@ -20,7 +20,6 @@ function GetEvents() {
   useEffect(() => {
     fetchData();
   }, []);
-
   const events = data.map((item, index) => {
     const event_name = GetEventName(item["id"]);
     if (event_name === "dantai" || !item["existence"]) {
