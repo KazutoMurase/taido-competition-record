@@ -191,6 +191,22 @@ function CheckPlayers({
               <u>コート{block_number.toUpperCase()}</u>
             </h2>
           </Grid>
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            style={{ height: "80px" }}
+          >
+            <Button
+              variant="contained"
+              type="submit"
+              onClick={(e) =>
+                onSubmit(null, block_number, event_id, is_test, forceFetchData)
+              }
+            >
+              全体呼び出し
+            </Button>
+          </Grid>
           <table border="1">
             <tbody>
               <tr className={checkStyles.column}>

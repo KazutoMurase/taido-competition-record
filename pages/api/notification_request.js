@@ -18,7 +18,12 @@ async function GetFromDB(req, res, notification_request_name) {
     notification_request_name +
     " AS t1 LEFT JOIN event_type AS t3 ON t1.event_id = t3.id LEFT JOIN court_type AS t4 ON t1.court_id = t4.id WHERE t1.group_id is not null";
   const result_group = await client.query(query);
-  return [...result.rows, ...result_group.rows];
+  query =
+    "SELECT t1.event_id, t1.group_id, t3.name AS event_name, t4.name AS court_name, t1.court_id FROM " +
+    notification_request_name +
+    " AS t1 LEFT JOIN event_type AS t3 ON t1.event_id = t3.id LEFT JOIN court_type AS t4 ON t1.court_id = t4.id WHERE t1.player_id is null and t1.group_id is null";
+  const result_all = await client.query(query);
+  return [...result.rows, ...result_group.rows, ...result_all.rows];
 }
 
 const NotificationRequest = async (req, res) => {
