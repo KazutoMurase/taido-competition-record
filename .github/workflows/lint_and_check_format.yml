@@ -30,3 +30,4 @@ jobs:
         run: |
           npm run lint
           npm run check-format
+          npm run ts
