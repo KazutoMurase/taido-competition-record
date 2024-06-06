@@ -23,7 +23,8 @@ primary key(id));
 create table current_block_x
 (id integer not null,
  game_id integer not null,
- foreign key (id) references block_x(id));
+ foreign key (id) references block_x(id),
+ primary key(id));
 
 create table block_y
 (id integer not null,
@@ -47,7 +48,8 @@ primary key(id));
 create table current_block_y
 (id integer not null,
  game_id integer not null,
- foreign key (id) references block_y(id));
+ foreign key (id) references block_y(id),
+ primary key(id));
 
 \COPY block_x from 'block_x.csv' csv header;
 \COPY block_x_games from 'block_x_games.csv' csv header;

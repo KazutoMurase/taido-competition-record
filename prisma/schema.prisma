@@ -1,0 +1,534 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model block_a {
+  id              Int              @id
+  event_id        Int
+  time_schedule   String
+  before_final    Int
+  final           Int
+  players_checked Int
+  next_unused_num Int
+  event_type      event_type       @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  block_a_games   block_a_games[]
+  current_block_a current_block_a?
+}
+
+model block_a_games {
+  id          Int     @id
+  schedule_id Int
+  order_id    Int
+  game_id     Int
+  block_a     block_a @relation(fields: [schedule_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model block_b {
+  id              Int              @id
+  event_id        Int
+  time_schedule   String
+  before_final    Int
+  final           Int
+  players_checked Int
+  next_unused_num Int
+  event_type      event_type       @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  block_b_games   block_b_games[]
+  current_block_b current_block_b?
+}
+
+model block_b_games {
+  id          Int     @id
+  schedule_id Int
+  order_id    Int
+  game_id     Int
+  block_b     block_b @relation(fields: [schedule_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model block_c {
+  id              Int              @id
+  event_id        Int
+  time_schedule   String
+  before_final    Int
+  final           Int
+  players_checked Int
+  next_unused_num Int
+  event_type      event_type       @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  block_c_games   block_c_games[]
+  current_block_c current_block_c?
+}
+
+model block_c_games {
+  id          Int     @id
+  schedule_id Int
+  order_id    Int
+  game_id     Int
+  block_c     block_c @relation(fields: [schedule_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model block_d {
+  id              Int              @id
+  event_id        Int
+  time_schedule   String
+  before_final    Int
+  final           Int
+  players_checked Int
+  next_unused_num Int
+  event_type      event_type       @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  block_d_games   block_d_games[]
+  current_block_d current_block_d?
+}
+
+model block_d_games {
+  id          Int     @id
+  schedule_id Int
+  order_id    Int
+  game_id     Int
+  block_d     block_d @relation(fields: [schedule_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model court_type {
+  id                        Int                         @id
+  name                      String
+  notification_request      notification_request[]
+  test_notification_request test_notification_request[]
+}
+
+model current_block_a {
+  id      Int     @id
+  game_id Int
+  block_a block_a @relation(fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model current_block_b {
+  id      Int     @id
+  game_id Int
+  block_b block_b @relation(fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model current_block_c {
+  id      Int     @id
+  game_id Int
+  block_c block_c @relation(fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model current_block_d {
+  id      Int     @id
+  game_id Int
+  block_d block_d @relation(fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model dantai {
+  id         Int        @id
+  event_id   Int
+  game_id    Int
+  group_id   Int
+  event_type event_type @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  groups     groups     @relation(fields: [group_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model event_type {
+  id                        Int                         @id
+  name                      String
+  existence                 Int
+  block_a                   block_a[]
+  block_b                   block_b[]
+  block_c                   block_c[]
+  block_d                   block_d[]
+  block_x                   block_x[]
+  block_y                   block_y[]
+  dantai                    dantai[]
+  notification_request      notification_request[]
+  test_dantai               test_dantai[]
+  test_notification_request test_notification_request[]
+}
+
+model groups {
+  id                         Int                          @id
+  name                       String
+  dantai                     dantai[]
+  dantai_zissen_man_groups   dantai_zissen_man_groups[]
+  dantai_zissen_woman_groups dantai_zissen_woman_groups[]
+  players                    players[]
+  test_dantai                test_dantai[]
+  test_notification_request  test_notification_request[]
+  test_players               test_players[]
+}
+
+model hokei_man {
+  id                                         Int      @id
+  left_player_id                             Int?
+  right_player_id                            Int?
+  next_left_id                               Int?
+  next_right_id                              Int?
+  left_player_flag                           Int?
+  left_retire                                Int?
+  right_retire                               Int?
+  players_hokei_man_left_player_idToplayers  players? @relation("hokei_man_left_player_idToplayers", fields: [left_player_id], references: [hokei_man_player_id], onDelete: NoAction, onUpdate: NoAction)
+  players_hokei_man_right_player_idToplayers players? @relation("hokei_man_right_player_idToplayers", fields: [right_player_id], references: [hokei_man_player_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model hokei_sonen {
+  id                                           Int      @id
+  left_player_id                               Int?
+  right_player_id                              Int?
+  next_left_id                                 Int?
+  next_right_id                                Int?
+  left_player_flag                             Int?
+  left_retire                                  Int?
+  right_retire                                 Int?
+  players_hokei_sonen_left_player_idToplayers  players? @relation("hokei_sonen_left_player_idToplayers", fields: [left_player_id], references: [hokei_sonen_player_id], onDelete: NoAction, onUpdate: NoAction)
+  players_hokei_sonen_right_player_idToplayers players? @relation("hokei_sonen_right_player_idToplayers", fields: [right_player_id], references: [hokei_sonen_player_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model hokei_woman {
+  id                                           Int      @id
+  left_player_id                               Int?
+  right_player_id                              Int?
+  next_left_id                                 Int?
+  next_right_id                                Int?
+  left_player_flag                             Int?
+  left_retire                                  Int?
+  right_retire                                 Int?
+  players_hokei_woman_left_player_idToplayers  players? @relation("hokei_woman_left_player_idToplayers", fields: [left_player_id], references: [hokei_woman_player_id], onDelete: NoAction, onUpdate: NoAction)
+  players_hokei_woman_right_player_idToplayers players? @relation("hokei_woman_right_player_idToplayers", fields: [right_player_id], references: [hokei_woman_player_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model notification_request {
+  id         Int        @id @default(autoincrement())
+  event_id   Int
+  player_id  Int?       @unique
+  group_id   Int?
+  group_name String?
+  court_id   Int
+  court_type court_type @relation(fields: [court_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  event_type event_type @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  players    players?   @relation(fields: [player_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model players {
+  id                                                             Int                   @id
+  group_id                                                       Int
+  name                                                           String
+  name_kana                                                      String
+  zissen_man_player_id                                           Int?                  @unique
+  hokei_man_player_id                                            Int?                  @unique
+  zissen_woman_player_id                                         Int?                  @unique
+  hokei_woman_player_id                                          Int?                  @unique
+  hokei_sonen_player_id                                          Int?                  @unique
+  hokei_newcommer_player_id                                      Int?                  @unique
+  zissen_kyuui_man_player_id                                     Int?                  @unique
+  hokei_kyuui_man_player_id                                      Int?                  @unique
+  zissen_kyuui_woman_player_id                                   Int?                  @unique
+  hokei_kyuui_woman_player_id                                    Int?                  @unique
+  hokei_kyuui_man_hokei_kyuui_man_left_player_idToplayers        hokei_kyuui_man[]     @relation("hokei_kyuui_man_left_player_idToplayers")
+  hokei_kyuui_man_hokei_kyuui_man_right_player_idToplayers       hokei_kyuui_man[]     @relation("hokei_kyuui_man_right_player_idToplayers")
+  hokei_kyuui_woman_hokei_kyuui_woman_left_player_idToplayers    hokei_kyuui_woman[]   @relation("hokei_kyuui_woman_left_player_idToplayers")
+  hokei_kyuui_woman_hokei_kyuui_woman_right_player_idToplayers   hokei_kyuui_woman[]   @relation("hokei_kyuui_woman_right_player_idToplayers")
+  hokei_man_hokei_man_left_player_idToplayers                    hokei_man[]           @relation("hokei_man_left_player_idToplayers")
+  hokei_man_hokei_man_right_player_idToplayers                   hokei_man[]           @relation("hokei_man_right_player_idToplayers")
+  hokei_newcommer_hokei_newcommer_left_player_idToplayers        hokei_newcommer[]     @relation("hokei_newcommer_left_player_idToplayers")
+  hokei_newcommer_hokei_newcommer_right_player_idToplayers       hokei_newcommer[]     @relation("hokei_newcommer_right_player_idToplayers")
+  hokei_sonen_hokei_sonen_left_player_idToplayers                hokei_sonen[]         @relation("hokei_sonen_left_player_idToplayers")
+  hokei_sonen_hokei_sonen_right_player_idToplayers               hokei_sonen[]         @relation("hokei_sonen_right_player_idToplayers")
+  hokei_woman_hokei_woman_left_player_idToplayers                hokei_woman[]         @relation("hokei_woman_left_player_idToplayers")
+  hokei_woman_hokei_woman_right_player_idToplayers               hokei_woman[]         @relation("hokei_woman_right_player_idToplayers")
+  notification_request                                           notification_request?
+  groups                                                         groups                @relation(fields: [group_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  zissen_kyuui_man_zissen_kyuui_man_left_player_idToplayers      zissen_kyuui_man[]    @relation("zissen_kyuui_man_left_player_idToplayers")
+  zissen_kyuui_man_zissen_kyuui_man_right_player_idToplayers     zissen_kyuui_man[]    @relation("zissen_kyuui_man_right_player_idToplayers")
+  zissen_kyuui_woman_zissen_kyuui_woman_left_player_idToplayers  zissen_kyuui_woman[]  @relation("zissen_kyuui_woman_left_player_idToplayers")
+  zissen_kyuui_woman_zissen_kyuui_woman_right_player_idToplayers zissen_kyuui_woman[]  @relation("zissen_kyuui_woman_right_player_idToplayers")
+  zissen_man_zissen_man_left_player_idToplayers                  zissen_man[]          @relation("zissen_man_left_player_idToplayers")
+  zissen_man_zissen_man_right_player_idToplayers                 zissen_man[]          @relation("zissen_man_right_player_idToplayers")
+  zissen_woman_zissen_woman_left_player_idToplayers              zissen_woman[]        @relation("zissen_woman_left_player_idToplayers")
+  zissen_woman_zissen_woman_right_player_idToplayers             zissen_woman[]        @relation("zissen_woman_right_player_idToplayers")
+}
+
+model zissen_man {
+  id                                          Int      @id
+  left_player_id                              Int?
+  right_player_id                             Int?
+  next_left_id                                Int?
+  next_right_id                               Int?
+  left_player_flag                            Int?
+  left_retire                                 Int?
+  right_retire                                Int?
+  players_zissen_man_left_player_idToplayers  players? @relation("zissen_man_left_player_idToplayers", fields: [left_player_id], references: [zissen_man_player_id], onDelete: NoAction, onUpdate: NoAction)
+  players_zissen_man_right_player_idToplayers players? @relation("zissen_man_right_player_idToplayers", fields: [right_player_id], references: [zissen_man_player_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model zissen_woman {
+  id                                            Int      @id
+  left_player_id                                Int?
+  right_player_id                               Int?
+  next_left_id                                  Int?
+  next_right_id                                 Int?
+  left_player_flag                              Int?
+  left_retire                                   Int?
+  right_retire                                  Int?
+  players_zissen_woman_left_player_idToplayers  players? @relation("zissen_woman_left_player_idToplayers", fields: [left_player_id], references: [zissen_woman_player_id], onDelete: NoAction, onUpdate: NoAction)
+  players_zissen_woman_right_player_idToplayers players? @relation("zissen_woman_right_player_idToplayers", fields: [right_player_id], references: [zissen_woman_player_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model dantai_zissen_man {
+  id                                                                                  Int                       @id
+  left_group_id                                                                       Int?
+  right_group_id                                                                      Int?
+  next_left_id                                                                        Int?
+  next_right_id                                                                       Int?
+  left_group_flag                                                                     Int?
+  left_retire                                                                         Int?
+  right_retire                                                                        Int?
+  dantai_zissen_man_groups_dantai_zissen_man_left_group_idTodantai_zissen_man_groups  dantai_zissen_man_groups? @relation("dantai_zissen_man_left_group_idTodantai_zissen_man_groups", fields: [left_group_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  dantai_zissen_man_groups_dantai_zissen_man_right_group_idTodantai_zissen_man_groups dantai_zissen_man_groups? @relation("dantai_zissen_man_right_group_idTodantai_zissen_man_groups", fields: [right_group_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model dantai_zissen_man_groups {
+  id                                                                           Int                 @id
+  group_id                                                                     Int
+  name                                                                         String
+  dantai_zissen_man_dantai_zissen_man_left_group_idTodantai_zissen_man_groups  dantai_zissen_man[] @relation("dantai_zissen_man_left_group_idTodantai_zissen_man_groups")
+  dantai_zissen_man_dantai_zissen_man_right_group_idTodantai_zissen_man_groups dantai_zissen_man[] @relation("dantai_zissen_man_right_group_idTodantai_zissen_man_groups")
+  groups                                                                       groups              @relation(fields: [group_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model dantai_zissen_woman {
+  id                                                                                        Int                         @id
+  left_group_id                                                                             Int?
+  right_group_id                                                                            Int?
+  next_left_id                                                                              Int?
+  next_right_id                                                                             Int?
+  left_group_flag                                                                           Int?
+  left_retire                                                                               Int?
+  right_retire                                                                              Int?
+  dantai_zissen_woman_groups_dantai_zissen_woman_left_group_idTodantai_zissen_woman_groups  dantai_zissen_woman_groups? @relation("dantai_zissen_woman_left_group_idTodantai_zissen_woman_groups", fields: [left_group_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  dantai_zissen_woman_groups_dantai_zissen_woman_right_group_idTodantai_zissen_woman_groups dantai_zissen_woman_groups? @relation("dantai_zissen_woman_right_group_idTodantai_zissen_woman_groups", fields: [right_group_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model dantai_zissen_woman_groups {
+  id                                                                                 Int                   @id
+  group_id                                                                           Int
+  name                                                                               String
+  dantai_zissen_woman_dantai_zissen_woman_left_group_idTodantai_zissen_woman_groups  dantai_zissen_woman[] @relation("dantai_zissen_woman_left_group_idTodantai_zissen_woman_groups")
+  dantai_zissen_woman_dantai_zissen_woman_right_group_idTodantai_zissen_woman_groups dantai_zissen_woman[] @relation("dantai_zissen_woman_right_group_idTodantai_zissen_woman_groups")
+  groups                                                                             groups                @relation(fields: [group_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model hokei_kyuui_man {
+  id                                               Int      @id
+  left_player_id                                   Int?
+  right_player_id                                  Int?
+  next_left_id                                     Int?
+  next_right_id                                    Int?
+  left_player_flag                                 Int?
+  left_retire                                      Int?
+  right_retire                                     Int?
+  players_hokei_kyuui_man_left_player_idToplayers  players? @relation("hokei_kyuui_man_left_player_idToplayers", fields: [left_player_id], references: [hokei_man_player_id], onDelete: NoAction, onUpdate: NoAction)
+  players_hokei_kyuui_man_right_player_idToplayers players? @relation("hokei_kyuui_man_right_player_idToplayers", fields: [right_player_id], references: [hokei_man_player_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model hokei_kyuui_woman {
+  id                                                 Int      @id
+  left_player_id                                     Int?
+  right_player_id                                    Int?
+  next_left_id                                       Int?
+  next_right_id                                      Int?
+  left_player_flag                                   Int?
+  left_retire                                        Int?
+  right_retire                                       Int?
+  players_hokei_kyuui_woman_left_player_idToplayers  players? @relation("hokei_kyuui_woman_left_player_idToplayers", fields: [left_player_id], references: [hokei_woman_player_id], onDelete: NoAction, onUpdate: NoAction)
+  players_hokei_kyuui_woman_right_player_idToplayers players? @relation("hokei_kyuui_woman_right_player_idToplayers", fields: [right_player_id], references: [hokei_woman_player_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model hokei_newcommer {
+  id                                               Int      @id
+  left_player_id                                   Int?
+  right_player_id                                  Int?
+  next_left_id                                     Int?
+  next_right_id                                    Int?
+  left_player_flag                                 Int?
+  left_retire                                      Int?
+  right_retire                                     Int?
+  players_hokei_newcommer_left_player_idToplayers  players? @relation("hokei_newcommer_left_player_idToplayers", fields: [left_player_id], references: [hokei_newcommer_player_id], onDelete: NoAction, onUpdate: NoAction)
+  players_hokei_newcommer_right_player_idToplayers players? @relation("hokei_newcommer_right_player_idToplayers", fields: [right_player_id], references: [hokei_newcommer_player_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model zissen_kyuui_man {
+  id                                                Int      @id
+  left_player_id                                    Int?
+  right_player_id                                   Int?
+  next_left_id                                      Int?
+  next_right_id                                     Int?
+  left_player_flag                                  Int?
+  left_retire                                       Int?
+  right_retire                                      Int?
+  players_zissen_kyuui_man_left_player_idToplayers  players? @relation("zissen_kyuui_man_left_player_idToplayers", fields: [left_player_id], references: [zissen_man_player_id], onDelete: NoAction, onUpdate: NoAction)
+  players_zissen_kyuui_man_right_player_idToplayers players? @relation("zissen_kyuui_man_right_player_idToplayers", fields: [right_player_id], references: [zissen_man_player_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model zissen_kyuui_woman {
+  id                                                  Int      @id
+  left_player_id                                      Int?
+  right_player_id                                     Int?
+  next_left_id                                        Int?
+  next_right_id                                       Int?
+  left_player_flag                                    Int?
+  left_retire                                         Int?
+  right_retire                                        Int?
+  players_zissen_kyuui_woman_left_player_idToplayers  players? @relation("zissen_kyuui_woman_left_player_idToplayers", fields: [left_player_id], references: [zissen_woman_player_id], onDelete: NoAction, onUpdate: NoAction)
+  players_zissen_kyuui_woman_right_player_idToplayers players? @relation("zissen_kyuui_woman_right_player_idToplayers", fields: [right_player_id], references: [zissen_woman_player_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model block_x {
+  id              Int              @id
+  event_id        Int
+  time_schedule   String
+  before_final    Int
+  final           Int
+  players_checked Int
+  next_unused_num Int
+  event_type      event_type       @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  block_x_games   block_x_games[]
+  current_block_x current_block_x?
+}
+
+model block_x_games {
+  id          Int     @id
+  schedule_id Int
+  order_id    Int
+  game_id     Int
+  block_x     block_x @relation(fields: [schedule_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model block_y {
+  id              Int              @id
+  event_id        Int
+  time_schedule   String
+  before_final    Int
+  final           Int
+  players_checked Int
+  next_unused_num Int
+  event_type      event_type       @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  block_y_games   block_y_games[]
+  current_block_y current_block_y?
+}
+
+model block_y_games {
+  id          Int     @id
+  schedule_id Int
+  order_id    Int
+  game_id     Int
+  block_y     block_y @relation(fields: [schedule_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model current_block_x {
+  id      Int     @id
+  game_id Int
+  block_x block_x @relation(fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model current_block_y {
+  id      Int     @id
+  game_id Int
+  block_y block_y @relation(fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model test_dantai {
+  id         Int        @id
+  event_id   Int
+  game_id    Int
+  group_id   Int
+  event_type event_type @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  groups     groups     @relation(fields: [group_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model test_hokei_man {
+  id                                                        Int           @id
+  left_player_id                                            Int?
+  right_player_id                                           Int?
+  next_left_id                                              Int?
+  next_right_id                                             Int?
+  left_player_flag                                          Int?
+  left_retire                                               Int?
+  right_retire                                              Int?
+  test_players_test_hokei_man_left_player_idTotest_players  test_players? @relation("test_hokei_man_left_player_idTotest_players", fields: [left_player_id], references: [test_hokei_man_player_id], onDelete: NoAction, onUpdate: NoAction)
+  test_players_test_hokei_man_right_player_idTotest_players test_players? @relation("test_hokei_man_right_player_idTotest_players", fields: [right_player_id], references: [test_hokei_man_player_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model test_hokei_woman {
+  id                                                          Int           @id
+  left_player_id                                              Int?
+  right_player_id                                             Int?
+  next_left_id                                                Int?
+  next_right_id                                               Int?
+  left_player_flag                                            Int?
+  left_retire                                                 Int?
+  right_retire                                                Int?
+  test_players_test_hokei_woman_left_player_idTotest_players  test_players? @relation("test_hokei_woman_left_player_idTotest_players", fields: [left_player_id], references: [test_hokei_woman_player_id], onDelete: NoAction, onUpdate: NoAction)
+  test_players_test_hokei_woman_right_player_idTotest_players test_players? @relation("test_hokei_woman_right_player_idTotest_players", fields: [right_player_id], references: [test_hokei_woman_player_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model test_notification_request {
+  id           Int           @id @default(autoincrement())
+  event_id     Int
+  player_id    Int?          @unique
+  group_id     Int?
+  court_id     Int
+  court_type   court_type    @relation(fields: [court_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  event_type   event_type    @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  groups       groups?       @relation(fields: [group_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  test_players test_players? @relation(fields: [player_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model test_players {
+  id                                                                Int                        @id
+  group_id                                                          Int
+  name                                                              String
+  name_kana                                                         String
+  test_zissen_man_player_id                                         Int?                       @unique
+  test_hokei_man_player_id                                          Int?                       @unique
+  test_zissen_woman_player_id                                       Int?                       @unique
+  test_hokei_woman_player_id                                        Int?                       @unique
+  test_hokei_sonen_player_id                                        Int?                       @unique
+  test_hokei_man_test_hokei_man_left_player_idTotest_players        test_hokei_man[]           @relation("test_hokei_man_left_player_idTotest_players")
+  test_hokei_man_test_hokei_man_right_player_idTotest_players       test_hokei_man[]           @relation("test_hokei_man_right_player_idTotest_players")
+  test_hokei_woman_test_hokei_woman_left_player_idTotest_players    test_hokei_woman[]         @relation("test_hokei_woman_left_player_idTotest_players")
+  test_hokei_woman_test_hokei_woman_right_player_idTotest_players   test_hokei_woman[]         @relation("test_hokei_woman_right_player_idTotest_players")
+  test_notification_request                                         test_notification_request?
+  groups                                                            groups                     @relation(fields: [group_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  test_zissen_man_test_zissen_man_left_player_idTotest_players      test_zissen_man[]          @relation("test_zissen_man_left_player_idTotest_players")
+  test_zissen_man_test_zissen_man_right_player_idTotest_players     test_zissen_man[]          @relation("test_zissen_man_right_player_idTotest_players")
+  test_zissen_woman_test_zissen_woman_left_player_idTotest_players  test_zissen_woman[]        @relation("test_zissen_woman_left_player_idTotest_players")
+  test_zissen_woman_test_zissen_woman_right_player_idTotest_players test_zissen_woman[]        @relation("test_zissen_woman_right_player_idTotest_players")
+}
+
+model test_zissen_man {
+  id                                                         Int           @id
+  left_player_id                                             Int?
+  right_player_id                                            Int?
+  next_left_id                                               Int?
+  next_right_id                                              Int?
+  left_player_flag                                           Int?
+  left_retire                                                Int?
+  right_retire                                               Int?
+  test_players_test_zissen_man_left_player_idTotest_players  test_players? @relation("test_zissen_man_left_player_idTotest_players", fields: [left_player_id], references: [test_zissen_man_player_id], onDelete: NoAction, onUpdate: NoAction)
+  test_players_test_zissen_man_right_player_idTotest_players test_players? @relation("test_zissen_man_right_player_idTotest_players", fields: [right_player_id], references: [test_zissen_man_player_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model test_zissen_woman {
+  id                                                           Int           @id
+  left_player_id                                               Int?
+  right_player_id                                              Int?
+  next_left_id                                                 Int?
+  next_right_id                                                Int?
+  left_player_flag                                             Int?
+  left_retire                                                  Int?
+  right_retire                                                 Int?
+  test_players_test_zissen_woman_left_player_idTotest_players  test_players? @relation("test_zissen_woman_left_player_idTotest_players", fields: [left_player_id], references: [test_zissen_woman_player_id], onDelete: NoAction, onUpdate: NoAction)
+  test_players_test_zissen_woman_right_player_idTotest_players test_players? @relation("test_zissen_woman_right_player_idTotest_players", fields: [right_player_id], references: [test_zissen_woman_player_id], onDelete: NoAction, onUpdate: NoAction)
+}
