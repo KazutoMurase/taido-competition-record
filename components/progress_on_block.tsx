@@ -110,9 +110,16 @@ const ProgressOnBlock: React.FC<{
         >
           <td>{schedule.time_schedule?.replace(/['"]+/g, "")}</td>
           <td>
-            <a href={"results/" + GetEventName(schedule.event_id)}>
-              {test_event_id_vs_event_name.get(schedule.event_id)}
-            </a>
+            {GetEventName(schedule.event_id) === "dantai" ? (
+              <>{test_event_id_vs_event_name.get(schedule.event_id)}</>
+            ) : (
+              <a
+                className="color-disabled"
+                href={"results/" + GetEventName(schedule.event_id)}
+              >
+                {test_event_id_vs_event_name.get(schedule.event_id)}
+              </a>
+            )}
           </td>
           <td>{schedule.games_text}</td>
           <td>
