@@ -17,5 +17,5 @@ if [ -z "${PRODUCTION}" ]; then
         cd /ws && npm run dev
     fi
 else
-    cd /ws && npx prisma migrate deploy && npm run start
+    cd /ws && npm run start
 fi
