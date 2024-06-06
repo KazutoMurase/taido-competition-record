@@ -37,7 +37,7 @@ const GetWinners = async (req, res) => {
     const final_left_flag = event_name.includes("dantai")
       ? final_data?.left_group_flag
       : final_data?.left_player_flag;
-    if (final_left_flag) {
+    if (final_left_flag !== null) {
       if (event_name.includes("hokei")) {
         if (final_left_flag >= 2) {
           winner1 = { name: final_data.left_name, id: final_data.left_id };
@@ -59,7 +59,7 @@ const GetWinners = async (req, res) => {
     const before_final_left_flag = event_name.includes("dantai")
       ? before_final_data?.left_group_flag
       : before_final_data?.left_player_flag;
-    if (before_final_left_flag) {
+    if (before_final_left_flag !== null) {
       if (event_name.includes("hokei")) {
         if (before_final_left_flag >= 2) {
           winner3 = {
