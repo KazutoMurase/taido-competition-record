@@ -15,7 +15,7 @@ docker build -t taido-competition-record .
 出来たイメージを使ってコンテナを立ち上げる。
 
 ```bash
-docker-compose up
+docker compose up
 ```
 
 ポート被りが無ければ、http://localhost:3000 でアクセスできる。
