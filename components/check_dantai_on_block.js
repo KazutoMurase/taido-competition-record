@@ -52,7 +52,7 @@ function onSubmit(
 
 function onClear(item, is_test, function_after_post) {
   let post = {
-    group_id: item.group_id,
+    group_id: item.id,
     event_id: item.event_id,
     is_test: is_test,
   };

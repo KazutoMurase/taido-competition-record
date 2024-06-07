@@ -150,7 +150,7 @@ async function GetFromDB(
   query =
     "SELECT " +
     (is_dantai ? "group" : "player") +
-    "_id FROM " +
+    "_id, event_id, court_id FROM " +
     notification_request_name;
   const result_requested = await client.query(query);
   const requested_data = result_requested.rows;
@@ -258,7 +258,17 @@ async function GetFromDB(
       }
     }
   }
-  return result_array;
+  // check if all requested
+  let all_requested_array = [];
+  for (let i = 0; i < requested_data.length; i++) {
+    if (!requested_data[i]["group_id"] && !requested_data[i]["player_id"]) {
+      all_requested_array.push({
+        court_id: requested_data[i]["court_id"],
+        event_id: requested_data[i]["event_id"],
+      });
+    }
+  }
+  return { items: result_array, all_requested: all_requested_array };
 }
 
 async function GetDantaiFromDB(
