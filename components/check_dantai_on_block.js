@@ -10,6 +10,12 @@ import checkStyles from "../styles/checks.module.css";
 import { useRouter } from "next/router";
 import { GetEventName } from "../lib/get_event_name";
 
+function GetCourtId(block_number) {
+  const code = block_number.charCodeAt(0);
+  // ASCII code of 'a' is 97
+  return code >= 97 && code <= 122 ? code - 96 : null;
+}
+
 function onSubmit(
   block_number,
   group_id,
@@ -50,10 +56,11 @@ function onSubmit(
     });
 }
 
-function onClear(item, is_test, function_after_post) {
+function onClear(group_id, event_id, court_id, is_test, function_after_post) {
   let post = {
-    group_id: item.id,
-    event_id: item.event_id,
+    group_id: group_id,
+    event_id: event_id,
+    court_id: court_id,
     is_test: is_test,
   };
   axios
@@ -195,6 +202,12 @@ function CheckDantai({
     let target_int = is_retired ? 1 : 0;
     return item.retire !== null && item.retire === target_int;
   }
+  const all_requested = data.all_requested?.find((elem) => {
+    return (
+      elem.event_id === parseInt(event_id) &&
+      elem.court_id == GetCourtId(block_number)
+    );
+  });
   return (
     <div>
       <Container maxWidth="md">
@@ -216,7 +229,7 @@ function CheckDantai({
             style={{ height: "80px" }}
           >
             <h3 className={checkStyles.warn}>
-              {data.length > 0 && "all" in data[0]
+              {data.items && data.items.length > 0 && "all" in data.items[0]
                 ? "※全団体が表示されていますので、点呼するべき団体を確認して下さい"
                 : ""}
             </h3>
@@ -240,9 +253,30 @@ function CheckDantai({
                   forceFetchData,
                 )
               }
+              style={!all_requested ? null : activeButtonStyle}
             >
-              全体呼び出し
+              {!all_requested ? "全体呼び出し" : "全体リクエスト済"}
             </Button>
+            {GetEventName(event_id) !== "dantai" ? (
+              <Button
+                variant="contained"
+                type="submit"
+                onClick={(e) =>
+                  onClear(
+                    null,
+                    event_id,
+                    GetCourtId(block_number),
+                    is_test,
+                    forceFetchData,
+                  )
+                }
+                disabled={!all_requested}
+              >
+                キャンセル
+              </Button>
+            ) : (
+              <></>
+            )}
           </Grid>
           <table border="1">
             <tbody>
@@ -251,11 +285,15 @@ function CheckDantai({
                 <th>団体名</th>
                 <th>点呼完了</th>
                 <th>棄権</th>
-                <th>{data.length > 0 && "all" in data[0] ? "敗退" : ""}</th>
+                <th>
+                  {data.items && data.items.length > 0 && "all" in data.items[0]
+                    ? "敗退"
+                    : ""}
+                </th>
                 <th></th>
                 <th></th>
               </tr>
-              {data.map((item, index) => (
+              {data.items?.map((item, index) => (
                 <tr key={item["id"]} className={checkStyles.column}>
                   {GetEventName(event_id) === "dantai" ? (
                     <></>
@@ -336,7 +374,15 @@ function CheckDantai({
                     <Button
                       variant="contained"
                       type="submit"
-                      onClick={(e) => onClear(item, is_test, forceFetchData)}
+                      onClick={(e) =>
+                        onClear(
+                          item.id,
+                          event_id,
+                          GetCourtId(block_number),
+                          is_test,
+                          forceFetchData,
+                        )
+                      }
                       disabled={!item["requested"]}
                     >
                       キャンセル
@@ -356,7 +402,7 @@ function CheckDantai({
               variant="contained"
               type="submit"
               onClick={(e) =>
-                onFinish(block_number, schedule_id, data, is_test)
+                onFinish(block_number, schedule_id, data.items, is_test)
               }
             >
               決定

@@ -330,7 +330,8 @@ async function GetDantaiFromDB(
       }
     }
   }
-  return result_dantai.rows;
+  //TODO: support all_requested
+  return { items: result_dantai.rows };
 }
 
 const CheckPlayersOnBlock = async (req, res) => {
