@@ -133,9 +133,9 @@ create table test_notification_request
  event_id integer not null,
  player_id integer unique,
  group_id integer,
+ group_name text,
  court_id integer not null,
  primary key(id),
- foreign key (group_id) references groups(id),
  foreign key (event_id) references event_type(id),
  foreign key (player_id) references test_players(id),
  foreign key (court_id) references court_type(id));
