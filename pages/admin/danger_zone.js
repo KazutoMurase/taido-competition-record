@@ -15,6 +15,7 @@ const Home = () => {
   }, []);
   let event_names = data?.map((item) => GetEventName(item["id"]));
   const filtered_event_names = event_names.filter((name) => name !== "dantai");
+  // FIXME: database_name should be obtained from env
   return (
     <>
       <ResetButton
