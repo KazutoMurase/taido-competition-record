@@ -31,8 +31,8 @@ create table test_notification_request
 \copy test_groups from 'test_groups.csv' csv header;
 \copy test_players from 'test_players.csv' csv header;
 
-insert into court_type(id,name) values (100, 'Xコート');
-insert into court_type(id,name) values (101, 'Yコート');
+insert into court_type(id,name) values (24, 'Xコート');
+insert into court_type(id,name) values (25, 'Yコート');
 
 create table test_hokei_man
 (id integer not null,

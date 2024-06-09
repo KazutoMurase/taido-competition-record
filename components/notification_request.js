@@ -48,7 +48,7 @@ function ShowName(item) {
     return item["name"] + "(" + item["name_kana"] + ")";
   }
   if ("group_name" in item) {
-    return item["group_name"].replace("'", "").replace("'", "") + "チーム";
+    return item["group_name"].replace("'", "").replace("'", "");
   } else {
     return "全体";
   }
