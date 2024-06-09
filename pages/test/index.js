@@ -79,23 +79,6 @@ export default function Home() {
             司会用
           </Button>
         </Grid>
-        <br />
-        <Grid
-          container
-          justifyContent="center"
-          alignItems="center"
-          style={{ height: "60px" }}
-        >
-          <Button
-            variant="contained"
-            type="submit"
-            onClick={(e) => {
-              router.push("/test/progress_check");
-            }}
-          >
-            進行確認
-          </Button>
-        </Grid>
       </Container>
     </div>
   );
