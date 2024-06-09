@@ -9,6 +9,12 @@ import SquareTwoToneIcon from "@mui/icons-material/SquareTwoTone";
 import checkStyles from "../styles/checks.module.css";
 import { useRouter } from "next/router";
 
+function GetCourtId(block_number) {
+  const code = block_number.charCodeAt(0);
+  // ASCII code of 'a' is 97
+  return code >= 97 && code <= 122 ? code - 96 : null;
+}
+
 function onSubmit(id, block_number, event_id, is_test, function_after_post) {
   // TODO: FIXME
   let court_id;
@@ -41,8 +47,13 @@ function onSubmit(id, block_number, event_id, is_test, function_after_post) {
     });
 }
 
-function onClear(id, is_test, function_after_post) {
-  let post = { player_id: id, is_test: is_test };
+function onClear(player_id, event_id, court_id, is_test, function_after_post) {
+  let post = {
+    player_id: player_id,
+    event_id: event_id,
+    court_id: court_id,
+    is_test: is_test,
+  };
   axios
     .post("/api/clear_notification_request", post)
     .then((response) => {
@@ -177,6 +188,13 @@ function CheckPlayers({
     let target_int = is_retired ? 1 : 0;
     return item.retire !== null && item.retire === target_int;
   }
+
+  const all_requested = data.all_requested?.find((elem) => {
+    return (
+      elem.event_id === parseInt(event_id) &&
+      elem.court_id == GetCourtId(block_number)
+    );
+  });
   return (
     <div>
       <Container maxWidth="md">
@@ -203,8 +221,25 @@ function CheckPlayers({
               onClick={(e) =>
                 onSubmit(null, block_number, event_id, is_test, forceFetchData)
               }
+              style={!all_requested ? null : activeButtonStyle}
             >
-              全体呼び出し
+              {!all_requested ? "全体呼び出し" : "全体リクエスト済"}
+            </Button>
+            <Button
+              variant="contained"
+              type="submit"
+              onClick={(e) =>
+                onClear(
+                  null,
+                  event_id,
+                  GetCourtId(block_number),
+                  is_test,
+                  forceFetchData,
+                )
+              }
+              disabled={!all_requested}
+            >
+              キャンセル
             </Button>
           </Grid>
           <table border="1">
@@ -217,7 +252,7 @@ function CheckPlayers({
                 <th></th>
                 <th></th>
               </tr>
-              {data.map((item, index) => (
+              {data.items?.map((item, index) => (
                 <tr key={item["id"]} className={checkStyles.column}>
                   <td>
                     <SquareTwoToneIcon
@@ -276,7 +311,9 @@ function CheckPlayers({
                     <Button
                       variant="contained"
                       type="submit"
-                      onClick={(e) => onClear(item.id, is_test, forceFetchData)}
+                      onClick={(e) =>
+                        onClear(item.id, null, null, is_test, forceFetchData)
+                      }
                       disabled={!item["requested"]}
                     >
                       キャンセル
@@ -296,7 +333,7 @@ function CheckPlayers({
               variant="contained"
               type="submit"
               onClick={(e) =>
-                onFinish(block_number, schedule_id, data, is_test)
+                onFinish(block_number, schedule_id, data.items, is_test)
               }
             >
               決定
