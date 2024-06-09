@@ -7,11 +7,12 @@ import { GetEventName } from "../../lib/get_event_name";
 
 const Home = () => {
   const router = useRouter();
-  const { block_number, schedule_id, dantai, event_id } = router.query;
+  const { block_number, schedule_id, event_id } = router.query;
   if (block_number === undefined) {
     return <></>;
   }
-  if (dantai === "0") {
+  const event_name = GetEventName(event_id);
+  if (event_name !== "dantai") {
     const event_name = "test_" + GetEventName(event_id);
     return (
       <>
