@@ -6,19 +6,28 @@ import Container from "@mui/material/Container";
 import React from "react";
 import { createRoot } from "react-dom/client";
 
-function onSubmit(event_names, block_names) {
-  let post = { event_names: event_names, block_names: block_names };
+function onSubmit(database_name, event_names, block_names) {
+  let post = {
+    database_name: database_name,
+    event_names: event_names,
+    block_names: block_names,
+  };
   axios
-    .post("/api/reset_test_db", post)
+    .post("/api/reset_db", post)
     .then((response) => {})
     .catch((e) => {
       console.log(e);
     });
 }
 
-const PopupComponent = ({ onClose, event_names, block_names }) => {
+const PopupComponent = ({
+  onClose,
+  database_name,
+  event_names,
+  block_names,
+}) => {
   const handleDecision = () => {
-    onSubmit(event_names, block_names);
+    onSubmit(database_name, event_names, block_names);
     onClose();
   };
 
@@ -36,7 +45,7 @@ const PopupComponent = ({ onClose, event_names, block_names }) => {
   );
 };
 
-function ResetButton({ event_names, block_names, text }) {
+function ResetButton({ database_name, event_names, block_names, text }) {
   const handlePopup = () => {
     const popupWindow = window.open("", "_blank", "width=350,height=50");
 
@@ -54,6 +63,7 @@ function ResetButton({ event_names, block_names, text }) {
     root.render(
       <PopupComponent
         onClose={handleClose}
+        database_name={database_name}
         event_names={event_names}
         block_names={block_names}
       />,

@@ -24,6 +24,7 @@ const Home = () => {
         return_url="/test"
       />
       <ResetButton
+        database_name="test"
         event_names={event_names}
         block_names={["block_" + block_number]}
         text="初期化"
