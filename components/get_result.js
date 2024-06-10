@@ -844,6 +844,7 @@ function ShowWinner(item) {
 }
 
 function GetResult({
+  backUrl = null,
   editable = false,
   updateInterval = 10000,
   returnUrl = null,
@@ -856,7 +857,11 @@ function GetResult({
     returnUrl = event_name + "_result";
   }
   const onBack = () => {
-    router.back();
+    if (backUrl === null) {
+      router.back();
+    } else {
+      router.push(backUrl);
+    }
   };
 
   const [data, setData] = useState([]);

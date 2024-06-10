@@ -6,7 +6,7 @@ import { GetEventName } from "../../lib/get_event_name";
 
 const Home = () => {
   const router = useRouter();
-  const { block_number, schedule_id, event_id } = router.query;
+  const { block_number, schedule_id, event_id, back_url } = router.query;
   if (block_number === undefined) {
     return <></>;
   }
@@ -17,7 +17,9 @@ const Home = () => {
     "%26schedule_id=" +
     schedule_id +
     "%26event_id=" +
-    event_id;
+    event_id +
+    "%26back_url=block?block_number=" +
+    block_number;
   return (
     <>
       <GetResult
@@ -25,6 +27,7 @@ const Home = () => {
         event_name={event_name}
         returnUrl={return_url}
         block_number={block_number}
+        backUrl={back_url}
       />
     </>
   );
