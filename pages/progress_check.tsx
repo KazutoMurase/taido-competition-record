@@ -1,7 +1,7 @@
 import React from "react";
 import { useRouter } from "next/router";
-import Button from "@mui/material/Button";
-import Grid from "@mui/material/Grid";
+import { Grid, Button, Box, Tabs, Tab, useMediaQuery } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 
 import ProgressOnBlock from "../components/progress_on_block";
 
@@ -10,39 +10,39 @@ const ProgressCheck: React.FC = () => {
   const onBack = () => {
     router.back();
   };
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const blockNumberList = ["a", "b", "c", "d"];
+  const [tabIndex, setTabIndex] = React.useState(0);
+  const handleTabChange = (event, newValue) => {
+    setTabIndex(newValue);
+  };
+
   return (
-    <div style={{ width: "1900px" }}>
-      <Grid container>
-        <Grid item xs={3}>
+    <div style={isMobile ? { width: '100%' } : {}}>
+      {isMobile ? (
+        <Box>
+          <Tabs value={tabIndex} onChange={handleTabChange} aria-label="Progress Tabs">
+            {blockNumberList.map(block => (
+              <Tab label={`${block.toUpperCase()}コート`} />
+            ))}
+          </Tabs>
+          <Box>
+            <ProgressOnBlock block_number={blockNumberList[tabIndex]} update_interval={10000} return_url="/" />
+          </Box>
+        </Box>
+        ) : (
+        <Box display="flex">
+        {blockNumberList.map(block => (
           <ProgressOnBlock
-            block_number="a"
+            block_number={block}
             update_interval={10000}
             return_url="/"
-          />
-        </Grid>
-        <Grid item xs={3}>
-          <ProgressOnBlock
-            block_number="b"
-            update_interval={10000}
-            return_url="/"
-          />
-        </Grid>
-        <Grid item xs={3}>
-          <ProgressOnBlock
-            block_number="c"
-            update_interval={10000}
-            return_url="/"
-          />
-        </Grid>
-        <Grid item xs={3}>
-          <ProgressOnBlock
-            block_number="d"
-            update_interval={10000}
-            return_url="/"
-          />
-        </Grid>
-      </Grid>
-      <Grid
+            />
+        ))}
+        </Box>
+      )}
+        <Grid
         container
         justifyContent="center"
         alignItems="center"
