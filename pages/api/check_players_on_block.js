@@ -280,6 +280,7 @@ async function GetDantaiFromDB(
 ) {
   const client = await GetClient();
   const block_name = "block_" + req.query.block_number;
+  const groups = event_name.includes("test") ? "test_groups" : "groups";
   const event_name = is_test ? "test_dantai" : "dantai";
   const schedule_id = req.query.schedule_id;
   let query =
@@ -297,7 +298,9 @@ async function GetDantaiFromDB(
   query =
     "SELECT t1.name, t0.group_id AS id, t0.event_id FROM " +
     event_name +
-    " as t0 LEFT JOIN groups AS t1 ON t0.group_id = t1.id WHERE t0.event_id = " +
+    " as t0 LEFT JOIN " +
+    groups +
+    " AS t1 ON t0.group_id = t1.id WHERE t0.event_id = " +
     event_id +
     " and game_id = " +
     game_id;
@@ -306,7 +309,9 @@ async function GetDantaiFromDB(
     query =
       "SELECT t1.name, t0.group_id AS id, t0.event_id FROM " +
       event_name +
-      " as t0 LEFT JOIN groups AS t1 ON t0.group_id = t1.id WHERE t0.event_id = " +
+      " as t0 LEFT JOIN " +
+      groups +
+      " AS t1 ON t0.group_id = t1.id WHERE t0.event_id = " +
       event_id;
     result_dantai = await client.query(query);
     for (let i = 0; i < result_dantai.rows.length; i++) {

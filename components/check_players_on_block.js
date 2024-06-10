@@ -27,9 +27,9 @@ function onSubmit(id, block_number, event_id, is_test, function_after_post) {
   } else if (block_number === "d") {
     court_id = 4;
   } else if (block_number === "x") {
-    court_id = 100;
+    court_id = 24;
   } else if (block_number === "y") {
-    court_id = 101;
+    court_id = 25;
   }
   let post = {
     event_id: event_id,
