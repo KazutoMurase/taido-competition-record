@@ -54,6 +54,7 @@ async function GetFromDB(req, res) {
     const players_name = event_name.includes("test")
       ? "test_players"
       : "players";
+    const groups = event_name.includes("test") ? "test_groups" : "groups";
     query =
       "SELECT t1.id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t2.name_kana AS left_name_kana, t4.name AS left_group_name, t3.name AS right_name, t3.name_kana AS right_name_kana, t5.name AS right_group_name, t1.left_player_flag FROM " +
       event_name +
@@ -65,7 +66,11 @@ async function GetFromDB(req, res) {
       players_name +
       " AS t3 ON t1.right_player_id = t3." +
       event_name +
-      "_player_id LEFT JOIN groups AS t4 ON t2.group_id = t4.id LEFT JOIN groups AS t5 ON t3.group_id = t5.id";
+      "_player_id LEFT JOIN " +
+      groups +
+      " AS t4 ON t2.group_id = t4.id LEFT JOIN " +
+      groups +
+      " AS t5 ON t3.group_id = t5.id";
   }
   const result_schedule = await client.query(query);
   const sorted_data = result_schedule.rows.sort((a, b) => a.id - b.id);

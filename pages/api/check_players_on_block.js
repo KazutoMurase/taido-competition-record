@@ -5,6 +5,7 @@ import { GetEventName } from "../../lib/get_event_name";
 async function GetFromDB(
   req,
   res,
+  event_id,
   event_name,
   players_name,
   notification_request_name,
@@ -198,7 +199,10 @@ async function GetFromDB(
               const requested_id = is_dantai
                 ? requested_data[k]["group_id"]
                 : requested_data[k]["player_id"];
-              if (requested_id === left_id) {
+              if (
+                requested_id === left_id &&
+                requested_data[k]["event_id"] === event_id
+              ) {
                 requested = true;
                 break;
               }
@@ -235,7 +239,10 @@ async function GetFromDB(
               const requested_id = is_dantai
                 ? requested_data[k]["group_id"]
                 : requested_data[k]["player_id"];
-              if (requested_id === right_id) {
+              if (
+                requested_id === right_id &&
+                requested_data[k]["event_id"] === event_id
+              ) {
                 requested = true;
                 break;
               }
@@ -280,8 +287,8 @@ async function GetDantaiFromDB(
 ) {
   const client = await GetClient();
   const block_name = "block_" + req.query.block_number;
-  const groups = event_name.includes("test") ? "test_groups" : "groups";
   const event_name = is_test ? "test_dantai" : "dantai";
+  const groups = event_name.includes("test") ? "test_groups" : "groups";
   const schedule_id = req.query.schedule_id;
   let query =
     "SELECT game_id FROM " +
@@ -396,6 +403,7 @@ const CheckPlayersOnBlock = async (req, res) => {
     const data = await GetFromDB(
       req,
       res,
+      event_id,
       event_name,
       players_name,
       notification_request_name,

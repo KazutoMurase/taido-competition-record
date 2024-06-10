@@ -12,9 +12,17 @@ const Home = () => {
   // TODO:
   let event_names = [];
   if (block_number === "x") {
-    event_names = ["test_hokei_man", "test_zissen_man"];
+    event_names = [
+      "test_hokei_man",
+      "test_zissen_man",
+      "test_dantai_zissen_woman",
+    ];
   } else if (block_number === "y") {
-    event_names = ["test_hokei_woman", "test_zissen_woman"];
+    event_names = [
+      "test_hokei_woman",
+      "test_zissen_woman",
+      "test_dantai_zissen_man",
+    ];
   }
   return (
     <>
