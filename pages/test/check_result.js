@@ -1,5 +1,5 @@
+import Button from "@mui/material/Button";
 import React from "react";
-import { useEffect, useState } from "react";
 import GetResult from "../../components/get_result";
 import { useRouter } from "next/router";
 import { GetEventName } from "../../lib/get_event_name";
@@ -26,6 +26,21 @@ const Home = () => {
         returnUrl={return_url}
         block_number={block_number}
       />
+      <div
+        style={{
+          textAlign: "center",
+        }}
+      >
+        <Button
+          variant="contained"
+          type="submit"
+          onClick={(e) => {
+            router.push("/test/block?block_number=" + block_number);
+          }}
+        >
+          コートメニューに戻る
+        </Button>
+      </div>
     </>
   );
 };
