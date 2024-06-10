@@ -196,7 +196,7 @@ function Block({ block_number, update_interval, return_url }) {
   return (
     <div>
       <Container maxWidth="md">
-        <Box style={{ minWidth: "840px" }}>
+        <Box style={{ minWidth: "1000px" }}>
           <Grid
             container
             justifyContent="center"

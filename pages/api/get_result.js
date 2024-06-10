@@ -36,7 +36,7 @@ async function GetFromDB(req, res) {
     const groups_name = event_name + "_groups";
     const groups = event_name.includes("test") ? "test_groups" : "groups";
     query =
-      "SELECT t1.id, t1.next_left_id, t1.next_right_id, t4.name AS left_group_name, t5.name AS right_group_name, t1.left_group_flag FROM " +
+      "SELECT t1.id, t1.next_left_id, t1.next_right_id, t2.name AS left_group_name, t3.name AS right_group_name, t1.left_group_flag FROM " +
       event_name +
       " AS t1 LEFT JOIN " +
       groups_name +
