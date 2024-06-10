@@ -19,10 +19,12 @@ function CreateDantaiText(item, lineWidth) {
       return (
         <>
           <Text
-            x={is_left ? 140 : 630}
+            x={is_left ? 10 : 630}
             y={item["left_begin_y"] - 5}
             text={item["left_group_name"].replace("'", "").replace("'", "")}
             fontSize={item["left_group_name"].length < 8 ? 18 : 14}
+            width={200}
+            align={is_left ? "right" : "left"}
           />
           <Rect
             x={is_left ? 130 : 625}
@@ -33,10 +35,12 @@ function CreateDantaiText(item, lineWidth) {
             visible={"left_out" in item}
           />
           <Text
-            x={is_left ? 140 : 630}
+            x={is_left ? 10 : 630}
             y={item["right_begin_y"] - 5}
             text={item["right_group_name"].replace("'", "").replace("'", "")}
             fontSize={item["right_group_name"].length < 8 ? 18 : 14}
+            width={200}
+            align={is_left ? "right" : "left"}
           />
           <Rect
             x={is_left ? 130 : 625}
@@ -53,10 +57,12 @@ function CreateDantaiText(item, lineWidth) {
       return (
         <>
           <Text
-            x={is_left ? 140 : 630}
+            x={is_left ? 10 : 630}
             y={item["left_begin_y"] - 5}
             text={item["left_group_name"].replace("'", "").replace("'", "")}
             fontSize={item["left_group_name"].length < 8 ? 18 : 14}
+            width={200}
+            align={is_left ? "right" : "left"}
           />
           <Rect
             x={is_left ? 130 : 625}
@@ -73,10 +79,12 @@ function CreateDantaiText(item, lineWidth) {
       return (
         <>
           <Text
-            x={is_left ? 140 : 630}
+            x={is_left ? 10 : 630}
             y={item["right_begin_y"] - 5}
             text={item["right_group_name"].replace("'", "").replace("'", "")}
             fontSize={item["right_group_name"].length < 8 ? 18 : 14}
+            width={200}
+            align={is_left ? "right" : "left"}
           />
           <Rect
             x={is_left ? 130 : 625}

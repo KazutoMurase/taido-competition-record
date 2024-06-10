@@ -34,8 +34,9 @@ async function GetFromDB(req, res) {
   let query;
   if (event_name.includes("dantai")) {
     const groups_name = event_name + "_groups";
+    const groups = event_name.includes("test") ? "test_groups" : "groups";
     query =
-      "SELECT t1.id, t1.next_left_id, t1.next_right_id, t4.name AS left_group_name, t5.name AS right_group_name, t1.left_group_flag FROM " +
+      "SELECT t1.id, t1.next_left_id, t1.next_right_id, t2.name AS left_group_name, t3.name AS right_group_name, t1.left_group_flag FROM " +
       event_name +
       " AS t1 LEFT JOIN " +
       groups_name +
@@ -43,9 +44,11 @@ async function GetFromDB(req, res) {
       " LEFT JOIN " +
       groups_name +
       " AS t3 ON t1.right_group_id = t3.id" +
-      " LEFT JOIN groups " +
+      " LEFT JOIN " +
+      groups +
       " AS t4 ON t2.group_id = t4.id" +
-      " LEFT JOIN groups " +
+      " LEFT JOIN " +
+      groups +
       " AS t5 ON t3.group_id = t5.id";
   } else {
     const players_name = event_name.includes("test")

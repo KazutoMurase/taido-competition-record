@@ -42,6 +42,11 @@ const test_event_id_vs_event_name: Map<number, string> = new Map([
   [9, "女子団体法形"],
   [10, "男子団体展開"],
   [11, "女子団体展開"],
+  [12, "新人運足八法"],
+  [13, "男子級位個人実戦"],
+  [14, "男子級位個人法形"],
+  [15, "女子級位個人実戦"],
+  [16, "女子級位個人法形"],
 ]);
 
 const ProgressOnBlock: React.FC<{
@@ -110,9 +115,16 @@ const ProgressOnBlock: React.FC<{
         >
           <td>{schedule.time_schedule?.replace(/['"]+/g, "")}</td>
           <td>
-            <a href={"results/" + GetEventName(schedule.event_id)}>
-              {test_event_id_vs_event_name.get(schedule.event_id)}
-            </a>
+            {GetEventName(schedule.event_id) === "dantai" ? (
+              <>{test_event_id_vs_event_name.get(schedule.event_id)}</>
+            ) : (
+              <a
+                className="color-disabled"
+                href={"results/" + GetEventName(schedule.event_id)}
+              >
+                {test_event_id_vs_event_name.get(schedule.event_id)}
+              </a>
+            )}
           </td>
           <td>{schedule.games_text}</td>
           <td>

@@ -30,6 +30,7 @@ function onClear(item, is_test, function_after_post) {
       group_id: item.group_id,
       is_test: is_test,
       event_id: item.event_id,
+      court_id: item.court_id,
     };
   }
   axios
@@ -46,7 +47,11 @@ function ShowName(item) {
   if ("name" in item) {
     return item["name"] + "(" + item["name_kana"] + ")";
   }
-  return item["group_name"].replace("'", "").replace("'", "") + "チーム";
+  if ("group_name" in item) {
+    return item["group_name"].replace("'", "").replace("'", "");
+  } else {
+    return "全体";
+  }
 }
 
 function NotificationRequest({ update_interval, return_url, is_test = false }) {

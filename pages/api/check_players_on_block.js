@@ -150,7 +150,7 @@ async function GetFromDB(
   query =
     "SELECT " +
     (is_dantai ? "group" : "player") +
-    "_id FROM " +
+    "_id, event_id, court_id FROM " +
     notification_request_name;
   const result_requested = await client.query(query);
   const requested_data = result_requested.rows;
@@ -258,7 +258,17 @@ async function GetFromDB(
       }
     }
   }
-  return result_array;
+  // check if all requested
+  let all_requested_array = [];
+  for (let i = 0; i < requested_data.length; i++) {
+    if (!requested_data[i]["group_id"] && !requested_data[i]["player_id"]) {
+      all_requested_array.push({
+        court_id: requested_data[i]["court_id"],
+        event_id: requested_data[i]["event_id"],
+      });
+    }
+  }
+  return { items: result_array, all_requested: all_requested_array };
 }
 
 async function GetDantaiFromDB(
@@ -270,6 +280,7 @@ async function GetDantaiFromDB(
 ) {
   const client = await GetClient();
   const block_name = "block_" + req.query.block_number;
+  const groups = event_name.includes("test") ? "test_groups" : "groups";
   const event_name = is_test ? "test_dantai" : "dantai";
   const schedule_id = req.query.schedule_id;
   let query =
@@ -287,7 +298,9 @@ async function GetDantaiFromDB(
   query =
     "SELECT t1.name, t0.group_id AS id, t0.event_id FROM " +
     event_name +
-    " as t0 LEFT JOIN groups AS t1 ON t0.group_id = t1.id WHERE t0.event_id = " +
+    " as t0 LEFT JOIN " +
+    groups +
+    " AS t1 ON t0.group_id = t1.id WHERE t0.event_id = " +
     event_id +
     " and game_id = " +
     game_id;
@@ -296,7 +309,9 @@ async function GetDantaiFromDB(
     query =
       "SELECT t1.name, t0.group_id AS id, t0.event_id FROM " +
       event_name +
-      " as t0 LEFT JOIN groups AS t1 ON t0.group_id = t1.id WHERE t0.event_id = " +
+      " as t0 LEFT JOIN " +
+      groups +
+      " AS t1 ON t0.group_id = t1.id WHERE t0.event_id = " +
       event_id;
     result_dantai = await client.query(query);
     for (let i = 0; i < result_dantai.rows.length; i++) {
@@ -320,7 +335,8 @@ async function GetDantaiFromDB(
       }
     }
   }
-  return result_dantai.rows;
+  //TODO: support all_requested
+  return { items: result_dantai.rows };
 }
 
 const CheckPlayersOnBlock = async (req, res) => {

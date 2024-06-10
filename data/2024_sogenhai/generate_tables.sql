@@ -185,10 +185,10 @@ primary key(id));
 \copy zissen_woman from 'zissen_woman.csv' csv header;
 \copy hokei_sonen from 'hokei_sonen.csv' csv header;
 \copy hokei_newcommer from 'hokei_newcommer.csv' csv header;
-\copy hokei_kyuui_man from 'hokei_man.csv' csv header;
-\copy zissen_kyuui_man from 'zissen_man.csv' csv header;
-\copy hokei_kyuui_woman from 'hokei_woman.csv' csv header;
-\copy zissen_kyuui_woman from 'zissen_woman.csv' csv header;
+\copy hokei_kyuui_man from 'hokei_kyuui_man.csv' csv header;
+\copy zissen_kyuui_man from 'zissen_kyuui_man.csv' csv header;
+\copy hokei_kyuui_woman from 'hokei_kyuui_woman.csv' csv header;
+\copy zissen_kyuui_woman from 'zissen_kyuui_woman.csv' csv header;
 
 create table dantai_zissen_man_groups
 (id integer not null,
