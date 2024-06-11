@@ -865,6 +865,7 @@ function GetResult({
   };
 
   const [data, setData] = useState([]);
+  const [lineWidth, setLineWidth] = useState(50);
   useEffect(() => {
     async function fetchData() {
       const response = await fetch(
@@ -872,6 +873,10 @@ function GetResult({
       );
       const result = await response.json();
       setData(result);
+      if (result.length > 0) {
+        const roundNum = result.sort((a, b) => b.round - a.round)[0].round;
+        setLineWidth(roundNum > 6 ? 25 : 50);
+      }
     }
     fetchData();
     if (updateInterval > 0) {
@@ -884,9 +889,7 @@ function GetResult({
     }
   }, [event_name, freeze, updateInterval]);
   const sortedData = data.sort((a, b) => a.id - b.id);
-  const lineWidth = 50;
   let maxHeight = 0;
-  console.log(data);
   for (let i = 0; i < data.length; i++) {
     if ("left_begin_y" in data[i] && maxHeight < data[i]["left_begin_y"]) {
       maxHeight = data[i]["left_begin_y"];
