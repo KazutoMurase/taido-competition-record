@@ -14,3 +14,5 @@
 
 - [選手点呼係](admin/check_players.md)
 - [選手呼び出し係](admin/call_players.md)
+- [記録係](admin/record.md)
+- [司会](admin/announce.md)

@@ -8,7 +8,7 @@
 <div style="color:#009900; font-size:25px">① 初期画面　コート選択</div>
 <p><img src="../images/admin_initial_page.png" width="300" /></p>
 
-<div style="color:#009900; font-size:25px">② 競技の「呼び出し」選択</div>
+<div style="color:#009900; font-size:25px">② 競技の「呼び出し」選択 (点呼が完了すると選択可) </div>
 <p><img src="../images/block_view_for_call_players.png" width="900" /></p>
 
 <div style="color:#009900; font-size:25px">③ 選手呼び出し画面</div>
