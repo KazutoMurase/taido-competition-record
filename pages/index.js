@@ -18,7 +18,7 @@ export default function Home() {
           style={{ height: "100px" }}
         >
           <h1>
-            <u>躰道 第56回全日本大会</u>
+            <u>第1回 創玄杯 躰道競技大会</u>
           </h1>
         </Grid>
         <Grid
