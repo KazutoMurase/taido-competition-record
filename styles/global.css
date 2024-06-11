@@ -86,6 +86,7 @@ table th {
   border-bottom: 1px solid #3c6690;
   box-shadow: 0px 1px 1px rgba(255, 255, 255, 0.3) inset;
   padding: 10px 0;
+  white-space: nowrap;
 }
 
 table td {
@@ -95,6 +96,7 @@ table td {
   border-top: none;
   box-shadow: 0px -3px 5px 1px #eee inset;
   padding: 10px 0;
+  white-space: nowrap;
 }
 
 table td:last-child {
