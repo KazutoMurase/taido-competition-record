@@ -50,6 +50,19 @@ const test_event_id_vs_event_name: Map<number, string> = new Map([
   [17, "団体実戦"],
 ]);
 
+function GetGamesText(schedule) {
+  if (!schedule.games_text) {
+    return "";
+  }
+  if (schedule.before_final) {
+    return "【三決】" + schedule.games_text;
+  }
+  if (schedule.final) {
+    return "【決勝】" + schedule.games_text;
+  }
+  return schedule.games_text;
+}
+
 const ProgressOnBlock: React.FC<{
   block_number: string;
   update_interval: number;
@@ -127,7 +140,7 @@ const ProgressOnBlock: React.FC<{
               </a>
             )}
           </td>
-          <td>{schedule.games_text}</td>
+          <td>{GetGamesText(schedule)}</td>
           <td>
             {isCurrentEvent
               ? games.find(
