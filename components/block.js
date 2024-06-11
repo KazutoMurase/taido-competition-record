@@ -21,8 +21,6 @@ function ShowDetails(
   if (GetEventName(item["event_id"]) === "dantai") {
     return (
       <>
-        &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;
-        &nbsp;&nbsp;
         <Button
           variant="contained"
           type="submit"
@@ -31,8 +29,6 @@ function ShowDetails(
         >
           競技終了
         </Button>
-        &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;
-        &nbsp;&nbsp; &nbsp;&nbsp;
       </>
     );
   }
@@ -226,7 +222,7 @@ function Block({ block_number, update_interval, return_url }) {
                   <td>
                     {"game_count" in item ? item["game_count"] + "試合" : ""}
                   </td>
-                  <td>
+                  <td style={{ textAlign: "left" }}>
                     {item["event_id"] > 0 ? (
                       <Button
                         variant="contained"
