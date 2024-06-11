@@ -11,7 +11,7 @@ const ProgressCheck: React.FC = () => {
     router.back();
   };
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const blockNumberList = ["a", "b", "c", "d"];
   const [tabIndex, setTabIndex] = React.useState(0);
   const handleTabChange = (event, newValue) => {
@@ -19,30 +19,39 @@ const ProgressCheck: React.FC = () => {
   };
 
   return (
-    <div style={isMobile ? { width: '100%' } : {}}>
+    <div style={isMobile ? { width: "100%" } : {}}>
       {isMobile ? (
         <Box>
-          <Tabs value={tabIndex} onChange={handleTabChange} aria-label="Progress Tabs">
-            {blockNumberList.map(block => (
-              <Tab label={`${block.toUpperCase()}コート`} />
+          <Tabs
+            value={tabIndex}
+            onChange={handleTabChange}
+            aria-label="Progress Tabs"
+          >
+            {blockNumberList.map((block) => (
+              <Tab key={block} label={`${block.toUpperCase()}コート`} />
             ))}
           </Tabs>
           <Box>
-            <ProgressOnBlock block_number={blockNumberList[tabIndex]} update_interval={10000} return_url="/" />
+            <ProgressOnBlock
+              block_number={blockNumberList[tabIndex]}
+              update_interval={10000}
+              return_url="/"
+            />
           </Box>
         </Box>
-        ) : (
+      ) : (
         <Box display="flex">
-        {blockNumberList.map(block => (
-          <ProgressOnBlock
-            block_number={block}
-            update_interval={10000}
-            return_url="/"
+          {blockNumberList.map((block) => (
+            <ProgressOnBlock
+              key={block}
+              block_number={block}
+              update_interval={10000}
+              return_url="/"
             />
-        ))}
+          ))}
         </Box>
       )}
-        <Grid
+      <Grid
         container
         justifyContent="center"
         alignItems="center"
