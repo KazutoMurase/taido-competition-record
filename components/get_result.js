@@ -175,7 +175,7 @@ function CreateText(item, lineWidth) {
             x={is_left ? 130 : 750}
             y={item["left_begin_y"]}
             text={item["left_group_name"].replace("'", "【").replace("'", "】")}
-            fontSize={14}
+            fontSize={item["left_group_name"].length < 8 ? 14 : 12}
           />
           <Rect
             x={is_left ? 130 : 750}
@@ -219,7 +219,7 @@ function CreateText(item, lineWidth) {
             text={item["right_group_name"]
               .replace("'", "【")
               .replace("'", "】")}
-            fontSize={14}
+            fontSize={item["right_group_name"].length < 8 ? 14 : 12}
           />
           <Rect
             x={is_left ? 130 : 750}
@@ -267,7 +267,7 @@ function CreateText(item, lineWidth) {
             x={is_left ? 130 : 750}
             y={item["left_begin_y"]}
             text={item["left_group_name"].replace("'", "【").replace("'", "】")}
-            fontSize={14}
+            fontSize={item["left_group_name"].length < 8 ? 14 : 12}
           />
           <Rect
             x={is_left ? 130 : 750}
@@ -317,7 +317,7 @@ function CreateText(item, lineWidth) {
             text={item["right_group_name"]
               .replace("'", "【")
               .replace("'", "】")}
-            fontSize={14}
+            fontSize={item["right_group_name"].length < 8 ? 14 : 12}
           />
           <Rect
             x={is_left ? 130 : 750}
@@ -397,7 +397,14 @@ function CreateText(item, lineWidth) {
   return <></>;
 }
 
-function CreateBlock(item, lineWidth, editable, event_name, returnUrl) {
+function CreateBlock(
+  item,
+  lineWidth,
+  maxHeight,
+  editable,
+  event_name,
+  returnUrl,
+) {
   const router = useRouter();
 
   const onUpdate = (id, editable) => {
@@ -456,12 +463,12 @@ function CreateBlock(item, lineWidth, editable, event_name, returnUrl) {
             x={x + width / 2}
             y={item["left_begin_y"]}
             width={left_winner || right_winner ? 5 : 1}
-            height={-50}
+            height={-50 + (maxHeight ? 20 : 0)}
             fill={left_winner || right_winner ? "red" : "black"}
           />
           <Text
             x={x + width / 2 - 20}
-            y={item["left_begin_y"] - 70}
+            y={item["left_begin_y"] - 70 + (maxHeight ? 20 : 0)}
             text={"決勝"}
             fontSize={18}
           />
@@ -1109,7 +1116,14 @@ function GetResult({
           <Stage width={850} height={maxHeight + 50}>
             <Layer>
               {sortedData.map((item, index) =>
-                CreateBlock(item, lineWidth, editable, event_name, returnUrl),
+                CreateBlock(
+                  item,
+                  lineWidth,
+                  maxHeight,
+                  editable,
+                  event_name,
+                  returnUrl,
+                ),
               )}
               {sortedData.map((item, index) =>
                 event_name.includes("dantai")
