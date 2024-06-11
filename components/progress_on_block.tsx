@@ -47,6 +47,7 @@ const test_event_id_vs_event_name: Map<number, string> = new Map([
   [14, "男子級位個人法形"],
   [15, "女子級位個人実戦"],
   [16, "女子級位個人法形"],
+  [17, "団体実戦"],
 ]);
 
 const ProgressOnBlock: React.FC<{

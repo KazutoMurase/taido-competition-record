@@ -904,6 +904,9 @@ function GetResult({
   } else if (event_name.includes("dantai_zissen_man")) {
     event_full_name = "男子団体実戦競技";
     event_description = ["試合時間 1分30秒"];
+  } else if (event_name.includes("dantai_zissen")) {
+    event_full_name = "団体実戦競技";
+    event_description = ["試合時間 1分30秒"];
   } else if (event_name.includes("hokei_man")) {
     event_full_name = "男子個人法形競技";
     event_description = ["1 ・ 2 回戦：運体の法形 / 3 回戦以降：転体の法形"];
