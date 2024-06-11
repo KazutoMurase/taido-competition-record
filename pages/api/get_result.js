@@ -1,13 +1,14 @@
 import GetClient from "../../lib/db_client";
 import { Get, Set } from "../../lib/redis_client";
 
-function update(sorted_data, item, block_indices, value) {
+function update(sorted_data, item, block_indices, value, round) {
   if ("prev_left_id" in item) {
     update(
       sorted_data,
       sorted_data[item["prev_left_id"]],
       block_indices,
       value,
+      round - 1,
     );
   }
   if (!("prev_left_id" in item) || !("prev_right_id" in item)) {
@@ -23,8 +24,10 @@ function update(sorted_data, item, block_indices, value) {
       sorted_data[item["prev_right_id"]],
       block_indices,
       value,
+      round - 1,
     );
   }
+  item["round"] = round;
   item["block_pos"] = value;
 }
 
@@ -161,13 +164,6 @@ async function GetFromDB(req, res) {
       sorted_data[parseInt(next_right_id) - 1]["prev_right_id"] = i;
     }
   }
-  for (let i = 0; i < sorted_data.length; i++) {
-    if (round_num[sorted_data[i]["round"]] === undefined) {
-      round_num[sorted_data[i]["round"]] = 1;
-    } else {
-      round_num[sorted_data[i]["round"]] += 1;
-    }
-  }
   // set block pos
   let left_block_indices = [];
   let right_block_indices = [];
@@ -180,13 +176,27 @@ async function GetFromDB(req, res) {
     sorted_data[sorted_data.length - 2]["block_pos"] = "center";
     const left_block_id = sorted_data[sorted_data.length - 1]["prev_left_id"];
     const right_block_id = sorted_data[sorted_data.length - 1]["prev_right_id"];
-    update(sorted_data, sorted_data[left_block_id], left_block_indices, "left");
+    update(
+      sorted_data,
+      sorted_data[left_block_id],
+      left_block_indices,
+      "left",
+      sorted_data[left_block_id]["round"],
+    );
     update(
       sorted_data,
       sorted_data[right_block_id],
       right_block_indices,
       "right",
+      sorted_data[right_block_id]["round"],
     );
+  }
+  for (let i = 0; i < sorted_data.length; i++) {
+    if (round_num[sorted_data[i]["round"]] === undefined) {
+      round_num[sorted_data[i]["round"]] = 1;
+    } else {
+      round_num[sorted_data[i]["round"]] += 1;
+    }
   }
   for (let i = 0; i < sorted_data.length; i++) {
     let id = sorted_data[i]["id"];
