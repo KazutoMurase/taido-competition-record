@@ -148,32 +148,29 @@ const ProgressOnBlock: React.FC<{
         textAlign: "center",
         alignItems: "center",
         justifyItems: "center",
-        alignContent: "center",
       }}
     >
-      <Container maxWidth="md">
-        <Box style={{ minWidth: "840px" }}>
-          <Grid
-            container
-            justifyContent="center"
-            alignItems="center"
-            style={{ height: "80px" }}
-          >
-            <h1>{block_number.toUpperCase() + "コート"}</h1>
-          </Grid>
-          <table align="center" border={1}>
-            <thead>
-              <tr className={checkStyles.column}>
-                <th>時間</th>
-                <th>競技</th>
-                <th>試合一覧</th>
-                <th>次の試合</th>
-              </tr>
-            </thead>
-            <tbody>{scheduleTables}</tbody>
-          </table>
-        </Box>
-      </Container>
+      <Box style={{ minWidth: "500px" }}>
+        <Grid
+          container
+          justifyContent="center"
+          alignItems="center"
+          style={{ height: "80px" }}
+        >
+          <h1>{block_number.toUpperCase() + "コート"}</h1>
+        </Grid>
+        <table align="center" border={1}>
+          <thead>
+            <tr className={checkStyles.column}>
+              <th>時間</th>
+              <th>競技</th>
+              <th>試合一覧</th>
+              <th>次の試合</th>
+            </tr>
+          </thead>
+          <tbody>{scheduleTables}</tbody>
+        </table>
+      </Box>
     </div>
   );
 };
