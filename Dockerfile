@@ -59,7 +59,7 @@ ENV HOSTNAME "0.0.0.0"
 
 ENV PATH /root/.nvm/versions/node/v20.13.1/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-ENV COMPETITION_NAME "2023"
+ENV COMPETITION_NAME "2024sogenhai"
 
 WORKDIR /ws
 
