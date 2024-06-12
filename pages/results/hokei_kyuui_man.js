@@ -1,8 +1,15 @@
 import React from "react";
 import GetResult from "../../components/get_result";
 
-const Home = () => {
-  const hide = process.env.NEXT_PUBLIC_ON_TEST === "1";
+export async function getStaticProps(context) {
+  const params = { production_test: process.env.PRODUCTION_TEST };
+  return {
+    props: { params },
+  };
+}
+
+const Home = ({ params }) => {
+  const hide = params.production_test === "1";
   return (
     <>
       <GetResult event_name="hokei_kyuui_man" hide={hide} />

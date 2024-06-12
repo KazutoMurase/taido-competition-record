@@ -1,11 +1,21 @@
 import React from "react";
+import type { InferGetStaticPropsType, GetStaticProps } from "next";
 import { useRouter } from "next/router";
 import { Grid, Button, Box, Tabs, Tab, useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
 import ProgressOnBlock from "../components/progress_on_block";
 
-const ProgressCheck: React.FC = () => {
+export async function getStaticProps(context) {
+  const params = { production_test: process.env.PRODUCTION_TEST };
+  return {
+    props: { params },
+  };
+}
+
+const ProgressCheck: React.FC = ({
+  params,
+}: InferGetStaticPropsType<typeof getStaticProps>) => {
   const router = useRouter();
   const onBack = () => {
     router.back();
@@ -17,7 +27,7 @@ const ProgressCheck: React.FC = () => {
   const handleTabChange = (event, newValue) => {
     setTabIndex(newValue);
   };
-  const hide = process.env.NEXT_PUBLIC_ON_TEST === "1";
+  const hide = params.production_test === "1";
 
   return (
     <div style={isMobile ? { width: "100%" } : {}}>
