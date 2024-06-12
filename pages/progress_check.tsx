@@ -1,21 +1,21 @@
 import React from "react";
-import type { InferGetStaticPropsType, GetStaticProps } from "next";
+import { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import { Grid, Button, Box, Tabs, Tab, useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
 import ProgressOnBlock from "../components/progress_on_block";
 
-export async function getStaticProps(context) {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const params = { production_test: process.env.PRODUCTION_TEST };
   return {
     props: { params },
   };
-}
+};
 
 const ProgressCheck: React.FC = ({
   params,
-}: InferGetStaticPropsType<typeof getStaticProps>) => {
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
   const onBack = () => {
     router.back();
