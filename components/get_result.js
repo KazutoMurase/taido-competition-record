@@ -918,17 +918,17 @@ function GetResult({
     event_full_name = "団体実戦競技";
     event_description = ["試合時間 1分30秒"];
   } else if (event_name.includes("hokei_man")) {
-    event_full_name = "男子個人法形競技";
+    event_full_name = "男子段位個人法形競技";
     event_description = ["1 ・ 2 回戦：運体の法形 / 3 回戦以降：転体の法形"];
   } else if (event_name.includes("zissen_man")) {
-    event_full_name = "男子個人実戦競技";
-    event_description = ["試合時間  予選1分30秒", "胴プロテクター着用厳守"];
+    event_full_name = "男子段位個人実戦競技";
+    event_description = ["試合時間  1分30秒", "胴プロテクター着用厳守"];
   } else if (event_name.includes("hokei_woman")) {
-    event_full_name = "女子個人法形競技";
+    event_full_name = "女子段位個人法形競技";
     event_description = ["1 ・ 2 回戦：運陰の法形 / 3 回戦以降：転陰の法形"];
   } else if (event_name.includes("zissen_woman")) {
-    event_full_name = "女子個人実戦競技";
-    event_description = ["試合時間  予選1分30秒", "胴プロテクター着用厳守"];
+    event_full_name = "女子段位個人実戦競技";
+    event_description = ["試合時間  1分30秒", "胴プロテクター着用厳守"];
   } else if (event_name.includes("hokei_sonen")) {
     event_full_name = "壮年法形競技";
     event_description = [
@@ -937,20 +937,20 @@ function GetResult({
   } else if (event_name.includes("hokei_newcommer")) {
     event_full_name = "新人運足八法競技";
     event_description = [
-      "", // TODO: 何か書くべきことがあれば
+      "",
     ];
   } else if (event_name.includes("hokei_kyuui_man")) {
     event_full_name = "男子級位個人法形競技";
     event_description = ["体の法形から自由選択"];
   } else if (event_name.includes("zissen_kyuui_man")) {
     event_full_name = "男子級位個人実戦競技";
-    event_description = ["試合時間 1分30秒", "胴プロテクター着用厳守"];
+    event_description = ["試合時間 1分30秒", "胴プロテクター・面ピット着用厳守"];
   } else if (event_name.includes("hokei_kyuui_woman")) {
     event_full_name = "女子級位個人法形競技";
     event_description = ["陰の法形から自由選択"];
   } else if (event_name.includes("zissen_kyuui_woman")) {
     event_full_name = "女子級位個人実戦競技";
-    event_description = ["試合時間  予選1分30秒", "胴プロテクター着用厳守"];
+    event_description = ["試合時間  予分30秒", "胴プロテクター・面ピット着用厳守"];
   }
   // calc num of players
   let num_of_players = 0;
