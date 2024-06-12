@@ -13,8 +13,12 @@ const Home = () => {
   useEffect(() => {
     fetchData();
   }, []);
-  let event_names = data?.map((item) => GetEventName(item["id"]));
-  const filtered_event_names = event_names.filter((name) => name !== "dantai");
+  let event_names = data?.map((item) => {
+    return item["existence"] ? GetEventName(item["id"]) : "";
+  });
+  const filtered_event_names = event_names.filter((name) => {
+    return name !== "dantai" && name !== "";
+  });
   // FIXME: database_name should be obtained from env
   return (
     <>
