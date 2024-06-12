@@ -936,21 +936,25 @@ function GetResult({
     ];
   } else if (event_name.includes("hokei_newcommer")) {
     event_full_name = "新人運足八法競技";
-    event_description = [
-      "",
-    ];
+    event_description = [""];
   } else if (event_name.includes("hokei_kyuui_man")) {
     event_full_name = "男子級位個人法形競技";
     event_description = ["体の法形から自由選択"];
   } else if (event_name.includes("zissen_kyuui_man")) {
     event_full_name = "男子級位個人実戦競技";
-    event_description = ["試合時間 1分30秒", "胴プロテクター・面ピット着用厳守"];
+    event_description = [
+      "試合時間 1分30秒",
+      "胴プロテクター・面ピット着用厳守",
+    ];
   } else if (event_name.includes("hokei_kyuui_woman")) {
     event_full_name = "女子級位個人法形競技";
     event_description = ["陰の法形から自由選択"];
   } else if (event_name.includes("zissen_kyuui_woman")) {
     event_full_name = "女子級位個人実戦競技";
-    event_description = ["試合時間  予分30秒", "胴プロテクター・面ピット着用厳守"];
+    event_description = [
+      "試合時間  予分30秒",
+      "胴プロテクター・面ピット着用厳守",
+    ];
   }
   // calc num of players
   let num_of_players = 0;
