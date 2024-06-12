@@ -13,6 +13,8 @@ if [ -z "${PRODUCTION}" ]; then
         cd /ws/data/test && sudo -u postgres psql -d taido_record < generate_tables.sql
     fi
     cd /ws && npm install && npm run dev
-else
+elif [ -z "${PRODUCTION_TEST}" ]; then
     cd /ws && npm run start
+else
+    cd /ws && sed -i -e "s/NEXT_PUBLIC_ON_TEST=\"0\"/NEXT_PUBLIC_ON_TEST=\"1\"/" .env.production && npm run start
 fi
