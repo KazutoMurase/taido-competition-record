@@ -17,6 +17,7 @@ const ProgressCheck: React.FC = () => {
   const handleTabChange = (event, newValue) => {
     setTabIndex(newValue);
   };
+  const hide = process.env.NEXT_PUBLIC_ON_TEST === "1";
 
   return (
     <div style={isMobile ? { width: "100%" } : {}}>
@@ -36,6 +37,7 @@ const ProgressCheck: React.FC = () => {
               block_number={blockNumberList[tabIndex]}
               update_interval={10000}
               return_url="/"
+              hide={hide}
             />
           </Box>
         </Box>
@@ -47,6 +49,7 @@ const ProgressCheck: React.FC = () => {
               block_number={block}
               update_interval={10000}
               return_url="/"
+              hide={hide}
             />
           ))}
         </Box>
