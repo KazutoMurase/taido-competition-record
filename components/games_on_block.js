@@ -36,7 +36,7 @@ function ShowHokeiType(item, event_name) {
   ) {
     return <td>自由法形</td>;
   }
-  return <td>{item["round"] <= 2 ? "指定法形" : "自由法形"}</td>;
+  return <td>{item["round"] <= 2 ? "運の法形" : "転の法形"}</td>;
 }
 
 function GamesOnBlock({
