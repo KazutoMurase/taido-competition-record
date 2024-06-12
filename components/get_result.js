@@ -404,6 +404,7 @@ function CreateBlock(
   editable,
   event_name,
   returnUrl,
+  hide,
 ) {
   const router = useRouter();
 
@@ -431,9 +432,12 @@ function CreateBlock(
         lineWidth -
         (item["round"] - 2) * 30 -
         (220 + lineWidth + (item["round"] - 2) * 30);
-      const left_flag = event_name.includes("dantai")
-        ? item["left_group_flag"]
-        : item["left_player_flag"];
+      let left_flag;
+      if (!hide) {
+        left_flag = event_name.includes("dantai")
+          ? item["left_group_flag"]
+          : item["left_player_flag"];
+      }
       let left_winner;
       let right_winner;
       if (event_name.includes("hokei")) {
@@ -528,9 +532,12 @@ function CreateBlock(
         lineWidth -
         (item["fake_round"] - 2) * 30 -
         (220 + lineWidth + (item["fake_round"] - 2) * 30);
-      const left_flag = event_name.includes("dantai")
-        ? item["left_group_flag"]
-        : item["left_player_flag"];
+      let left_flag;
+      if (!hide) {
+        left_flag = event_name.includes("dantai")
+          ? item["left_group_flag"]
+          : item["left_player_flag"];
+      }
       let left_winner;
       let right_winner;
       if (event_name.includes("hokei")) {
@@ -623,9 +630,12 @@ function CreateBlock(
   if ("left_begin_y" in item && "right_begin_y" in item) {
     const has_left = "has_left" in item;
     const has_right = "has_right" in item;
-    const left_flag = event_name.includes("dantai")
-      ? item["left_group_flag"]
-      : item["left_player_flag"];
+    let left_flag;
+    if (!hide) {
+      left_flag = event_name.includes("dantai")
+        ? item["left_group_flag"]
+        : item["left_player_flag"];
+    }
     let left_winner;
     let right_winner;
     if (left_flag === -2) {
@@ -857,7 +867,7 @@ function GetResult({
   returnUrl = null,
   event_name = null,
   block_number = null,
-  freeze = 0,
+  hide = false,
 }) {
   const router = useRouter();
   if (returnUrl === null) {
@@ -875,9 +885,7 @@ function GetResult({
   const [lineWidth, setLineWidth] = useState(50);
   useEffect(() => {
     async function fetchData() {
-      const response = await fetch(
-        "/api/get_result?event_name=" + event_name + "&freeze=" + freeze,
-      );
+      const response = await fetch("/api/get_result?event_name=" + event_name);
       const result = await response.json();
       setData(result);
       if (result.length > 0) {
@@ -894,7 +902,7 @@ function GetResult({
         clearInterval(interval);
       };
     }
-  }, [event_name, freeze, updateInterval]);
+  }, [event_name, updateInterval]);
   const sortedData = data.sort((a, b) => a.id - b.id);
   let maxHeight = 0;
   for (let i = 0; i < data.length; i++) {
@@ -1130,6 +1138,7 @@ function GetResult({
                   editable,
                   event_name,
                   returnUrl,
+                  hide,
                 ),
               )}
               {sortedData.map((item, index) =>
