@@ -38,17 +38,6 @@ WHERE zissen_man.id = tmp_zissen_man.id;
 UPDATE zissen_man SET left_player_flag=null, left_retire=null, right_retire=null;
 DROP TABLE tmp_zissen_man;
 
-CREATE TABLE tmp_hokei_sonen AS SELECT * FROM hokei_sonen WHERE false;
-\COPY tmp_hokei_sonen FROM 'hokei_sonen.csv' WITH CSV HEADER;
-UPDATE hokei_sonen
-SET left_player_id = tmp_hokei_sonen.left_player_id,
-    right_player_id = tmp_hokei_sonen.right_player_id
-FROM tmp_hokei_sonen
-WHERE hokei_sonen.id = tmp_hokei_sonen.id;
-UPDATE hokei_sonen SET left_player_flag=null, left_retire=null, right_retire=null;
-DROP TABLE tmp_hokei_sonen;
-
-
 CREATE TABLE tmp_block_a_games AS SELECT * FROM block_a_games WHERE false;
 \COPY tmp_block_a_games FROM 'block_a_games.csv' WITH CSV HEADER;
 UPDATE block_a_games
