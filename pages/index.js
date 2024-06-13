@@ -3,7 +3,9 @@ import React from "react";
 import Container from "@mui/material/Container";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
+import Image from "next/image";
 import GetEvents from "../components/get_events";
+import topImage from "../public/top.jpeg";
 
 export default function Home() {
   const router = useRouter();
@@ -25,10 +27,19 @@ export default function Home() {
           container
           justifyContent="center"
           alignItems="center"
+          style={{ height: "350px" }}
+        >
+          <Image src={topImage} height={300} alt="" />
+        </Grid>
+        <Grid
+          container
+          justifyContent="center"
+          alignItems="center"
           style={{ height: "60px" }}
         >
           <Button
             variant="contained"
+            style={{ minWidth: "110px" }}
             type="submit"
             onClick={(e) => {
               router.push("/progress_check");
@@ -45,6 +56,7 @@ export default function Home() {
         >
           <Button
             variant="contained"
+            style={{ minWidth: "110px" }}
             type="submit"
             onClick={(e) => {
               router.push("/results");
