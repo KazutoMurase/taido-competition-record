@@ -171,7 +171,8 @@ async function GetFromDB(
           for (let k = 0; k < round - 1; k++) {
             game_id -= round_num[k + 1];
           }
-          if (round_num[round] % 2 === 0) {
+          // TODO: temporary fix for 2024sogenhai. change left/right judgement logic later
+          if (round_num[round] % 2 === 0 || event_name === "dantai_zissen") {
             block_pos = game_id <= round_num[round] / 2 ? "left" : "right";
           } else {
             block_pos = game_id <= round_num[round] / 2 + 1 ? "left" : "right";
