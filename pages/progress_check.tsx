@@ -1,11 +1,21 @@
 import React from "react";
+import { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import { Grid, Button, Box, Tabs, Tab, useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
 import ProgressOnBlock from "../components/progress_on_block";
 
-const ProgressCheck: React.FC = () => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const params = { production_test: process.env.PRODUCTION_TEST };
+  return {
+    props: { params },
+  };
+};
+
+const ProgressCheck: React.FC = ({
+  params,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
   const onBack = () => {
     router.back();
@@ -17,6 +27,7 @@ const ProgressCheck: React.FC = () => {
   const handleTabChange = (event, newValue) => {
     setTabIndex(newValue);
   };
+  const hide = params.production_test === "1";
 
   return (
     <div style={isMobile ? { width: "100%" } : {}}>
@@ -36,6 +47,7 @@ const ProgressCheck: React.FC = () => {
               block_number={blockNumberList[tabIndex]}
               update_interval={10000}
               return_url="/"
+              hide={hide}
             />
           </Box>
         </Box>
@@ -47,6 +59,7 @@ const ProgressCheck: React.FC = () => {
               block_number={block}
               update_interval={10000}
               return_url="/"
+              hide={hide}
             />
           ))}
         </Box>

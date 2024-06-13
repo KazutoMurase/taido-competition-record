@@ -67,7 +67,8 @@ const ProgressOnBlock: React.FC<{
   block_number: string;
   update_interval: number;
   return_url: string;
-}> = ({ block_number, update_interval }) => {
+  hide: boolean;
+}> = ({ block_number, update_interval, hide }) => {
   const [currentScheduleData, setCurrentScheduleData] =
     useState<CurrentScheduleData>();
   const [timeSchedules, setTimeSchedules] = useState<TimeScheduleData[]>([]);
@@ -120,7 +121,7 @@ const ProgressOnBlock: React.FC<{
     }
     const tables: JSX.Element[] = [];
     timeSchedules.forEach((schedule) => {
-      const isCurrentEvent = schedule.id === currentScheduleData.id;
+      const isCurrentEvent = hide ? 0 : schedule.id === currentScheduleData.id;
       tables.push(
         <tr
           key={schedule.id}
@@ -154,7 +155,7 @@ const ProgressOnBlock: React.FC<{
       );
     });
     setScheduleTables(tables);
-  }, [block_number, currentScheduleData, timeSchedules, games]);
+  }, [block_number, currentScheduleData, timeSchedules, games, hide]);
 
   return (
     <div
