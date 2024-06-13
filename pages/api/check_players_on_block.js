@@ -171,7 +171,11 @@ async function GetFromDB(
           for (let k = 0; k < round - 1; k++) {
             game_id -= round_num[k + 1];
           }
-          block_pos = game_id <= round_num[round] / 2 ? "left" : "right";
+          if (round_num[round] % 2 === 0) {
+            block_pos = game_id <= round_num[round] / 2 ? "left" : "right";
+          } else {
+            block_pos = game_id <= round_num[round] / 2 + 1 ? "left" : "right";
+          }
         } else {
           block_pos = "center";
           game_id = 1;
