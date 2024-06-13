@@ -10,7 +10,7 @@ import { Layer, Stage, Rect, Text } from "react-konva";
 import Grid from "@mui/material/Grid";
 import Summary from "./show_summary";
 
-function CreateDantaiText(item, lineWidth) {
+function CreateDantaiText(item, lineWidth, hide = false) {
   const is_left = item["block_pos"] === "left";
   const is_right = item["block_pos"] === "right";
   const has_left = "has_left" in item;
@@ -110,7 +110,11 @@ function CreateDantaiText(item, lineWidth) {
         <Text
           x={x - 80}
           y={item["left_begin_y"] - 10}
-          text={item["left_group_name"]?.replace("'", "").replace("'", "")}
+          text={
+            hide
+              ? ""
+              : item["left_group_name"]?.replace("'", "").replace("'", "")
+          }
           fontSize={
             (item["left_group_name"] !== null &&
               item["left_group_name"].length) < 8
@@ -121,7 +125,11 @@ function CreateDantaiText(item, lineWidth) {
         <Text
           x={x + width + 10}
           y={item["left_begin_y"] - 10}
-          text={item["right_group_name"]?.replace("'", "").replace("'", "")}
+          text={
+            hide
+              ? ""
+              : item["right_group_name"]?.replace("'", "").replace("'", "")
+          }
           fontSize={
             (item["right_group_name"] !== null &&
               item["right_group_name"].length) < 8
@@ -1130,7 +1138,7 @@ function GetResult({
               )}
               {sortedData.map((item, index) =>
                 event_name.includes("dantai")
-                  ? CreateDantaiText(item, lineWidth)
+                  ? CreateDantaiText(item, lineWidth, hide)
                   : CreateText(item, lineWidth, hide),
               )}
             </Layer>
