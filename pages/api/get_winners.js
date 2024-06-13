@@ -18,13 +18,15 @@ const GetWinners = async (req, res) => {
         " AS t3 ON t1.right_group_id = t3.id";
     } else {
       query =
-        "SELECT t1.id, t1.left_player_id AS left_id, t2.name AS left_name, t1.right_player_id AS right_id, t3.name AS right_name, t1.left_player_flag FROM " +
+        "SELECT t1.id, t1.left_player_id AS left_id, t2.name AS left_name, t2.name_kana AS left_name_kana, t1.right_player_id AS right_id, t3.name AS right_name, t3.name_kana AS right_name_kana, t1.left_player_flag, t4.name AS left_group, t5.name AS right_group FROM " +
         event_name +
         " AS t1 LEFT JOIN players AS t2 ON t1.left_player_id = t2." +
         event_name +
         "_player_id LEFT JOIN players AS t3 ON t1.right_player_id = t3." +
         event_name +
-        "_player_id";
+        "_player_id" +
+        " LEFT JOIN groups AS t4 ON t2.group_id = t4.id" +
+        " LEFT JOIN groups AS t5 ON t3.group_id = t5.id";
     }
     const result = await client.query(query);
     const sorted_data = result.rows.sort((a, b) => a.id - b.id);
@@ -40,19 +42,59 @@ const GetWinners = async (req, res) => {
     if (final_left_flag !== null) {
       if (event_name.includes("hokei")) {
         if (final_left_flag >= 2) {
-          winner1 = { name: final_data.left_name, id: final_data.left_id };
-          winner2 = { name: final_data.right_name, id: final_data.right_id };
+          winner1 = {
+            name: final_data.left_name,
+            name_kana: final_data.left_name_kana,
+            id: final_data.left_id,
+            group: final_data.left_group,
+          };
+          winner2 = {
+            name: final_data.right_name,
+            name_kana: final_data.right_name_kana,
+            id: final_data.right_id,
+            group: final_data.right_group,
+          };
         } else {
-          winner1 = { name: final_data.right_name, id: final_data.right_id };
-          winner2 = { name: final_data.left_name, id: final_data.left_id };
+          winner1 = {
+            name: final_data.right_name,
+            name_kana: final_data.right_name_kana,
+            id: final_data.right_id,
+            group: final_data.right_group,
+          };
+          winner2 = {
+            name: final_data.left_name,
+            name_kana: final_data.left_name_kana,
+            id: final_data.left_id,
+            group: final_data.left_group,
+          };
         }
       } else if (event_name.includes("zissen")) {
         if (final_left_flag >= 1) {
-          winner1 = { name: final_data.left_name, id: final_data.left_id };
-          winner2 = { name: final_data.right_name, id: final_data.right_id };
+          winner1 = {
+            name: final_data.left_name,
+            name_kana: final_data.left_name_kana,
+            id: final_data.left_id,
+            group: final_data.left_group,
+          };
+          winner2 = {
+            name: final_data.right_name,
+            name_kana: final_data.right_name_kana,
+            id: final_data.right_id,
+            group: final_data.right_group,
+          };
         } else {
-          winner1 = { name: final_data.right_name, id: final_data.right_id };
-          winner2 = { name: final_data.left_name, id: final_data.left_id };
+          winner1 = {
+            name: final_data.right_name,
+            name_kana: final_data.right_name_kana,
+            id: final_data.right_id,
+            group: final_data.right_group,
+          };
+          winner2 = {
+            name: final_data.left_name,
+            name_kana: final_data.left_name_kana,
+            id: final_data.left_id,
+            group: final_data.left_group,
+          };
         }
       }
     }
@@ -64,40 +106,56 @@ const GetWinners = async (req, res) => {
         if (before_final_left_flag >= 2) {
           winner3 = {
             name: before_final_data.left_name,
+            name_kana: before_final_data.left_name_kana,
             id: before_final_data.left_id,
+            group: before_final_data.left_group,
           };
           winner4 = {
             name: before_final_data.right_name,
+            name_kana: before_final_data.right_name_kana,
             id: before_final_data.right_id,
+            group: before_final_data.right_group,
           };
         } else {
           winner3 = {
             name: before_final_data.right_name,
+            name_kana: before_final_data.right_name_kana,
             id: before_final_data.right_id,
+            group: before_final_data.right_group,
           };
           winner4 = {
             name: before_final_data.left_name,
+            name_kana: before_final_data.left_name_kana,
             id: before_final_data.left_id,
+            group: before_final_data.left_group,
           };
         }
       } else if (event_name.includes("zissen")) {
         if (before_final_left_flag >= 1) {
           winner3 = {
             name: before_final_data.left_name,
+            name_kana: before_final_data.left_name_kana,
             id: before_final_data.left_id,
+            group: before_final_data.left_group,
           };
           winner4 = {
             name: before_final_data.right_name,
+            name_kana: before_final_data.right_name_kana,
             id: before_final_data.right_id,
+            group: before_final_data.right_group,
           };
         } else {
           winner3 = {
             name: before_final_data.right_name,
+            name_kana: before_final_data.right_name_kana,
             id: before_final_data.right_id,
+            group: before_final_data.right_group,
           };
           winner4 = {
             name: before_final_data.left_name,
+            name_kana: before_final_data.left_name_kana,
             id: before_final_data.left_id,
+            group: before_final_data.left_group,
           };
         }
       }

@@ -8,7 +8,7 @@ import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import { Layer, Stage, Rect, Text } from "react-konva";
 import Grid from "@mui/material/Grid";
-import GetSummary from "./get_summary";
+import Summary from "./show_summary";
 
 function CreateDantaiText(item, lineWidth) {
   const is_left = item["block_pos"] === "left";
@@ -341,7 +341,7 @@ function CreateText(item, lineWidth) {
     return (
       <>
         <Text
-          x={x - 200}
+          x={x - 220}
           y={item["left_begin_y"] - 10}
           text={item["left_name"]}
           fontSize={
@@ -351,13 +351,13 @@ function CreateText(item, lineWidth) {
           }
         />
         <Text
-          x={x - 200}
+          x={x - 220}
           y={item["left_begin_y"] - 30}
           text={item["left_name_kana"]}
           fontSize={12}
         />
         <Text
-          x={x - 90}
+          x={x - 110}
           y={item["left_begin_y"] - 5}
           text={
             item["left_group_name"] !== null
@@ -1129,11 +1129,8 @@ function GetResult({
               )}
             </Layer>
           </Stage>
-          <GetSummary
-            winner1={winner1}
-            winner2={winner2}
-            winner3={winner3}
-            winner4={winner4}
+          <Summary
+            winners={{ 1: winner1, 2: winner2, 3: winner3, 4: winner4 }}
           />
           <Grid
             container

@@ -20,7 +20,7 @@ function ShowWinner(item) {
   }
 }
 
-function GetSummary(winner1, winner2, winner3, winner4) {
+function Summary({ winners }) {
   return (
     <Grid
       container
@@ -37,10 +37,34 @@ function GetSummary(winner1, winner2, winner3, winner4) {
             <td>第4位</td>
           </tr>
           <tr style={{ height: "80px" }}>
-            <td>{winner1 ? (winner1.group ? ShowWinner(winner1) : "") : ""}</td>
-            <td>{winner2 ? (winner2.group ? ShowWinner(winner2) : "") : ""}</td>
-            <td>{winner3 ? (winner3.group ? ShowWinner(winner3) : "") : ""}</td>
-            <td>{winner4 ? (winner4.group ? ShowWinner(winner4) : "") : ""}</td>
+            <td>
+              {winners["1"]
+                ? winners["1"].group
+                  ? ShowWinner(winners["1"])
+                  : ""
+                : ""}
+            </td>
+            <td>
+              {winners["2"]
+                ? winners["2"].group
+                  ? ShowWinner(winners["2"])
+                  : ""
+                : ""}
+            </td>
+            <td>
+              {winners["3"]
+                ? winners["3"].group
+                  ? ShowWinner(winners["3"])
+                  : ""
+                : ""}
+            </td>
+            <td>
+              {winners["4"]
+                ? winners["4"].group
+                  ? ShowWinner(winners["4"])
+                  : ""
+                : ""}
+            </td>
           </tr>
         </tbody>
       </table>
@@ -48,4 +72,4 @@ function GetSummary(winner1, winner2, winner3, winner4) {
   );
 }
 
-export default GetSummary;
+export default Summary;
