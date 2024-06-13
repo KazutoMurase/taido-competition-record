@@ -35,6 +35,7 @@ function GetEvents() {
       >
         <Button
           variant="contained"
+          style={{ minWidth: "140px" }}
           type="submit"
           onClick={(e) => ToResult(event_name)}
         >
