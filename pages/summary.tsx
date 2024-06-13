@@ -7,7 +7,7 @@ const Summary: React.FC = ({}) => {
   return (
     <>
       {event_ids.map((id) => (
-        <GetSummary event_id={id} />
+        <GetSummary key={id} event_id={id} />
       ))}
     </>
   );
