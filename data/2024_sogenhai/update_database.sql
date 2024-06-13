@@ -31,6 +31,17 @@ FROM tmp_hokei_man
 WHERE hokei_man.id = tmp_hokei_man.id;
 DROP TABLE tmp_hokei_man;
 
+CREATE TABLE tmp_zissen_man AS SELECT * FROM zissen_man WHERE false;
+\COPY tmp_zissen_man FROM 'zissen_man.csv' WITH CSV HEADER;
+UPDATE zissen_man
+SET left_player_id = tmp_zissen_man.left_player_id,
+    right_player_id = tmp_zissen_man.right_player_id,
+    next_left_id = tmp_zissen_man.next_left_id,
+    next_right_id = tmp_zissen_man.next_right_id
+FROM tmp_zissen_man
+WHERE zissen_man.id = tmp_zissen_man.id;
+DROP TABLE tmp_zissen_man;
+
 CREATE TABLE tmp_zissen_kyuui_man AS SELECT * FROM zissen_kyuui_man WHERE false;
 \COPY tmp_zissen_kyuui_man FROM 'zissen_kyuui_man.csv' WITH CSV HEADER;
 UPDATE zissen_kyuui_man
@@ -98,6 +109,17 @@ SET left_player_id = tmp_hokei_newcommer.left_player_id,
 FROM tmp_hokei_newcommer
 WHERE hokei_newcommer.id = tmp_hokei_newcommer.id;
 DROP TABLE tmp_hokei_newcommer;
+
+CREATE TABLE tmp_dantai_zissen AS SELECT * FROM dantai_zissen WHERE false;
+\COPY tmp_dantai_zissen FROM 'dantai_zissen.csv' WITH CSV HEADER;
+UPDATE dantai_zissen
+SET left_player_id = tmp_dantai_zissen.left_player_id,
+    right_player_id = tmp_dantai_zissen.right_player_id,
+    next_left_id = tmp_dantai_zissen.next_left_id,
+    next_right_id = tmp_dantai_zissen.next_right_id
+FROM tmp_dantai_zissen
+WHERE dantai_zissen.id = tmp_dantai_zissen.id;
+DROP TABLE tmp_dantai_zissen;
 
 CREATE TABLE tmp_block_a AS SELECT * FROM block_a WHERE false;
 \COPY tmp_block_a FROM 'block_a.csv' WITH CSV HEADER;
