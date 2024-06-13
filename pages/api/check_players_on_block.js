@@ -2,6 +2,36 @@ import GetClient from "../../lib/db_client";
 import { Get, Set } from "../../lib/redis_client";
 import { GetEventName } from "../../lib/get_event_name";
 
+function update(sorted_data, item, block_indices, value, round) {
+  if ("prev_left_id" in item) {
+    update(
+      sorted_data,
+      sorted_data[item["prev_left_id"]],
+      block_indices,
+      value,
+      round - 1,
+    );
+  }
+  if (!("prev_left_id" in item) || !("prev_right_id" in item)) {
+    if (value === "left") {
+      block_indices.push(item["id"]);
+    } else {
+      block_indices.splice(0, 0, item["id"]);
+    }
+  }
+  if ("prev_right_id" in item) {
+    update(
+      sorted_data,
+      sorted_data[item["prev_right_id"]],
+      block_indices,
+      value,
+      round - 1,
+    );
+  }
+  item["round"] = round;
+  item["block_pos"] = value;
+}
+
 async function GetFromDB(
   req,
   res,
@@ -141,6 +171,33 @@ async function GetFromDB(
       sorted_data[parseInt(next_right_id) - 1]["prev_right_id"] = i;
     }
   }
+  // set block pos
+  let left_block_indices = [];
+  let right_block_indices = [];
+  if (
+    sorted_data.length > 3 &&
+    "prev_left_id" in sorted_data[sorted_data.length - 1] &&
+    "prev_right_id" in sorted_data[sorted_data.length - 1]
+  ) {
+    sorted_data[sorted_data.length - 1]["block_pos"] = "center";
+    sorted_data[sorted_data.length - 2]["block_pos"] = "center";
+    const left_block_id = sorted_data[sorted_data.length - 1]["prev_left_id"];
+    const right_block_id = sorted_data[sorted_data.length - 1]["prev_right_id"];
+    update(
+      sorted_data,
+      sorted_data[left_block_id],
+      left_block_indices,
+      "left",
+      sorted_data[left_block_id]["round"],
+    );
+    update(
+      sorted_data,
+      sorted_data[right_block_id],
+      right_block_indices,
+      "right",
+      sorted_data[right_block_id]["round"],
+    );
+  }
   for (let i = 0; i < sorted_data.length; i++) {
     if (round_num[sorted_data[i]["round"]] === undefined) {
       round_num[sorted_data[i]["round"]] = 1;
@@ -159,11 +216,10 @@ async function GetFromDB(
   let result_array = [];
   for (let i = 0; i < data.length; i++) {
     for (let j = 0; j < sorted_data.length; j++) {
+      const block_pos = sorted_data[j].block_pos;
       if (data[i].id === sorted_data[j].id) {
         let game_id;
-        let block_pos;
         if (j === sorted_data.length - 1) {
-          block_pos = "center";
           game_id = 1;
         } else if ("round" in sorted_data[j]) {
           const round = sorted_data[j]["round"];
@@ -171,9 +227,7 @@ async function GetFromDB(
           for (let k = 0; k < round - 1; k++) {
             game_id -= round_num[k + 1];
           }
-          block_pos = game_id <= round_num[round] / 2 ? "left" : "right";
         } else {
-          block_pos = "center";
           game_id = 1;
         }
         const left_id = is_dantai
@@ -265,6 +319,7 @@ async function GetFromDB(
       }
     }
   }
+  console.log(result_array);
   // check if all requested
   let all_requested_array = [];
   for (let i = 0; i < requested_data.length; i++) {

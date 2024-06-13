@@ -1,5 +1,35 @@
 import GetClient from "../../lib/db_client";
 
+function update(sorted_data, item, block_indices, value, round) {
+  if ("prev_left_id" in item) {
+    update(
+      sorted_data,
+      sorted_data[item["prev_left_id"]],
+      block_indices,
+      value,
+      round - 1,
+    );
+  }
+  if (!("prev_left_id" in item) || !("prev_right_id" in item)) {
+    if (value === "left") {
+      block_indices.push(item["id"]);
+    } else {
+      block_indices.splice(0, 0, item["id"]);
+    }
+  }
+  if ("prev_right_id" in item) {
+    update(
+      sorted_data,
+      sorted_data[item["prev_right_id"]],
+      block_indices,
+      value,
+      round - 1,
+    );
+  }
+  item["round"] = round;
+  item["block_pos"] = value;
+}
+
 const GetGame = async (req, res) => {
   try {
     const client = await GetClient();
@@ -37,7 +67,6 @@ const GetGame = async (req, res) => {
     const result_schedule = await client.query(query);
     const sorted_data = result_schedule.rows.sort((a, b) => a.id - b.id);
     // set round 0, 1,...until (without final and before final)
-    let round_num = {};
     for (let i = 0; i < sorted_data.length; i++) {
       if (i == sorted_data.length - 2) {
         sorted_data[i]["fake_round"] = sorted_data[i - 1]["round"] + 1;
@@ -125,37 +154,42 @@ const GetGame = async (req, res) => {
         sorted_data[parseInt(next_right_id) - 1]["prev_right_id"] = i;
       }
     }
-    for (let i = 0; i < sorted_data.length; i++) {
-      if (round_num[sorted_data[i]["round"]] === undefined) {
-        round_num[sorted_data[i]["round"]] = 1;
-      } else {
-        round_num[sorted_data[i]["round"]] += 1;
-      }
+    // set block pos
+    let left_block_indices = [];
+    let right_block_indices = [];
+    if (
+      sorted_data.length > 3 &&
+      "prev_left_id" in sorted_data[sorted_data.length - 1] &&
+      "prev_right_id" in sorted_data[sorted_data.length - 1]
+    ) {
+      sorted_data[sorted_data.length - 1]["block_pos"] = "center";
+      sorted_data[sorted_data.length - 2]["block_pos"] = "center";
+      const left_block_id = sorted_data[sorted_data.length - 1]["prev_left_id"];
+      const right_block_id =
+        sorted_data[sorted_data.length - 1]["prev_right_id"];
+      update(
+        sorted_data,
+        sorted_data[left_block_id],
+        left_block_indices,
+        "left",
+        sorted_data[left_block_id]["round"],
+      );
+      update(
+        sorted_data,
+        sorted_data[right_block_id],
+        right_block_indices,
+        "right",
+        sorted_data[right_block_id]["round"],
+      );
     }
     // select item
     for (let i = 0; i < sorted_data.length; i++) {
-      console.log(sorted_data[i]);
       if (sorted_data[i]["id"] === current_id) {
-        if (i === sorted_data.length - 1) {
-          sorted_data[i]["block_pos"] = "center";
-          sorted_data[i]["left_color"] = "red";
-        } else if ("round" in sorted_data[i]) {
-          const round = sorted_data[i]["round"];
-          let game_id = sorted_data[i]["id"];
-          for (let j = 0; j < round - 1; j++) {
-            game_id -= round_num[j + 1];
-          }
-          if (game_id <= round_num[round] / 2) {
-            // sorted_data[i]['block_pos'] = 'left';
-            sorted_data[i]["left_color"] = "red";
-          } else {
-            //sorted_data[i]['block_pos'] = 'right';
-            sorted_data[i]["left_color"] = "white";
-          }
-        } else {
-          sorted_data[i]["block_pos"] = "center";
-          sorted_data[i]["left_color"] = "red";
-        }
+        sorted_data[i].left_color =
+          sorted_data[i].block_pos == "left" ||
+          sorted_data[i].block_pos == "center"
+            ? "red"
+            : "white";
         console.log(sorted_data[i]);
         res.json(sorted_data[i]);
         return;
