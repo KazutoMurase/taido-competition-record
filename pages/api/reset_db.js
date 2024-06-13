@@ -35,10 +35,11 @@ async function UpdateEventFromCSV(client, db_name, event_name) {
   const records = await parseAsync(fileData);
   const is_dantai = event_name.includes("dantai");
   const type_name = is_dantai ? "group" : "player";
+  let query;
   for (const record of records) {
     const left_id = is_dantai ? record.left_player_id : record.left_group_id;
     const right_id = is_dantai ? record.right_player_id : record.right_group_id;
-    const query = {
+    query = {
       text:
         "UPDATE " +
         event_name +
@@ -53,9 +54,24 @@ async function UpdateEventFromCSV(client, db_name, event_name) {
         record.id,
       ],
     };
-    client.query(query);
+    // before_final / final
+    if (record.next_left_id === "" && record.next_right_id === "") {
+      query = {
+        text:
+          "UPDATE " +
+          event_name +
+          " SET left_" +
+          type_name +
+          "_id = $1," +
+          " right_" +
+          type_name +
+          "_id = $2 WHERE id = $3",
+        values: [null, null, record.id],
+      };
+      client.query(query);
+    }
   }
-  let query =
+  query =
     "UPDATE " +
     event_name +
     " SET left_" +
