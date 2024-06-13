@@ -8,6 +8,7 @@ import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import { Layer, Stage, Rect, Text } from "react-konva";
 import Grid from "@mui/material/Grid";
+import Summary from "./show_summary";
 
 function CreateDantaiText(item, lineWidth) {
   const is_left = item["block_pos"] === "left";
@@ -340,7 +341,7 @@ function CreateText(item, lineWidth) {
     return (
       <>
         <Text
-          x={x - 200}
+          x={x - 220}
           y={item["left_begin_y"] - 10}
           text={item["left_name"]}
           fontSize={
@@ -350,13 +351,13 @@ function CreateText(item, lineWidth) {
           }
         />
         <Text
-          x={x - 200}
+          x={x - 220}
           y={item["left_begin_y"] - 30}
           text={item["left_name_kana"]}
           fontSize={12}
         />
         <Text
-          x={x - 90}
+          x={x - 110}
           y={item["left_begin_y"] - 5}
           text={
             item["left_group_name"] !== null
@@ -840,26 +841,6 @@ function CreateBlock(
   return <></>;
 }
 
-function ShowWinner(item) {
-  if (item["name"] !== undefined) {
-    return (
-      <>
-        <div style={{ fontSize: "10px" }}>{item["name_kana"]}</div>
-        <b style={{ fontSize: "16px" }}>{item["name"]}</b>
-        <div style={{ fontSize: "12px" }}>
-          {item["group"].replace("'", "【").replace("'", "】")}
-        </div>
-      </>
-    );
-  } else {
-    return (
-      <div style={{ fontSize: "16px" }}>
-        {item["group"].replace("'", "").replace("'", "")}
-      </div>
-    );
-  }
-}
-
 function GetResult({
   backUrl = null,
   editable = false,
@@ -1148,40 +1129,9 @@ function GetResult({
               )}
             </Layer>
           </Stage>
-          <Grid
-            container
-            justifyContent="center"
-            alignItems="center"
-            style={{ height: "120px" }}
-          >
-            <table
-              border="1"
-              style={{ width: "800px", "table-layout": "fixed" }}
-            >
-              <tbody>
-                <tr style={{ fontSize: "12px" }}>
-                  <td>優勝　</td>
-                  <td>第2位</td>
-                  <td>第3位</td>
-                  <td>第4位</td>
-                </tr>
-                <tr style={{ height: "80px" }}>
-                  <td>
-                    {winner1 ? (winner1.group ? ShowWinner(winner1) : "") : ""}
-                  </td>
-                  <td>
-                    {winner2 ? (winner2.group ? ShowWinner(winner2) : "") : ""}
-                  </td>
-                  <td>
-                    {winner3 ? (winner3.group ? ShowWinner(winner3) : "") : ""}
-                  </td>
-                  <td>
-                    {winner4 ? (winner4.group ? ShowWinner(winner4) : "") : ""}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </Grid>
+          <Summary
+            winners={{ 1: winner1, 2: winner2, 3: winner3, 4: winner4 }}
+          />
           <Grid
             container
             justifyContent="center"
