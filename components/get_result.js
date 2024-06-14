@@ -10,7 +10,7 @@ import { Layer, Stage, Rect, Text } from "react-konva";
 import Grid from "@mui/material/Grid";
 import Summary from "./show_summary";
 
-function CreateDantaiText(item, lineWidth) {
+function CreateDantaiText(item, lineWidth, hide = false) {
   const is_left = item["block_pos"] === "left";
   const is_right = item["block_pos"] === "right";
   const has_left = "has_left" in item;
@@ -110,7 +110,11 @@ function CreateDantaiText(item, lineWidth) {
         <Text
           x={x - 80}
           y={item["left_begin_y"] - 10}
-          text={item["left_group_name"]?.replace("'", "").replace("'", "")}
+          text={
+            hide
+              ? ""
+              : item["left_group_name"]?.replace("'", "").replace("'", "")
+          }
           fontSize={
             (item["left_group_name"] !== null &&
               item["left_group_name"].length) < 8
@@ -121,7 +125,11 @@ function CreateDantaiText(item, lineWidth) {
         <Text
           x={x + width + 10}
           y={item["left_begin_y"] - 10}
-          text={item["right_group_name"]?.replace("'", "").replace("'", "")}
+          text={
+            hide
+              ? ""
+              : item["right_group_name"]?.replace("'", "").replace("'", "")
+          }
           fontSize={
             (item["right_group_name"] !== null &&
               item["right_group_name"].length) < 8
@@ -135,7 +143,7 @@ function CreateDantaiText(item, lineWidth) {
   return <></>;
 }
 
-function CreateText(item, lineWidth) {
+function CreateText(item, lineWidth, hide = false) {
   const is_left = item["block_pos"] === "left";
   const is_right = item["block_pos"] === "right";
   const has_left = "has_left" in item;
@@ -343,7 +351,7 @@ function CreateText(item, lineWidth) {
         <Text
           x={x - 220}
           y={item["left_begin_y"] - 10}
-          text={item["left_name"]}
+          text={hide ? "" : item["left_name"]}
           fontSize={
             (item["left_name"] !== null && item["left_name"].length) < 8
               ? 18
@@ -353,14 +361,14 @@ function CreateText(item, lineWidth) {
         <Text
           x={x - 220}
           y={item["left_begin_y"] - 30}
-          text={item["left_name_kana"]}
+          text={hide ? "" : item["left_name_kana"]}
           fontSize={12}
         />
         <Text
           x={x - 110}
           y={item["left_begin_y"] - 5}
           text={
-            item["left_group_name"] !== null
+            item["left_group_name"] !== null && !hide
               ? item["left_group_name"].replace("'", "【").replace("'", "】")
               : ""
           }
@@ -369,7 +377,7 @@ function CreateText(item, lineWidth) {
         <Text
           x={x + width + 10}
           y={item["left_begin_y"] - 10}
-          text={item["right_name"]}
+          text={hide ? "" : item["right_name"]}
           fontSize={
             (item["right_name"] !== null && item["right_name"].length) < 8
               ? 18
@@ -379,14 +387,14 @@ function CreateText(item, lineWidth) {
         <Text
           x={x + width + 10}
           y={item["left_begin_y"] - 30}
-          text={item["right_name_kana"]}
+          text={hide ? "" : item["right_name_kana"]}
           fontSize={12}
         />
         <Text
           x={x + width + 130}
           y={item["left_begin_y"] - 5}
           text={
-            item["right_group_name"] !== null
+            item["right_group_name"] !== null && !hide
               ? item["right_group_name"].replace("'", "【").replace("'", "】")
               : ""
           }
@@ -1076,6 +1084,12 @@ function GetResult({
       }
     }
   }
+  if (hide) {
+    winner1 = null;
+    winner2 = null;
+    winner3 = null;
+    winner4 = null;
+  }
   return (
     <div>
       <Container maxWidth="md">
@@ -1124,8 +1138,8 @@ function GetResult({
               )}
               {sortedData.map((item, index) =>
                 event_name.includes("dantai")
-                  ? CreateDantaiText(item, lineWidth)
-                  : CreateText(item, lineWidth),
+                  ? CreateDantaiText(item, lineWidth, hide)
+                  : CreateText(item, lineWidth, hide),
               )}
             </Layer>
           </Stage>
