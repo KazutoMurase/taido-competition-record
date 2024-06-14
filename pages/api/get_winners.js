@@ -8,7 +8,7 @@ const GetWinners = async (req, res) => {
     if (event_name.includes("dantai")) {
       const groups_name = event_name + "_groups";
       query =
-        "SELECT t1.id, t1.left_group_id AS left_id, t2.name AS left_name, t1.right_group_id AS right_id, t3.name AS right_name, t1.left_group_flag FROM " +
+        "SELECT t1.id, t1.left_group_id AS left_id, t2.name AS left_group, t1.right_group_id AS right_id, t3.name AS right_group, t1.left_group_flag FROM " +
         event_name +
         " AS t1 LEFT JOIN " +
         groups_name +
