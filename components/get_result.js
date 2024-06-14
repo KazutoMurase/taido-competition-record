@@ -99,9 +99,9 @@ function CreateDantaiText(item, lineWidth, hide = false) {
       );
     }
   } else if ("fake_round" in item) {
-    const x = 220 + lineWidth + (item["fake_round"] - 2) * 30;
+    const x = 150 + lineWidth + (item["fake_round"] - 2) * 30;
     const width =
-      620 -
+      690 -
       lineWidth -
       (item["fake_round"] - 2) * 30 -
       (220 + lineWidth + (item["fake_round"] - 2) * 30);
