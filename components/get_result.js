@@ -1123,26 +1123,33 @@ function GetResult({
             </Grid>
           ))}
           <br />
-          <Stage width={850} height={maxHeight + 50}>
-            <Layer>
-              {sortedData.map((item, index) =>
-                CreateBlock(
-                  item,
-                  lineWidth,
-                  maxHeight,
-                  editable,
-                  event_name,
-                  returnUrl,
-                  hide,
-                ),
-              )}
-              {sortedData.map((item, index) =>
-                event_name.includes("dantai")
-                  ? CreateDantaiText(item, lineWidth, hide)
-                  : CreateText(item, lineWidth, hide),
-              )}
-            </Layer>
-          </Stage>
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            style={{ height: maxHeight + 50 }}
+          >
+            <Stage width={850} height={maxHeight + 50}>
+              <Layer>
+                {sortedData.map((item, index) =>
+                  CreateBlock(
+                    item,
+                    lineWidth,
+                    maxHeight,
+                    editable,
+                    event_name,
+                    returnUrl,
+                    hide,
+                  ),
+                )}
+                {sortedData.map((item, index) =>
+                  event_name.includes("dantai")
+                    ? CreateDantaiText(item, lineWidth, hide)
+                    : CreateText(item, lineWidth, hide),
+                )}
+              </Layer>
+            </Stage>
+          </Grid>
           <Summary
             winners={{ 1: winner1, 2: winner2, 3: winner3, 4: winner4 }}
           />
@@ -1158,8 +1165,6 @@ function GetResult({
           </Grid>
         </Box>
       </Container>
-      <br />
-      <br />
     </div>
   );
 }
