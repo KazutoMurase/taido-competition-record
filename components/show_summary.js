@@ -1,6 +1,6 @@
 import Grid from "@mui/material/Grid";
 
-function ShowWinner(item) {
+export function ShowWinner(item) {
   if (item["name"] !== undefined) {
     return (
       <>
@@ -13,8 +13,10 @@ function ShowWinner(item) {
     );
   } else {
     return (
-      <div style={{ fontSize: "16px" }}>
-        {item["group"].replace("'", "").replace("'", "")}
+      <div>
+        <b style={{ fontSize: "16px" }}>
+          {item["group"]?.replace("'", "").replace("'", "")}
+        </b>
       </div>
     );
   }
