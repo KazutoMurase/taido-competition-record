@@ -1,9 +1,11 @@
 #!/bin/bash
 competition_name=$1
 
-systemctl start redis-server.service
+if [ "${USE_LOCAL_REDIS}" == "1" ]; then
+    systemctl start redis-server.service
+fi
 
-if [ -z "${PRODUCTION}" ]; then
+if [ "${USE_LOCAL_DB}" == "1" ]; then
     /etc/init.d/postgresql start
     if sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -qw taido_record; then
         echo "database already exists."
@@ -12,6 +14,10 @@ if [ -z "${PRODUCTION}" ]; then
         cd /ws/data/$competition_name && sudo -u postgres psql -d taido_record < generate_tables.sql
         cd /ws/data/test && sudo -u postgres psql -d taido_record < generate_tables.sql
     fi
+fi
+
+
+if [ -z "${PRODUCTION}" ]; then
     cd /ws && npm install && npm run dev
 else
     cd /ws && npm run start
