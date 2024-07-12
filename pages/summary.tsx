@@ -13,6 +13,14 @@ const Summary: React.FC = ({}) => {
   const event_ids = [1, 2, 3, 4, 12, 13, 14, 15, 16, 17];
   return (
     <>
+      <Grid
+        container
+        justifyContent="center"
+        alignItems="center"
+        style={{ height: "80px" }}
+      >
+        <h1>サマリー</h1>
+      </Grid>
       {event_ids.map((id) => (
         <GetSummary key={id} event_id={id} />
       ))}

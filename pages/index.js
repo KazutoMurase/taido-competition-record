@@ -9,6 +9,9 @@ import topImage from "../public/top.jpeg";
 
 export default function Home() {
   const router = useRouter();
+  const ToSummary = () => {
+    router.push("/summary");
+  };
   return (
     <div>
       <br />
@@ -63,6 +66,20 @@ export default function Home() {
             }}
           >
             競技結果一覧
+          </Button>
+        </Grid>
+        <Grid
+          container
+          justifyContent="center"
+          alignItems="center"
+          style={{ height: "80px" }}
+        >
+          <Button
+            variant="contained"
+            type="submit"
+            onClick={(e) => ToSummary()}
+          >
+            サマリー
           </Button>
         </Grid>
       </Container>
