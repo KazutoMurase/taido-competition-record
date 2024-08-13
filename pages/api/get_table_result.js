@@ -41,7 +41,7 @@ async function GetFromDB(req, res) {
     result[data.round].push(data);
     return result;
   }, {});
-
+  // TODO: don't update rank until all the scores are set
   const ranked_data = Object.values(grouped_data).flatMap((round_group) => {
     round_group.sort((a, b) => {
       if (b.sum_score === a.sum_score) {

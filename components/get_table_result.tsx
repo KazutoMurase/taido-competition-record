@@ -3,6 +3,7 @@ import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import checkStyles from "../styles/checks.module.css";
+import Summary from "./show_summary";
 
 const GetTableResult: React.FC<{
   update_interval: number;
@@ -10,27 +11,40 @@ const GetTableResult: React.FC<{
   hide: boolean;
 }> = ({ update_interval = 10000, event_name = null, hide = false }) => {
   const [resultTable, setResultTable] = useState([]);
+  const [resultWinners, setResultWinners] = useState({});
 
   const fetchData = useCallback(async () => {
     fetch("/api/get_table_result?event_name=" + event_name)
       .then((response) => response.json())
       .then((data) => {
         const tables: JSX.Element[] = [];
+        const winners = {};
         data.forEach((elem) => {
+          const group_name = elem.name.replace(/['"]+/g, "");
           tables.push(
             <tr key={elem.id}>
               <td>{elem.id}</td>
-              <td>{elem.name.replace(/['"]+/g, "")}</td>
-              <td>{elem.main_score}</td>
-              <td>{elem.sub1_score}</td>
-              <td>{elem.sub2_score}</td>
-              <td className={checkStyles.border_right}>{elem.penalty}</td>
-              <td className={checkStyles.border_right}>{elem.sum_score}</td>
-              <td>{elem.rank}</td>
+              <td>{group_name}</td>
+              <td>{elem.main_score ? elem.main_score.toFixed(1) : ""}</td>
+              <td>{elem.sub1_score ? elem.sub1_score.toFixed(1) : ""}</td>
+              <td>{elem.sub2_score ? elem.sub2_score.toFixed(1) : ""}</td>
+              <td className={checkStyles.border_right}>
+                {elem.penalty ? elem.penalty.toFixed(1) : ""}
+              </td>
+              <td className={checkStyles.border_right}>
+                {elem.sum_score ? elem.sum_score.toFixed(1) : ""}
+              </td>
+              <td className={elem.rank < 4 ? checkStyles.winner : null}>
+                {elem.rank}
+              </td>
             </tr>,
           );
+          if (elem.rank) {
+            winners[elem.rank] = { group: group_name };
+          }
         });
         setResultTable(tables);
+        setResultWinners(winners);
       });
   }, [event_name]);
   useEffect(() => {
@@ -94,9 +108,14 @@ const GetTableResult: React.FC<{
               </tr>
             </thead>
             <tbody>{resultTable}</tbody>
+            <caption className={checkStyles.table_caption}>
+              ※1：競技順番は実行委員会で抽選を行いました。
+            </caption>
           </table>
         </Box>
       </Container>
+      <p />
+      <Summary winners={resultWinners} />
     </div>
   );
 };
