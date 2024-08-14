@@ -31,7 +31,7 @@ const GetTableResult: React.FC<{
           tables.push(
             <tr key={elem.id}>
               <td>{elem.id}</td>
-              <td>{group_name}</td>
+              <td>{elem.retire ? <s>{group_name}</s> : <>{group_name}</>}</td>
               <td>{elem.main_score ? elem.main_score.toFixed(1) : ""}</td>
               <td>{elem.sub1_score ? elem.sub1_score.toFixed(1) : ""}</td>
               <td>{elem.sub2_score ? elem.sub2_score.toFixed(1) : ""}</td>
