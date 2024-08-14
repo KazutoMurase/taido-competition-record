@@ -16,3 +16,21 @@
 .warn {
   color: red;
 }
+
+.border_bottom td {
+  border-bottom: 4px double;
+}
+
+.border_right {
+  border-right: 4px double;
+}
+
+.winner {
+  color: red;
+  font-weight: bold;
+}
+
+.table_caption {
+  caption-side: bottom;
+  text-align: left;
+}
