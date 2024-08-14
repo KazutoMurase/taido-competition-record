@@ -1,4 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
@@ -10,6 +12,11 @@ const GetTableResult: React.FC<{
   event_name: string;
   hide: boolean;
 }> = ({ update_interval = 10000, event_name = null, hide = false }) => {
+  const router = useRouter();
+  const onBack = () => {
+    router.back();
+  };
+
   const [resultTable, setResultTable] = useState([]);
   const [resultWinners, setResultWinners] = useState({});
 
@@ -116,6 +123,16 @@ const GetTableResult: React.FC<{
       </Container>
       <p />
       <Summary winners={resultWinners} />
+      <Grid
+        container
+        justifyContent="center"
+        alignItems="center"
+        style={{ height: "80px" }}
+      >
+        <Button variant="contained" type="submit" onClick={(e) => onBack()}>
+          戻る
+        </Button>
+      </Grid>
     </div>
   );
 };

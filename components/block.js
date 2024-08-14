@@ -112,9 +112,17 @@ function Block({ block_number, update_interval, return_url }) {
     );
   };
   const ToRecord = (block_number, id, event_id) => {
+    let record_url;
+    if (GetEventName(event_id).includes("dantai_hokei")) {
+      record_url = "record_table_result";
+    } else {
+      record_url = "record_result";
+    }
     router.push(
       return_url +
-        "/record_result?block_number=" +
+        "/" +
+        record_url +
+        "?block_number=" +
         block_number +
         "&schedule_id=" +
         id +
