@@ -204,18 +204,6 @@ function CheckTable({
             alignItems="center"
             style={{ height: "80px" }}
           >
-            <h3 className={checkStyles.warn}>
-              {data.items && data.items.length > 0 && "all" in data.items[0]
-                ? "※全団体が表示されていますので、点呼するべき団体を確認して下さい"
-                : ""}
-            </h3>
-          </Grid>
-          <Grid
-            container
-            justifyContent="center"
-            alignItems="center"
-            style={{ height: "80px" }}
-          >
             <Button
               variant="contained"
               type="submit"
