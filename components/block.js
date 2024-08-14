@@ -131,9 +131,17 @@ function Block({ block_number, update_interval, return_url }) {
     );
   };
   const ToUpdate = (block_number, id, event_id) => {
+    let check_url;
+    if (GetEventName(event_id).includes("dantai_hokei")) {
+      check_url = "check_table_result";
+    } else {
+      check_url = "check_result";
+    }
     router.push(
       return_url +
-        "/check_result?block_number=" +
+        "/" +
+        check_url +
+        "?block_number=" +
         block_number +
         "&schedule_id=" +
         id +
