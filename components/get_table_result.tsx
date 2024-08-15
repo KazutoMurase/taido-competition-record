@@ -1,4 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
@@ -9,7 +11,29 @@ const GetTableResult: React.FC<{
   update_interval: number;
   event_name: string;
   hide: boolean;
-}> = ({ update_interval = 10000, event_name = null, hide = false }) => {
+  editable: boolean;
+  back_url: string;
+  return_url: string;
+}> = ({
+  update_interval = 10000,
+  event_name = null,
+  hide = false,
+  editable = false,
+  back_url = null,
+  return_url = null,
+}) => {
+  const router = useRouter();
+  if (return_url === null) {
+    return_url = event_name + "_result";
+  }
+  const onBack = () => {
+    if (back_url === null) {
+      router.back();
+    } else {
+      router.push(back_url);
+    }
+  };
+
   const [resultTable, setResultTable] = useState([]);
   const [resultWinners, setResultWinners] = useState({});
 
@@ -23,8 +47,26 @@ const GetTableResult: React.FC<{
           const group_name = elem.name.replace(/['"]+/g, "");
           tables.push(
             <tr key={elem.id}>
-              <td>{elem.id}</td>
-              <td>{group_name}</td>
+              <td>
+                {editable ? (
+                  <a
+                    className="color-disabled"
+                    href={
+                      "update_table_result?event_name=" +
+                      event_name +
+                      "&id=" +
+                      elem.id +
+                      "&return_url=" +
+                      return_url
+                    }
+                  >
+                    {elem.id}
+                  </a>
+                ) : (
+                  <>{elem.id}</>
+                )}
+              </td>
+              <td>{elem.retire ? <s>{group_name}</s> : <>{group_name}</>}</td>
               <td>{elem.main_score ? elem.main_score.toFixed(1) : ""}</td>
               <td>{elem.sub1_score ? elem.sub1_score.toFixed(1) : ""}</td>
               <td>{elem.sub2_score ? elem.sub2_score.toFixed(1) : ""}</td>
@@ -46,7 +88,7 @@ const GetTableResult: React.FC<{
         setResultTable(tables);
         setResultWinners(winners);
       });
-  }, [event_name]);
+  }, [event_name, editable, return_url]);
   useEffect(() => {
     fetchData();
     if (update_interval > 0) {
@@ -116,6 +158,16 @@ const GetTableResult: React.FC<{
       </Container>
       <p />
       <Summary winners={resultWinners} />
+      <Grid
+        container
+        justifyContent="center"
+        alignItems="center"
+        style={{ height: "80px" }}
+      >
+        <Button variant="contained" type="submit" onClick={(e) => onBack()}>
+          戻る
+        </Button>
+      </Grid>
     </div>
   );
 };
