@@ -952,6 +952,24 @@ function GetResult({
       "試合時間  1分30秒",
       "胴プロテクター・面ピット着用厳守",
     ];
+  } else if (event_name.includes("hokei_kyuui")) {
+    event_full_name = "級位個人法形競技";
+    event_description = [];
+  } else if (event_name.includes("zissen_sonen_man")) {
+    event_full_name = "壮年男子個人実戦競技";
+    event_description = [];
+  } else if (event_name.includes("zissen_sonen_woman")) {
+    event_full_name = "壮年女子個人実戦競技";
+    event_description = [];
+  } else if (event_name.includes("hokei_mei_kyuui_newcommer")) {
+    event_full_name = "命の法形(新人・級位)";
+    event_description = [];
+  } else if (event_name.includes("hokei_mei")) {
+    event_full_name = "命の法形";
+    event_description = [];
+  } else if (event_name.includes("hokei_sei")) {
+    event_full_name = "制の法形";
+    event_description = [];
   }
   // calc num of players
   let num_of_players = 0;
