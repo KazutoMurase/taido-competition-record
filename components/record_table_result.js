@@ -21,22 +21,51 @@ function onSubmit(
     event_name: event_name,
     update_block: block_number,
   };
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < 19; i++) {
     if (values[i] === null && initialValues[i] !== "") {
       values[i] = initialValues[i];
     }
   }
-  if (values[0] !== null && values[1] !== null) {
-    post["main_score"] = (parseInt(values[0]) * 10 + parseInt(values[1])) / 10;
+  if (
+    values[0] !== null &&
+    values[1] !== null &&
+    values[2] !== null &&
+    values[3] !== null
+  ) {
+    post["elapsed_time"] =
+      (parseInt(values[0]) * 1000 +
+        parseInt(values[1]) * 100 +
+        parseInt(values[2]) * 10 +
+        parseInt(values[3])) /
+      100;
   }
-  if (values[2] !== null && values[3] !== null) {
-    post["sub1_score"] = (parseInt(values[2]) * 10 + parseInt(values[3])) / 10;
+  if (values[5] !== null && values[6] !== null) {
+    post["main_score"] =
+      ((values[4] !== null ? parseInt(values[4]) * 100 : 0) +
+        parseInt(values[5]) * 10 +
+        parseInt(values[6])) /
+      10;
   }
-  if (values[4] !== null && values[5] !== null) {
-    post["sub2_score"] = (parseInt(values[4]) * 10 + parseInt(values[5])) / 10;
+  if (values[7] !== null && values[8] !== null) {
+    post["sub1_score"] = (parseInt(values[7]) * 10 + parseInt(values[8])) / 10;
   }
-  if (values[6] !== null && values[7] !== null) {
-    post["penalty"] = -(parseInt(values[6]) * 10 + parseInt(values[7])) / 10;
+  if (values[9] !== null && values[10] !== null) {
+    post["sub2_score"] = (parseInt(values[9]) * 10 + parseInt(values[10])) / 10;
+  }
+  if (values[11] !== null && values[12] !== null) {
+    post["sub3_score"] =
+      (parseInt(values[11]) * 10 + parseInt(values[12])) / 10;
+  }
+  if (values[13] !== null && values[14] !== null) {
+    post["sub4_score"] =
+      (parseInt(values[13]) * 10 + parseInt(values[14])) / 10;
+  }
+  if (values[15] !== null && values[16] !== null) {
+    post["sub5_score"] =
+      (parseInt(values[15]) * 10 + parseInt(values[16])) / 10;
+  }
+  if (values[17] !== null && values[18] !== null) {
+    post["penalty"] = -(parseInt(values[17]) * 10 + parseInt(values[18])) / 10;
   } else {
     post["penalty"] = null;
   }
@@ -62,50 +91,49 @@ function onBack(data, block_number, function_after_post) {
     });
 }
 
-function ScoreField(title, values, initialValues, refs, index, handleChange) {
+function ScoreField(
+  title,
+  values,
+  initialValues,
+  refs,
+  start_index,
+  period_index,
+  last_index,
+  handleChange,
+) {
+  const fields = [];
+  for (let i = start_index; i <= last_index; i++) {
+    fields.push(
+      <TextField
+        value={values[i] !== null ? values[i] : initialValues[i]}
+        onChange={(event) => handleChange(i, event)}
+        inputRef={refs[i]}
+        inputProps={{
+          maxLength: 1,
+          style: { textAlign: "center", fontSize: "4rem" },
+          inputMode: "numeric",
+          pattern: "[0-9]*",
+        }}
+        variant="outlined"
+        size="small"
+        sx={{
+          width: "4rem",
+        }}
+      />,
+    );
+    if (i === period_index) {
+      fields.push(
+        <Typography variant="h3" sx={{ mx: 1 }}>
+          .
+        </Typography>,
+      );
+    }
+  }
   return (
     <Box display="flex" flexDirection="column" alignItems="center">
       <Typography variant="h4">{title}</Typography>
       <Box display="flex" flexDirection="row" alignItems="flex-end">
-        <TextField
-          value={values[index] !== null ? values[index] : initialValues[index]}
-          onChange={(event) => handleChange(index, event)}
-          inputRef={refs[index]}
-          inputProps={{
-            maxLength: 1,
-            style: { textAlign: "center", fontSize: "4rem" },
-            inputMode: "numeric",
-            pattern: "[0-9]*",
-          }}
-          variant="outlined"
-          size="small"
-          sx={{
-            width: "4rem",
-          }}
-        />
-        <Typography variant="h3" sx={{ mx: 1 }}>
-          .
-        </Typography>
-        <TextField
-          value={
-            values[index + 1] !== null
-              ? values[index + 1]
-              : initialValues[index + 1]
-          }
-          onChange={(event) => handleChange(index + 1, event)}
-          inputRef={refs[index + 1]}
-          inputProps={{
-            maxLength: 1,
-            style: { textAlign: "center", fontSize: "4rem" },
-            inputMode: "numeric",
-            pattern: "[0-9]*",
-          }}
-          variant="outlined"
-          size="small"
-          sx={{
-            width: "4rem",
-          }}
-        />
+        {fields}
       </Box>
     </Box>
   );
@@ -113,45 +141,57 @@ function ScoreField(title, values, initialValues, refs, index, handleChange) {
 
 function CalcSum(values, initialValues) {
   let sum = 0.0;
+  let elapsed_time = 0.0;
   if (values[0] !== null) {
-    sum += (values[0] ? parseInt(values[0]) : 0) * 10;
+    elapsed_time += values[0] ? parseInt(values[0] * 1000) : 0;
   } else if (initialValues[0] !== "") {
-    sum += parseInt(initialValues[0]) * 10;
+    elapsed_time += parseInt(initialValues[0]) * 1000;
   }
   if (values[1] !== null) {
-    sum += values[1] ? parseInt(values[1]) : 0;
+    elapsed_time += values[1] ? parseInt(values[1] * 100) : 0;
   } else if (initialValues[1] !== "") {
-    sum += parseInt(initialValues[1]);
+    elapsed_time += parseInt(initialValues[1] * 100);
   }
   if (values[2] !== null) {
-    sum += (values[2] ? parseInt(values[2]) : 0) * 10;
+    elapsed_time += values[2] ? parseInt(values[2]) * 10 : 0;
   } else if (initialValues[2] !== "") {
-    sum += parseInt(initialValues[2]) * 10;
+    elapsed_time += parseInt(initialValues[2]) * 10;
   }
   if (values[3] !== null) {
-    sum += values[3] ? parseInt(values[3]) : 0;
+    elapsed_time += values[3] ? parseInt(values[3]) : 0;
   } else if (initialValues[3] !== "") {
-    sum += parseInt(initialValues[3]);
+    elapsed_time += parseInt(initialValues[3]);
+  }
+  elapsed_time /= 100;
+  if (elapsed_time > 0.0) {
+    if (elapsed_time >= 30.0) {
+      sum -= Math.ceil((elapsed_time - 30.0) * 2) * 0.5 * 10;
+    } else if (elapsed_time <= 25.0) {
+      sum -= Math.ceil((25.0 - elapsed_time) * 2) * 0.5 * 10;
+    }
   }
   if (values[4] !== null) {
-    sum += (values[4] ? parseInt(values[4]) : 0) * 10;
+    sum += (values[4] ? parseInt(values[4]) : 0) * 100;
   } else if (initialValues[4] !== "") {
-    sum += parseInt(initialValues[4]) * 10;
+    sum += parseInt(initialValues[4]) * 100;
   }
-  if (values[5] !== null) {
-    sum += values[5] ? parseInt(values[5]) : 0;
-  } else if (initialValues[5] !== "") {
-    sum += parseInt(initialValues[5]);
+  for (let i = 5; i < 17; i++) {
+    const scale = i % 2 ? 10 : 1;
+    if (values[i] !== null) {
+      sum += (values[i] ? parseInt(values[i]) : 0) * scale;
+    } else if (initialValues[i] !== "") {
+      sum += parseInt(initialValues[i]) * scale;
+    }
   }
-  if (values[6] !== null) {
-    sum -= (values[6] ? parseInt(values[6]) : 0) * 10;
-  } else if (initialValues[6] !== "") {
-    sum -= parseInt(initialValues[6]) * 10;
+  if (values[17] !== null) {
+    sum -= (values[17] ? parseInt(values[17]) : 0) * 10;
+  } else if (initialValues[17] !== "") {
+    sum -= parseInt(initialValues[17]) * 10;
   }
-  if (values[7] !== null) {
-    sum -= values[7] ? parseInt(values[7]) : values[7];
-  } else if (initialValues[7] !== "") {
-    sum -= parseInt(initialValues[7]);
+  if (values[18] !== null) {
+    sum -= values[18] ? parseInt(values[18]) : values[18];
+  } else if (initialValues[18] !== "") {
+    sum -= parseInt(initialValues[18]);
   }
   return (
     <Typography variant="h1" color="red">
@@ -166,8 +206,19 @@ function RecordTableResult({
   schedule_id,
   update_interval,
 }) {
-  // main, sub1, sub2, penalty
+  // time x4, main x3, sub1 x2, sub2 x2, sub3 x2, sub4 x2, sub5 x2, penalty x2
   const [values, setValues] = useState([
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
     null,
     null,
     null,
@@ -186,8 +237,30 @@ function RecordTableResult({
     "",
     "",
     "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
   ]);
   const inputRefs = [
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
     useRef(null),
     useRef(null),
     useRef(null),
@@ -213,22 +286,61 @@ function RecordTableResult({
     if (result.length === 0) {
       router.push("block?block_number=" + block_number);
     }
-    let initialValues = ["", "", "", "", "", "", "", ""];
+    let initialValues = [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+    ];
+    if (result.elapsed_time) {
+      initialValues[0] = parseInt(result.elapsed_time / 10);
+      initialValues[1] = parseInt(result.elapsed_time % 10);
+      initialValues[2] = parseInt(result.elapsed_time * 10) % 10;
+      initialValues[3] = parseInt(result.elapsed_time * 100) % 10;
+    }
     if (result.main_score) {
-      initialValues[0] = parseInt(result.main_score);
-      initialValues[1] = parseInt(result.main_score * 10) % 10;
+      initialValues[4] = parseInt(result.main_score / 10);
+      initialValues[5] = parseInt(result.main_score % 10);
+      initialValues[6] = parseInt(result.main_score * 10) % 10;
     }
     if (result.sub1_score) {
-      initialValues[2] = parseInt(result.sub1_score);
-      initialValues[3] = parseInt(result.sub1_score * 10) % 10;
+      initialValues[7] = parseInt(result.sub1_score);
+      initialValues[8] = parseInt(result.sub1_score * 10) % 10;
     }
     if (result.sub2_score) {
-      initialValues[4] = parseInt(result.sub2_score);
-      initialValues[5] = parseInt(result.sub2_score * 10) % 10;
+      initialValues[9] = parseInt(result.sub2_score);
+      initialValues[10] = parseInt(result.sub2_score * 10) % 10;
+    }
+    if (result.sub3_score) {
+      initialValues[11] = parseInt(result.sub3_score);
+      initialValues[12] = parseInt(result.sub3_score * 10) % 10;
+    }
+    if (result.sub4_score) {
+      initialValues[13] = parseInt(result.sub4_score);
+      initialValues[14] = parseInt(result.sub4_score * 10) % 10;
+    }
+    if (result.sub5_score) {
+      initialValues[15] = parseInt(result.sub5_score);
+      initialValues[16] = parseInt(result.sub5_score * 10) % 10;
     }
     if (result.penalty) {
-      initialValues[6] = parseInt(-result.penalty);
-      initialValues[7] = parseInt(-result.penalty * 10) % 10;
+      initialValues[17] = parseInt(-result.penalty);
+      initialValues[18] = parseInt(-result.penalty * 10) % 10;
     }
     setInitialValues(initialValues);
     setData(result);
@@ -253,8 +365,11 @@ function RecordTableResult({
       const newValues = [...values];
       newValues[index] = value;
       setValues(newValues);
-      if (index < inputRefs.length - 1) {
-        inputRefs[index + 1].current.focus();
+      for (let i = index + 1; i < inputRefs.length; i++) {
+        if (inputRefs[i].current !== null) {
+          inputRefs[i].current.focus();
+          break;
+        }
       }
     } else if (value === "") {
       const newValues = [...values];
@@ -262,6 +377,7 @@ function RecordTableResult({
       setValues(newValues);
     }
   };
+  const main_score_start_index = event_name.includes("tenkai") ? 4 : 5;
   return (
     <div>
       <Container maxWidth="md">
@@ -299,13 +415,31 @@ function RecordTableResult({
             )}
           </Grid>
         </Box>
+        {event_name.includes("tenkai") ? (
+          <Box display="flex" alignItems="center" justifyContent="center">
+            {ScoreField(
+              "時間",
+              values,
+              initialValues,
+              inputRefs,
+              0,
+              1,
+              3,
+              handleChange,
+            )}
+          </Box>
+        ) : (
+          <></>
+        )}
         <Box display="flex" alignItems="center" justifyContent="center">
           {ScoreField(
             "主審",
             values,
             initialValues,
             inputRefs,
-            0,
+            main_score_start_index,
+            5,
+            6,
             handleChange,
           )}
           <Typography variant="h4" sx={{ mx: 1, mt: 5 }}>
@@ -316,7 +450,9 @@ function RecordTableResult({
             values,
             initialValues,
             inputRefs,
-            2,
+            7,
+            7,
+            8,
             handleChange,
           )}
           <Typography variant="h4" sx={{ mx: 1, mt: 5 }}>
@@ -327,21 +463,90 @@ function RecordTableResult({
             values,
             initialValues,
             inputRefs,
-            4,
+            9,
+            9,
+            10,
             handleChange,
           )}
-          <Typography variant="h4" sx={{ mx: 1, mt: 5 }}>
-            -
-          </Typography>
-          {ScoreField(
-            "場外減点",
-            values,
-            initialValues,
-            inputRefs,
-            6,
-            handleChange,
+          {event_name.includes("tenkai") ? (
+            <>
+              <Typography variant="h4" sx={{ mx: 1, mt: 5 }}>
+                +
+              </Typography>
+              {ScoreField(
+                "副審3",
+                values,
+                initialValues,
+                inputRefs,
+                11,
+                11,
+                12,
+                handleChange,
+              )}
+            </>
+          ) : (
+            <>
+              <Typography variant="h4" sx={{ mx: 1, mt: 5 }}>
+                -
+              </Typography>
+              {ScoreField(
+                "場外減点",
+                values,
+                initialValues,
+                inputRefs,
+                17,
+                17,
+                18,
+                handleChange,
+              )}
+            </>
           )}
         </Box>
+        {event_name.includes("tenkai") ? (
+          <Box display="flex" alignItems="center" justifyContent="center">
+            <Typography variant="h4" sx={{ mx: 1, mt: 5 }}>
+              +
+            </Typography>
+            {ScoreField(
+              "副審4",
+              values,
+              initialValues,
+              inputRefs,
+              13,
+              13,
+              14,
+              handleChange,
+            )}
+            <Typography variant="h4" sx={{ mx: 1, mt: 5 }}>
+              +
+            </Typography>
+            {ScoreField(
+              "副審5",
+              values,
+              initialValues,
+              inputRefs,
+              15,
+              15,
+              16,
+              handleChange,
+            )}
+            <Typography variant="h4" sx={{ mx: 1, mt: 5 }}>
+              -
+            </Typography>
+            {ScoreField(
+              "場外減点",
+              values,
+              initialValues,
+              inputRefs,
+              17,
+              17,
+              18,
+              handleChange,
+            )}
+          </Box>
+        ) : (
+          <></>
+        )}
         <Box display="flex" alignItems="center" justifyContent="center">
           <Box display="flex" flexDirection="column" alignItems="center">
             <Typography variant="h4" sx={{ mx: 1, mt: 5 }}>

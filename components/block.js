@@ -113,8 +113,10 @@ function Block({ block_number, update_interval, return_url }) {
   };
   const ToRecord = (block_number, id, event_id) => {
     let record_url;
-    if (GetEventName(event_id).includes("dantai_hokei") ||
-        GetEventName(event_id).includes("tenkai")) {
+    if (
+      GetEventName(event_id).includes("dantai_hokei") ||
+      GetEventName(event_id).includes("tenkai")
+    ) {
       record_url = "record_table_result";
     } else {
       record_url = "record_result";
@@ -133,8 +135,10 @@ function Block({ block_number, update_interval, return_url }) {
   };
   const ToUpdate = (block_number, id, event_id) => {
     let check_url;
-    if (GetEventName(event_id).includes("dantai_hokei") ||
-        GetEventName(event_id).includes("tenkai")) {
+    if (
+      GetEventName(event_id).includes("dantai_hokei") ||
+      GetEventName(event_id).includes("tenkai")
+    ) {
       check_url = "check_table_result";
     } else {
       check_url = "check_result";

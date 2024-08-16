@@ -88,7 +88,7 @@ const GetTableResult: React.FC<{
                     {elem.elapsed_time ? elem.elapsed_time.toFixed(2) : ""}
                   </td>
                   <td>
-                    {elem.time_penalty ? elem.time_penalty.toFixed(2) : ""}
+                    {elem.time_penalty ? elem.time_penalty.toFixed(1) : ""}
                   </td>
                   <td>{elem.penalty ? elem.penalty.toFixed(1) : ""}</td>
                   <td className={checkStyles.border_right}>

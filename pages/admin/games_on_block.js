@@ -13,8 +13,7 @@ const Home = () => {
     return <></>;
   }
   const event_name = GetEventName(event_id);
-  if (event_name.includes("dantai_hokei") ||
-      event_name.includes("tenkai")) {
+  if (event_name.includes("dantai_hokei") || event_name.includes("tenkai")) {
     return (
       <>
         <TableProgressOnBlock

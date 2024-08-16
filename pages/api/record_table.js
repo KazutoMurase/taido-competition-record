@@ -28,6 +28,34 @@ const RecordTable = async (req, res) => {
         req.body.sub2_score;
       initial_value_is_set = true;
     }
+    if (req.body.sub3_score) {
+      query +=
+        (initial_value_is_set ? "," : " ") +
+        "sub3_score=" +
+        req.body.sub3_score;
+      initial_value_is_set = true;
+    }
+    if (req.body.sub4_score) {
+      query +=
+        (initial_value_is_set ? "," : " ") +
+        "sub4_score=" +
+        req.body.sub4_score;
+      initial_value_is_set = true;
+    }
+    if (req.body.sub5_score) {
+      query +=
+        (initial_value_is_set ? "," : " ") +
+        "sub5_score=" +
+        req.body.sub5_score;
+      initial_value_is_set = true;
+    }
+    if (req.body.elapsed_time) {
+      query +=
+        (initial_value_is_set ? "," : " ") +
+        "elapsed_time=" +
+        req.body.elapsed_time;
+      initial_value_is_set = true;
+    }
     if (req.body.penalty !== undefined) {
       query +=
         (initial_value_is_set ? "," : " ") + "penalty=" + req.body.penalty;
