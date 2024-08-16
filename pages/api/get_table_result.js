@@ -1,19 +1,27 @@
 import GetClient from "../../lib/db_client";
 import { Get, Set } from "../../lib/redis_client";
 
-// FIXME: need to support tenkai
 async function GetFromDB(req, res) {
   const client = await GetClient();
   const event_name = req.query.event_name;
   let query;
   const groups_name = event_name + "_groups";
   const groups = event_name.includes("test") ? "test_groups" : "groups";
-  query =
-    "SELECT t1.id, t1.round, t1.main_score, t1.sub1_score, t1.sub2_score, t1.penalty, t1.retire, t2.name FROM " +
-    event_name +
-    " AS t1 LEFT JOIN " +
-    groups_name +
-    " AS t2 ON t1.group_id = t2.id";
+  if (event_name.includes("tenkai")) {
+    query =
+      "SELECT t1.id, t1.round, t1.main_score, t1.sub1_score, t1.sub2_score, t1.sub3_score, t1.sub4_score, t1.sub5_score, t1.elapsed_time, t1.penalty, t1.retire, t2.name FROM " +
+      event_name +
+      " AS t1 LEFT JOIN " +
+      groups_name +
+      " AS t2 ON t1.group_id = t2.id";
+  } else {
+    query =
+      "SELECT t1.id, t1.round, t1.main_score, t1.sub1_score, t1.sub2_score, t1.penalty, t1.retire, t2.name FROM " +
+      event_name +
+      " AS t1 LEFT JOIN " +
+      groups_name +
+      " AS t2 ON t1.group_id = t2.id";
+  }
   const result_schedule = await client.query(query);
   const sorted_data = result_schedule.rows.sort((a, b) => a.id - b.id);
   for (let i = 0; i < sorted_data.length; i++) {
@@ -29,8 +37,30 @@ async function GetFromDB(req, res) {
     if (sorted_data[i]["sub2_score"]) {
       sum_score += parseFloat(sorted_data[i]["sub2_score"]) * 10;
     }
+    if (sorted_data[i]["sub3_score"]) {
+      sum_score += parseFloat(sorted_data[i]["sub3_score"]) * 10;
+    }
+    if (sorted_data[i]["sub4_score"]) {
+      sum_score += parseFloat(sorted_data[i]["sub4_score"]) * 10;
+    }
+    if (sorted_data[i]["sub5_score"]) {
+      sum_score += parseFloat(sorted_data[i]["sub5_score"]) * 10;
+    }
+    sorted_data[i]["sum_score_without_penalty"] = sum_score
+      ? sum_score / 10
+      : null;
     if (sorted_data[i]["penalty"]) {
       sum_score += parseFloat(sorted_data[i]["penalty"]) * 10;
+    }
+    if (sorted_data[i]["elapsed_time"]) {
+      const time = parseFloat(sorted_data[i]["elapsed_time"]);
+      if (time >= 30.0) {
+        sorted_data[i]["time_penalty"] = -Math.ceil((time - 30.0) * 2) * 0.5;
+        sum_score += sorted_data[i]["time_penalty"] * 10;
+      } else if (time <= 25.0) {
+        sorted_data[i]["time_penalty"] = -Math.ceil((25.0 - time) * 2) * 0.5;
+        sum_score += sorted_data[i]["time_penalty"] * 10;
+      }
     }
     sorted_data[i]["sum_score"] = sum_score ? sum_score / 10 : null;
   }

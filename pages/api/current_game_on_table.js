@@ -29,13 +29,23 @@ async function GetFromDB(req, res) {
   let current_id = result.rows[0].game_id;
   const groups_name = event_name + "_groups";
   const groups = event_name.includes("test") ? "test_groups" : "groups";
-  query =
-    "SELECT t1.id, t2.name, t1.main_score, t1.sub1_score, t1.sub2_score, t1.penalty, t1.retire FROM " +
-    event_name +
-    " AS t1 LEFT JOIN " +
-    groups_name +
-    " AS t2 ON t1.group_id = t2.id WHERE t1.id = " +
-    current_id;
+  if (event_name.includes("tenkai")) {
+    query =
+      "SELECT t1.id, t2.name, t1.main_score, t1.sub1_score, t1.sub2_score, t1.sub3_score, t1.sub4_score, t1.sub5_score, t1.elapsed_time, t1.penalty, t1.retire FROM " +
+      event_name +
+      " AS t1 LEFT JOIN " +
+      groups_name +
+      " AS t2 ON t1.group_id = t2.id WHERE t1.id = " +
+      current_id;
+  } else {
+    query =
+      "SELECT t1.id, t2.name, t1.main_score, t1.sub1_score, t1.sub2_score, t1.penalty, t1.retire FROM " +
+      event_name +
+      " AS t1 LEFT JOIN " +
+      groups_name +
+      " AS t2 ON t1.group_id = t2.id WHERE t1.id = " +
+      current_id;
+  }
   const result_schedule = await client.query(query);
   if (result_schedule.rows.length === 0) {
     return [];
