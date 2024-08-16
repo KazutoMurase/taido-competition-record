@@ -25,7 +25,8 @@ const Home = () => {
         />
       </>
     );
-  } else if (event_name.includes("dantai_hokei")) {
+  } else if (event_name.includes("dantai_hokei") ||
+             event_name.includes("tenkai")) {
     return (
       <>
         <CheckTable

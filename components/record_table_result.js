@@ -22,20 +22,20 @@ function onSubmit(
     update_block: block_number,
   };
   for (let i = 0; i < 8; i++) {
-    if (values[i] === null && initialValues[i]) {
+    if (values[i] === null && initialValues[i] !== "") {
       values[i] = initialValues[i];
     }
   }
-  if (values[0] && values[1]) {
+  if (values[0] !== null && values[1] !== null) {
     post["main_score"] = (parseInt(values[0]) * 10 + parseInt(values[1])) / 10;
   }
-  if (values[2] && values[3]) {
+  if (values[2] !== null && values[3] !== null) {
     post["sub1_score"] = (parseInt(values[2]) * 10 + parseInt(values[3])) / 10;
   }
-  if (values[4] && values[5]) {
+  if (values[4] !== null && values[5] !== null) {
     post["sub2_score"] = (parseInt(values[4]) * 10 + parseInt(values[5])) / 10;
   }
-  if (values[6] && values[7]) {
+  if (values[6] !== null && values[7] !== null) {
     post["penalty"] = -(parseInt(values[6]) * 10 + parseInt(values[7])) / 10;
   } else {
     post["penalty"] = null;

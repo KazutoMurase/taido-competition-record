@@ -66,19 +66,57 @@ const GetTableResult: React.FC<{
                   <>{elem.id}</>
                 )}
               </td>
-              <td>{elem.retire ? <s>{group_name}</s> : <>{group_name}</>}</td>
-              <td>{elem.main_score ? elem.main_score.toFixed(1) : ""}</td>
-              <td>{elem.sub1_score ? elem.sub1_score.toFixed(1) : ""}</td>
-              <td>{elem.sub2_score ? elem.sub2_score.toFixed(1) : ""}</td>
-              <td className={checkStyles.border_right}>
-                {elem.penalty ? elem.penalty.toFixed(1) : ""}
-              </td>
-              <td className={checkStyles.border_right}>
-                {elem.sum_score ? elem.sum_score.toFixed(1) : ""}
-              </td>
-              <td className={elem.rank < 4 ? checkStyles.winner : null}>
-                {elem.rank}
-              </td>
+              {event_name.includes("tenkai") ? (
+                <>
+                  <td>
+                    {elem.retire ? <s>{group_name}</s> : <>{group_name}</>}
+                  </td>
+                  <td>{elem.main_score ? elem.main_score.toFixed(1) : ""}</td>
+                  <td>{elem.sub1_score ? elem.sub1_score.toFixed(1) : ""}</td>
+                  <td>{elem.sub2_score ? elem.sub2_score.toFixed(1) : ""}</td>
+                  <td>{elem.sub3_score ? elem.sub3_score.toFixed(1) : ""}</td>
+                  <td>{elem.sub4_score ? elem.sub4_score.toFixed(1) : ""}</td>
+                  <td className={checkStyles.border_right}>
+                    {elem.sub5_score ? elem.sub5_score.toFixed(1) : ""}
+                  </td>
+                  <td className={checkStyles.border_right}>
+                    {elem.sum_score_without_penalty
+                      ? elem.sum_score_without_penalty.toFixed(1)
+                      : ""}
+                  </td>
+                  <td>
+                    {elem.elapsed_time ? elem.elapsed_time.toFixed(2) : ""}
+                  </td>
+                  <td>
+                    {elem.time_penalty ? elem.time_penalty.toFixed(2) : ""}
+                  </td>
+                  <td>{elem.penalty ? elem.penalty.toFixed(1) : ""}</td>
+                  <td className={checkStyles.border_right}>
+                    {elem.sum_score ? elem.sum_score.toFixed(1) : ""}
+                  </td>
+                  <td className={elem.rank < 4 ? checkStyles.winner : null}>
+                    {elem.rank}
+                  </td>
+                </>
+              ) : (
+                <>
+                  <td>
+                    {elem.retire ? <s>{group_name}</s> : <>{group_name}</>}
+                  </td>
+                  <td>{elem.main_score ? elem.main_score.toFixed(1) : ""}</td>
+                  <td>{elem.sub1_score ? elem.sub1_score.toFixed(1) : ""}</td>
+                  <td>{elem.sub2_score ? elem.sub2_score.toFixed(1) : ""}</td>
+                  <td className={checkStyles.border_right}>
+                    {elem.penalty ? elem.penalty.toFixed(1) : ""}
+                  </td>
+                  <td className={checkStyles.border_right}>
+                    {elem.sum_score ? elem.sum_score.toFixed(1) : ""}
+                  </td>
+                  <td className={elem.rank < 4 ? checkStyles.winner : null}>
+                    {elem.rank}
+                  </td>
+                </>
+              )}
             </tr>,
           );
           if (elem.rank) {
@@ -107,6 +145,8 @@ const GetTableResult: React.FC<{
     event_full_name = "女子団体法形競技";
   } else if (event_name.includes("dantai_hokei")) {
     event_full_name = "団体法形競技";
+  } else if (event_name.includes("tenkai")) {
+    event_full_name = "団体展開競技";
   }
   let num_of_groups = resultTable.length;
   return (
@@ -126,27 +166,71 @@ const GetTableResult: React.FC<{
           <table align="center" border={1}>
             <thead>
               <tr>
-                <td colSpan={8}>決　　勝</td>
+                <td colSpan={14}>決　　勝</td>
               </tr>
               <tr className={checkStyles.border_bottom}>
-                <td style={{ width: "50px" }}>No.</td>
-                <td style={{ width: "150px" }}>団体名</td>
-                <td style={{ width: "100px" }}>主審</td>
-                <td style={{ width: "100px" }}>副審</td>
-                <td style={{ width: "100px" }}>副審</td>
-                <td
-                  className={checkStyles.border_right}
-                  style={{ width: "100px" }}
-                >
-                  場外減点
-                </td>
-                <td
-                  className={checkStyles.border_right}
-                  style={{ width: "100px" }}
-                >
-                  合計得点
-                </td>
-                <td style={{ width: "100px" }}>順位</td>
+                {event_name.includes("tenkai") ? (
+                  <>
+                    <td style={{ width: "50px" }}>No.</td>
+                    <td style={{ width: "150px" }}>団体名</td>
+                    <td style={{ width: "50px" }}>主審</td>
+                    <td style={{ width: "50px" }}>副審1</td>
+                    <td style={{ width: "50px" }}>副審2</td>
+                    <td style={{ width: "50px" }}>副審3</td>
+                    <td style={{ width: "50px" }}>副審4</td>
+                    <td
+                      className={checkStyles.border_right}
+                      style={{ width: "50px" }}
+                    >
+                      副審5
+                    </td>
+                    <td
+                      className={checkStyles.border_right}
+                      style={{ width: "50px" }}
+                    >
+                      合計
+                    </td>
+                    <td style={{ width: "50px" }}>タイム</td>
+                    <td style={{ width: "50px" }}>
+                      時間
+                      <br />
+                      減点
+                    </td>
+                    <td style={{ width: "50px" }}>
+                      場外
+                      <br />
+                      減点
+                    </td>
+                    <td
+                      className={checkStyles.border_right}
+                      style={{ width: "50px" }}
+                    >
+                      得点
+                    </td>
+                    <td style={{ width: "50px" }}>順位</td>
+                  </>
+                ) : (
+                  <>
+                    <td style={{ width: "50px" }}>No.</td>
+                    <td style={{ width: "150px" }}>団体名</td>
+                    <td style={{ width: "100px" }}>主審</td>
+                    <td style={{ width: "100px" }}>副審</td>
+                    <td style={{ width: "100px" }}>副審</td>
+                    <td
+                      className={checkStyles.border_right}
+                      style={{ width: "100px" }}
+                    >
+                      場外減点
+                    </td>
+                    <td
+                      className={checkStyles.border_right}
+                      style={{ width: "100px" }}
+                    >
+                      合計得点
+                    </td>
+                    <td style={{ width: "100px" }}>順位</td>
+                  </>
+                )}
               </tr>
             </thead>
             <tbody>{resultTable}</tbody>
