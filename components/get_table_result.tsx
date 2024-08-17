@@ -69,64 +69,95 @@ const GetTableResult: React.FC<{
               {event_name.includes("tenkai") ? (
                 <>
                   <td>
-                    {elem.retire ? <s>{group_name}</s> : <>{group_name}</>}
+                    {elem.retire && !hide ? (
+                      <s>{group_name}</s>
+                    ) : (
+                      <>{group_name}</>
+                    )}
                   </td>
-                  <td>{elem.main_score ? elem.main_score.toFixed(1) : ""}</td>
-                  <td>{elem.sub1_score ? elem.sub1_score.toFixed(1) : ""}</td>
-                  <td>{elem.sub2_score ? elem.sub2_score.toFixed(1) : ""}</td>
-                  <td>{elem.sub3_score ? elem.sub3_score.toFixed(1) : ""}</td>
-                  <td>{elem.sub4_score ? elem.sub4_score.toFixed(1) : ""}</td>
-                  <td className={checkStyles.border_right}>
-                    {elem.sub5_score ? elem.sub5_score.toFixed(1) : ""}
+                  <td>
+                    {elem.main_score && !hide ? elem.main_score.toFixed(1) : ""}
+                  </td>
+                  <td>
+                    {elem.sub1_score && !hide ? elem.sub1_score.toFixed(1) : ""}
+                  </td>
+                  <td>
+                    {elem.sub2_score && !hide ? elem.sub2_score.toFixed(1) : ""}
+                  </td>
+                  <td>
+                    {elem.sub3_score && !hide ? elem.sub3_score.toFixed(1) : ""}
+                  </td>
+                  <td>
+                    {elem.sub4_score && !hide ? elem.sub4_score.toFixed(1) : ""}
                   </td>
                   <td className={checkStyles.border_right}>
-                    {elem.sum_score_without_penalty
+                    {elem.sub5_score && !hide ? elem.sub5_score.toFixed(1) : ""}
+                  </td>
+                  <td className={checkStyles.border_right}>
+                    {elem.sum_score_without_penalty && !hide
                       ? elem.sum_score_without_penalty.toFixed(1)
                       : ""}
                   </td>
                   <td>
-                    {elem.elapsed_time ? elem.elapsed_time.toFixed(2) : ""}
+                    {elem.elapsed_time && !hide
+                      ? elem.elapsed_time.toFixed(2)
+                      : ""}
                   </td>
                   <td>
-                    {elem.time_penalty ? elem.time_penalty.toFixed(1) : ""}
+                    {elem.time_penalty && !hide
+                      ? elem.time_penalty.toFixed(1)
+                      : ""}
                   </td>
-                  <td>{elem.penalty ? elem.penalty.toFixed(1) : ""}</td>
+                  <td>
+                    {elem.penalty && !hide ? elem.penalty.toFixed(1) : ""}
+                  </td>
                   <td className={checkStyles.border_right}>
-                    {elem.sum_score ? elem.sum_score.toFixed(1) : ""}
+                    {elem.sum_score && !hide ? elem.sum_score.toFixed(1) : ""}
                   </td>
                   <td className={elem.rank < 4 ? checkStyles.winner : null}>
-                    {elem.rank}
+                    {!hide ? elem.rank : ""}
                   </td>
                 </>
               ) : (
                 <>
                   <td>
-                    {elem.retire ? <s>{group_name}</s> : <>{group_name}</>}
+                    {elem.retire && !hide ? (
+                      <s>{group_name}</s>
+                    ) : (
+                      <>{group_name}</>
+                    )}
                   </td>
-                  <td>{elem.main_score ? elem.main_score.toFixed(1) : ""}</td>
-                  <td>{elem.sub1_score ? elem.sub1_score.toFixed(1) : ""}</td>
-                  <td>{elem.sub2_score ? elem.sub2_score.toFixed(1) : ""}</td>
-                  <td className={checkStyles.border_right}>
-                    {elem.penalty ? elem.penalty.toFixed(1) : ""}
+                  <td>
+                    {elem.main_score && !hide ? elem.main_score.toFixed(1) : ""}
+                  </td>
+                  <td>
+                    {elem.sub1_score && !hide ? elem.sub1_score.toFixed(1) : ""}
+                  </td>
+                  <td>
+                    {elem.sub2_score && !hide ? elem.sub2_score.toFixed(1) : ""}
                   </td>
                   <td className={checkStyles.border_right}>
-                    {elem.sum_score ? elem.sum_score.toFixed(1) : ""}
+                    {elem.penalty && !hide ? elem.penalty.toFixed(1) : ""}
+                  </td>
+                  <td className={checkStyles.border_right}>
+                    {elem.sum_score && !hide ? elem.sum_score.toFixed(1) : ""}
                   </td>
                   <td className={elem.rank < 4 ? checkStyles.winner : null}>
-                    {elem.rank}
+                    {!hide ? elem.rank : ""}
                   </td>
                 </>
               )}
             </tr>,
           );
-          if (elem.rank) {
+          console.log(hide);
+          if (elem.rank && !hide) {
             winners[elem.rank] = { group: group_name };
           }
         });
         setResultTable(tables);
         setResultWinners(winners);
       });
-  }, [event_name, editable, return_url]);
+  }, [event_name, editable, hide, return_url]);
   useEffect(() => {
     fetchData();
     if (update_interval > 0) {
