@@ -143,7 +143,7 @@ function CreateDantaiText(item, lineWidth, hide = false) {
   return <></>;
 }
 
-function CreateText(item, lineWidth, hide = false) {
+function CreateText(item, lineWidth, y_padding, hide = false) {
   const is_left = item["block_pos"] === "left";
   const is_right = item["block_pos"] === "right";
   const has_left = "has_left" in item;
@@ -154,13 +154,13 @@ function CreateText(item, lineWidth, hide = false) {
         <>
           <Text
             x={is_left ? 10 : 630}
-            y={item["left_begin_y"] - 20}
+            y={item["left_begin_y"] - 20 + y_padding}
             text={item["left_name_kana"]}
             fontSize={10}
           />
           <Rect
             x={is_left ? 0 : 625}
-            y={item["left_begin_y"] - 16}
+            y={item["left_begin_y"] - 16 + y_padding}
             width={["left_name_kana"].length * 110}
             height={1}
             fill="black"
@@ -168,13 +168,13 @@ function CreateText(item, lineWidth, hide = false) {
           />
           <Text
             x={is_left ? 10 : 630}
-            y={item["left_begin_y"] - 5}
+            y={item["left_begin_y"] - 5 + y_padding}
             text={item["left_name"]}
             fontSize={item["left_name"].length < 8 ? 18 : 14}
           />
           <Rect
             x={is_left ? 0 : 625}
-            y={item["left_begin_y"] + 2}
+            y={item["left_begin_y"] + 2 + y_padding}
             width={["left_name"].length * 110}
             height={1}
             fill="black"
@@ -182,13 +182,13 @@ function CreateText(item, lineWidth, hide = false) {
           />
           <Text
             x={is_left ? 130 : 750}
-            y={item["left_begin_y"]}
+            y={item["left_begin_y"] + y_padding}
             text={item["left_group_name"].replace("'", "【").replace("'", "】")}
             fontSize={item["left_group_name"].length < 8 ? 14 : 12}
           />
           <Rect
             x={is_left ? 130 : 750}
-            y={item["left_begin_y"] + 5}
+            y={item["left_begin_y"] + 5 + y_padding}
             width={["left_group_name"].length * 80}
             height={1}
             fill="black"
@@ -196,13 +196,13 @@ function CreateText(item, lineWidth, hide = false) {
           />
           <Text
             x={is_left ? 10 : 630}
-            y={item["right_begin_y"] - 20}
+            y={item["right_begin_y"] - 20 + y_padding}
             text={item["right_name_kana"]}
             fontSize={10}
           />
           <Rect
             x={is_left ? 0 : 625}
-            y={item["right_begin_y"] - 18}
+            y={item["right_begin_y"] - 18 + y_padding}
             width={["right_name_kana"].length * 110}
             height={1}
             fill="black"
@@ -210,13 +210,13 @@ function CreateText(item, lineWidth, hide = false) {
           />
           <Text
             x={is_left ? 10 : 630}
-            y={item["right_begin_y"] - 5}
+            y={item["right_begin_y"] - 5 + y_padding}
             text={item["right_name"]}
             fontSize={item["right_name"].length < 8 ? 18 : 14}
           />
           <Rect
             x={is_left ? 0 : 625}
-            y={item["right_begin_y"]}
+            y={item["right_begin_y"] + y_padding}
             width={["right_name"].length * 110}
             height={1}
             fill="black"
@@ -224,7 +224,7 @@ function CreateText(item, lineWidth, hide = false) {
           />
           <Text
             x={is_left ? 130 : 750}
-            y={item["right_begin_y"]}
+            y={item["right_begin_y"] + y_padding}
             text={item["right_group_name"]
               .replace("'", "【")
               .replace("'", "】")}
@@ -232,7 +232,7 @@ function CreateText(item, lineWidth, hide = false) {
           />
           <Rect
             x={is_left ? 130 : 750}
-            y={item["right_begin_y"] + 5}
+            y={item["right_begin_y"] + 5 + y_padding}
             width={["right_group_name"].length * 80}
             height={1}
             fill="black"
@@ -433,6 +433,7 @@ function CreateBlock(
   const is_left = item["block_pos"] === "left";
   const is_right = item["block_pos"] === "right";
   const pointX = is_left ? 220 : 620;
+  const y_padding = maxHeight < 200 ? 50 : 0;
   if (!is_left && !is_right) {
     if ("left_begin_y" in item && "right_begin_y" in item) {
       const x = 220 + lineWidth + (item["round"] - 2) * 30;
@@ -460,34 +461,34 @@ function CreateBlock(
         <>
           <Rect
             x={x}
-            y={item["left_begin_y"]}
+            y={item["left_begin_y"] + y_padding}
             width={width / 2}
             height={left_winner ? 5 : 1}
             fill={left_winner ? "red" : "black"}
           />
           <Rect
             x={x + width / 2}
-            y={item["left_begin_y"]}
+            y={item["left_begin_y"] + y_padding}
             width={width / 2}
             height={right_winner ? 5 : 1}
             fill={right_winner ? "red" : "black"}
           />
           <Rect
             x={x + width / 2}
-            y={item["left_begin_y"]}
+            y={item["left_begin_y"] + y_padding}
             width={left_winner || right_winner ? 5 : 1}
             height={-50 + (maxHeight ? 20 : 0)}
             fill={left_winner || right_winner ? "red" : "black"}
           />
           <Text
             x={x + width / 2 - 20}
-            y={item["left_begin_y"] - 70 + (maxHeight ? 20 : 0)}
+            y={item["left_begin_y"] - 70 + (maxHeight ? 20 : 0) + y_padding}
             text={"決勝"}
             fontSize={18}
           />
           <Text
             x={x + width / 2 - 8}
-            y={item["left_begin_y"] + 5}
+            y={item["left_begin_y"] + 5 + y_padding}
             text={item["id"]}
             fill={"gray"}
             fontSize={12}
@@ -496,7 +497,7 @@ function CreateBlock(
           />
           <Rect
             x={x + width / 2 - 16}
-            y={item["left_begin_y"] - 5}
+            y={item["left_begin_y"] - 5 + y_padding}
             width={30}
             height={30}
             strokeWidth={2}
@@ -506,7 +507,7 @@ function CreateBlock(
           />
           <Text
             x={x + width / 2 - 10}
-            y={item["left_begin_y"] - 15}
+            y={item["left_begin_y"] - 15 + y_padding}
             text={
               event_name.includes("hokei") &&
               left_flag !== null &&
@@ -520,7 +521,7 @@ function CreateBlock(
           />
           <Text
             x={x + width / 2 + 8}
-            y={item["left_begin_y"] - 15}
+            y={item["left_begin_y"] - 15 + y_padding}
             text={
               event_name.includes("hokei") &&
               left_flag !== null &&
@@ -560,34 +561,34 @@ function CreateBlock(
         <>
           <Rect
             x={x}
-            y={item["left_begin_y"]}
+            y={item["left_begin_y"] + y_padding}
             width={width / 2}
             height={left_winner ? 5 : 1}
             fill={left_winner ? "red" : "black"}
           />
           <Rect
             x={x + width / 2}
-            y={item["left_begin_y"]}
+            y={item["left_begin_y"] + y_padding}
             width={width / 2}
             height={right_winner ? 5 : 1}
             fill={right_winner ? "red" : "black"}
           />
           <Rect
             x={x + width / 2}
-            y={item["left_begin_y"]}
+            y={item["left_begin_y"] + y_padding}
             width={left_winner || right_winner ? 5 : 1}
             height={-50}
             fill={left_winner || right_winner ? "red" : "black"}
           />
           <Text
             x={x + width / 2 - 20}
-            y={item["left_begin_y"] - 70}
+            y={item["left_begin_y"] - 70 + y_padding}
             text={"三決"}
             fontSize={18}
           />
           <Rect
             x={x + width / 2 - 16}
-            y={item["left_begin_y"] - 5}
+            y={item["left_begin_y"] - 5 + y_padding}
             width={30}
             height={30}
             strokeWidth={2}
@@ -597,7 +598,7 @@ function CreateBlock(
           />
           <Text
             x={x + width / 2 - 8}
-            y={item["left_begin_y"] + 5}
+            y={item["left_begin_y"] + 5 + y_padding}
             text={item["id"]}
             fill={"gray"}
             fontSize={12}
@@ -606,7 +607,7 @@ function CreateBlock(
           />
           <Text
             x={x + width / 2 - 10}
-            y={item["left_begin_y"] - 15}
+            y={item["left_begin_y"] - 15 + y_padding}
             text={
               event_name.includes("hokei") &&
               left_flag !== null &&
@@ -620,7 +621,7 @@ function CreateBlock(
           />
           <Text
             x={x + width / 2 + 8}
-            y={item["left_begin_y"] - 15}
+            y={item["left_begin_y"] - 15 + y_padding}
             text={
               event_name.includes("hokei") &&
               left_flag !== null &&
@@ -693,7 +694,7 @@ function CreateBlock(
             (has_left ? lineWidth + (item["round"] - 2) * 30 : 0) *
               (is_left ? 1 : -1)
           }
-          y={item["left_begin_y"]}
+          y={item["left_begin_y"] + y_padding}
           fill={
             left_winner ||
             (has_left && right_winner && item["left_name"] !== null)
@@ -717,7 +718,7 @@ function CreateBlock(
             (has_right ? lineWidth + (item["round"] - 2) * 30 : 0) *
               (is_left ? 1 : -1)
           }
-          y={item["right_begin_y"]}
+          y={item["right_begin_y"] + y_padding}
           fill={
             right_winner ||
             (has_right && left_winner && item["right_name"] !== null)
@@ -741,7 +742,10 @@ function CreateBlock(
               ? pointX + lineWidth + (item["round"] - 1) * 30 - 10
               : pointX - lineWidth - (item["round"] - 1) * 30
           }
-          y={is_left ? item["left_begin_y"] - 15 : item["left_begin_y"] + 4}
+          y={
+            (is_left ? item["left_begin_y"] - 15 : item["left_begin_y"] + 4) +
+            y_padding
+          }
           text={
             event_name.includes("hokei") &&
             left_flag !== null &&
@@ -759,7 +763,10 @@ function CreateBlock(
               ? pointX + lineWidth + (item["round"] - 1) * 30 - 10
               : pointX - lineWidth - (item["round"] - 1) * 30
           }
-          y={is_left ? item["right_begin_y"] + 4 : item["right_begin_y"] - 15}
+          y={
+            (is_left ? item["right_begin_y"] + 4 : item["right_begin_y"] - 15) +
+            y_padding
+          }
           text={
             event_name.includes("hokei") &&
             left_flag !== null &&
@@ -777,7 +784,9 @@ function CreateBlock(
               ? pointX + lineWidth + (item["round"] - 1) * 30
               : pointX - lineWidth - (item["round"] - 1) * 30
           }
-          y={is_left ? item["left_begin_y"] : item["right_begin_y"]}
+          y={
+            (is_left ? item["left_begin_y"] : item["right_begin_y"]) + y_padding
+          }
           fill={upper_focus ? "red" : "black"}
           width={upper_focus ? 5 : 1}
           height={
@@ -795,7 +804,8 @@ function CreateBlock(
           }
           y={
             (item["left_begin_y"] + item["right_begin_y"]) * 0.5 +
-            ("offset_y" in item ? item["offset_y"] : 0)
+            ("offset_y" in item ? item["offset_y"] : 0) +
+            y_padding
           }
           fill={lower_focus ? "red" : "black"}
           width={lower_focus ? 5 : 1}
@@ -817,7 +827,8 @@ function CreateBlock(
             (item["left_begin_y"] + item["right_begin_y"]) * 0.5 -
             5 +
             ("offset_y" in item ? item["offset_y"] : 0) -
-            10
+            10 +
+            y_padding
           }
           width={30}
           height={30}
@@ -835,7 +846,8 @@ function CreateBlock(
           y={
             (item["left_begin_y"] + item["right_begin_y"]) * 0.5 -
             5 +
-            ("offset_y" in item ? item["offset_y"] : 0)
+            ("offset_y" in item ? item["offset_y"] : 0) +
+            y_padding
           }
           text={item["id"] < 10 ? " " + item["id"] : item["id"]}
           fill={"gray"}
@@ -1108,6 +1120,7 @@ function GetResult({
     winner3 = null;
     winner4 = null;
   }
+  const y_padding = maxHeight < 200 ? 50 : 0;
   return (
     <div>
       <Container maxWidth="md">
@@ -1145,9 +1158,9 @@ function GetResult({
             container
             justifyContent="center"
             alignItems="center"
-            style={{ height: maxHeight + 50 }}
+            style={{ height: maxHeight + 50 + y_padding }}
           >
-            <Stage width={850} height={maxHeight + 50}>
+            <Stage width={850} height={maxHeight + 50 + y_padding}>
               <Layer>
                 {sortedData.map((item, index) =>
                   CreateBlock(
@@ -1163,7 +1176,7 @@ function GetResult({
                 {sortedData.map((item, index) =>
                   event_name.includes("dantai")
                     ? CreateDantaiText(item, lineWidth, hide)
-                    : CreateText(item, lineWidth, hide),
+                    : CreateText(item, lineWidth, y_padding, hide),
                 )}
               </Layer>
             </Stage>
