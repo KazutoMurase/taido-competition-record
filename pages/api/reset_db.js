@@ -65,6 +65,22 @@ async function UpdateEventFromCSV(client, db_name, event_name) {
   await client.query(query);
 }
 
+async function UpdateTableEventFromCSV(client, db_name, event_name) {
+  let query;
+  if (event_name.includes("tenkai")) {
+    query =
+      "UPDATE " +
+      event_name +
+      " SET main_score=null, sub1_score=null, sub2_score=null, sub3_score=null, sub4_score=null, sub5_score=null, elapsed_time=null, penalty=null, retire=null";
+  } else {
+    query =
+      "UPDATE " +
+      event_name +
+      " SET main_score=null, sub1_score=null, sub2_score=null, penalty=null, retire=null";
+  }
+  await client.query(query);
+}
+
 async function UpdateBlockFromCSV(client, db_name, block_name) {
   const csvFilePath = path.join(
     process.cwd(),
@@ -92,7 +108,14 @@ const ResetDb = async (req, res) => {
     const is_test = db_name === "test";
     for (let i = 0; i < req.body.event_names.length; i++) {
       console.log("reset " + req.body.event_names[i]);
-      await UpdateEventFromCSV(client, db_name, req.body.event_names[i]);
+      if (
+        req.body.event_names[i].includes("dantai_hokei") ||
+        req.body.event_names[i].includes("tenkai")
+      ) {
+        await UpdateTableEventFromCSV(client, db_name, req.body.event_names[i]);
+      } else {
+        await UpdateEventFromCSV(client, db_name, req.body.event_names[i]);
+      }
     }
     for (let i = 0; i < req.body.block_names.length; i++) {
       console.log("reset " + req.body.block_names[i]);

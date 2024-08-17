@@ -137,6 +137,53 @@ primary key(id));
 \copy test_dantai_zissen_man from 'test_dantai_zissen_man.csv' csv header;
 \copy test_dantai_zissen_woman from 'test_dantai_zissen_woman.csv' csv header;
 
+create table test_dantai_hokei_groups
+(id integer not null,
+group_id integer not null,
+name text not null,
+foreign key (group_id) references groups(id),
+primary key(id));
+
+create table test_dantai_hokei
+(id integer not null,
+group_id integer,
+round integer,
+main_score real,
+sub1_score real,
+sub2_score real,
+penalty real,
+retire integer,
+foreign key (group_id) references test_dantai_hokei_groups(id),
+primary key(id));
+
+create table test_tenkai_groups
+(id integer not null,
+group_id integer not null,
+name text not null,
+foreign key (group_id) references groups(id),
+primary key(id));
+
+create table test_tenkai
+(id integer not null,
+group_id integer,
+round integer,
+main_score real,
+sub1_score real,
+sub2_score real,
+sub3_score real,
+sub4_score real,
+sub5_score real,
+elapsed_time real,
+penalty real,
+retire integer,
+foreign key (group_id) references test_tenkai_groups(id),
+primary key(id));
+
+\copy test_dantai_hokei_groups from 'test_dantai_hokei_groups.csv' csv header;
+\copy test_dantai_hokei from 'test_dantai_hokei.csv' csv header;
+\copy test_tenkai_groups from 'test_tenkai_groups.csv' csv header;
+\copy test_tenkai from 'test_tenkai.csv' csv header;
+
 create table block_x
 (id integer not null,
  event_id integer not null,
