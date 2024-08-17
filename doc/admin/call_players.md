@@ -3,6 +3,24 @@
 - 選手棄権が出ていないか競技開始前に確認する<span style="color:blue">（以下の選手呼び出し画面で確認できます）</span>。
 - 各試合時の号令・選手呼び出しを行う。
 
+## サンプル動画
+
+<script src="../assets/js/toggleIframe.js"></script>
+
+法形
+<div id="call_hokei_demo_iframe_container"
+     style="width: 100px; height: auto; background-color: #fff; color: #555; cursor: pointer; text-align: center;"
+     onclick="toggleIframe('call_hokei_demo_iframe_container', 'call_hokei_demo', 'M1W2vTVevgc')">
+    <div id="call_hokei_demo">動画を表示</div>
+</div>
+
+実戦
+<div id="call_zissen_demo_iframe_container"
+     style="width: 100px; height: auto; background-color: #fff; color: #555; cursor: pointer; text-align: center;"
+     onclick="toggleIframe('call_zissen_demo_iframe_container', 'call_zissen_demo', '0w7it--FkNI')">
+    <div id="call_zissen_demo">動画を表示</div>
+</div>
+
 ## タブレット操作方法
 
 <div style="color:#009900; font-size:25px">① 初期画面　コート選択</div>
