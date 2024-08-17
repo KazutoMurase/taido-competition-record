@@ -5,13 +5,14 @@ import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Image from "next/image";
 import GetEvents from "../components/get_events";
-import topImage from "../public/top.jpeg";
 
 export default function Home() {
   const router = useRouter();
   const ToSummary = () => {
     router.push("/summary");
   };
+  // TODO: make it optional
+  const show_image = false;
   return (
     <div>
       <br />
@@ -23,17 +24,21 @@ export default function Home() {
           style={{ height: "100px" }}
         >
           <h1>
-            <u>第1回 創玄杯 躰道競技大会</u>
+            <u>第33回 全国社会人躰道優勝大会</u>
           </h1>
         </Grid>
-        <Grid
-          container
-          justifyContent="center"
-          alignItems="center"
-          style={{ height: "350px" }}
-        >
-          <Image src={topImage} height={300} alt="" />
-        </Grid>
+        {show_image ? (
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            style={{ height: "350px" }}
+          >
+            <Image src={topImage} height={300} alt="" />
+          </Grid>
+        ) : (
+          <></>
+        )}
         <Grid
           container
           justifyContent="center"
