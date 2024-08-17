@@ -2,6 +2,16 @@
 
 - 各競技の選手の点呼を行う。
 
+## サンプル動画
+
+<script src="../assets/js/toggleIframe.js"></script>
+
+<div id="check_players_iframe_container"
+     style="width: 100px; height: auto; background-color: #fff; color: #555; cursor: pointer; text-align: center;"
+     onclick="toggleIframe('check_players_iframe_container', 'check_players', 'cz2O2-lbBMs')">
+    <div id="check_players">動画を表示</div>
+</div>
+
 ## タブレット操作方法
 
 <div style="color:#009900; font-size:25px">① 初期画面　コート選択</div>

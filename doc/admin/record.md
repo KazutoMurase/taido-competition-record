@@ -2,6 +2,54 @@
 
 - 各競技の結果を記録する。
 
+## サンプル動画
+
+<script src="../assets/js/toggleIframe.js"></script>
+
+法形
+<div id="record_hokei_demo_iframe_container"
+     style="width: 100px; height: auto; background-color: #fff; color: #555; cursor: pointer; text-align: center;"
+     onclick="toggleIframe('record_hokei_demo_iframe_container', 'record_hokei_demo', '-6lrw86kIw8')">
+    <div id="record_hokei_demo">動画を表示</div>
+</div>
+
+実戦
+<div id="record_zissen_demo_iframe_container"
+     style="width: 100px; height: auto; background-color: #fff; color: #555; cursor: pointer; text-align: center;"
+     onclick="toggleIframe('record_zissen_demo_iframe_container', 'record_zissen_demo', 'iYSlyVMiCsk')">
+    <div id="record_zissen_demo">動画を表示</div>
+</div>
+
+修正 (法形/実戦, 競技中)
+<div id="fix_on_game_demo_iframe_container"
+     style="width: 100px; height: auto; background-color: #fff; color: #555; cursor: pointer; text-align: center;"
+     onclick="toggleIframe('fix_on_game_demo_iframe_container', 'fix_on_game_demo', '7txQ31Aa5N8')">
+    <div id="fix_on_game_demo">動画を表示</div>
+</div>
+
+修正 (法形/実戦, 競技後)
+<div id="fix_after_game_demo_iframe_container"
+     style="width: 100px; height: auto; background-color: #fff; color: #555; cursor: pointer; text-align: center;"
+     onclick="toggleIframe('fix_after_game_demo_iframe_container', 'fix_after_game_demo', 'DHbsYWWGFhs')">
+    <div id="fix_after_game_demo">動画を表示</div>
+</div>
+
+
+団体法形
+<div id="record_dantai_hokei_demo_iframe_container"
+     style="width: 100px; height: auto; background-color: #fff; color: #555; cursor: pointer; text-align: center;"
+     onclick="toggleIframe('record_dantai_hokei_demo_iframe_container', 'record_dantai_hokei_demo', 'UmJZfhvQ8dw')">
+    <div id="record_dantai_hokei_demo">動画を表示</div>
+</div>
+
+展開
+<div id="record_tenkai_demo_iframe_container"
+     style="width: 100px; height: auto; background-color: #fff; color: #555; cursor: pointer; text-align: center;"
+     onclick="toggleIframe('record_tenkai_demo_iframe_container', 'record_tenkai_demo', 'N61O3MvCAng')">
+    <div id="record_tenkai_demo">動画を表示</div>
+</div>
+
+
 ## タブレット操作方法
 
 <div style="color:#009900; font-size:25px">① 初期画面　コート選択</div>
