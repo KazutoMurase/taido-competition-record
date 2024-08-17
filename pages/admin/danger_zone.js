@@ -23,7 +23,7 @@ const Home = () => {
   return (
     <>
       <ResetButton
-        database_name="2024_sogenhai"
+        database_name="2024_adult"
         event_names={filtered_event_names}
         block_names={["block_a", "block_b", "block_c", "block_d"]}
         text="データベース初期化"
