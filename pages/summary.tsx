@@ -3,6 +3,7 @@ import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import { useRouter } from "next/router";
 import GetSummary from "../components/get_summary";
+import { ShowWinner } from "../components/show_summary";
 
 const Summary: React.FC = ({}) => {
   const router = useRouter();
@@ -10,7 +11,28 @@ const Summary: React.FC = ({}) => {
     router.back();
   };
   // TODO: use api/get_events
-  const event_ids = [1, 2, 3, 4, 12, 13, 14, 15, 16, 17];
+  const event_ids = [1, 3, 2, 4, 12, 20, 24, 25, 23, 21, 22, 18, 19];
+  // item for MVP, etc
+  const mvp_item = {
+    name: "　　　",
+    name_kana: "",
+    group: "",
+  };
+  const syukun_item = {
+    name: "　　　",
+    name_kana: "",
+    group: "",
+  };
+  const kantou_item = {
+    name: "　　　",
+    name_kana: "",
+    group: "",
+  };
+  const ginou_item = {
+    name: "　　　",
+    name_kana: "",
+    group: "",
+  };
   return (
     <>
       <Grid
@@ -24,6 +46,41 @@ const Summary: React.FC = ({}) => {
       {event_ids.map((id) => (
         <GetSummary key={id} event_id={id} />
       ))}
+      <Grid
+        container
+        justifyContent="center"
+        alignItems="center"
+        style={{ height: "220px" }}
+      >
+        <table border={1} style={{ width: "400px" }}>
+          <tbody>
+            <tr style={{ fontSize: "12px" }}>
+              <td>
+                <div style={{ fontSize: "16px" }}>最高師範杯</div>
+              </td>
+              <td>{ShowWinner(mvp_item)}</td>
+            </tr>
+            <tr style={{ fontSize: "12px" }}>
+              <td>
+                <div style={{ fontSize: "16px" }}>殊勲賞</div>
+              </td>
+              <td>{ShowWinner(syukun_item)}</td>
+            </tr>
+            <tr style={{ fontSize: "12px" }}>
+              <td>
+                <div style={{ fontSize: "16px" }}>敢闘賞</div>
+              </td>
+              <td>{ShowWinner(kantou_item)}</td>
+            </tr>
+            <tr style={{ fontSize: "12px" }}>
+              <td>
+                <div style={{ fontSize: "16px" }}>技能賞</div>
+              </td>
+              <td>{ShowWinner(ginou_item)}</td>
+            </tr>
+          </tbody>
+        </table>
+      </Grid>
       <Grid
         container
         justifyContent="center"

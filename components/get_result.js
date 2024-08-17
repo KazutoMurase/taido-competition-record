@@ -927,25 +927,25 @@ function GetResult({
     event_full_name = "団体実戦競技";
     event_description = ["試合時間 1分30秒"];
   } else if (event_name.includes("hokei_man")) {
-    event_full_name = "男子段位個人法形競技";
-    event_description = ["1 ・ 2 回戦：運体の法形 / 3 回戦以降：転体の法形"];
+    event_full_name = "個人法形競技（男子の部）";
+    event_description = [];
   } else if (event_name.includes("zissen_man")) {
-    event_full_name = "男子段位個人実戦競技";
-    event_description = ["試合時間  1分30秒", "胴プロテクター着用厳守"];
+    event_full_name = "個人実戦競技（男子の部）";
+    event_description = [];
   } else if (event_name.includes("hokei_woman")) {
-    event_full_name = "女子段位個人法形競技";
-    event_description = ["1 ・ 2 回戦：運陰の法形 / 3 回戦以降：転陰の法形"];
+    event_full_name = "個人法形競技（女子の部）";
+    event_description = [];
   } else if (event_name.includes("zissen_woman")) {
-    event_full_name = "女子段位個人実戦競技";
-    event_description = ["試合時間  1分30秒", "胴プロテクター着用厳守"];
+    event_full_name = "個人実戦競技（女子の部）";
+    event_description = [];
   } else if (event_name.includes("hokei_sonen")) {
     event_full_name = "壮年法形競技";
     event_description = [
       "1.2 回戦勢命（表のみ）、3 回戦以降　活命・延命から選択",
     ];
   } else if (event_name.includes("hokei_newcommer")) {
-    event_full_name = "新人運足八法競技";
-    event_description = [""];
+    event_full_name = "個人法形競技（新人の部）";
+    event_description = [];
   } else if (event_name.includes("hokei_kyuui_man")) {
     event_full_name = "男子級位個人法形競技";
     event_description = ["体の法形から自由選択"];
@@ -965,22 +965,22 @@ function GetResult({
       "胴プロテクター・面ピット着用厳守",
     ];
   } else if (event_name.includes("hokei_kyuui")) {
-    event_full_name = "級位個人法形競技";
+    event_full_name = "個人法形競技（級位の部）";
     event_description = [];
   } else if (event_name.includes("zissen_sonen_man")) {
-    event_full_name = "壮年男子個人実戦競技";
+    event_full_name = "個人実戦競技（壮年の部）男子";
     event_description = [];
   } else if (event_name.includes("zissen_sonen_woman")) {
-    event_full_name = "壮年女子個人実戦競技";
+    event_full_name = "個人実戦競技（壮年の部）女子";
     event_description = [];
   } else if (event_name.includes("hokei_mei_kyuui_newcommer")) {
-    event_full_name = "命の法形(新人・級位)";
+    event_full_name = "個人法形（命）新人・級位の部";
     event_description = [];
   } else if (event_name.includes("hokei_mei")) {
-    event_full_name = "命の法形";
+    event_full_name = "個人法形（命）有段者の部";
     event_description = [];
   } else if (event_name.includes("hokei_sei")) {
-    event_full_name = "制の法形";
+    event_full_name = "個人法形競技（制の法形）";
     event_description = [];
   }
   // calc num of players
