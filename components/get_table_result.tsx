@@ -139,16 +139,23 @@ const GetTableResult: React.FC<{
     }
   }, [fetchData, update_interval]);
   let event_full_name;
+  let event_description;
   if (event_name.includes("dantai_hokei_man")) {
     event_full_name = "男子団体法形競技";
+    event_description = [];
   } else if (event_name.includes("dantai_hokei_woman")) {
     event_full_name = "女子団体法形競技";
+    event_description = [];
   } else if (event_name.includes("dantai_hokei")) {
     event_full_name = "団体法形競技";
+    event_description = ["躰道の法形から選択、段級位問わず"];
   } else if (event_name.includes("tenkai")) {
     event_full_name = "団体展開競技";
+    event_description = ["1チーム6名 男女混合可　背番号着用", "段級位問わず"];
   }
   let num_of_groups = resultTable.length;
+  // TODO: make it optional
+  let show_caption = false;
   return (
     <div>
       <Container maxWidth="md">
@@ -163,6 +170,18 @@ const GetTableResult: React.FC<{
               <u>{event_full_name + "　" + num_of_groups + "チーム"}</u>
             </h1>
           </Grid>
+          {event_description.map((text, index) => (
+            <Grid
+              key={index}
+              container
+              justifyContent="center"
+              alignItems="center"
+              style={{ height: "20px" }}
+            >
+              {text}
+            </Grid>
+          ))}
+          <br />
           <table align="center" border={1}>
             <thead>
               <tr>
@@ -234,9 +253,13 @@ const GetTableResult: React.FC<{
               </tr>
             </thead>
             <tbody>{resultTable}</tbody>
-            <caption className={checkStyles.table_caption}>
-              ※1：競技順番は実行委員会で抽選を行いました。
-            </caption>
+            {show_caption ? (
+              <caption className={checkStyles.table_caption}>
+                ※1：競技順番は実行委員会で抽選を行いました。
+              </caption>
+            ) : (
+              <></>
+            )}
           </table>
         </Box>
       </Container>
