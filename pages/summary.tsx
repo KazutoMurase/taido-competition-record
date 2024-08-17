@@ -10,7 +10,7 @@ const Summary: React.FC = ({}) => {
     router.back();
   };
   // TODO: use api/get_events
-  const event_ids = [1, 2, 3, 4, 12, 13, 14, 15, 16, 17];
+  const event_ids = [1, 3, 2, 4, 12, 20, 24, 25, 23, 21, 22, 18, 19];
   return (
     <>
       <Grid
