@@ -350,7 +350,7 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
       <>
         <Text
           x={x - 220}
-          y={item["left_begin_y"] - 10}
+          y={item["left_begin_y"] - 10 + y_padding}
           text={hide ? "" : item["left_name"]}
           fontSize={
             (item["left_name"] !== null && item["left_name"].length) < 8
@@ -360,13 +360,13 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
         />
         <Text
           x={x - 220}
-          y={item["left_begin_y"] - 30}
+          y={item["left_begin_y"] - 30 + y_padding}
           text={hide ? "" : item["left_name_kana"]}
           fontSize={12}
         />
         <Text
           x={x - 110}
-          y={item["left_begin_y"] - 5}
+          y={item["left_begin_y"] - 5 + y_padding}
           text={
             item["left_group_name"] !== null && !hide
               ? item["left_group_name"].replace("'", "【").replace("'", "】")
@@ -376,7 +376,7 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
         />
         <Text
           x={x + width + 10}
-          y={item["left_begin_y"] - 10}
+          y={item["left_begin_y"] - 10 + y_padding}
           text={hide ? "" : item["right_name"]}
           fontSize={
             (item["right_name"] !== null && item["right_name"].length) < 8
@@ -386,13 +386,13 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
         />
         <Text
           x={x + width + 10}
-          y={item["left_begin_y"] - 30}
+          y={item["left_begin_y"] - 30 + y_padding}
           text={hide ? "" : item["right_name_kana"]}
           fontSize={12}
         />
         <Text
           x={x + width + 130}
-          y={item["left_begin_y"] - 5}
+          y={item["left_begin_y"] - 5 + y_padding}
           text={
             item["right_group_name"] !== null && !hide
               ? item["right_group_name"].replace("'", "【").replace("'", "】")
