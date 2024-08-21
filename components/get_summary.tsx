@@ -34,7 +34,10 @@ const test_event_id_vs_event_name: Map<number, string> = new Map([
   [25, "命法形（新人級位）"],
 ]);
 
-const GetSummary: React.FC<{ event_id: number }> = ({ event_id }) => {
+const GetSummary: React.FC<{ event_id: number; hide: boolean }> = ({
+  event_id,
+  hide,
+}) => {
   const [data, setData] = useState({});
   const event_name = GetEventName(event_id);
   useEffect(() => {
@@ -65,8 +68,10 @@ const GetSummary: React.FC<{ event_id: number }> = ({ event_id }) => {
         setData(result);
       }
     }
-    fetchData();
-  }, [event_name]);
+    if (!hide) {
+      fetchData();
+    }
+  }, [event_name, hide]);
   if (!data) {
     return <></>;
   }
