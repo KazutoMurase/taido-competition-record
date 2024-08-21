@@ -35,13 +35,35 @@ const test_event_id_vs_event_name: Map<number, string> = new Map([
 ]);
 
 const GetSummary: React.FC<{ event_id: number }> = ({ event_id }) => {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState({});
   const event_name = GetEventName(event_id);
   useEffect(() => {
     async function fetchData() {
-      const response = await fetch("/api/get_winners?event_name=" + event_name);
-      const result = await response.json();
-      setData(result);
+      if (
+        event_name.includes("dantai_hokei") ||
+        event_name.includes("tenkai")
+      ) {
+        let winners = {};
+        const response = await fetch(
+          "/api/get_table_result?event_name=" + event_name,
+        );
+        const result = await response.json();
+        for (let i = 0; i < result.length; i++) {
+          if (result[i].rank) {
+            winners[result[i].rank] = {
+              id: result[i].id,
+              group: result[i].name,
+            };
+          }
+        }
+        setData(winners);
+      } else {
+        const response = await fetch(
+          "/api/get_winners?event_name=" + event_name,
+        );
+        const result = await response.json();
+        setData(result);
+      }
     }
     fetchData();
   }, [event_name]);
