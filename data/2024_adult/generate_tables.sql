@@ -351,17 +351,17 @@ create table current_block_d
 \copy block_a from 'block_a.csv' csv header;
 \copy block_a_games from 'block_a_games.csv' csv header;
 
-insert into current_block_a(id, game_id) values (1, 1);
+insert into current_block_a(id, game_id) values (9, 1);
 
 \copy block_b from 'block_b.csv' csv header;
 \copy block_b_games from 'block_b_games.csv' csv header;
 
-insert into current_block_b(id, game_id) values (1, 1);
+insert into current_block_b(id, game_id) values (9, 1);
 
 \copy block_c from 'block_c.csv' csv header;
 \copy block_c_games from 'block_c_games.csv' csv header;
 
-insert into current_block_c(id, game_id) values (1, 1);
+insert into current_block_c(id, game_id) values (5, 1);
 
 \copy block_d from 'block_d.csv' csv header;
 \copy block_d_games from 'block_d_games.csv' csv header;
