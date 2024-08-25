@@ -59,7 +59,7 @@ const Summary: React.FC<{ params }> = ({ params }) => {
         container
         justifyContent="center"
         alignItems="center"
-        style={{ height: "220px" }}
+        style={{ height: "320px" }}
       >
         <table border={1} style={{ width: "400px" }}>
           <tbody>
