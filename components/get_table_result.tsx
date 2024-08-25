@@ -292,20 +292,20 @@ const GetTableResult: React.FC<{
               <></>
             )}
           </table>
+          <p />
+          <Summary winners={resultWinners} />
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            style={{ height: "80px" }}
+          >
+            <Button variant="contained" type="submit" onClick={(e) => onBack()}>
+              戻る
+            </Button>
+          </Grid>
         </Box>
       </Container>
-      <p />
-      <Summary winners={resultWinners} />
-      <Grid
-        container
-        justifyContent="center"
-        alignItems="center"
-        style={{ height: "80px" }}
-      >
-        <Button variant="contained" type="submit" onClick={(e) => onBack()}>
-          戻る
-        </Button>
-      </Grid>
     </div>
   );
 };
