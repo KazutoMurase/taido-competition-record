@@ -23,24 +23,24 @@ const Summary: React.FC<{ params }> = ({ params }) => {
   const event_ids = [1, 3, 2, 4, 12, 20, 24, 25, 23, 21, 22, 18, 19];
   // item for MVP, etc
   const mvp_item = {
-    name: "　　　",
-    name_kana: "",
-    group: "",
+    name: "稲見 安希子",
+    name_kana: "イナミ アキコ",
+    group: "千葉県",
   };
   const syukun_item = {
-    name: "　　　",
-    name_kana: "",
-    group: "",
+    name: "木村 雅和",
+    name_kana: "キムラ マサカズ",
+    group: "愛知県",
   };
   const kantou_item = {
-    name: "　　　",
-    name_kana: "",
+    name: "大越 晴斗",
+    name_kana: "オオコシ ハルト",
     group: "",
   };
   const ginou_item = {
-    name: "　　　",
-    name_kana: "",
-    group: "",
+    name: "佐々木 尚希",
+    name_kana: "ササキ ナオキ",
+    group: "宮城県",
   };
   return (
     <>
