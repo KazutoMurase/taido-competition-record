@@ -10,7 +10,7 @@ import { Layer, Stage, Rect, Text } from "react-konva";
 import Grid from "@mui/material/Grid";
 import Summary from "./show_summary";
 
-function CreateDantaiText(item, lineWidth, hide = false) {
+function CreateDantaiText(item, lineWidth, y_padding, hide = false) {
   const is_left = item["block_pos"] === "left";
   const is_right = item["block_pos"] === "right";
   const has_left = "has_left" in item;
@@ -21,7 +21,7 @@ function CreateDantaiText(item, lineWidth, hide = false) {
         <>
           <Text
             x={is_left ? 10 : 630}
-            y={item["left_begin_y"] - 5}
+            y={item["left_begin_y"] - 5 + y_padding}
             text={item["left_group_name"].replace("'", "").replace("'", "")}
             fontSize={item["left_group_name"].length < 8 ? 18 : 14}
             width={200}
@@ -29,7 +29,7 @@ function CreateDantaiText(item, lineWidth, hide = false) {
           />
           <Rect
             x={is_left ? 130 : 625}
-            y={item["left_begin_y"] + 2}
+            y={item["left_begin_y"] + 2 + y_padding}
             width={["left_group_name"].length * 80}
             height={1}
             fill="black"
@@ -37,7 +37,7 @@ function CreateDantaiText(item, lineWidth, hide = false) {
           />
           <Text
             x={is_left ? 10 : 630}
-            y={item["right_begin_y"] - 5}
+            y={item["right_begin_y"] - 5 + y_padding}
             text={item["right_group_name"].replace("'", "").replace("'", "")}
             fontSize={item["right_group_name"].length < 8 ? 18 : 14}
             width={200}
@@ -45,7 +45,7 @@ function CreateDantaiText(item, lineWidth, hide = false) {
           />
           <Rect
             x={is_left ? 130 : 625}
-            y={item["right_begin_y"]}
+            y={item["right_begin_y"] + y_padding}
             width={["right_group_name"].length * 80}
             height={1}
             fill="black"
@@ -59,7 +59,7 @@ function CreateDantaiText(item, lineWidth, hide = false) {
         <>
           <Text
             x={is_left ? 10 : 630}
-            y={item["left_begin_y"] - 5}
+            y={item["left_begin_y"] - 5 + y_padding}
             text={item["left_group_name"].replace("'", "").replace("'", "")}
             fontSize={item["left_group_name"].length < 8 ? 18 : 14}
             width={200}
@@ -67,7 +67,7 @@ function CreateDantaiText(item, lineWidth, hide = false) {
           />
           <Rect
             x={is_left ? 130 : 625}
-            y={item["left_begin_y"] + 2}
+            y={item["left_begin_y"] + 2 + y_padding}
             width={["left_group_name"].length * 80}
             height={1}
             fill="black"
@@ -81,7 +81,7 @@ function CreateDantaiText(item, lineWidth, hide = false) {
         <>
           <Text
             x={is_left ? 10 : 630}
-            y={item["right_begin_y"] - 5}
+            y={item["right_begin_y"] - 5 + y_padding}
             text={item["right_group_name"].replace("'", "").replace("'", "")}
             fontSize={item["right_group_name"].length < 8 ? 18 : 14}
             width={200}
@@ -89,7 +89,7 @@ function CreateDantaiText(item, lineWidth, hide = false) {
           />
           <Rect
             x={is_left ? 130 : 625}
-            y={item["right_begin_y"] + 2}
+            y={item["right_begin_y"] + 2 + y_padding}
             width={["right_group_name"].length * 80}
             height={1}
             fill="black"
@@ -109,7 +109,7 @@ function CreateDantaiText(item, lineWidth, hide = false) {
       <>
         <Text
           x={x - 80}
-          y={item["left_begin_y"] - 10}
+          y={item["left_begin_y"] - 10 + y_padding}
           text={
             hide
               ? ""
@@ -124,7 +124,7 @@ function CreateDantaiText(item, lineWidth, hide = false) {
         />
         <Text
           x={x + width + 10}
-          y={item["left_begin_y"] - 10}
+          y={item["left_begin_y"] - 10 + y_padding}
           text={
             hide
               ? ""
@@ -1175,7 +1175,7 @@ function GetResult({
                 )}
                 {sortedData.map((item, index) =>
                   event_name.includes("dantai")
-                    ? CreateDantaiText(item, lineWidth, hide)
+                    ? CreateDantaiText(item, lineWidth, y_padding, hide)
                     : CreateText(item, lineWidth, y_padding, hide),
                 )}
               </Layer>
