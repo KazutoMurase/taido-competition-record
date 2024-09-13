@@ -1,4 +1,5 @@
 import React from "react";
+import { useEffect, useState } from "react";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import { useRouter } from "next/router";
@@ -19,8 +20,25 @@ const Summary: React.FC<{ params }> = ({ params }) => {
     router.back();
   };
   const hide = params.production_test === "1";
-  // TODO: use api/get_events
-  const event_ids = [1, 3, 2, 4, 12, 20, 24, 25, 23, 21, 22, 18, 19];
+  const [data, setData] = useState([]);
+
+  const fetchData = async () => {
+    const response = await fetch("/api/get_events");
+    const result = await response.json();
+    const event_infos = [];
+    for (let i = 0; i < result.length; i++) {
+      if (result[i]["existence"] && result[i]["name_en"] != "finished") {
+        event_infos.push({
+          id: result[i]["id"],
+          name: result[i]["name"].replace(/['"]+/g, ""),
+        });
+      }
+    }
+    setData(event_infos);
+  };
+  useEffect(() => {
+    fetchData();
+  }, []);
   // item for MVP, etc
   const mvp_item = {
     name: "稲見 安希子",
@@ -52,8 +70,13 @@ const Summary: React.FC<{ params }> = ({ params }) => {
       >
         <h1>サマリー</h1>
       </Grid>
-      {event_ids.map((id) => (
-        <GetSummary key={id} event_id={id} hide={hide} />
+      {data.map((event_info) => (
+        <GetSummary
+          key={event_info.id}
+          event_id={event_info.id}
+          event_name={event_info.name}
+          hide={hide}
+        />
       ))}
       <Grid
         container

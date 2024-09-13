@@ -6,6 +6,8 @@ primary key(id));
 create table event_type
 (id integer not null,
  name text not null,
+ name_en text not null,
+ order_id integer not null,
  existence integer not null,
  primary key(id));
 
