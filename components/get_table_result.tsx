@@ -276,7 +276,9 @@ const GetTableResult: React.FC<{
   const length = entries.length;
   for (let i = 0; i < (length === 1 ? 1 : length - 1); i++) {
     const [key, value] = entries[i];
-    num_of_groups += value.length;
+    if (Array.isArray(value)) {
+      num_of_groups += value.length;
+    }
   }
   let titles = {};
   if (length === 1) {
