@@ -1,22 +1,22 @@
 import GetClient from "../../lib/db_client";
-import { Get, Set } from "../../lib/redis_client";
+import { Set } from "../../lib/redis_client";
 
-async function GetFromDB(req, res) {
+const Confirm = async (req, res) => {
   const client = await GetClient();
-  const event_name = req.query.event_name;
+  const event_name = req.body.event_name;
   let query;
   const groups_name = event_name + "_groups";
   const groups = event_name.includes("test") ? "test_groups" : "groups";
   if (event_name.includes("tenkai")) {
     query =
-      "SELECT t1.id, t1.round, t1.main_score, t1.sub1_score, t1.sub2_score, t1.sub3_score, t1.sub4_score, t1.sub5_score, t1.elapsed_time, t1.penalty, t1.retire, t2.name FROM " +
+      "SELECT t1.id, t1.group_id, t1.round, t1.main_score, t1.sub1_score, t1.sub2_score, t1.sub3_score, t1.sub4_score, t1.sub5_score, t1.elapsed_time, t1.penalty, t1.retire, t2.name FROM " +
       event_name +
       " AS t1 LEFT JOIN " +
       groups_name +
       " AS t2 ON t1.group_id = t2.id";
   } else {
     query =
-      "SELECT t1.id, t1.round, t1.main_score, t1.sub1_score, t1.sub2_score, t1.penalty, t1.retire, t2.name FROM " +
+      "SELECT t1.id, t1.group_id, t1.round, t1.main_score, t1.sub1_score, t1.sub2_score, t1.penalty, t1.retire, t2.name FROM " +
       event_name +
       " AS t1 LEFT JOIN " +
       groups_name +
@@ -71,7 +71,6 @@ async function GetFromDB(req, res) {
     result[data.round].push(data);
     return result;
   }, {});
-  // TODO: don't update rank until all the scores are set
   const ranked_data = Object.values(grouped_data).flatMap((round_group) => {
     round_group.sort((a, b) => {
       if (b.sum_score === a.sum_score) {
@@ -85,33 +84,30 @@ async function GetFromDB(req, res) {
     return round_group;
   });
   const final_round_num = Object.entries(grouped_data).length;
-  for (let i = 0; i < ranked_data.length; i++) {
-    ranked_data[i]["is_final"] = ranked_data[i]["round"] === final_round_num;
-  }
-  return ranked_data.sort((a, b) => a.id - b.id);
-}
-
-const GetResult = async (req, res) => {
-  try {
-    const event_name = req.query.event_name;
-    const latest_update_key =
-      "latest_update_result_for_" + event_name + "_timestamp";
-    const cache_key = "get_result_for_" + event_name + "_cache_data";
-    const cached_data = await Get(cache_key);
-    const latest_update_timestamp = (await Get(latest_update_key)) || 0;
-    if (cached_data && latest_update_timestamp < cached_data.timestamp) {
-      console.log("using cache");
-      return res.json(cached_data.data);
+  if (final_round_num > 1) {
+    const winners_num =
+      grouped_data[final_round_num].length / (final_round_num - 1);
+    const final_round_start_id = grouped_data[final_round_num][0].id;
+    for (let i = 1; i < final_round_num; i++) {
+      const data = grouped_data[i];
+      for (const item of data) {
+        if (item.rank && item.rank <= winners_num) {
+          const target_id =
+            final_round_start_id +
+            (winners_num - item.rank) * (final_round_num - 1) +
+            (i - 1);
+          query = "update " + event_name + " set group_id = $1 where id = $2";
+          let values = [item.group_id, target_id];
+          console.log(values);
+          let result = await client.query(query, values);
+        }
+      }
     }
-    console.log("get new data");
-    const data = await GetFromDB(req, res);
-    console.log(data);
-    await Set(cache_key, { data: data, timestamp: Date.now() });
-    res.json(data);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Error fetching data" });
+    const key = "latest_update_result_for_" + event_name + "_timestamp";
+    const timestamp = Date.now();
+    await Set(key, timestamp);
   }
+  res.json({});
 };
 
-export default GetResult;
+export default Confirm;

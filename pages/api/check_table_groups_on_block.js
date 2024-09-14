@@ -21,7 +21,7 @@ async function GetFromDB(
     " AS t1 ON t0.game_id = t1.id LEFT JOIN " +
     groups_name +
     " AS t2 ON t1.group_id = t2.id" +
-    " where t0.schedule_id = $1";
+    " where t0.schedule_id = $1 and t2.id is not null";
   const result = await client.query(query, [schedule_id]);
   const sorted_data = result.rows.sort((a, b) => a.id - b.id);
   query =
