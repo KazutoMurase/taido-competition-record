@@ -142,12 +142,19 @@ const GetTableResult: React.FC<{
       .then((data) => {
         const tables = {};
         const winners = {};
+        let final_num = 0;
+        let final_finished_num = 0;
         // check if final is confirmed or not
         let final_is_confirmed = false;
         for (let i = 0; i < data.length; i++) {
-          if (data[i].is_final && data[i]["name"]) {
-            final_is_confirmed = true;
-            break;
+          if (data[i].is_final) {
+            final_num += 1;
+            if (data[i]["name"]) {
+              final_is_confirmed = true;
+            }
+            if (data[i]["sum_score"] || data[i]["retire"]) {
+              final_finished_num += 1;
+            }
           }
         }
         data.forEach((elem) => {
@@ -279,7 +286,12 @@ const GetTableResult: React.FC<{
               )}
             </tr>,
           );
-          if (elem.rank && elem.is_final && visible) {
+          if (
+            final_finished_num === final_num &&
+            elem.rank &&
+            elem.is_final &&
+            visible
+          ) {
             winners[elem.rank] = { group: group_name };
           }
         });
