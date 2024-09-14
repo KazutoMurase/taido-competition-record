@@ -43,8 +43,16 @@ function onClear(item, is_test, function_after_post) {
     });
 }
 
-function ShowName(item) {
+function ShowName(item, is_mobile) {
   if ("name" in item) {
+    if (is_mobile) {
+      return (
+        <>
+          <div style={{ fontSize: "15px" }}>{item["name_kana"]}</div>
+          {item["name"]}
+        </>
+      );
+    }
     return item["name"] + "(" + item["name_kana"] + ")";
   }
   if ("group_name" in item) {
@@ -54,7 +62,12 @@ function ShowName(item) {
   }
 }
 
-function NotificationRequest({ update_interval, return_url, is_test = false }) {
+function NotificationRequest({
+  update_interval,
+  is_mobile = false,
+  return_url,
+  is_test = false,
+}) {
   const [selectedRadioButton, setSelectedRadioButton] = useState(null);
 
   const handleRadioButtonChange = (event) => {
@@ -86,11 +99,11 @@ function NotificationRequest({ update_interval, return_url, is_test = false }) {
   const forceFetchData = () => {
     fetchData();
   };
-
+  const minWidth = is_mobile ? "400px" : "720px";
   return (
     <div>
       <Container maxWidth="md">
-        <Box style={{ minWidth: "720px" }}>
+        <Box style={{ minWidth: minWidth }}>
           <Grid
             container
             justifyContent="center"
@@ -115,9 +128,13 @@ function NotificationRequest({ update_interval, return_url, is_test = false }) {
                   <td>
                     {item["event_name"].replace("'", "").replace("'", "")}
                   </td>
-                  <td>{ShowName(item)}</td>
+                  <td>{ShowName(item, is_mobile)}</td>
                   <td>
-                    {item["court_name"].replace("'", "").replace("'", "")}
+                    {is_mobile
+                      ? item["court_name"]
+                          .replace(/['"]+/g, "")
+                          .replace("コート", "")
+                      : item["court_name"].replace(/['"]+/g, "")}
                   </td>
                   <td>
                     {"name" in item
@@ -128,9 +145,18 @@ function NotificationRequest({ update_interval, return_url, is_test = false }) {
                     <Button
                       variant="contained"
                       type="submit"
+                      size={is_mobile ? "small" : "medium"}
                       onClick={(e) => onClear(item, is_test, forceFetchData)}
                     >
-                      呼び出し完了
+                      {is_mobile ? (
+                        <>
+                          呼び出し
+                          <br />
+                          完了
+                        </>
+                      ) : (
+                        "呼び出し完了"
+                      )}
                     </Button>
                   </td>
                 </tr>
