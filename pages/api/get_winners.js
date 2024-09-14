@@ -5,6 +5,7 @@ const GetWinners = async (req, res) => {
     const client = await GetClient();
     const event_name = req.query.event_name;
     let query;
+    console.log(event_name);
     if (event_name.includes("dantai")) {
       const groups_name = event_name + "_groups";
       query =
