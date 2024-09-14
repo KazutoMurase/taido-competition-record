@@ -1136,7 +1136,7 @@ function GetResult({
         setStagePos(savedPos);
       }
     }
-  }, []);
+  }, [is_mobile, event_name]);
   const handleTouchStart = (event) => {
     event.evt.preventDefault();
     const point = event.target.getStage().getPointerPosition();

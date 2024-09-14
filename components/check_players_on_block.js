@@ -69,6 +69,7 @@ function CheckPlayers({
   schedule_id,
   event_id,
   update_interval,
+  is_mobile,
   is_test = false,
 }) {
   const router = useRouter();
@@ -195,10 +196,12 @@ function CheckPlayers({
       elem.court_id == GetCourtId(block_number)
     );
   });
+  const minWidth = is_mobile ? "200px" : "720px";
+  const squareColorFontSize = is_mobile ? 30 : 60;
   return (
     <div>
       <Container maxWidth="md">
-        <Box style={{ minWidth: "720px" }}>
+        <Box style={{ minWidth: minWidth }}>
           <Grid
             container
             justifyContent="center"
@@ -247,7 +250,15 @@ function CheckPlayers({
               <tr className={checkStyles.column}>
                 <th>色</th>
                 <th>選手名</th>
-                <th>点呼完了</th>
+                {is_mobile ? (
+                  <th>
+                    点呼
+                    <br />
+                    完了
+                  </th>
+                ) : (
+                  <th>点呼完了</th>
+                )}
                 <th>棄権</th>
                 <th></th>
                 <th></th>
@@ -256,12 +267,21 @@ function CheckPlayers({
                 <tr key={item["id"]} className={checkStyles.column}>
                   <td>
                     <SquareTwoToneIcon
-                      sx={{ fontSize: 60 }}
+                      sx={{ fontSize: squareColorFontSize }}
                       htmlColor={item["color"] === "red" ? "red" : "gray"}
                     />
                   </td>
                   <td>
-                    {item["name"]}({item["name_kana"]})
+                    {is_mobile ? (
+                      <>
+                        <div style={{ fontSize: "15px" }}>
+                          {item["name_kana"]}
+                        </div>
+                        {item["name"]}
+                      </>
+                    ) : (
+                      item["name"] + "(" + item["name_kana"] + ")"
+                    )}
                   </td>
                   <td className={checkStyles.elem}>
                     <input
@@ -289,36 +309,77 @@ function CheckPlayers({
                       }
                     />
                   </td>
-                  <td>
-                    <Button
-                      variant="contained"
-                      type="submit"
-                      onClick={(e) =>
-                        onSubmit(
-                          item.id,
-                          block_number,
-                          event_id,
-                          is_test,
-                          forceFetchData,
-                        )
-                      }
-                      style={!item["requested"] ? null : activeButtonStyle}
-                    >
-                      {!item["requested"] ? "　呼び出し　" : "リクエスト済"}
-                    </Button>
-                  </td>
-                  <td>
-                    <Button
-                      variant="contained"
-                      type="submit"
-                      onClick={(e) =>
-                        onClear(item.id, null, null, is_test, forceFetchData)
-                      }
-                      disabled={!item["requested"]}
-                    >
-                      キャンセル
-                    </Button>
-                  </td>
+                  {is_mobile ? (
+                    <td>
+                      <Button
+                        size="small"
+                        variant="contained"
+                        type="submit"
+                        onClick={(e) =>
+                          onSubmit(
+                            item.id,
+                            block_number,
+                            event_id,
+                            is_test,
+                            forceFetchData,
+                          )
+                        }
+                        style={!item["requested"] ? null : activeButtonStyle}
+                      >
+                        {!item["requested"] ? "　呼び出し　" : "リクエスト済"}
+                      </Button>
+                      <br />
+                      <Button
+                        variant="contained"
+                        type="submit"
+                        onClick={(e) =>
+                          onClear(item.id, null, null, is_test, forceFetchData)
+                        }
+                        disabled={!item["requested"]}
+                      >
+                        キャンセル
+                      </Button>
+                    </td>
+                  ) : (
+                    <>
+                      <td>
+                        <Button
+                          variant="contained"
+                          type="submit"
+                          onClick={(e) =>
+                            onSubmit(
+                              item.id,
+                              block_number,
+                              event_id,
+                              is_test,
+                              forceFetchData,
+                            )
+                          }
+                          style={!item["requested"] ? null : activeButtonStyle}
+                        >
+                          {!item["requested"] ? "　呼び出し　" : "リクエスト済"}
+                        </Button>
+                      </td>
+                      <td>
+                        <Button
+                          variant="contained"
+                          type="submit"
+                          onClick={(e) =>
+                            onClear(
+                              item.id,
+                              null,
+                              null,
+                              is_test,
+                              forceFetchData,
+                            )
+                          }
+                          disabled={!item["requested"]}
+                        >
+                          キャンセル
+                        </Button>
+                      </td>
+                    </>
+                  )}
                 </tr>
               ))}
             </tbody>
