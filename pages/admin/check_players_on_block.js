@@ -38,35 +38,101 @@ const Home = () => {
     event_name.includes("tenkai")
   ) {
     return (
-      <>
-        <CheckTable
-          block_number={block_number}
-          schedule_id={schedule_id}
-          event_id={event_id}
-          update_interval={3000}
-        />
-        <GetTableResult
-          update_interval={3000}
-          event_name={event_name}
-          block_number={block_number}
-        />
-      </>
+      <div style={isMobile ? { width: "100%" } : {}}>
+        {isMobile ? (
+          <Box>
+            <Tabs
+              value={tabIndex}
+              onChange={handleTabChange}
+              aria-label="Record Tabs"
+            >
+              <Tab key="main" label="点呼" />
+              <Tab key="result" label="トーナメント" />
+            </Tabs>
+            <Box>
+              {tabIndex === 0 ? (
+                <CheckTable
+                  block_number={block_number}
+                  schedule_id={schedule_id}
+                  event_id={event_id}
+                  update_interval={3000}
+                  is_mobile={isMobile}
+                />
+              ) : (
+                <GetTableResult
+                  update_interval={3000}
+                  event_name={event_name}
+                  block_number={block_number}
+                  is_mobile={isMobile}
+                />
+              )}
+            </Box>
+          </Box>
+        ) : (
+          <>
+            <CheckTable
+              block_number={block_number}
+              schedule_id={schedule_id}
+              event_id={event_id}
+              update_interval={3000}
+            />
+            <GetTableResult
+              update_interval={3000}
+              event_name={event_name}
+              block_number={block_number}
+            />
+          </>
+        )}
+      </div>
     );
   } else if (event_name.includes("dantai_zissen")) {
     return (
-      <>
-        <CheckDantai
-          block_number={block_number}
-          schedule_id={schedule_id}
-          event_id={event_id}
-          update_interval={3000}
-        />
-        <GetResult
-          updateInterval={3000}
-          event_name={event_name}
-          block_number={block_number}
-        />
-      </>
+      <div style={isMobile ? { width: "100%" } : {}}>
+        {isMobile ? (
+          <Box>
+            <Tabs
+              value={tabIndex}
+              onChange={handleTabChange}
+              aria-label="Record Tabs"
+            >
+              <Tab key="main" label="点呼" />
+              <Tab key="result" label="トーナメント" />
+            </Tabs>
+            <Box>
+              {tabIndex === 0 ? (
+                <CheckDantai
+                  block_number={block_number}
+                  schedule_id={schedule_id}
+                  event_id={event_id}
+                  update_interval={3000}
+                  is_mobile={isMobile}
+                />
+              ) : (
+                <GetResult
+                  updateInterval={3000}
+                  event_name={event_name}
+                  block_number={block_number}
+                  is_mobile={isMobile}
+                />
+              )}
+            </Box>
+          </Box>
+        ) : (
+          <>
+            <CheckDantai
+              block_number={block_number}
+              schedule_id={schedule_id}
+              event_id={event_id}
+              update_interval={3000}
+            />
+            <GetResult
+              updateInterval={3000}
+              event_name={event_name}
+              block_number={block_number}
+            />
+          </>
+        )}
+      </div>
     );
   } else {
     return (
