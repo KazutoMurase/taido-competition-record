@@ -28,6 +28,7 @@ function TableProgressOnBlock({
   event_name,
   schedule_id,
   update_interval,
+  is_mobile,
 }) {
   const router = useRouter();
 
@@ -68,10 +69,11 @@ function TableProgressOnBlock({
       break;
     }
   }
+  const minWidth = is_mobile ? "500px" : "950px";
   return (
     <div>
       <Container maxWidth="md">
-        <Box style={{ minWidth: "950px" }}>
+        <Box style={{ minWidth: minWidth }}>
           <Grid container justifyContent="center" alignItems="center">
             <table border="1">
               <tbody>
