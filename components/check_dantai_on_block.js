@@ -78,6 +78,7 @@ function CheckDantai({
   schedule_id,
   event_id,
   update_interval,
+  is_mobile,
   is_test = false,
 }) {
   const router = useRouter();
@@ -208,10 +209,12 @@ function CheckDantai({
       elem.court_id == GetCourtId(block_number)
     );
   });
+  const minWidth = is_mobile ? "200px" : "720px";
+  const squareColorFontSize = is_mobile ? 30 : 60;
   return (
     <div>
       <Container maxWidth="md">
-        <Box style={{ minWidth: "720px" }}>
+        <Box style={{ minWidth: minWidth }}>
           <Grid
             container
             justifyContent="center"
@@ -283,13 +286,16 @@ function CheckDantai({
               <tr className={checkStyles.column}>
                 {GetEventName(event_id) === "dantai" ? <></> : <th>色</th>}
                 <th>団体名</th>
-                <th>点呼完了</th>
+                {is_mobile ? (
+                  <th>
+                    点呼
+                    <br />
+                    完了
+                  </th>
+                ) : (
+                  <th>点呼完了</th>
+                )}
                 <th>棄権</th>
-                <th>
-                  {data.items && data.items.length > 0 && "all" in data.items[0]
-                    ? "敗退"
-                    : ""}
-                </th>
                 <th></th>
                 <th></th>
               </tr>
@@ -300,7 +306,7 @@ function CheckDantai({
                   ) : (
                     <td>
                       <SquareTwoToneIcon
-                        sx={{ fontSize: 60 }}
+                        sx={{ fontSize: squareColorFontSize }}
                         htmlColor={item["color"] === "red" ? "red" : "gray"}
                       />
                     </td>
@@ -341,20 +347,10 @@ function CheckDantai({
                     />
                   </td>
                   <td>
-                    {"all" in item ? (
-                      <input
-                        type="radio"
-                        name={index}
-                        className={checkStyles.large_checkbox}
-                      />
-                    ) : (
-                      <></>
-                    )}
-                  </td>
-                  <td>
                     <Button
                       variant="contained"
                       type="submit"
+                      size={is_mobile ? "small" : "medium"}
                       onClick={(e) =>
                         onSubmit(
                           block_number,
@@ -374,6 +370,7 @@ function CheckDantai({
                     <Button
                       variant="contained"
                       type="submit"
+                      size={is_mobile ? "small" : "medium"}
                       onClick={(e) =>
                         onClear(
                           item.id,

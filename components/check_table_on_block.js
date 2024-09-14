@@ -78,6 +78,7 @@ function CheckTable({
   schedule_id,
   event_id,
   update_interval,
+  is_mobile,
   is_test = false,
 }) {
   const router = useRouter();
@@ -184,10 +185,11 @@ function CheckTable({
       elem.court_id == GetCourtId(block_number)
     );
   });
+  const minWidth = is_mobile ? "200px" : "720px";
   return (
     <div>
       <Container maxWidth="md">
-        <Box style={{ minWidth: "720px" }}>
+        <Box style={{ minWidth: minWidth }}>
           <Grid
             container
             justifyContent="center"
@@ -246,7 +248,15 @@ function CheckTable({
             <tbody>
               <tr className={checkStyles.column}>
                 <th>団体名</th>
-                <th>点呼完了</th>
+                {is_mobile ? (
+                  <th>
+                    点呼
+                    <br />
+                    完了
+                  </th>
+                ) : (
+                  <th>点呼完了</th>
+                )}
                 <th>棄権</th>
                 <th></th>
                 <th></th>
@@ -276,6 +286,7 @@ function CheckTable({
                     <Button
                       variant="contained"
                       type="submit"
+                      size={is_mobile ? "small" : "medium"}
                       onClick={(e) =>
                         onSubmit(
                           block_number,
@@ -295,6 +306,7 @@ function CheckTable({
                     <Button
                       variant="contained"
                       type="submit"
+                      size={is_mobile ? "small" : "medium"}
                       onClick={(e) =>
                         onClear(
                           item.id,
