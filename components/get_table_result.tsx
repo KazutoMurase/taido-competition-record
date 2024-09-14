@@ -97,6 +97,7 @@ const GetTableResult: React.FC<{
   event_name: string;
   hide: boolean;
   editable: boolean;
+  is_mobile: boolean;
   back_url: string;
   return_url: string;
 }> = ({
@@ -104,6 +105,7 @@ const GetTableResult: React.FC<{
   event_name = null,
   hide = false,
   editable = false,
+  is_mobile = false,
   back_url = null,
   return_url = null,
 }) => {
@@ -350,20 +352,25 @@ const GetTableResult: React.FC<{
   }
   // TODO: make it optional
   let show_caption = false;
+  const areaWidth = is_mobile ? "500px" : "850px";
   return (
     <div>
       <Container maxWidth="md">
-        <Box style={{ minWidth: "850px" }}>
-          <Grid
-            container
-            justifyContent="center"
-            alignItems="center"
-            style={{ height: "100px" }}
-          >
-            <h1>
-              <u>{event_full_name + "　" + num_of_groups + "チーム"}</u>
-            </h1>
-          </Grid>
+        <Box style={{ minWidth: areaWidth }}>
+          {is_mobile ? (
+            <></>
+          ) : (
+            <Grid
+              container
+              justifyContent="center"
+              alignItems="center"
+              style={{ height: "100px" }}
+            >
+              <h1>
+                <u>{event_full_name + "　" + num_of_groups + "チーム"}</u>
+              </h1>
+            </Grid>
+          )}
           {editable ? (
             <Grid
               key="confirm"
@@ -403,7 +410,7 @@ const GetTableResult: React.FC<{
           ))}
           {}
           <p />
-          <Summary winners={resultWinners} />
+          {is_mobile ? <></> : <Summary winners={resultWinners} />}
           <Grid
             container
             justifyContent="center"

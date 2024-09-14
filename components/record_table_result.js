@@ -231,6 +231,7 @@ function RecordTableResult({
   event_name,
   schedule_id,
   update_interval,
+  is_mobile,
 }) {
   // time x4, main x3, sub1 x2, sub2 x2, sub3 x2, sub4 x2, sub5 x2, penalty x2
   const [values, setValues] = useState([
@@ -404,10 +405,11 @@ function RecordTableResult({
     }
   };
   const main_score_start_index = event_name.includes("tenkai") ? 4 : 5;
+  const minWidth = is_mobile ? "300px" : "850px";
   return (
     <div>
       <Container maxWidth="md">
-        <Box style={{ minWidth: "850px" }}>
+        <Box style={{ minWidth: minWidth }}>
           <Grid
             container
             justifyContent="center"
@@ -472,119 +474,230 @@ function RecordTableResult({
         ) : (
           <></>
         )}
-        <Box display="flex" alignItems="center" justifyContent="center">
-          {ScoreField(
-            "主審",
-            values,
-            initialValues,
-            inputRefs,
-            main_score_start_index,
-            5,
-            6,
-            handleChange,
-          )}
-          <Typography variant="h4" sx={{ mx: 1, mt: 5 }}>
-            +
-          </Typography>
-          {ScoreField(
-            "副審1",
-            values,
-            initialValues,
-            inputRefs,
-            7,
-            7,
-            8,
-            handleChange,
-          )}
-          <Typography variant="h4" sx={{ mx: 1, mt: 5 }}>
-            +
-          </Typography>
-          {ScoreField(
-            "副審2",
-            values,
-            initialValues,
-            inputRefs,
-            9,
-            9,
-            10,
-            handleChange,
-          )}
-          {event_name.includes("tenkai") ? (
-            <>
-              <Typography variant="h4" sx={{ mx: 1, mt: 5 }}>
-                +
-              </Typography>
+        {is_mobile ? (
+          <>
+            <Box display="flex" alignItems="center" justifyContent="center">
               {ScoreField(
-                "副審3",
+                "主審",
                 values,
                 initialValues,
                 inputRefs,
-                11,
-                11,
-                12,
+                main_score_start_index,
+                5,
+                6,
                 handleChange,
               )}
-            </>
-          ) : (
-            <>
-              <Typography variant="h4" sx={{ mx: 1, mt: 5 }}>
-                -
-              </Typography>
+            </Box>
+            <Box display="flex" alignItems="center" justifyContent="center">
               {ScoreField(
-                "場外減点",
+                "副審1",
                 values,
                 initialValues,
                 inputRefs,
-                17,
-                17,
-                18,
+                7,
+                7,
+                8,
                 handleChange,
               )}
-            </>
-          )}
-        </Box>
-        {event_name.includes("tenkai") ? (
+            </Box>
+            <Box display="flex" alignItems="center" justifyContent="center">
+              {ScoreField(
+                "副審2",
+                values,
+                initialValues,
+                inputRefs,
+                9,
+                9,
+                10,
+                handleChange,
+              )}
+            </Box>
+            {event_name.includes("tenkai") ? (
+              <Box display="flex" alignItems="center" justifyContent="center">
+                {ScoreField(
+                  "副審3",
+                  values,
+                  initialValues,
+                  inputRefs,
+                  11,
+                  11,
+                  12,
+                  handleChange,
+                )}
+              </Box>
+            ) : (
+              <Box display="flex" alignItems="center" justifyContent="center">
+                {ScoreField(
+                  "場外減点",
+                  values,
+                  initialValues,
+                  inputRefs,
+                  17,
+                  17,
+                  18,
+                  handleChange,
+                )}
+              </Box>
+            )}
+          </>
+        ) : (
           <Box display="flex" alignItems="center" justifyContent="center">
-            <Typography variant="h4" sx={{ mx: 1, mt: 5 }}>
-              +
-            </Typography>
             {ScoreField(
-              "副審4",
+              "主審",
               values,
               initialValues,
               inputRefs,
-              13,
-              13,
-              14,
+              main_score_start_index,
+              5,
+              6,
               handleChange,
             )}
             <Typography variant="h4" sx={{ mx: 1, mt: 5 }}>
               +
             </Typography>
             {ScoreField(
-              "副審5",
+              "副審1",
               values,
               initialValues,
               inputRefs,
-              15,
-              15,
-              16,
+              7,
+              7,
+              8,
               handleChange,
             )}
             <Typography variant="h4" sx={{ mx: 1, mt: 5 }}>
-              -
+              +
             </Typography>
             {ScoreField(
-              "場外減点",
+              "副審2",
               values,
               initialValues,
               inputRefs,
-              17,
-              17,
-              18,
+              9,
+              9,
+              10,
               handleChange,
+            )}
+            {event_name.includes("tenkai") ? (
+              <>
+                <Typography variant="h4" sx={{ mx: 1, mt: 5 }}>
+                  +
+                </Typography>
+                {ScoreField(
+                  "副審3",
+                  values,
+                  initialValues,
+                  inputRefs,
+                  11,
+                  11,
+                  12,
+                  handleChange,
+                )}
+              </>
+            ) : (
+              <>
+                <Typography variant="h4" sx={{ mx: 1, mt: 5 }}>
+                  -
+                </Typography>
+                {ScoreField(
+                  "場外減点",
+                  values,
+                  initialValues,
+                  inputRefs,
+                  17,
+                  17,
+                  18,
+                  handleChange,
+                )}
+              </>
             )}
           </Box>
+        )}
+        {event_name.includes("tenkai") ? (
+          <>
+            {is_mobile ? (
+              <>
+                <Box display="flex" alignItems="center" justifyContent="center">
+                  {ScoreField(
+                    "副審4",
+                    values,
+                    initialValues,
+                    inputRefs,
+                    13,
+                    13,
+                    14,
+                    handleChange,
+                  )}
+                </Box>
+                <Box display="flex" alignItems="center" justifyContent="center">
+                  {ScoreField(
+                    "副審5",
+                    values,
+                    initialValues,
+                    inputRefs,
+                    15,
+                    15,
+                    16,
+                    handleChange,
+                  )}
+                </Box>
+                <Box display="flex" alignItems="center" justifyContent="center">
+                  {ScoreField(
+                    "場外減点",
+                    values,
+                    initialValues,
+                    inputRefs,
+                    17,
+                    17,
+                    18,
+                    handleChange,
+                  )}
+                </Box>
+              </>
+            ) : (
+              <Box display="flex" alignItems="center" justifyContent="center">
+                <Typography variant="h4" sx={{ mx: 1, mt: 5 }}>
+                  +
+                </Typography>
+                {ScoreField(
+                  "副審4",
+                  values,
+                  initialValues,
+                  inputRefs,
+                  13,
+                  13,
+                  14,
+                  handleChange,
+                )}
+                <Typography variant="h4" sx={{ mx: 1, mt: 5 }}>
+                  +
+                </Typography>
+                {ScoreField(
+                  "副審5",
+                  values,
+                  initialValues,
+                  inputRefs,
+                  15,
+                  15,
+                  16,
+                  handleChange,
+                )}
+                <Typography variant="h4" sx={{ mx: 1, mt: 5 }}>
+                  -
+                </Typography>
+                {ScoreField(
+                  "場外減点",
+                  values,
+                  initialValues,
+                  inputRefs,
+                  17,
+                  17,
+                  18,
+                  handleChange,
+                )}
+              </Box>
+            )}
+          </>
         ) : (
           <></>
         )}
