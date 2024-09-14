@@ -7,54 +7,59 @@ const RecordTable = async (req, res) => {
     const event_name = req.body.event_name;
     let query = "update " + event_name + " set ";
     let initial_value_is_set = false;
-    if (req.body.main_score) {
+    if (req.body.main_score || req.body.retire) {
       query +=
         (initial_value_is_set ? "," : " ") +
         "main_score=" +
         req.body.main_score;
       initial_value_is_set = true;
     }
-    if (req.body.sub1_score) {
+    if (req.body.sub1_score || req.body.retire) {
       query +=
         (initial_value_is_set ? "," : " ") +
         "sub1_score=" +
         req.body.sub1_score;
       initial_value_is_set = true;
     }
-    if (req.body.sub2_score) {
+    if (req.body.sub2_score || req.body.retire) {
       query +=
         (initial_value_is_set ? "," : " ") +
         "sub2_score=" +
         req.body.sub2_score;
       initial_value_is_set = true;
     }
-    if (req.body.sub3_score) {
+    if (req.body.sub3_score || req.body.retire) {
       query +=
         (initial_value_is_set ? "," : " ") +
         "sub3_score=" +
         req.body.sub3_score;
       initial_value_is_set = true;
     }
-    if (req.body.sub4_score) {
+    if (req.body.sub4_score || req.body.retire) {
       query +=
         (initial_value_is_set ? "," : " ") +
         "sub4_score=" +
         req.body.sub4_score;
       initial_value_is_set = true;
     }
-    if (req.body.sub5_score) {
+    if (req.body.sub5_score || req.body.retire) {
       query +=
         (initial_value_is_set ? "," : " ") +
         "sub5_score=" +
         req.body.sub5_score;
       initial_value_is_set = true;
     }
-    if (req.body.elapsed_time) {
+    if (req.body.elapsed_time || req.body.retire) {
       query +=
         (initial_value_is_set ? "," : " ") +
         "elapsed_time=" +
         req.body.elapsed_time;
       initial_value_is_set = true;
+    }
+    if (req.body.retire) {
+      query += ",retire=1";
+    } else {
+      query += (initial_value_is_set ? "," : " ") + "retire=0";
     }
     if (req.body.penalty !== undefined) {
       query +=
