@@ -142,11 +142,21 @@ const GetTableResult: React.FC<{
       .then((data) => {
         const tables = {};
         const winners = {};
+        // check if final is confirmed or not
+        let final_is_confirmed = false;
+        for (let i = 0; i < data.length; i++) {
+          if (data[i].is_final && data[i]["name"]) {
+            final_is_confirmed = true;
+            break;
+          }
+        }
         data.forEach((elem) => {
           const group_name = elem.name?.replace(/['"]+/g, "");
           if (!(elem.round in tables)) {
             tables[elem.round] = [];
           }
+          const visible =
+            !hide && (elem.is_final || final_is_confirmed || editable);
           tables[elem.round].push(
             <tr key={elem.id}>
               <td>
@@ -171,88 +181,105 @@ const GetTableResult: React.FC<{
               {event_name.includes("tenkai") ? (
                 <>
                   <td>
-                    {elem.retire && !hide ? (
+                    {elem.retire && visible ? (
                       <s>{group_name}</s>
                     ) : (
                       <>{group_name}</>
                     )}
                   </td>
                   <td>
-                    {elem.main_score && !hide ? elem.main_score.toFixed(1) : ""}
+                    {elem.main_score && visible
+                      ? elem.main_score.toFixed(1)
+                      : ""}
                   </td>
                   <td>
-                    {elem.sub1_score && !hide ? elem.sub1_score.toFixed(1) : ""}
+                    {elem.sub1_score && visible
+                      ? elem.sub1_score.toFixed(1)
+                      : ""}
                   </td>
                   <td>
-                    {elem.sub2_score && !hide ? elem.sub2_score.toFixed(1) : ""}
+                    {elem.sub2_score && visible
+                      ? elem.sub2_score.toFixed(1)
+                      : ""}
                   </td>
                   <td>
-                    {elem.sub3_score && !hide ? elem.sub3_score.toFixed(1) : ""}
+                    {elem.sub3_score && visible
+                      ? elem.sub3_score.toFixed(1)
+                      : ""}
                   </td>
                   <td>
-                    {elem.sub4_score && !hide ? elem.sub4_score.toFixed(1) : ""}
+                    {elem.sub4_score && visible
+                      ? elem.sub4_score.toFixed(1)
+                      : ""}
                   </td>
                   <td className={checkStyles.border_right}>
-                    {elem.sub5_score && !hide ? elem.sub5_score.toFixed(1) : ""}
+                    {elem.sub5_score && visible
+                      ? elem.sub5_score.toFixed(1)
+                      : ""}
                   </td>
                   <td className={checkStyles.border_right}>
-                    {elem.sum_score_without_penalty && !hide
+                    {elem.sum_score_without_penalty && visible
                       ? elem.sum_score_without_penalty.toFixed(1)
                       : ""}
                   </td>
                   <td>
-                    {elem.elapsed_time && !hide
+                    {elem.elapsed_time && visible
                       ? elem.elapsed_time.toFixed(2)
                       : ""}
                   </td>
                   <td>
-                    {elem.time_penalty && !hide
+                    {elem.time_penalty && visible
                       ? elem.time_penalty.toFixed(1)
                       : ""}
                   </td>
                   <td>
-                    {elem.penalty && !hide ? elem.penalty.toFixed(1) : ""}
+                    {elem.penalty && visible ? elem.penalty.toFixed(1) : ""}
                   </td>
                   <td className={checkStyles.border_right}>
-                    {elem.sum_score && !hide ? elem.sum_score.toFixed(1) : ""}
+                    {elem.sum_score && visible ? elem.sum_score.toFixed(1) : ""}
                   </td>
                   <td className={elem.winner ? checkStyles.winner : null}>
-                    {!hide ? elem.rank : ""}
+                    {visible ? elem.rank : ""}
                   </td>
                 </>
               ) : (
                 <>
                   <td>
-                    {elem.retire && !hide ? (
+                    {elem.retire && visible ? (
                       <s>{group_name}</s>
                     ) : (
                       <>{group_name}</>
                     )}
                   </td>
                   <td>
-                    {elem.main_score && !hide ? elem.main_score.toFixed(1) : ""}
+                    {elem.main_score && visible
+                      ? elem.main_score.toFixed(1)
+                      : ""}
                   </td>
                   <td>
-                    {elem.sub1_score && !hide ? elem.sub1_score.toFixed(1) : ""}
+                    {elem.sub1_score && visible
+                      ? elem.sub1_score.toFixed(1)
+                      : ""}
                   </td>
                   <td>
-                    {elem.sub2_score && !hide ? elem.sub2_score.toFixed(1) : ""}
+                    {elem.sub2_score && visible
+                      ? elem.sub2_score.toFixed(1)
+                      : ""}
                   </td>
                   <td className={checkStyles.border_right}>
-                    {elem.penalty && !hide ? elem.penalty.toFixed(1) : ""}
+                    {elem.penalty && visible ? elem.penalty.toFixed(1) : ""}
                   </td>
                   <td className={checkStyles.border_right}>
-                    {elem.sum_score && !hide ? elem.sum_score.toFixed(1) : ""}
+                    {elem.sum_score && visible ? elem.sum_score.toFixed(1) : ""}
                   </td>
                   <td className={elem.winner ? checkStyles.winner : null}>
-                    {!hide ? elem.rank : ""}
+                    {visible ? elem.rank : ""}
                   </td>
                 </>
               )}
             </tr>,
           );
-          console.log(hide);
-          if (elem.rank && elem.is_final && !hide) {
+          if (elem.rank && elem.is_final && visible) {
             winners[elem.rank] = { group: group_name };
           }
         });
