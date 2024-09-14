@@ -22,6 +22,12 @@ export default function Home({ params }) {
   const ToNotificationRequest = () => {
     router.push("/admin/notification_request");
   };
+  const ToSummary = () => {
+    router.push("/summary");
+  };
+  const ToTotal = () => {
+    router.push("/total");
+  };
   const hide = params.production_test === "1";
   return (
     <div>
@@ -121,6 +127,33 @@ export default function Home({ params }) {
             onClick={(e) => ToNotificationRequest()}
           >
             司会用
+          </Button>
+        </Grid>
+        <br />
+        <br />
+        <br />
+        <Grid
+          container
+          justifyContent="center"
+          alignItems="center"
+          style={{ height: "80px" }}
+        >
+          <Button
+            variant="contained"
+            type="submit"
+            onClick={(e) => ToSummary()}
+          >
+            サマリー
+          </Button>
+        </Grid>
+        <Grid
+          container
+          justifyContent="center"
+          alignItems="center"
+          style={{ height: "40px" }}
+        >
+          <Button variant="contained" type="submit" onClick={(e) => ToTotal()}>
+            総合得点表
           </Button>
         </Grid>
         <br />

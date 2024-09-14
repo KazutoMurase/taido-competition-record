@@ -7,6 +7,11 @@ function AddScore(data, id, score) {
   } else {
     data[id] = score;
   }
+  if (data["total"]) {
+    data["total"] += score;
+  } else {
+    data["total"] = score;
+  }
 }
 
 const GetTotal = async (req, res) => {
@@ -199,6 +204,28 @@ const GetTotal = async (req, res) => {
       }
     }
   }
+  // set rank
+  sorted_group_data.sort((a, b) => {
+    if (!a.total) {
+      a.total = 0;
+    }
+    if (!b.total) {
+      b.total = 0;
+    }
+    if (b.total === a.total) {
+    }
+    return b.total - a.total;
+  });
+  let prev_total = -1;
+  sorted_group_data.forEach((item, index) => {
+    if (item.total) {
+      item.rank = item.total === prev_total ? index : index + 1;
+      prev_total = item.total;
+    } else {
+      item.rank = null;
+    }
+  });
+  sorted_group_data.sort((a, b) => a.id - b.id);
   res.json(sorted_group_data);
 };
 
