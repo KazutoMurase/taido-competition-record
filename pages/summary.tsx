@@ -31,6 +31,7 @@ const Summary: React.FC<{ params }> = ({ params }) => {
         event_infos.push({
           id: result[i]["id"],
           name: result[i]["name"].replace(/['"]+/g, ""),
+          name_en: result[i]["name_en"].replace(/['"]+/g, ""),
         });
       }
     }
@@ -75,6 +76,7 @@ const Summary: React.FC<{ params }> = ({ params }) => {
           key={event_info.id}
           event_id={event_info.id}
           event_name={event_info.name}
+          event_name_en={event_info.name_en}
           hide={hide}
         />
       ))}

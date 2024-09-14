@@ -60,6 +60,7 @@ const RecordTable = async (req, res) => {
       query += ",retire=1";
     } else {
       query += (initial_value_is_set ? "," : " ") + "retire=0";
+      initial_value_is_set = true;
     }
     if (req.body.penalty !== undefined) {
       query +=
