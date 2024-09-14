@@ -341,6 +341,30 @@ function UpdateTableResult({ event_name, id, return_url }) {
         console.log(e);
       });
   };
+  const onSubmitRetire = (data, event_name) => {
+    let post = {
+      id: data.id,
+      event_name: event_name,
+      main_score: null,
+      sub1_score: null,
+      sub2_score: null,
+      retire: true,
+    };
+    if (event_name.includes("tenkai")) {
+      post["sub3_score"] = null;
+      post["sub4_score"] = null;
+      post["sub5_score"] = null;
+      post["elapsed_time"] = null;
+    }
+    axios
+      .post("/api/record_table", post)
+      .then((response) => {
+        router.push("/" + return_url);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
   const main_score_start_index = event_name.includes("tenkai") ? 4 : 5;
   return (
     <div>
@@ -359,6 +383,21 @@ function UpdateTableResult({ event_name, id, return_url }) {
             style={{ height: "40px" }}
           >
             <h2>第{data.id}試合</h2>
+          </Grid>
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            style={{ height: "80px" }}
+          >
+            <Button
+              variant="contained"
+              type="submit"
+              onClick={(e) => onSubmitRetire(data, event_name)}
+              style={{ backgroundColor: "gray" }}
+            >
+              棄権
+            </Button>
           </Grid>
           <Grid
             container

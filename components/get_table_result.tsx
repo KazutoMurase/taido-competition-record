@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import axios from "axios";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
@@ -118,6 +119,20 @@ const GetTableResult: React.FC<{
     }
   };
 
+  const onConfirm = () => {
+    let post = {
+      event_name: event_name,
+    };
+    axios
+      .post("/api/confirm_table_result", post)
+      .then((response) => {
+        window.location.reload();
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
+
   const [resultTable, setResultTable] = useState({});
   const [resultWinners, setResultWinners] = useState({});
 
@@ -201,7 +216,7 @@ const GetTableResult: React.FC<{
                   <td className={checkStyles.border_right}>
                     {elem.sum_score && !hide ? elem.sum_score.toFixed(1) : ""}
                   </td>
-                  <td className={elem.rank < 4 ? checkStyles.winner : null}>
+                  <td className={elem.winner ? checkStyles.winner : null}>
                     {!hide ? elem.rank : ""}
                   </td>
                 </>
@@ -229,7 +244,7 @@ const GetTableResult: React.FC<{
                   <td className={checkStyles.border_right}>
                     {elem.sum_score && !hide ? elem.sum_score.toFixed(1) : ""}
                   </td>
-                  <td className={elem.rank < 4 ? checkStyles.winner : null}>
+                  <td className={elem.winner ? checkStyles.winner : null}>
                     {!hide ? elem.rank : ""}
                   </td>
                 </>
@@ -237,7 +252,7 @@ const GetTableResult: React.FC<{
             </tr>,
           );
           console.log(hide);
-          if (elem.rank && !hide) {
+          if (elem.rank && elem.is_final && !hide) {
             winners[elem.rank] = { group: group_name };
           }
         });
@@ -267,6 +282,12 @@ const GetTableResult: React.FC<{
   } else if (event_name.includes("dantai_hokei")) {
     event_full_name = "団体法形競技";
     event_description = ["躰道の法形から選択、段級位問わず"];
+  } else if (event_name.includes("tenkai_man")) {
+    event_full_name = "男子団体展開競技";
+    event_description = [];
+  } else if (event_name.includes("tenkai_woman")) {
+    event_full_name = "女子団体展開競技";
+    event_description = [];
   } else if (event_name.includes("tenkai")) {
     event_full_name = "団体展開競技";
     event_description = ["1チーム6名 男女混合可　背番号着用", "段級位問わず"];
@@ -304,6 +325,25 @@ const GetTableResult: React.FC<{
               <u>{event_full_name + "　" + num_of_groups + "チーム"}</u>
             </h1>
           </Grid>
+          {editable ? (
+            <Grid
+              key="confirm"
+              container
+              justifyContent="center"
+              alignItems="center"
+              style={{ height: "40px" }}
+            >
+              <Button
+                variant="contained"
+                type="submit"
+                onClick={(e) => onConfirm()}
+              >
+                結果確定
+              </Button>
+            </Grid>
+          ) : (
+            <></>
+          )}
           {event_description.map((text, index) => (
             <Grid
               key={index}

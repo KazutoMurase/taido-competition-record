@@ -8,6 +8,32 @@ import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 
+function onSubmitRetire(data, block_number, event_name) {
+  let post = {
+    id: data.id,
+    event_name: event_name,
+    update_block: block_number,
+    main_score: null,
+    sub1_score: null,
+    sub2_score: null,
+    retire: true,
+  };
+  if (event_name.includes("tenkai")) {
+    post["sub3_score"] = null;
+    post["sub4_score"] = null;
+    post["sub5_score"] = null;
+    post["elapsed_time"] = null;
+  }
+  axios
+    .post("/api/record_table", post)
+    .then((response) => {
+      window.location.reload();
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+}
+
 function onSubmit(
   data,
   values,
@@ -399,6 +425,21 @@ function RecordTableResult({
             style={{ height: "40px" }}
           >
             <h2>第{data.id}試合</h2>
+          </Grid>
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            style={{ height: "80px" }}
+          >
+            <Button
+              variant="contained"
+              type="submit"
+              onClick={(e) => onSubmitRetire(data, block_number, event_name)}
+              style={{ backgroundColor: "gray" }}
+            >
+              棄権
+            </Button>
           </Grid>
           <Grid
             container
