@@ -869,6 +869,7 @@ function GetResult({
   event_name = null,
   block_number = null,
   hide = false,
+  is_mobile = false,
 }) {
   const router = useRouter();
   if (returnUrl === null) {
@@ -1121,38 +1122,83 @@ function GetResult({
     winner4 = null;
   }
   const y_padding = maxHeight < 200 ? 50 : 0;
+  const areaWidth = is_mobile ? "340px" : "850px";
+  const areaWidthNum = is_mobile ? 340 : 850;
+  const stageX = 0;
+  const stageScale = is_mobile ? 0.8 : 1;
+  const [stagePos, setStagePos] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [lastTouchPos, setLastTouchPos] = useState(0);
+  useEffect(() => {
+    if (is_mobile) {
+      const savedPos = localStorage.getItem(event_name + "stagePos");
+      if (savedPos) {
+        setStagePos(savedPos);
+      }
+    }
+  }, []);
+  const handleTouchStart = (event) => {
+    event.evt.preventDefault();
+    const point = event.target.getStage().getPointerPosition();
+    setLastTouchPos(point.x);
+    setIsDragging(true);
+  };
+
+  const handleTouchMove = (event) => {
+    if (!isDragging || !lastTouchPos) return;
+
+    event.evt.preventDefault();
+    const point = event.target.getStage().getPointerPosition();
+    const deltaX = point.x - lastTouchPos;
+    const nextStagePos = parseFloat(stagePos + deltaX);
+    if (nextStagePos <= 0) {
+      setStagePos(nextStagePos);
+    }
+    localStorage.setItem(event_name + "stagePos", stagePos);
+    setLastTouchPos(point.x);
+  };
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    setLastTouchPos(null);
+  };
   return (
     <div>
       <Container maxWidth="md">
-        <Box style={{ minWidth: "850px" }}>
-          <Grid
-            container
-            justifyContent="center"
-            alignItems="center"
-            style={{ height: "70px" }}
-          >
-            <h1>
-              <u>
-                {event_full_name +
-                  (num_of_players > 0
-                    ? "　" +
-                      num_of_players +
-                      (event_name.includes("dantai") ? "チーム" : "人")
-                    : "")}
-              </u>
-            </h1>
-          </Grid>
-          {event_description.map((text, index) => (
-            <Grid
-              key={index}
-              container
-              justifyContent="center"
-              alignItems="center"
-              style={{ height: "20px" }}
-            >
-              {text}
-            </Grid>
-          ))}
+        <Box style={{ minWidth: areaWidth }}>
+          {is_mobile ? (
+            <></>
+          ) : (
+            <>
+              <Grid
+                container
+                justifyContent="center"
+                alignItems="center"
+                style={{ height: "70px" }}
+              >
+                <h1>
+                  <u>
+                    {event_full_name +
+                      (num_of_players > 0
+                        ? "　" +
+                          num_of_players +
+                          (event_name.includes("dantai") ? "チーム" : "人")
+                        : "")}
+                  </u>
+                </h1>
+              </Grid>
+              {event_description.map((text, index) => (
+                <Grid
+                  key={index}
+                  container
+                  justifyContent="center"
+                  alignItems="center"
+                  style={{ height: "20px" }}
+                >
+                  {text}
+                </Grid>
+              ))}
+            </>
+          )}
           <br />
           <Grid
             container
@@ -1160,30 +1206,54 @@ function GetResult({
             alignItems="center"
             style={{ height: maxHeight + 50 + y_padding }}
           >
-            <Stage width={850} height={maxHeight + 50 + y_padding}>
-              <Layer>
-                {sortedData.map((item, index) =>
-                  CreateBlock(
-                    item,
-                    lineWidth,
-                    maxHeight,
-                    editable,
-                    event_name,
-                    returnUrl,
-                    hide,
-                  ),
-                )}
-                {sortedData.map((item, index) =>
-                  event_name.includes("dantai")
-                    ? CreateDantaiText(item, lineWidth, y_padding, hide)
-                    : CreateText(item, lineWidth, y_padding, hide),
-                )}
-              </Layer>
-            </Stage>
+            <Box
+              sx={{
+                width: areaWidth,
+                height: (maxHeight + 50 + y_padding) * stageScale,
+                overflow: "hidden",
+                margin: "0 auto",
+                position: "relative",
+              }}
+            >
+              <Stage
+                width={areaWidthNum}
+                height={maxHeight + 50 + y_padding}
+                x={stagePos}
+                scaleX={stageScale}
+                scaleY={stageScale}
+                style={{ cursor: isDragging ? "grabbing" : "grab" }}
+                onTouchStart={is_mobile ? handleTouchStart : null}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+              >
+                <Layer>
+                  {sortedData.map((item, index) =>
+                    CreateBlock(
+                      item,
+                      lineWidth,
+                      maxHeight,
+                      editable,
+                      event_name,
+                      returnUrl,
+                      hide,
+                    ),
+                  )}
+                  {sortedData.map((item, index) =>
+                    event_name.includes("dantai")
+                      ? CreateDantaiText(item, lineWidth, y_padding, hide)
+                      : CreateText(item, lineWidth, y_padding, hide),
+                  )}
+                </Layer>
+              </Stage>
+            </Box>
           </Grid>
-          <Summary
-            winners={{ 1: winner1, 2: winner2, 3: winner3, 4: winner4 }}
-          />
+          {is_mobile ? (
+            <></>
+          ) : (
+            <Summary
+              winners={{ 1: winner1, 2: winner2, 3: winner3, 4: winner4 }}
+            />
+          )}
           <Grid
             container
             justifyContent="center"

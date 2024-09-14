@@ -84,7 +84,12 @@ function onBack(data, block_number, function_after_post) {
     });
 }
 
-function ShowRedFlags(event_name, initialRadioButton, selectedRadioButton) {
+function ShowRedFlags(
+  event_name,
+  initialRadioButton,
+  selectedRadioButton,
+  fontSize,
+) {
   const flag =
     selectedRadioButton === null
       ? parseInt(initialRadioButton)
@@ -96,29 +101,34 @@ function ShowRedFlags(event_name, initialRadioButton, selectedRadioButton) {
     return (
       <>
         {flag >= 1 ? (
-          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" />
+          <FlagCircleRoundedIcon sx={{ fontSize: fontSize }} htmlColor="red" />
         ) : null}
         {flag >= 2 ? (
-          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" />
+          <FlagCircleRoundedIcon sx={{ fontSize: fontSize }} htmlColor="red" />
         ) : null}
         {flag >= 3 ? (
-          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" />
+          <FlagCircleRoundedIcon sx={{ fontSize: fontSize }} htmlColor="red" />
         ) : null}
       </>
     );
   } else if (event_name.includes("zissen")) {
     return (
       <>
-        <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="white" />
+        <FlagCircleRoundedIcon sx={{ fontSize: fontSize }} htmlColor="white" />
         {flag === 0 ? (
-          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" />
+          <FlagCircleRoundedIcon sx={{ fontSize: fontSize }} htmlColor="red" />
         ) : null}
       </>
     );
   }
 }
 
-function ShowWhiteFlags(event_name, initialRadioButton, selectedRadioButton) {
+function ShowWhiteFlags(
+  event_name,
+  initialRadioButton,
+  selectedRadioButton,
+  fontSize,
+) {
   const flag =
     selectedRadioButton === null
       ? parseInt(initialRadioButton)
@@ -130,54 +140,52 @@ function ShowWhiteFlags(event_name, initialRadioButton, selectedRadioButton) {
     return (
       <>
         {flag <= 0 ? (
-          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="gray" />
+          <FlagCircleRoundedIcon sx={{ fontSize: fontSize }} htmlColor="gray" />
         ) : null}
         {flag <= 1 ? (
-          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="gray" />
+          <FlagCircleRoundedIcon sx={{ fontSize: fontSize }} htmlColor="gray" />
         ) : null}
         {flag <= 2 ? (
-          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="gray" />
+          <FlagCircleRoundedIcon sx={{ fontSize: fontSize }} htmlColor="gray" />
         ) : null}
       </>
     );
   } else if (event_name.includes("zissen")) {
     return (
       <>
-        <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="white" />
+        <FlagCircleRoundedIcon sx={{ fontSize: fontSize }} htmlColor="white" />
         {flag >= 1 ? (
-          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="gray" />
+          <FlagCircleRoundedIcon sx={{ fontSize: fontSize }} htmlColor="gray" />
         ) : null}
       </>
     );
   }
 }
 
-function ShowLeftName(data) {
+function ShowLeftName(data, is_mobile) {
   if (data.left_retire) {
     return (
-      <s>
-        <h1>{data.left_name}</h1>
-      </s>
+      <s>{is_mobile ? <h2>{data.left_name}</h2> : <h1>{data.left_name}</h1>}</s>
     );
   }
   return (
     <span>
-      <h1>{data.left_name}</h1>
+      {is_mobile ? <h2>{data.left_name}</h2> : <h1>{data.left_name}</h1>}
     </span>
   );
 }
 
-function ShowRightName(data) {
+function ShowRightName(data, is_mobile) {
   if (data.right_retire) {
     return (
       <s>
-        <h1>{data.right_name}</h1>
+        {is_mobile ? <h2>{data.right_name}</h2> : <h1>{data.right_name}</h1>}
       </s>
     );
   }
   return (
     <span>
-      <h1>{data.right_name}</h1>
+      {is_mobile ? <h2>{data.right_name}</h2> : <h1>{data.right_name}</h1>}
     </span>
   );
 }
@@ -187,6 +195,7 @@ function RecordResult({
   event_name,
   schedule_id,
   update_interval,
+  is_mobile,
 }) {
   const [initialRadioButton, setInitialRadioButton] = useState(null);
   const [selectedRadioButton, setSelectedRadioButton] = useState(null);
@@ -264,11 +273,12 @@ function RecordResult({
     no_game_red_winner = -1;
     no_game_white_winner = 2;
   }
-
+  const minWidth = is_mobile ? "250px" : "850px";
+  const flagFontSize = is_mobile ? 50 : 60;
   return (
     <div>
       <Container maxWidth="md">
-        <Box style={{ minWidth: "850px" }}>
+        <Box style={{ minWidth: minWidth }}>
           <Grid
             container
             justifyContent="center"
@@ -303,53 +313,64 @@ function RecordResult({
             </Button>
           </Grid>
           <Grid container>
-            <Grid item xs={3} />
-            <Grid item xs={4} style={{ height: "220px" }}>
-              <Button
-                variant="contained"
-                type="submit"
-                onClick={(e) =>
-                  onSubmit(data, no_game_red_winner, block_number, event_name)
-                }
-              >
-                赤不戦勝
-              </Button>
-              <h3>
+            <Grid item xs={is_mobile ? 0 : 3} />
+            <Grid item xs={is_mobile ? 6 : 4} style={{ height: "220px" }}>
+              <Box textAlign={is_mobile ? "center" : "left"}>
+                <Button
+                  variant="contained"
+                  type="submit"
+                  onClick={(e) =>
+                    onSubmit(data, no_game_red_winner, block_number, event_name)
+                  }
+                >
+                  赤不戦勝
+                </Button>
+                <h3>
+                  {data.left_color === "white"
+                    ? data.right_group_name
+                    : data.left_group_name}
+                </h3>
                 {data.left_color === "white"
-                  ? data.right_group_name
-                  : data.left_group_name}
-              </h3>
-              {data.left_color === "white"
-                ? ShowRightName(data)
-                : ShowLeftName(data)}
+                  ? ShowRightName(data, is_mobile)
+                  : ShowLeftName(data, is_mobile)}
+              </Box>
               {ShowRedFlags(
                 event_name,
                 initialRadioButton,
                 selectedRadioButton,
+                flagFontSize,
               )}
             </Grid>
-            <Grid item xs={4} style={{ height: "220px" }}>
-              <Button
-                variant="contained"
-                type="submit"
-                onClick={(e) =>
-                  onSubmit(data, no_game_white_winner, block_number, event_name)
-                }
-              >
-                白不戦勝
-              </Button>
-              <h3>
+            <Grid item xs={is_mobile ? 6 : 4} style={{ height: "220px" }}>
+              <Box textAlign={is_mobile ? "center" : "left"}>
+                <Button
+                  variant="contained"
+                  type="submit"
+                  onClick={(e) =>
+                    onSubmit(
+                      data,
+                      no_game_white_winner,
+                      block_number,
+                      event_name,
+                    )
+                  }
+                >
+                  白不戦勝
+                </Button>
+                <h3>
+                  {data.left_color === "white"
+                    ? data.left_group_name
+                    : data.right_group_name}
+                </h3>
                 {data.left_color === "white"
-                  ? data.left_group_name
-                  : data.right_group_name}
-              </h3>
-              {data.left_color === "white"
-                ? ShowLeftName(data)
-                : ShowRightName(data)}
+                  ? ShowLeftName(data, is_mobile)
+                  : ShowRightName(data, is_mobile)}
+              </Box>
               {ShowWhiteFlags(
                 event_name,
                 initialRadioButton,
                 selectedRadioButton,
+                flagFontSize,
               )}
             </Grid>
             <br />
