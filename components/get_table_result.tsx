@@ -7,6 +7,90 @@ import Grid from "@mui/material/Grid";
 import checkStyles from "../styles/checks.module.css";
 import Summary from "./show_summary";
 
+function MakeTable(event_name, resultTable, title, show_caption) {
+  return (
+    <table align="center" border={1}>
+      <thead>
+        <tr>
+          <td colSpan={14}>{title}</td>
+        </tr>
+        <tr className={checkStyles.border_bottom}>
+          {event_name.includes("tenkai") ? (
+            <>
+              <td style={{ width: "50px" }}>No.</td>
+              <td style={{ width: "150px" }}>団体名</td>
+              <td style={{ width: "50px" }}>主審</td>
+              <td style={{ width: "50px" }}>副審1</td>
+              <td style={{ width: "50px" }}>副審2</td>
+              <td style={{ width: "50px" }}>副審3</td>
+              <td style={{ width: "50px" }}>副審4</td>
+              <td
+                className={checkStyles.border_right}
+                style={{ width: "50px" }}
+              >
+                副審5
+              </td>
+              <td
+                className={checkStyles.border_right}
+                style={{ width: "50px" }}
+              >
+                合計
+              </td>
+              <td style={{ width: "50px" }}>タイム</td>
+              <td style={{ width: "50px" }}>
+                時間
+                <br />
+                減点
+              </td>
+              <td style={{ width: "50px" }}>
+                場外
+                <br />
+                減点
+              </td>
+              <td
+                className={checkStyles.border_right}
+                style={{ width: "50px" }}
+              >
+                得点
+              </td>
+              <td style={{ width: "50px" }}>順位</td>
+            </>
+          ) : (
+            <>
+              <td style={{ width: "50px" }}>No.</td>
+              <td style={{ width: "150px" }}>団体名</td>
+              <td style={{ width: "100px" }}>主審</td>
+              <td style={{ width: "100px" }}>副審</td>
+              <td style={{ width: "100px" }}>副審</td>
+              <td
+                className={checkStyles.border_right}
+                style={{ width: "100px" }}
+              >
+                場外減点
+              </td>
+              <td
+                className={checkStyles.border_right}
+                style={{ width: "100px" }}
+              >
+                合計得点
+              </td>
+              <td style={{ width: "100px" }}>順位</td>
+            </>
+          )}
+        </tr>
+      </thead>
+      <tbody>{resultTable}</tbody>
+      {show_caption ? (
+        <caption className={checkStyles.table_caption}>
+          ※1：競技順番は実行委員会で抽選を行いました。
+        </caption>
+      ) : (
+        <></>
+      )}
+    </table>
+  );
+}
+
 const GetTableResult: React.FC<{
   update_interval: number;
   event_name: string;
@@ -34,18 +118,21 @@ const GetTableResult: React.FC<{
     }
   };
 
-  const [resultTable, setResultTable] = useState([]);
+  const [resultTable, setResultTable] = useState({});
   const [resultWinners, setResultWinners] = useState({});
 
   const fetchData = useCallback(async () => {
     fetch("/api/get_table_result?event_name=" + event_name)
       .then((response) => response.json())
       .then((data) => {
-        const tables: JSX.Element[] = [];
+        const tables = {};
         const winners = {};
         data.forEach((elem) => {
-          const group_name = elem.name.replace(/['"]+/g, "");
-          tables.push(
+          const group_name = elem.name?.replace(/['"]+/g, "");
+          if (!(elem.round in tables)) {
+            tables[elem.round] = [];
+          }
+          tables[elem.round].push(
             <tr key={elem.id}>
               <td>
                 {editable ? (
@@ -184,7 +271,23 @@ const GetTableResult: React.FC<{
     event_full_name = "団体展開競技";
     event_description = ["1チーム6名 男女混合可　背番号着用", "段級位問わず"];
   }
-  let num_of_groups = resultTable.length;
+  let num_of_groups = 0;
+  const entries = Object.entries(resultTable);
+  const length = entries.length;
+  for (let i = 0; i < (length === 1 ? 1 : length - 1); i++) {
+    const [key, value] = entries[i];
+    if (Array.isArray(value)) {
+      num_of_groups += value.length;
+    }
+  }
+  let titles = {};
+  if (length === 1) {
+    titles = { 1: "決　　勝" };
+  } else if (length === 2) {
+    titles = { 1: "予　　選", 2: "決　　勝" };
+  } else if (length === 3) {
+    titles = { 1: "予　　選　　A", 2: "予　　選　　B", 3: "決　　勝" };
+  }
   // TODO: make it optional
   let show_caption = false;
   return (
@@ -213,85 +316,13 @@ const GetTableResult: React.FC<{
             </Grid>
           ))}
           <br />
-          <table align="center" border={1}>
-            <thead>
-              <tr>
-                <td colSpan={14}>決　　勝</td>
-              </tr>
-              <tr className={checkStyles.border_bottom}>
-                {event_name.includes("tenkai") ? (
-                  <>
-                    <td style={{ width: "50px" }}>No.</td>
-                    <td style={{ width: "150px" }}>団体名</td>
-                    <td style={{ width: "50px" }}>主審</td>
-                    <td style={{ width: "50px" }}>副審1</td>
-                    <td style={{ width: "50px" }}>副審2</td>
-                    <td style={{ width: "50px" }}>副審3</td>
-                    <td style={{ width: "50px" }}>副審4</td>
-                    <td
-                      className={checkStyles.border_right}
-                      style={{ width: "50px" }}
-                    >
-                      副審5
-                    </td>
-                    <td
-                      className={checkStyles.border_right}
-                      style={{ width: "50px" }}
-                    >
-                      合計
-                    </td>
-                    <td style={{ width: "50px" }}>タイム</td>
-                    <td style={{ width: "50px" }}>
-                      時間
-                      <br />
-                      減点
-                    </td>
-                    <td style={{ width: "50px" }}>
-                      場外
-                      <br />
-                      減点
-                    </td>
-                    <td
-                      className={checkStyles.border_right}
-                      style={{ width: "50px" }}
-                    >
-                      得点
-                    </td>
-                    <td style={{ width: "50px" }}>順位</td>
-                  </>
-                ) : (
-                  <>
-                    <td style={{ width: "50px" }}>No.</td>
-                    <td style={{ width: "150px" }}>団体名</td>
-                    <td style={{ width: "100px" }}>主審</td>
-                    <td style={{ width: "100px" }}>副審</td>
-                    <td style={{ width: "100px" }}>副審</td>
-                    <td
-                      className={checkStyles.border_right}
-                      style={{ width: "100px" }}
-                    >
-                      場外減点
-                    </td>
-                    <td
-                      className={checkStyles.border_right}
-                      style={{ width: "100px" }}
-                    >
-                      合計得点
-                    </td>
-                    <td style={{ width: "100px" }}>順位</td>
-                  </>
-                )}
-              </tr>
-            </thead>
-            <tbody>{resultTable}</tbody>
-            {show_caption ? (
-              <caption className={checkStyles.table_caption}>
-                ※1：競技順番は実行委員会で抽選を行いました。
-              </caption>
-            ) : (
-              <></>
-            )}
-          </table>
+          {Object.entries(resultTable).map(([key, table]) => (
+            <>
+              {MakeTable(event_name, table, titles[key], show_caption)}
+              <p />
+            </>
+          ))}
+          {}
           <p />
           <Summary winners={resultWinners} />
           <Grid
