@@ -216,7 +216,7 @@ const GetTableResult: React.FC<{
                   <td className={checkStyles.border_right}>
                     {elem.sum_score && !hide ? elem.sum_score.toFixed(1) : ""}
                   </td>
-                  <td className={elem.rank < 4 ? checkStyles.winner : null}>
+                  <td className={elem.winner ? checkStyles.winner : null}>
                     {!hide ? elem.rank : ""}
                   </td>
                 </>
@@ -244,7 +244,7 @@ const GetTableResult: React.FC<{
                   <td className={checkStyles.border_right}>
                     {elem.sum_score && !hide ? elem.sum_score.toFixed(1) : ""}
                   </td>
-                  <td className={elem.rank < 4 ? checkStyles.winner : null}>
+                  <td className={elem.winner ? checkStyles.winner : null}>
                     {!hide ? elem.rank : ""}
                   </td>
                 </>

@@ -86,7 +86,16 @@ async function GetFromDB(req, res) {
   });
   const final_round_num = Object.entries(grouped_data).length;
   for (let i = 0; i < ranked_data.length; i++) {
-    ranked_data[i]["is_final"] = ranked_data[i]["round"] === final_round_num;
+    const is_final = ranked_data[i]["round"] === final_round_num;
+    ranked_data[i]["is_final"] = is_final;
+    if (is_final) {
+      ranked_data[i]["winner"] = ranked_data[i]["rank"] < 4;
+    } else {
+      const final_round_num = Object.entries(grouped_data).length;
+      const winners_num =
+        grouped_data[final_round_num].length / (final_round_num - 1);
+      ranked_data[i]["winner"] = ranked_data[i]["rank"] <= winners_num;
+    }
   }
   return ranked_data.sort((a, b) => a.id - b.id);
 }
@@ -101,7 +110,7 @@ const GetResult = async (req, res) => {
     const latest_update_timestamp = (await Get(latest_update_key)) || 0;
     if (cached_data && latest_update_timestamp < cached_data.timestamp) {
       console.log("using cache");
-      return res.json(cached_data.data);
+      //return res.json(cached_data.data);
     }
     console.log("get new data");
     const data = await GetFromDB(req, res);
