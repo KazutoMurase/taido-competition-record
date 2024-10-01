@@ -1,4 +1,4 @@
-id,group_id,name_kana,zissen_man_player_id,hokei_man_player_id,zissen_woman_player_id,hokei_woman_player_id
+id,group_id,name,name_kana,zissen_man_player_id,hokei_man_player_id,zissen_woman_player_id,hokei_woman_player_id
 1,1,野波　柾希,ノナミ　マサキ,1,,,
 2,1,古田　若葉,フルタ　ワカバ,,,,1
 3,1,三浦　知咲歩,ミウラ　チサホ,,,1,
