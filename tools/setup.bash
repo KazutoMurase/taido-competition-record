@@ -15,6 +15,8 @@ if [ "${USE_LOCAL_DB}" == "1" ]; then
     fi
 fi
 
+export COMPETITION_TITLE=`cat /ws/data/$COMPETITION_NAME/title.txt`
+
 
 if [ -z "${PRODUCTION}" ]; then
     cd /ws && npm install && npm run dev
