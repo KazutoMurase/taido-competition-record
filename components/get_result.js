@@ -143,6 +143,19 @@ function CreateDantaiText(item, lineWidth, y_padding, hide = false) {
   return <></>;
 }
 
+function GetGroupNameFontSize(group_name) {
+  if (group_name.length < 8) {
+    return 14;
+  }
+  if (group_name.length < 9) {
+    return 13;
+  }
+  if (group_name.length < 10) {
+    return 12;
+  }
+  return 10;
+}
+
 function CreateText(item, lineWidth, y_padding, hide = false) {
   const is_left = item["block_pos"] === "left";
   const is_right = item["block_pos"] === "right";
@@ -153,7 +166,7 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
       return (
         <>
           <Text
-            x={is_left ? 10 : 630}
+            x={is_left ? 0 : 630}
             y={item["left_begin_y"] - 20 + y_padding}
             text={item["left_name_kana"]}
             fontSize={10}
@@ -167,7 +180,7 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
             visible={"left_out" in item}
           />
           <Text
-            x={is_left ? 10 : 630}
+            x={is_left ? 0 : 630}
             y={item["left_begin_y"] - 5 + y_padding}
             text={item["left_name"]}
             fontSize={item["left_name"].length < 8 ? 18 : 14}
@@ -181,13 +194,13 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
             visible={"left_out" in item}
           />
           <Text
-            x={is_left ? 130 : 750}
+            x={is_left ? 120 : 750}
             y={item["left_begin_y"] + y_padding}
             text={item["left_group_name"].replace("'", "【").replace("'", "】")}
-            fontSize={item["left_group_name"].length < 8 ? 14 : 12}
+            fontSize={GetGroupNameFontSize(item["left_group_name"])}
           />
           <Rect
-            x={is_left ? 130 : 750}
+            x={is_left ? 120 : 750}
             y={item["left_begin_y"] + 5 + y_padding}
             width={["left_group_name"].length * 80}
             height={1}
@@ -195,7 +208,7 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
             visible={"left_out" in item}
           />
           <Text
-            x={is_left ? 10 : 630}
+            x={is_left ? 0 : 630}
             y={item["right_begin_y"] - 20 + y_padding}
             text={item["right_name_kana"]}
             fontSize={10}
@@ -209,7 +222,7 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
             visible={"right_out" in item}
           />
           <Text
-            x={is_left ? 10 : 630}
+            x={is_left ? 0 : 630}
             y={item["right_begin_y"] - 5 + y_padding}
             text={item["right_name"]}
             fontSize={item["right_name"].length < 8 ? 18 : 14}
@@ -223,15 +236,15 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
             visible={"right_out" in item}
           />
           <Text
-            x={is_left ? 130 : 750}
+            x={is_left ? 120 : 750}
             y={item["right_begin_y"] + y_padding}
             text={item["right_group_name"]
               .replace("'", "【")
               .replace("'", "】")}
-            fontSize={item["right_group_name"].length < 8 ? 14 : 12}
+            fontSize={GetGroupNameFontSize(item["right_group_name"])}
           />
           <Rect
-            x={is_left ? 130 : 750}
+            x={is_left ? 120 : 750}
             y={item["right_begin_y"] + 5 + y_padding}
             width={["right_group_name"].length * 80}
             height={1}
@@ -245,7 +258,7 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
       return (
         <>
           <Text
-            x={is_left ? 10 : 630}
+            x={is_left ? 0 : 630}
             y={item["left_begin_y"] - 20}
             text={item["left_name_kana"]}
             fontSize={10}
@@ -259,7 +272,7 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
             visible={"left_out" in item}
           />
           <Text
-            x={is_left ? 10 : 630}
+            x={is_left ? 0 : 630}
             y={item["left_begin_y"] - 5}
             text={item["left_name"]}
             fontSize={item["left_name"].length < 8 ? 18 : 14}
@@ -273,13 +286,13 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
             visible={"left_out" in item}
           />
           <Text
-            x={is_left ? 130 : 750}
+            x={is_left ? 120 : 750}
             y={item["left_begin_y"]}
             text={item["left_group_name"].replace("'", "【").replace("'", "】")}
-            fontSize={item["left_group_name"].length < 8 ? 14 : 12}
+            fontSize={GetGroupNameFontSize(item["left_group_name"])}
           />
           <Rect
-            x={is_left ? 130 : 750}
+            x={is_left ? 120 : 750}
             y={item["left_begin_y"] + 5}
             width={["left_group_name"].length * 80}
             height={1}
@@ -293,7 +306,7 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
       return (
         <>
           <Text
-            x={is_left ? 10 : 630}
+            x={is_left ? 0 : 630}
             y={item["right_begin_y"] - 20}
             text={item["right_name_kana"]}
             fontSize={10}
@@ -307,7 +320,7 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
             visible={"right_out" in item}
           />
           <Text
-            x={is_left ? 10 : 630}
+            x={is_left ? 0 : 630}
             y={item["right_begin_y"] - 5}
             text={item["right_name"]}
             fontSize={item["right_name"].length < 8 ? 18 : 14}
@@ -321,15 +334,15 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
             visible={"right_out" in item}
           />
           <Text
-            x={is_left ? 130 : 750}
+            x={is_left ? 120 : 750}
             y={item["right_begin_y"]}
             text={item["right_group_name"]
               .replace("'", "【")
               .replace("'", "】")}
-            fontSize={item["right_group_name"].length < 8 ? 14 : 12}
+            fontSize={GetGroupNameFontSize(item["right_group_name"])}
           />
           <Rect
-            x={is_left ? 130 : 750}
+            x={is_left ? 120 : 750}
             y={item["right_begin_y"] + 5}
             width={["right_group_name"].length * 80}
             height={1}
@@ -391,7 +404,7 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
           fontSize={12}
         />
         <Text
-          x={x + width + 130}
+          x={x + width + 120}
           y={item["left_begin_y"] - 5 + y_padding}
           text={
             item["right_group_name"] !== null && !hide
