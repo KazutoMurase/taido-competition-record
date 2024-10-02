@@ -14,6 +14,13 @@ async function GetFromDB(req, res) {
       " AS t1 LEFT JOIN " +
       groups_name +
       " AS t2 ON t1.group_id = t2.id";
+  } else if (event_name === "dantai_hokei_newcommer") {
+    query =
+      "SELECT t1.id, t1.round, t1.main_score, t1.sub1_score, t1.sub2_score, t1.penalty, t1.retire, t2.name, t2.hokei_name FROM " +
+      event_name +
+      " AS t1 LEFT JOIN " +
+      groups_name +
+      " AS t2 ON t1.group_id = t2.id";
   } else {
     query =
       "SELECT t1.id, t1.round, t1.main_score, t1.sub1_score, t1.sub2_score, t1.penalty, t1.retire, t2.name FROM " +

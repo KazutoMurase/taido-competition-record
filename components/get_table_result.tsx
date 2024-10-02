@@ -60,6 +60,11 @@ function MakeTable(event_name, resultTable, title, show_caption) {
             <>
               <td style={{ width: "50px" }}>No.</td>
               <td style={{ width: "150px" }}>団体名</td>
+              {event_name === "dantai_hokei_newcommer" ? (
+                <td style={{ width: "100px" }}>選択法形</td>
+              ) : (
+                <></>
+              )}
               <td style={{ width: "100px" }}>主審</td>
               <td style={{ width: "100px" }}>副審</td>
               <td style={{ width: "100px" }}>副審</td>
@@ -260,6 +265,11 @@ const GetTableResult: React.FC<{
                       <>{group_name}</>
                     )}
                   </td>
+                  {event_name === "dantai_hokei_newcommer" ? (
+                    <td>{elem.hokei_name}</td>
+                  ) : (
+                    <></>
+                  )}
                   <td>
                     {elem.main_score && visible
                       ? elem.main_score.toFixed(1)
@@ -320,6 +330,12 @@ const GetTableResult: React.FC<{
   } else if (event_name.includes("dantai_hokei_woman")) {
     event_full_name = "女子団体法形競技";
     event_description = [];
+  } else if (event_name.includes("dantai_hokei_newcommer")) {
+    event_full_name = "新人団体法形競技";
+    event_description = [
+      "旋体・旋陰から選択   令和 6年 4 月以降に躰道部に入部した 5 級以下の男女",
+      "1 チーム 5 名（ 4 名以下不可）　旋体の場合は男子 3 名以上、旋陰の場合は女子 3 名以上の人員構成とする",
+    ];
   } else if (event_name.includes("dantai_hokei")) {
     event_full_name = "団体法形競技";
     event_description = ["躰道の法形から選択、段級位問わず"];
@@ -348,7 +364,16 @@ const GetTableResult: React.FC<{
   } else if (length === 2) {
     titles = { 1: "予　　選", 2: "決　　勝" };
   } else if (length === 3) {
-    titles = { 1: "予　　選　　A", 2: "予　　選　　B", 3: "決　　勝" };
+    titles = {
+      1: "予　　選　　(A組 No 1 ~ " + resultTable["1"].length + ")",
+      2:
+        "予　　選　　(B組 No " +
+        (resultTable["1"].length + 1) +
+        " ~ " +
+        (resultTable["1"].length + resultTable["2"].length) +
+        ")",
+      3: "決　　勝",
+    };
   }
   // TODO: make it optional
   let show_caption = false;
