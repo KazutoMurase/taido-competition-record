@@ -8,33 +8,10 @@ import FlagCircleRoundedIcon from "@mui/icons-material/FlagCircleRounded";
 import SquareTwoToneIcon from "@mui/icons-material/SquareTwoTone";
 import checkStyles from "../styles/checks.module.css";
 import { useRouter } from "next/router";
-
-function GetCourtId(block_number) {
-  const code = block_number.charCodeAt(0);
-  // ASCII code of 'a' is 97
-  return code >= 97 && code <= 122 ? code - 96 : null;
-}
+import { GetCourtId } from "../lib/get_court_id";
 
 function onSubmit(id, block_number, event_id, is_test, function_after_post) {
-  // TODO: FIXME
-  let court_id;
-  if (block_number === "a") {
-    court_id = 1;
-  } else if (block_number === "b") {
-    court_id = 2;
-  } else if (block_number === "c") {
-    court_id = 3;
-  } else if (block_number === "d") {
-    court_id = 4;
-  } else if (block_number === "e") {
-    court_id = 5;
-  } else if (block_number === "f") {
-    court_id = 6;
-  } else if (block_number === "x") {
-    court_id = 24;
-  } else if (block_number === "y") {
-    court_id = 25;
-  }
+  const court_id = GetCourtId(block_number);
   let post = {
     event_id: event_id,
     player_id: id,
