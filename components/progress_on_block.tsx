@@ -56,11 +56,15 @@ const test_event_id_vs_event_name: Map<number, string> = new Map([
   [23, "制の法形"],
   [24, "命 段位法形"],
   [25, "命 新人級位"],
+  [26, "新人団体法形"],
 ]);
 
 function GetGamesText(schedule) {
   if (!schedule.games_text) {
     return "";
+  }
+  if (schedule.before_final && schedule.final) {
+    return "【三決・決勝】" + schedule.games_text;
   }
   if (schedule.before_final) {
     return "【三決】" + schedule.games_text;
