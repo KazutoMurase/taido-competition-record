@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import React from "react";
 import Container from "@mui/material/Container";
@@ -29,6 +30,16 @@ export default function Home({ params }) {
     router.push("/total");
   };
   const hide = params.production_test === "1";
+  const [courts, setCourts] = useState([]);
+
+  const fetchCourts = async () => {
+    const response = await fetch("/api/get_courts");
+    const result = await response.json();
+    setCourts(result);
+  };
+  useEffect(() => {
+    fetchCourts();
+  }, []);
   return (
     <div>
       <br />
@@ -47,74 +58,32 @@ export default function Home({ params }) {
         <br />
         <br />
         <br />
-        <Grid
-          container
-          justifyContent="center"
-          alignItems="center"
-          style={{ height: "1vh" }}
-        >
-          <Button
-            variant="contained"
-            type="submit"
-            onClick={(e) => ToBlock("a")}
-          >
-            Aコート
-          </Button>
-        </Grid>
-        <br />
-        <br />
-        <Grid
-          container
-          justifyContent="center"
-          alignItems="center"
-          style={{ height: "1vh" }}
-        >
-          <Button
-            variant="contained"
-            type="submit"
-            onClick={(e) => ToBlock("b")}
-          >
-            Bコート
-          </Button>
-        </Grid>
-        <br />
-        <br />
-        <Grid
-          container
-          justifyContent="center"
-          alignItems="center"
-          style={{ height: "1vh" }}
-        >
-          <Button
-            variant="contained"
-            type="submit"
-            onClick={(e) => ToBlock("c")}
-          >
-            Cコート
-          </Button>
-        </Grid>
-        <br />
-        <br />
-        <Grid
-          container
-          justifyContent="center"
-          alignItems="center"
-          style={{ height: "1vh" }}
-        >
-          <br />
-          <br />
-          <Button
-            variant="contained"
-            type="submit"
-            onClick={(e) => ToBlock("d")}
-          >
-            Dコート
-          </Button>
-        </Grid>
-        <br />
-        <br />
-        <br />
-        <br />
+        {courts.map((item, index) => {
+          // TODO: split into "test_court_type"
+          if (item.name.includes("X") || item.name.includes("Y")) {
+            return <></>;
+          }
+          return (
+            <>
+              <Grid
+                container
+                justifyContent="center"
+                alignItems="center"
+                style={{ height: "1vh" }}
+              >
+                <Button
+                  variant="contained"
+                  type="submit"
+                  onClick={(e) => ToBlock(item.name[1].toLowerCase())}
+                >
+                  {item.name.replace(/['"]+/g, "")}
+                </Button>
+              </Grid>
+              <br />
+              <br />
+            </>
+          );
+        })}
         <Grid
           container
           justifyContent="center"
