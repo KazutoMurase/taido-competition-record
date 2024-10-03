@@ -4,6 +4,7 @@ import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import { useRouter } from "next/router";
 import GetSummary from "../components/get_summary";
+import GetAwardedPlayers from "../components/get_awarded_players";
 import { ShowWinner } from "../components/show_summary";
 import { InferGetServerSidePropsType, GetServerSideProps } from "next";
 
@@ -40,27 +41,6 @@ const Summary: React.FC<{ params }> = ({ params }) => {
   useEffect(() => {
     fetchData();
   }, []);
-  // item for MVP, etc
-  const mvp_item = {
-    name: "稲見 安希子",
-    name_kana: "イナミ アキコ",
-    group: "千葉県",
-  };
-  const syukun_item = {
-    name: "木村 雅和",
-    name_kana: "キムラ マサカズ",
-    group: "愛知県",
-  };
-  const kantou_item = {
-    name: "大越 晴斗",
-    name_kana: "オオコシ ハルト",
-    group: "",
-  };
-  const ginou_item = {
-    name: "佐々木 尚希",
-    name_kana: "ササキ ナオキ",
-    group: "宮城県",
-  };
   return (
     <>
       <Grid
@@ -86,34 +66,7 @@ const Summary: React.FC<{ params }> = ({ params }) => {
         alignItems="center"
         style={{ height: "320px" }}
       >
-        <table border={1} style={{ width: "400px" }}>
-          <tbody>
-            <tr style={{ fontSize: "12px" }}>
-              <td>
-                <div style={{ fontSize: "16px" }}>最高師範杯</div>
-              </td>
-              <td>{ShowWinner(mvp_item)}</td>
-            </tr>
-            <tr style={{ fontSize: "12px" }}>
-              <td>
-                <div style={{ fontSize: "16px" }}>殊勲賞</div>
-              </td>
-              <td>{ShowWinner(syukun_item)}</td>
-            </tr>
-            <tr style={{ fontSize: "12px" }}>
-              <td>
-                <div style={{ fontSize: "16px" }}>敢闘賞</div>
-              </td>
-              <td>{ShowWinner(kantou_item)}</td>
-            </tr>
-            <tr style={{ fontSize: "12px" }}>
-              <td>
-                <div style={{ fontSize: "16px" }}>技能賞</div>
-              </td>
-              <td>{ShowWinner(ginou_item)}</td>
-            </tr>
-          </tbody>
-        </table>
+        <GetAwardedPlayers />
       </Grid>
       <Grid
         container

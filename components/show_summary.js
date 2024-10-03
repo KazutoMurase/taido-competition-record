@@ -6,8 +6,8 @@ export function ShowWinner(item) {
       <>
         <div style={{ fontSize: "10px" }}>{item["name_kana"]}</div>
         <b style={{ fontSize: "16px" }}>{item["name"]}</b>
-        <div style={{ fontSize: "12px" }}>
-          {item["group"].replace("'", "【").replace("'", "】")}
+        <div style={{ fontSize: "12px", minWidth: "100px" }}>
+          {item["group"]?.replace("'", "【").replace("'", "】")}
         </div>
       </>
     );

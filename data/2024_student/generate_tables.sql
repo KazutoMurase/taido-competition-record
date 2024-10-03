@@ -431,3 +431,12 @@ create table current_block_f
 \copy block_f from 'block_f.csv' csv header;
 \copy block_f_games from 'block_f_games.csv' csv header;
 \copy current_block_f from 'current_block_f.csv' csv header;
+
+create table awarded_players
+(id integer not null,
+award_name text not null,
+player_id integer,
+foreign key (player_id) references players(id),
+primary key (id));
+
+\copy awarded_players from 'awarded_players.csv' csv header;
