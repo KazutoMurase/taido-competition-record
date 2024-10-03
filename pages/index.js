@@ -5,7 +5,16 @@ import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Image from "next/image";
 
-export default function Home() {
+export const getStaticProps = async () => {
+  const competitionTitle = process.env.COMPETITION_TITLE;
+  return {
+    props: {
+      competitionTitle,
+    },
+  };
+};
+
+export default function Home({ competitionTitle }) {
   const router = useRouter();
   const ToSummary = () => {
     router.push("/summary");
@@ -23,7 +32,7 @@ export default function Home() {
           style={{ height: "100px" }}
         >
           <h1>
-            <u>第33回 全国社会人躰道優勝大会</u>
+            <u>{competitionTitle}</u>
           </h1>
         </Grid>
         {show_image ? (
