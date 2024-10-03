@@ -22,7 +22,7 @@ const ProgressCheck: React.FC = ({
   };
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const blockNumberList = ["a", "b", "c", "d"];
+  const blockNumberList = ["a", "b", "c", "d", "e", "f"];
   const [tabIndex, setTabIndex] = React.useState(0);
   const handleTabChange = (event, newValue) => {
     setTabIndex(newValue);

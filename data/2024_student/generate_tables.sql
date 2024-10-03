@@ -360,6 +360,54 @@ create table current_block_d
  game_id integer not null,
  foreign key (id) references block_d(id));
 
+create table block_e
+(id integer not null,
+ event_id integer not null,
+ time_schedule text not null,
+ before_final integer not null,
+ final integer not null,
+ players_checked integer not null,
+ next_unused_num integer not null,
+ foreign key (event_id) references event_type(id),
+primary key(id));
+
+create table block_e_games
+(id integer not null,
+ schedule_id integer not null,
+ order_id integer not null,
+ game_id integer not null,
+ foreign key (schedule_id) references block_e(id),
+primary key(id));
+
+create table current_block_e
+(id integer not null,
+ game_id integer not null,
+ foreign key (id) references block_e(id));
+
+create table block_f
+(id integer not null,
+ event_id integer not null,
+ time_schedule text not null,
+ before_final integer not null,
+ final integer not null,
+ players_checked integer not null,
+ next_unused_num integer not null,
+ foreign key (event_id) references event_type(id),
+primary key(id));
+
+create table block_f_games
+(id integer not null,
+ schedule_id integer not null,
+ order_id integer not null,
+ game_id integer not null,
+ foreign key (schedule_id) references block_f(id),
+primary key(id));
+
+create table current_block_f
+(id integer not null,
+ game_id integer not null,
+ foreign key (id) references block_f(id));
+
 \copy block_a from 'block_a.csv' csv header;
 \copy block_a_games from 'block_a_games.csv' csv header;
 \copy current_block_a from 'current_block_a.csv' csv header;
@@ -375,6 +423,14 @@ create table current_block_d
 \copy block_d from 'block_d.csv' csv header;
 \copy block_d_games from 'block_d_games.csv' csv header;
 \copy current_block_d from 'current_block_d.csv' csv header;
+
+\copy block_e from 'block_e.csv' csv header;
+\copy block_e_games from 'block_e_games.csv' csv header;
+\copy current_block_e from 'current_block_e.csv' csv header;
+
+\copy block_f from 'block_f.csv' csv header;
+\copy block_f_games from 'block_f_games.csv' csv header;
+\copy current_block_f from 'current_block_f.csv' csv header;
 
 create table awarded_players
 (id integer not null,
