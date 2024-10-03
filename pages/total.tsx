@@ -19,33 +19,45 @@ const Total: React.FC<{ params }> = ({ params }) => {
   const ToBack = () => {
     router.back();
   };
-  const event_ids = [1, 2, 3, 4, 5, 7, 8, 10, 6, 9, 11];
+  const [events, setEvents] = useState([]);
+
+  const fetchEvents = async () => {
+    const response = await fetch("/api/get_events");
+    const result = await response.json();
+    setEvents(result);
+  };
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+  const event_ids = [1, 2, 3, 4, 5, 7, 8, 10, 6, 9, 11, 26];
   let personal_span = 0;
   let dantai_span = 0;
+  let row_span = 1;
   let header1 = [];
   let header2 = [];
   let human_type = "";
   let same_human_type_length = 0;
   for (const id of event_ids) {
+    let event_info = events.find((item) => item.id === id);
+    if (!event_info || !event_info.existence) {
+      continue;
+    }
     const event_name = GetEventName(id);
     if (event_name.includes("dantai") || event_name.includes("tenkai")) {
       dantai_span += 1;
     } else {
       personal_span += 1;
     }
-    if (event_name.includes("zissen")) {
-      header2.push(<td style={{ width: "50px", padding: 2 }}>実戦</td>);
-    } else if (event_name.includes("hokei")) {
-      header2.push(<td style={{ width: "50px", padding: 2 }}>法形</td>);
-    } else if (event_name.includes("tenkai")) {
-      header2.push(<td style={{ width: "50px", padding: 2 }}>展開</td>);
-    }
     if (event_name.includes("sonen")) {
       if (human_type === "壮年") {
         same_human_type_length += 1;
       } else if (same_human_type_length >= 1) {
         header1.push(
-          <td style={{ padding: 2 }} colSpan={same_human_type_length}>
+          <td
+            style={{ width: "50px", padding: 2 }}
+            colSpan={same_human_type_length}
+            rowSpan={row_span}
+          >
             {human_type}
           </td>,
         );
@@ -54,12 +66,36 @@ const Total: React.FC<{ params }> = ({ params }) => {
         same_human_type_length = 1;
       }
       human_type = "壮年";
+      row_span = 1;
+    } else if (event_name.includes("newcommer")) {
+      if (human_type === "新人") {
+        same_human_type_length += 1;
+      } else if (same_human_type_length >= 1) {
+        header1.push(
+          <td
+            style={{ width: "50px", padding: 2 }}
+            colSpan={same_human_type_length}
+            rowSpan={row_span}
+          >
+            {human_type}
+          </td>,
+        );
+        same_human_type_length = 1;
+      } else {
+        same_human_type_length = 1;
+      }
+      human_type = "新人";
+      row_span = 2;
     } else if (event_name.includes("woman")) {
       if (human_type === "女子") {
         same_human_type_length += 1;
       } else if (same_human_type_length >= 1) {
         header1.push(
-          <td style={{ padding: 2 }} colSpan={same_human_type_length}>
+          <td
+            style={{ width: "50px", padding: 2 }}
+            colSpan={same_human_type_length}
+            rowSpan={row_span}
+          >
             {human_type}
           </td>,
         );
@@ -68,12 +104,17 @@ const Total: React.FC<{ params }> = ({ params }) => {
         same_human_type_length = 1;
       }
       human_type = "女子";
+      row_span = 1;
     } else if (event_name.includes("man")) {
       if (human_type === "男子") {
         same_human_type_length += 1;
       } else if (same_human_type_length >= 1) {
         header1.push(
-          <td style={{ padding: 2 }} colSpan={same_human_type_length}>
+          <td
+            style={{ width: "50px", padding: 2 }}
+            colSpan={same_human_type_length}
+            rowSpan={row_span}
+          >
             {human_type}
           </td>,
         );
@@ -82,12 +123,34 @@ const Total: React.FC<{ params }> = ({ params }) => {
         same_human_type_length = 1;
       }
       human_type = "男子";
+      row_span = 1;
+    }
+    if (row_span === 2) {
+      // do nothing
+    } else if (event_name.includes("zissen")) {
+      header2.push(<td style={{ width: "50px", padding: 2 }}>実戦</td>);
+    } else if (event_name.includes("hokei")) {
+      header2.push(<td style={{ width: "50px", padding: 2 }}>法形</td>);
+    } else if (event_name.includes("tenkai")) {
+      header2.push(<td style={{ width: "50px", padding: 2 }}>展開</td>);
     }
   }
   if (same_human_type_length >= 1) {
     header1.push(
-      <td style={{ padding: 2 }} colSpan={same_human_type_length}>
-        {human_type}
+      <td
+        style={{ width: "50px", padding: 2 }}
+        colSpan={same_human_type_length}
+        rowSpan={row_span}
+      >
+        {human_type === "新人" ? (
+          <>
+            新人
+            <br />
+            団法
+          </>
+        ) : (
+          <>{human_type}</>
+        )}
       </td>,
     );
   }
@@ -136,6 +199,10 @@ const Total: React.FC<{ params }> = ({ params }) => {
                         {elem.name?.replace(/['"]+/g, "")}
                       </td>
                       {event_ids.map((id) => {
+                        let event_info = events.find((item) => item.id === id);
+                        if (!event_info || !event_info.existence) {
+                          return <></>;
+                        }
                         return (
                           <td key={id} className={checkStyles.total}>
                             {elem[id] ? elem[id] : ""}
