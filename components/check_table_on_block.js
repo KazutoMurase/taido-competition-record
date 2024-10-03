@@ -34,6 +34,10 @@ function onSubmit(
     court_id = 3;
   } else if (block_number === "d") {
     court_id = 4;
+  } else if (block_number === "e") {
+    court_id = 5;
+  } else if (block_number === "f") {
+    court_id = 6;
   } else if (block_number === "x") {
     court_id = 24;
   } else if (block_number === "y") {
