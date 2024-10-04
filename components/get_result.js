@@ -1164,7 +1164,7 @@ function GetResult({
     const point = event.target.getStage().getPointerPosition();
     const deltaX = point.x - lastTouchPos;
     const nextStagePos = parseFloat(stagePos + deltaX);
-    if (nextStagePos <= 0 && nextStagePos >= -350) {
+    if (nextStagePos <= 0 && nextStagePos >= -400) {
       setStagePos(nextStagePos);
     }
     localStorage.setItem(event_name + "stagePos", stagePos);
