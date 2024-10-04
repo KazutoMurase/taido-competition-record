@@ -1,4 +1,5 @@
 import React from "react";
+import { useEffect, useState } from "react";
 import { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import { Grid, Button, Box, Tabs, Tab, useMediaQuery } from "@mui/material";
@@ -22,15 +23,32 @@ const ProgressCheck: React.FC = ({
   };
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const blockNumberList = ["a", "b", "c", "d", "e", "f"];
   const [tabIndex, setTabIndex] = React.useState(0);
   const handleTabChange = (event, newValue) => {
     setTabIndex(newValue);
   };
   const hide = params.production_test === "1";
+  const [courts, setCourts] = useState([]);
 
+  const fetchCourts = async () => {
+    const response = await fetch("/api/get_courts");
+    const result = await response.json();
+    let tmp_courts = [];
+    result.map((item) => {
+      if (!item.name.includes("X") && !item.name.includes("Y")) {
+        tmp_courts.push(item.name[1]);
+      }
+    });
+    setCourts(tmp_courts);
+  };
+  useEffect(() => {
+    fetchCourts();
+  }, []);
+  if (courts.length === 0) {
+    return <></>;
+  }
   return (
-    <div style={isMobile ? { width: "100%" } : {}}>
+    <div style={isMobile ? { width: courts.length > 4 ? "150%" : "100%" } : {}}>
       {isMobile ? (
         <Box>
           <Tabs
@@ -38,13 +56,13 @@ const ProgressCheck: React.FC = ({
             onChange={handleTabChange}
             aria-label="Progress Tabs"
           >
-            {blockNumberList.map((block) => (
-              <Tab key={block} label={`${block.toUpperCase()}コート`} />
+            {courts.map((court) => (
+              <Tab key={court} label={`${court.toUpperCase()}コート`} />
             ))}
           </Tabs>
           <Box>
             <ProgressOnBlock
-              block_number={blockNumberList[tabIndex]}
+              block_number={courts[tabIndex]}
               update_interval={10000}
               return_url="/"
               hide={hide}
@@ -53,10 +71,10 @@ const ProgressCheck: React.FC = ({
         </Box>
       ) : (
         <Box display="flex">
-          {blockNumberList.map((block) => (
+          {courts.map((court) => (
             <ProgressOnBlock
-              key={block}
-              block_number={block}
+              key={court}
+              block_number={court}
               update_interval={10000}
               return_url="/"
               hide={hide}

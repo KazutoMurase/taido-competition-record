@@ -177,7 +177,7 @@ const ProgressOnBlock: React.FC<{
         justifyItems: "center",
       }}
     >
-      <Box style={{ minWidth: "500px" }}>
+      <Box>
         <Grid
           container
           justifyContent="center"
