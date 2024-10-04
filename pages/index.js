@@ -5,7 +5,7 @@ import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Image from "next/image";
 
-export const getStaticProps = async () => {
+export const getServerSideProps = async () => {
   const competitionTitle = process.env.COMPETITION_TITLE;
   return {
     props: {
