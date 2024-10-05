@@ -8,7 +8,10 @@ import checkStyles from "../styles/checks.module.css";
 import { GetEventName } from "../lib/get_event_name";
 
 export const getServerSideProps = async (context) => {
-  const params = { production_test: process.env.PRODUCTION_TEST };
+  const params = {
+    production_test: process.env.PRODUCTION_TEST,
+    title: process.env.COMPETITION_TITLE,
+  };
   return {
     props: { params },
   };
@@ -29,6 +32,8 @@ const Total: React.FC<{ params }> = ({ params }) => {
   useEffect(() => {
     fetchEvents();
   }, []);
+  // Perhaps score definition should be statics or database in future
+  const use_different_personal_scores = params.title.includes("全国学生");
   const event_ids = [1, 2, 3, 4, 5, 7, 8, 10, 6, 9, 11, 26];
   let personal_span = 0;
   let dantai_span = 0;
@@ -157,7 +162,10 @@ const Total: React.FC<{ params }> = ({ params }) => {
   const [data, setData] = useState([]);
   useEffect(() => {
     async function fetchData() {
-      const response = await fetch("/api/get_total");
+      const response = await fetch(
+        "/api/get_total?use_different_personal_scores=" +
+          use_different_personal_scores,
+      );
       const result = await response.json();
       setData(result);
     }
