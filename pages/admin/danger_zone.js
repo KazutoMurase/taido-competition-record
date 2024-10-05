@@ -3,7 +3,14 @@ import { useEffect, useState } from "react";
 import { GetEventName } from "../../lib/get_event_name";
 import ResetButton from "../../components/reset";
 
-const Home = () => {
+export const getServerSideProps = async (context) => {
+  const params = { database_name: process.env.COMPETITION_NAME };
+  return {
+    props: { params },
+  };
+};
+
+const Home = ({ params }) => {
   const [data, setData] = useState([]);
   const fetchData = async () => {
     const response = await fetch("/api/get_events");
@@ -19,13 +26,28 @@ const Home = () => {
   const filtered_event_names = event_names.filter((name) => {
     return name !== "dantai" && name !== "";
   });
-  // FIXME: database_name should be obtained from env
+  const [blocks, setBlocks] = useState([]);
+
+  const fetchBlocks = async () => {
+    const response = await fetch("/api/get_courts");
+    const result = await response.json();
+    let tmp_blocks = [];
+    result.map((item) => {
+      if (!item.name.includes("X") && !item.name.includes("Y")) {
+        tmp_blocks.push("block_" + item.name[1].toLowerCase());
+      }
+    });
+    setBlocks(tmp_blocks);
+  };
+  useEffect(() => {
+    fetchBlocks();
+  }, []);
   return (
     <>
       <ResetButton
-        database_name="2024_adult"
+        database_name={params.database_name}
         event_names={filtered_event_names}
-        block_names={["block_a", "block_b", "block_c", "block_d"]}
+        block_names={blocks}
         text="データベース初期化"
       />
     </>
