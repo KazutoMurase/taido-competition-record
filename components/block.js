@@ -147,12 +147,6 @@ function ShowGamesText(item, is_mobile) {
   if (prefix !== "" && !is_mobile) {
     prefix = "【" + prefix + "】";
   }
-  if (
-    item["name"]?.includes("団体展開") ||
-    item["name"]?.includes("団体法形")
-  ) {
-    return prefix + "";
-  }
   if (is_mobile) {
     const elems = item["games_text"]?.split(",");
     if (elems) {
