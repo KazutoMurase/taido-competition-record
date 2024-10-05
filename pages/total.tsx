@@ -170,7 +170,7 @@ const Total: React.FC<{ params }> = ({ params }) => {
       setData(result);
     }
     fetchData();
-  }, []);
+  }, [use_different_personal_scores]);
   return (
     <>
       <Container maxWidth="md">
