@@ -5,6 +5,8 @@ import GetResult from "../../components/get_result";
 import GetTableResult from "../../components/get_table_result";
 import { useRouter } from "next/router";
 import { Box, Tabs, Tab, useMediaQuery } from "@mui/material";
+import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid";
 import { useTheme } from "@mui/material/styles";
 import { GetEventName } from "../../lib/get_event_name";
 
@@ -19,6 +21,9 @@ const Home = () => {
   }
   const handleTabChange = (event, newValue) => {
     setTabIndex(newValue);
+  };
+  const onBack = () => {
+    router.back();
   };
   const event_name = GetEventName(event_id);
   if (event_name.includes("dantai_hokei") || event_name.includes("tenkai")) {
@@ -52,6 +57,16 @@ const Home = () => {
                 />
               )}
             </Box>
+            <Grid
+              container
+              justifyContent="center"
+              alignItems="center"
+              style={{ height: "100px" }}
+            >
+              <Button variant="contained" type="submit" onClick={onBack}>
+                戻る
+              </Button>
+            </Grid>
           </Box>
         ) : (
           <>
@@ -102,6 +117,16 @@ const Home = () => {
                 />
               )}
             </Box>
+            <Grid
+              container
+              justifyContent="center"
+              alignItems="center"
+              style={{ height: "100px" }}
+            >
+              <Button variant="contained" type="submit" onClick={onBack}>
+                戻る
+              </Button>
+            </Grid>
           </Box>
         ) : (
           <>

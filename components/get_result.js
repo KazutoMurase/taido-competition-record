@@ -1137,42 +1137,64 @@ function GetResult({
   const y_padding = maxHeight < 200 ? 50 : 0;
   const areaWidth = is_mobile ? "340px" : "850px";
   const areaWidthNum = is_mobile ? 340 : 850;
-  const stageX = 0;
   const stageScale = is_mobile ? 0.8 : 1;
-  const [stagePos, setStagePos] = useState(0);
+  const [stagePosX, setStagePosX] = useState(0);
+  const [stagePosY, setStagePosY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
-  const [lastTouchPos, setLastTouchPos] = useState(0);
+  const [lastTouchPosX, setLastTouchPosX] = useState(0);
+  const [lastTouchPosY, setLastTouchPosY] = useState(0);
   useEffect(() => {
     if (is_mobile) {
-      const savedPos = localStorage.getItem(event_name + "stagePos");
-      if (savedPos) {
-        setStagePos(savedPos);
+      const savedPosX = localStorage.getItem(event_name + "stagePosX");
+      if (savedPosX) {
+        setStagePosX(savedPosX);
+      }
+      const savedPosY = localStorage.getItem(event_name + "stagePosY");
+      if (savedPosY) {
+        setStagePosY(savedPosY);
       }
     }
   }, [is_mobile, event_name]);
   const handleTouchStart = (event) => {
     event.evt.preventDefault();
     const point = event.target.getStage().getPointerPosition();
-    setLastTouchPos(point.x);
+    setLastTouchPosX(point.x);
+    setLastTouchPosY(point.y);
     setIsDragging(true);
   };
 
   const handleTouchMove = (event) => {
-    if (!isDragging || !lastTouchPos) return;
+    if (!isDragging || !lastTouchPosX || !lastTouchPosY) return;
 
     event.evt.preventDefault();
     const point = event.target.getStage().getPointerPosition();
-    const deltaX = point.x - lastTouchPos;
-    const nextStagePos = parseFloat(stagePos + deltaX);
-    if (nextStagePos <= 0 && nextStagePos >= -400) {
-      setStagePos(nextStagePos);
+    const deltaX = point.x - lastTouchPosX;
+    const deltaY = point.y - lastTouchPosY;
+    const nextStagePosX = parseFloat(stagePosX + deltaX);
+    const nextStagePosY = parseFloat(stagePosY + deltaY);
+    if (nextStagePosX > 0) {
+      setStagePosX(0);
+    } else if (nextStagePosX < -400) {
+      setStagePosX(-400);
+    } else {
+      setStagePosX(nextStagePosX);
     }
-    localStorage.setItem(event_name + "stagePos", stagePos);
-    setLastTouchPos(point.x);
+    if (nextStagePosY > 0) {
+      setStagePosY(0);
+    } else if (nextStagePosY < -maxHeight * 0.8) {
+      setStagePosY(-maxHeight * 0.8);
+    } else {
+      setStagePosY(nextStagePosY);
+    }
+    localStorage.setItem(event_name + "stagePosX", stagePosX);
+    localStorage.setItem(event_name + "stagePosY", stagePosY);
+    setLastTouchPosX(point.x);
+    setLastTouchPosY(point.y);
   };
   const handleTouchEnd = () => {
     setIsDragging(false);
-    setLastTouchPos(null);
+    setLastTouchPosX(null);
+    setLastTouchPosY(null);
   };
   return (
     <div>
@@ -1222,7 +1244,7 @@ function GetResult({
             <Box
               sx={{
                 width: areaWidth,
-                height: (maxHeight + 50 + y_padding) * stageScale,
+                height: maxHeight + 50 + y_padding,
                 overflow: "hidden",
                 margin: "0 auto",
                 position: "relative",
@@ -1230,8 +1252,9 @@ function GetResult({
             >
               <Stage
                 width={areaWidthNum}
-                height={maxHeight + 50 + y_padding}
-                x={stagePos}
+                height={is_mobile ? 600 : maxHeight + 50 + y_padding}
+                x={stagePosX}
+                y={stagePosY}
                 scaleX={stageScale}
                 scaleY={stageScale}
                 style={{ cursor: isDragging ? "grabbing" : "grab" }}
