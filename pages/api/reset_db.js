@@ -121,8 +121,9 @@ const ResetDb = async (req, res) => {
       console.log("reset " + req.body.block_names[i]);
       await UpdateBlockFromCSV(client, db_name, req.body.block_names[i]);
     }
-    let query =
-      "DELETE FROM " + (is_test ? "test_" : "") + "notification_request";
+    let query = "UPDATE awarded_players SET player_id=null";
+    await client.query(query);
+    query = "DELETE FROM " + (is_test ? "test_" : "") + "notification_request";
     await client.query(query);
     // update timestamp to current
     const timestamp = Date.now();
