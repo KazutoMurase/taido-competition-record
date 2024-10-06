@@ -36,7 +36,7 @@ const ProgressCheck: React.FC = ({
     let tmp_courts = [];
     result.map((item) => {
       if (!item.name.includes("X") && !item.name.includes("Y")) {
-        tmp_courts.push(item.name[1]);
+        tmp_courts.push(item.name[1].toLowerCase());
       }
     });
     setCourts(tmp_courts);
