@@ -2,6 +2,9 @@ import GetClient from "../../lib/db_client";
 import { Get, Set } from "../../lib/redis_client";
 
 function AddScore(data, id, score) {
+  if (!data) {
+    return;
+  }
   if (data[id]) {
     data[id] += score;
   } else {
@@ -12,6 +15,10 @@ function AddScore(data, id, score) {
   } else {
     data["total"] = score;
   }
+}
+
+function GetDataById(data, id) {
+  return data.find((item) => item.id === id);
 }
 
 const GetTotal = async (req, res) => {
@@ -116,25 +123,25 @@ const GetTotal = async (req, res) => {
         if (ranked_data[i]["round"] === final_round_num) {
           if (ranked_data[i]["rank"] === 1) {
             AddScore(
-              sorted_group_data[ranked_data[i].group_id - 1],
+              GetDataById(sorted_group_data, ranked_data[i].group_id),
               elem.id,
               dantai_scores[0],
             );
           } else if (ranked_data[i]["rank"] === 2) {
             AddScore(
-              sorted_group_data[ranked_data[i].group_id - 1],
+              GetDataById(sorted_group_data, ranked_data[i].group_id),
               elem.id,
               dantai_scores[1],
             );
           } else if (ranked_data[i]["rank"] === 3) {
             AddScore(
-              sorted_group_data[ranked_data[i].group_id - 1],
+              GetDataById(sorted_group_data, ranked_data[i].group_id),
               elem.id,
               dantai_scores[2],
             );
           } else if (ranked_data[i]["rank"] === 4) {
             AddScore(
-              sorted_group_data[ranked_data[i].group_id - 1],
+              GetDataById(sorted_group_data, ranked_data[i].group_id),
               elem.id,
               dantai_scores[3],
             );
@@ -176,14 +183,14 @@ const GetTotal = async (req, res) => {
       const thresh = elem.name_en.includes("hokei") ? 2 : 1;
       if (final_left_flag >= thresh) {
         AddScore(
-          sorted_group_data[final_data.left_group_id - 1],
+          GetDataById(sorted_group_data, final_data.left_group_id),
           elem.id,
           elem.name_en.includes("dantai")
             ? dantai_scores[0]
             : personal_scores[0],
         );
         AddScore(
-          sorted_group_data[final_data.right_group_id - 1],
+          GetDataById(sorted_group_data, final_data.right_group_id),
           elem.id,
           elem.name_en.includes("dantai")
             ? dantai_scores[1]
@@ -191,14 +198,14 @@ const GetTotal = async (req, res) => {
         );
       } else {
         AddScore(
-          sorted_group_data[final_data.right_group_id - 1],
+          GetDataById(sorted_group_data, final_data.right_group_id),
           elem.id,
           elem.name_en.includes("dantai")
             ? dantai_scores[0]
             : personal_scores[0],
         );
         AddScore(
-          sorted_group_data[final_data.left_group_id - 1],
+          GetDataById(sorted_group_data, final_data.left_group_id),
           elem.id,
           elem.name_en.includes("dantai")
             ? dantai_scores[1]
@@ -210,14 +217,14 @@ const GetTotal = async (req, res) => {
       const thresh = elem.name_en.includes("hokei") ? 2 : 1;
       if (before_final_left_flag >= thresh) {
         AddScore(
-          sorted_group_data[before_final_data.left_group_id - 1],
+          GetDataById(sorted_group_data, before_final_data.left_group_id),
           elem.id,
           elem.name_en.includes("dantai")
             ? dantai_scores[2]
             : personal_scores[2],
         );
         AddScore(
-          sorted_group_data[before_final_data.right_group_id - 1],
+          GetDataById(sorted_group_data, before_final_data.right_group_id),
           elem.id,
           elem.name_en.includes("dantai")
             ? dantai_scores[3]
@@ -225,14 +232,14 @@ const GetTotal = async (req, res) => {
         );
       } else {
         AddScore(
-          sorted_group_data[before_final_data.right_group_id - 1],
+          GetDataById(sorted_group_data, before_final_data.right_group_id),
           elem.id,
           elem.name_en.includes("dantai")
             ? dantai_scores[2]
             : personal_scores[2],
         );
         AddScore(
-          sorted_group_data[before_final_data.left_group_id - 1],
+          GetDataById(sorted_group_data, before_final_data.left_group_id),
           elem.id,
           elem.name_en.includes("dantai")
             ? dantai_scores[3]
