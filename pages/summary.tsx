@@ -66,7 +66,7 @@ const Summary: React.FC<{ params }> = ({ params }) => {
         alignItems="center"
         style={{ height: "320px" }}
       >
-        <GetAwardedPlayers />
+        <GetAwardedPlayers hide={hide} />
       </Grid>
       <Grid
         container

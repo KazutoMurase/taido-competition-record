@@ -2,7 +2,9 @@ import React from "react";
 import { useEffect, useState } from "react";
 import { ShowWinner } from "./show_summary";
 
-const GetAwardedPlayers = ({}) => {
+const GetAwardedPlayers: React.FC<{
+  hide: boolean;
+}> = ({ hide }) => {
   const [resultTable, setResultTable] = useState([]);
   useEffect(() => {
     async function fetchData() {
@@ -15,14 +17,20 @@ const GetAwardedPlayers = ({}) => {
             <td>
               <div style={{ fontSize: "16px" }}>{elem.award_name}</div>
             </td>
-            <td>{ShowWinner(elem)}</td>
+            <td>
+              {hide ? (
+                <div style={{ fontSize: "12px", minWidth: "100px" }}></div>
+              ) : (
+                ShowWinner(elem)
+              )}
+            </td>
           </tr>,
         );
       });
       setResultTable(table);
     }
     fetchData();
-  }, []);
+  }, [hide]);
 
   if (!resultTable) {
     return <></>;
