@@ -897,6 +897,10 @@ function GetResult({
   };
 
   const [data, setData] = useState([]);
+  const [eventInfo, setEventInfo] = useState({
+    full_name: "",
+    description: [],
+  });
   const [lineWidth, setLineWidth] = useState(50);
   useEffect(() => {
     async function fetchData() {
@@ -909,6 +913,26 @@ function GetResult({
       }
     }
     fetchData();
+    async function fetchEventDescription() {
+      const response = await fetch(
+        "/api/get_event_info?event_name=" + event_name,
+      );
+      const result = await response.json();
+      if (
+        result.length > 0 &&
+        result[0]["full_name"] &&
+        result[0]["description"]
+      ) {
+        // use "|" as a separator
+        setEventInfo({
+          full_name: result[0]["full_name"].replace(/['"]+/g, ""),
+          description: result[0]["description"]
+            .replace(/['"]+/g, "")
+            .split("|"),
+        });
+      }
+    }
+    fetchEventDescription();
     if (updateInterval > 0) {
       const interval = setInterval(() => {
         fetchData();
@@ -928,75 +952,7 @@ function GetResult({
       maxHeight = data[i]["right_begin_y"];
     }
   }
-  // TODO: from DB
-  let event_full_name;
-  let event_description = [];
-  if (event_name.includes("dantai_zissen_woman")) {
-    event_full_name = "女子団体実戦競技";
-    event_description = ["試合時間 1分30秒"];
-  } else if (event_name.includes("dantai_zissen_man")) {
-    event_full_name = "男子団体実戦競技";
-    event_description = ["試合時間 1分30秒"];
-  } else if (event_name.includes("dantai_zissen")) {
-    event_full_name = "団体実戦競技";
-    event_description = ["試合時間 1分30秒"];
-  } else if (event_name.includes("hokei_man")) {
-    event_full_name = "個人法形競技（男子の部）";
-    event_description = [];
-  } else if (event_name.includes("zissen_man")) {
-    event_full_name = "個人実戦競技（男子の部）";
-    event_description = [];
-  } else if (event_name.includes("hokei_woman")) {
-    event_full_name = "個人法形競技（女子の部）";
-    event_description = [];
-  } else if (event_name.includes("zissen_woman")) {
-    event_full_name = "個人実戦競技（女子の部）";
-    event_description = [];
-  } else if (event_name.includes("hokei_sonen")) {
-    event_full_name = "壮年法形競技";
-    event_description = [
-      "1.2 回戦勢命（表のみ）、3 回戦以降　活命・延命から選択",
-    ];
-  } else if (event_name.includes("hokei_newcommer")) {
-    event_full_name = "個人法形競技（新人の部）";
-    event_description = [];
-  } else if (event_name.includes("hokei_kyuui_man")) {
-    event_full_name = "男子級位個人法形競技";
-    event_description = ["体の法形から自由選択"];
-  } else if (event_name.includes("zissen_kyuui_man")) {
-    event_full_name = "男子級位個人実戦競技";
-    event_description = [
-      "試合時間 1分30秒",
-      "胴プロテクター・面ピット着用厳守",
-    ];
-  } else if (event_name.includes("hokei_kyuui_woman")) {
-    event_full_name = "女子級位個人法形競技";
-    event_description = ["陰の法形から自由選択"];
-  } else if (event_name.includes("zissen_kyuui_woman")) {
-    event_full_name = "女子級位個人実戦競技";
-    event_description = [
-      "試合時間  1分30秒",
-      "胴プロテクター・面ピット着用厳守",
-    ];
-  } else if (event_name.includes("hokei_kyuui")) {
-    event_full_name = "個人法形競技（級位の部）";
-    event_description = [];
-  } else if (event_name.includes("zissen_sonen_man")) {
-    event_full_name = "個人実戦競技（壮年の部）男子";
-    event_description = [];
-  } else if (event_name.includes("zissen_sonen_woman")) {
-    event_full_name = "個人実戦競技（壮年の部）女子";
-    event_description = [];
-  } else if (event_name.includes("hokei_mei_kyuui_newcommer")) {
-    event_full_name = "個人法形（命）新人・級位の部";
-    event_description = [];
-  } else if (event_name.includes("hokei_mei")) {
-    event_full_name = "個人法形（命）有段者の部";
-    event_description = [];
-  } else if (event_name.includes("hokei_sei")) {
-    event_full_name = "個人法形競技（制の法形）";
-    event_description = [];
-  }
+
   // calc num of players
   let num_of_players = 0;
   for (let i = 0; i < sortedData.length; i++) {
@@ -1212,7 +1168,7 @@ function GetResult({
               >
                 <h1>
                   <u>
-                    {event_full_name +
+                    {eventInfo.full_name +
                       (num_of_players > 0
                         ? "　" +
                           num_of_players +
@@ -1221,7 +1177,7 @@ function GetResult({
                   </u>
                 </h1>
               </Grid>
-              {event_description.map((text, index) => (
+              {eventInfo.description.map((text, index) => (
                 <Grid
                   key={index}
                   container

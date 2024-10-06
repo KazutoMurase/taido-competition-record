@@ -142,6 +142,10 @@ const GetTableResult: React.FC<{
 
   const [resultTable, setResultTable] = useState({});
   const [resultWinners, setResultWinners] = useState({});
+  const [eventInfo, setEventInfo] = useState({
+    full_name: "",
+    description: [],
+  });
 
   const fetchData = useCallback(async () => {
     fetch("/api/get_table_result?event_name=" + event_name)
@@ -322,33 +326,28 @@ const GetTableResult: React.FC<{
       };
     }
   }, [fetchData, update_interval]);
-  let event_full_name;
-  let event_description;
-  if (event_name.includes("dantai_hokei_man")) {
-    event_full_name = "男子団体法形競技";
-    event_description = [];
-  } else if (event_name.includes("dantai_hokei_woman")) {
-    event_full_name = "女子団体法形競技";
-    event_description = [];
-  } else if (event_name.includes("dantai_hokei_newcommer")) {
-    event_full_name = "新人団体法形競技";
-    event_description = [
-      "旋体・旋陰から選択   令和 6年 4 月以降に躰道部に入部した 5 級以下の男女",
-      "1 チーム 5 名（ 4 名以下不可）　旋体の場合は男子 3 名以上、旋陰の場合は女子 3 名以上の人員構成とする",
-    ];
-  } else if (event_name.includes("dantai_hokei")) {
-    event_full_name = "団体法形競技";
-    event_description = ["躰道の法形から選択、段級位問わず"];
-  } else if (event_name.includes("tenkai_man")) {
-    event_full_name = "男子団体展開競技";
-    event_description = [];
-  } else if (event_name.includes("tenkai_woman")) {
-    event_full_name = "女子団体展開競技";
-    event_description = [];
-  } else if (event_name.includes("tenkai")) {
-    event_full_name = "団体展開競技";
-    event_description = ["1チーム6名 男女混合可　背番号着用", "段級位問わず"];
-  }
+
+  const fetchEventInfo = useCallback(async () => {
+    const response = await fetch(
+      "/api/get_event_info?event_name=" + event_name,
+    );
+    const result = await response.json();
+    if (
+      result.length > 0 &&
+      result[0]["full_name"] &&
+      result[0]["description"]
+    ) {
+      // use "|" as a separator
+      setEventInfo({
+        full_name: result[0]["full_name"].replace(/['"]+/g, ""),
+        description: result[0]["description"].replace(/['"]+/g, "").split("|"),
+      });
+    }
+  }, [event_name]);
+  useEffect(() => {
+    fetchEventInfo();
+  }, [fetchEventInfo]);
+
   let num_of_groups = 0;
   const entries = Object.entries(resultTable);
   const length = entries.length;
@@ -392,7 +391,7 @@ const GetTableResult: React.FC<{
               style={{ height: "100px" }}
             >
               <h1>
-                <u>{event_full_name + "　" + num_of_groups + "チーム"}</u>
+                <u>{eventInfo.full_name + "　" + num_of_groups + "チーム"}</u>
               </h1>
             </Grid>
           )}
@@ -415,7 +414,7 @@ const GetTableResult: React.FC<{
           ) : (
             <></>
           )}
-          {event_description.map((text, index) => (
+          {eventInfo.description.map((text, index) => (
             <Grid
               key={index}
               container
