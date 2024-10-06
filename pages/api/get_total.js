@@ -15,6 +15,11 @@ function AddScore(data, id, score) {
 }
 
 const GetTotal = async (req, res) => {
+  const dantai_scores = [10, 6, 3, 1];
+  const personal_scores =
+    req.query.use_different_personal_scores === "true"
+      ? [7, 4, 2, 1]
+      : [10, 6, 3, 1];
   const client = await GetClient();
   const event_name = req.query.event_name;
   let query = "SELECT id, name_en FROM event_type WHERE existence = 1";
@@ -113,25 +118,25 @@ const GetTotal = async (req, res) => {
             AddScore(
               sorted_group_data[ranked_data[i].group_id - 1],
               elem.id,
-              10,
+              dantai_scores[0],
             );
           } else if (ranked_data[i]["rank"] === 2) {
             AddScore(
               sorted_group_data[ranked_data[i].group_id - 1],
               elem.id,
-              6,
+              dantai_scores[1],
             );
           } else if (ranked_data[i]["rank"] === 3) {
             AddScore(
               sorted_group_data[ranked_data[i].group_id - 1],
               elem.id,
-              3,
+              dantai_scores[2],
             );
           } else if (ranked_data[i]["rank"] === 4) {
             AddScore(
               sorted_group_data[ranked_data[i].group_id - 1],
               elem.id,
-              1,
+              dantai_scores[3],
             );
           }
         }
@@ -170,11 +175,35 @@ const GetTotal = async (req, res) => {
     if (final_left_flag !== null) {
       const thresh = elem.name_en.includes("hokei") ? 2 : 1;
       if (final_left_flag >= thresh) {
-        AddScore(sorted_group_data[final_data.left_group_id - 1], elem.id, 10);
-        AddScore(sorted_group_data[final_data.right_group_id - 1], elem.id, 6);
+        AddScore(
+          sorted_group_data[final_data.left_group_id - 1],
+          elem.id,
+          elem.name_en.includes("dantai")
+            ? dantai_scores[0]
+            : personal_scores[0],
+        );
+        AddScore(
+          sorted_group_data[final_data.right_group_id - 1],
+          elem.id,
+          elem.name_en.includes("dantai")
+            ? dantai_scores[1]
+            : personal_scores[1],
+        );
       } else {
-        AddScore(sorted_group_data[final_data.right_group_id - 1], elem.id, 10);
-        AddScore(sorted_group_data[final_data.left_group_id - 1], elem.id, 6);
+        AddScore(
+          sorted_group_data[final_data.right_group_id - 1],
+          elem.id,
+          elem.name_en.includes("dantai")
+            ? dantai_scores[0]
+            : personal_scores[0],
+        );
+        AddScore(
+          sorted_group_data[final_data.left_group_id - 1],
+          elem.id,
+          elem.name_en.includes("dantai")
+            ? dantai_scores[1]
+            : personal_scores[1],
+        );
       }
     }
     if (before_final_left_flag !== null) {
@@ -183,23 +212,31 @@ const GetTotal = async (req, res) => {
         AddScore(
           sorted_group_data[before_final_data.left_group_id - 1],
           elem.id,
-          3,
+          elem.name_en.includes("dantai")
+            ? dantai_scores[2]
+            : personal_scores[2],
         );
         AddScore(
           sorted_group_data[before_final_data.right_group_id - 1],
           elem.id,
-          1,
+          elem.name_en.includes("dantai")
+            ? dantai_scores[3]
+            : personal_scores[3],
         );
       } else {
         AddScore(
           sorted_group_data[before_final_data.right_group_id - 1],
           elem.id,
-          3,
+          elem.name_en.includes("dantai")
+            ? dantai_scores[2]
+            : personal_scores[2],
         );
         AddScore(
           sorted_group_data[before_final_data.left_group_id - 1],
           elem.id,
-          1,
+          elem.name_en.includes("dantai")
+            ? dantai_scores[3]
+            : personal_scores[3],
         );
       }
     }
