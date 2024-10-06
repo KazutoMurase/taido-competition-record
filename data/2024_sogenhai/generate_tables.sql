@@ -9,6 +9,8 @@ create table event_type
  name_en text not null,
  order_id integer not null,
  existence integer not null,
+ full_name text not null,
+ description text not null,
  primary key(id));
 
 create table court_type
