@@ -144,6 +144,9 @@ function CreateDantaiText(item, lineWidth, y_padding, hide = false) {
 }
 
 function GetGroupNameFontSize(group_name) {
+  if (!group_name) {
+    return 10;
+  }
   if (group_name.length < 8) {
     return 14;
   }
