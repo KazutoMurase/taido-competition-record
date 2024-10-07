@@ -385,7 +385,7 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
               ? item["left_group_name"].replace("'", "【").replace("'", "】")
               : ""
           }
-          fontSize={14}
+          fontSize={GetGroupNameFontSize(item["left_group_name"])}
         />
         <Text
           x={x + width + 10}
@@ -411,7 +411,7 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
               ? item["right_group_name"].replace("'", "【").replace("'", "】")
               : ""
           }
-          fontSize={14}
+          fontSize={GetGroupNameFontSize(item["right_group_name"])}
         />
       </>
     );
