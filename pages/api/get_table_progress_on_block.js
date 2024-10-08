@@ -29,7 +29,9 @@ async function GetFromDB(req, res, event_name) {
   const current_id = result.rows.length === 0 ? -1 : result.rows[0].game_id;
   const groups_name = event_name + "_groups";
   query =
-    "SELECT t0.order_id, t1.id, t1.retire, t2.name FROM " +
+    "SELECT t0.order_id, t1.id, t1.retire, t2.name" +
+    (event_name === "dantai_hokei_newcommer" ? ", t2.hokei_name" : "") +
+    " FROM " +
     block_name +
     "_games AS t0 LEFT JOIN " +
     event_name +
