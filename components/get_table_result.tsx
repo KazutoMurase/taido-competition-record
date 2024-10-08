@@ -201,6 +201,8 @@ const GetTableResult: React.FC<{
                   <td>
                     {elem.retire && visible ? (
                       <s>{group_name}</s>
+                    ) : hide && elem.is_final ? (
+                      <></>
                     ) : (
                       <>{group_name}</>
                     )}
