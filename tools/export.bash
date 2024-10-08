@@ -2,8 +2,8 @@
 
 mkdir -p export
 
-COMPETITION_NAME=$1
-URL=$2
+source .env
+URL=$1
 
 for csv_file in data/$COMPETITION_NAME/*.csv
 do
