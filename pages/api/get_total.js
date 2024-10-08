@@ -1,5 +1,5 @@
+import { PrecisionManufacturing } from "@mui/icons-material";
 import GetClient from "../../lib/db_client";
-import { Get, Set } from "../../lib/redis_client";
 
 function AddScore(data, id, score) {
   if (!data) {
@@ -14,6 +14,19 @@ function AddScore(data, id, score) {
     data["total"] += score;
   } else {
     data["total"] = score;
+  }
+}
+
+// for rank resolution when total score equals
+function AddRankedCount(data, rank, is_dantai) {
+  if (!data) {
+    return;
+  }
+  const rank_key = "rank" + rank.toString();
+  data[rank_key] = (data[rank_key] ? data[rank_key] : 0) + 1;
+  if (is_dantai) {
+    data["dantai_ranked"] =
+      (data["dantai_ranked"] ? data["dantai_ranked"] : 0) + 1;
   }
 }
 
@@ -121,30 +134,19 @@ const GetTotal = async (req, res) => {
       const final_round_num = Object.entries(grouped_data).length;
       for (let i = 0; i < ranked_data.length; i++) {
         if (ranked_data[i]["round"] === final_round_num) {
+          const data = GetDataById(sorted_group_data, ranked_data[i].group_id);
           if (ranked_data[i]["rank"] === 1) {
-            AddScore(
-              GetDataById(sorted_group_data, ranked_data[i].group_id),
-              elem.id,
-              dantai_scores[0],
-            );
+            AddScore(data, elem.id, dantai_scores[0]);
+            AddRankedCount(data, 1, true);
           } else if (ranked_data[i]["rank"] === 2) {
-            AddScore(
-              GetDataById(sorted_group_data, ranked_data[i].group_id),
-              elem.id,
-              dantai_scores[1],
-            );
+            AddScore(data, elem.id, dantai_scores[1]);
+            AddRankedCount(data, 2, true);
           } else if (ranked_data[i]["rank"] === 3) {
-            AddScore(
-              GetDataById(sorted_group_data, ranked_data[i].group_id),
-              elem.id,
-              dantai_scores[2],
-            );
+            AddScore(data, elem.id, dantai_scores[2]);
+            AddRankedCount(data, 3, true);
           } else if (ranked_data[i]["rank"] === 4) {
-            AddScore(
-              GetDataById(sorted_group_data, ranked_data[i].group_id),
-              elem.id,
-              dantai_scores[3],
-            );
+            AddScore(data, elem.id, dantai_scores[3]);
+            AddRankedCount(data, 4, true);
           }
         }
       }
@@ -181,70 +183,80 @@ const GetTotal = async (req, res) => {
     const before_final_left_flag = before_final_data?.left_flag;
     if (final_left_flag !== null) {
       const thresh = elem.name_en.includes("hokei") ? 2 : 1;
+      const left_data = GetDataById(
+        sorted_group_data,
+        final_data.left_group_id,
+      );
+      const right_data = GetDataById(
+        sorted_group_data,
+        final_data.right_group_id,
+      );
+      const is_dantai = elem.name_en.includes("dantai");
       if (final_left_flag >= thresh) {
         AddScore(
-          GetDataById(sorted_group_data, final_data.left_group_id),
+          left_data,
           elem.id,
-          elem.name_en.includes("dantai")
-            ? dantai_scores[0]
-            : personal_scores[0],
+          is_dantai ? dantai_scores[0] : personal_scores[0],
         );
+        AddRankedCount(left_data, 1, is_dantai);
         AddScore(
-          GetDataById(sorted_group_data, final_data.right_group_id),
+          right_data,
           elem.id,
-          elem.name_en.includes("dantai")
-            ? dantai_scores[1]
-            : personal_scores[1],
+          is_dantai ? dantai_scores[1] : personal_scores[1],
         );
+        AddRankedCount(right_data, 2, is_dantai);
       } else {
         AddScore(
-          GetDataById(sorted_group_data, final_data.right_group_id),
+          right_data,
           elem.id,
-          elem.name_en.includes("dantai")
-            ? dantai_scores[0]
-            : personal_scores[0],
+          is_dantai ? dantai_scores[0] : personal_scores[0],
         );
+        AddRankedCount(right_data, 1, is_dantai);
         AddScore(
-          GetDataById(sorted_group_data, final_data.left_group_id),
+          left_data,
           elem.id,
-          elem.name_en.includes("dantai")
-            ? dantai_scores[1]
-            : personal_scores[1],
+          is_dantai ? dantai_scores[1] : personal_scores[1],
         );
+        AddRankedCount(left_data, 2, is_dantai);
       }
     }
     if (before_final_left_flag !== null) {
       const thresh = elem.name_en.includes("hokei") ? 2 : 1;
+      const left_data = GetDataById(
+        sorted_group_data,
+        before_final_data.left_group_id,
+      );
+      const right_data = GetDataById(
+        sorted_group_data,
+        before_final_data.right_group_id,
+      );
+      const is_dantai = elem.name_en.includes("dantai");
       if (before_final_left_flag >= thresh) {
         AddScore(
-          GetDataById(sorted_group_data, before_final_data.left_group_id),
+          left_data,
           elem.id,
-          elem.name_en.includes("dantai")
-            ? dantai_scores[2]
-            : personal_scores[2],
+          is_dantai ? dantai_scores[2] : personal_scores[2],
         );
+        AddRankedCount(left_data, 3, is_dantai);
         AddScore(
-          GetDataById(sorted_group_data, before_final_data.right_group_id),
+          right_data,
           elem.id,
-          elem.name_en.includes("dantai")
-            ? dantai_scores[3]
-            : personal_scores[3],
+          is_dantai ? dantai_scores[3] : personal_scores[3],
         );
+        AddRankedCount(right_data, 4, is_dantai);
       } else {
         AddScore(
-          GetDataById(sorted_group_data, before_final_data.right_group_id),
+          right_data,
           elem.id,
-          elem.name_en.includes("dantai")
-            ? dantai_scores[2]
-            : personal_scores[2],
+          is_dantai ? dantai_scores[2] : personal_scores[2],
         );
+        AddRankedCount(right_data, 3, is_dantai);
         AddScore(
-          GetDataById(sorted_group_data, before_final_data.left_group_id),
+          left_data,
           elem.id,
-          elem.name_en.includes("dantai")
-            ? dantai_scores[3]
-            : personal_scores[3],
+          is_dantai ? dantai_scores[3] : personal_scores[3],
         );
+        AddRankedCount(left_data, 4, is_dantai);
       }
     }
   }
@@ -256,15 +268,48 @@ const GetTotal = async (req, res) => {
     if (!b.total) {
       b.total = 0;
     }
-    if (b.total === a.total) {
+    if (b.total !== a.total || (b.total === 0 && a.total === 0)) {
+      return b.total - a.total;
     }
-    return b.total - a.total;
+    // if total scores are same, compare the numbers of ranked events at 1~4 each
+    for (let i = 1; i <= 4; ++i) {
+      console.log(
+        `total scores are same bw ${b.id} & ${a.id} at score ${a.total}`,
+      );
+      const rank_key = "rank" + i.toString();
+      if (!a[rank_key]) a[rank_key] = 0;
+      if (!b[rank_key]) b[rank_key] = 0;
+      if (b[rank_key] !== a[rank_key]) {
+        console.log(
+          `rank ${rank_key} are different! ${b[rank_key]} & ${a[rank_key]} at score ${a.total}`,
+        );
+        return b[rank_key] - a[rank_key];
+      }
+    }
+    // if the numbers of ranked events are same at all ranks, compare the sum of ranked dantai events
+    if (!a["dantai_ranked"]) a["dantai_ranked"] = 0;
+    if (!b["dantai_ranked"]) b["dantai_ranked"] = 0;
+    if (b["dantai_ranked"] === a["dantai_ranked"]) {
+      b["same_as"] = a.id;
+      a["same_as"] = b.id;
+    }
+    return b["dantai_ranked"] - a["dantai_ranked"];
   });
   let prev_total = -1;
+  let prev_id = -1;
   sorted_group_data.forEach((item, index) => {
     if (item.total) {
-      item.rank = item.total === prev_total ? index : index + 1;
+      if (
+        item.total !== prev_total ||
+        !item["same_as"] ||
+        item["same_as"] !== prev_id
+      ) {
+        item.rank = index + 1;
+      } else {
+        item.rank = sorted_group_data[index - 1].rank;
+      }
       prev_total = item.total;
+      prev_id = item.id;
     } else {
       item.rank = null;
     }
