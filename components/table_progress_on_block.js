@@ -79,6 +79,11 @@ function TableProgressOnBlock({
               <tbody>
                 <tr className={checkStyles.column}>
                   <th style={{ width: "200px" }}>団体名</th>
+                  {event_name === "dantai_hokei_newcommer" ? (
+                    <th>選択法形</th>
+                  ) : (
+                    <></>
+                  )}
                   <th>順序変更</th>
                 </tr>
                 {data.map((item, index) => (
@@ -94,6 +99,11 @@ function TableProgressOnBlock({
                         <span>{item["name"].replace(/['"]+/g, "")}</span>
                       )}
                     </td>
+                    {event_name === "dantai_hokei_newcommer" ? (
+                      <td>{item["hokei_name"]}</td>
+                    ) : (
+                      <></>
+                    )}
                     <td>
                       <Button
                         variant="contained"
