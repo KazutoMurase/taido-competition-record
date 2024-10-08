@@ -4,7 +4,7 @@
 初回はユーザー名/パスワードを入力する必要がある。
 アクセス後、ホーム画面に追加しておくとよい。
 
-- [役員用サイト](https://taido-competition-record-ym2upnal4a-an.a.run.app/admin)
+- [役員用サイト](https://competition-records-20307256491.asia-northeast1.run.app/admin)
 
 カメラでQRコードを読み取るのが楽である。
 
@@ -15,7 +15,7 @@
 以下サイトにアクセスする。
 初回はユーザー名/パスワードを入力する必要がある。
 
-- [テスト用サイト](https://taido-competition-record-ym2upnal4a-an.a.run.app/test)
+- [テスト用サイト](https://competition-records-20307256491.asia-northeast1.run.app/test)
 
 <img src="../images/test_link.png" />
 
@@ -38,7 +38,7 @@ X/Yコートがあり、片方を選び一通り進めることで、システ�
 ## 参考情報
 
 以下は選手・観客向けに公開される。尋ねられたら案内するとよい。
-- [一般公開サイト](https://taido-competition-record-ym2upnal4a-an.a.run.app/)
+- [一般公開サイト](https://competition-records-20307256491.asia-northeast1.run.app)
 
 <img src="../images/public_link.png" />
 
