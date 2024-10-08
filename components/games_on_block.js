@@ -35,7 +35,7 @@ function ShowHokeiType(item, event_name) {
   } else if (event_name.includes("hokei_sei")) {
     return <td>制の法形</td>;
   }
-  return <td>運の法形</td>;
+  return <td>{item["round"] <= 2 ? "運の法形" : "自由法形"}</td>;
 }
 
 function GamesOnBlock({
