@@ -1,4 +1,3 @@
-import { PrecisionManufacturing } from "@mui/icons-material";
 import GetClient from "../../lib/db_client";
 
 function AddScore(data, id, score) {
@@ -22,11 +21,11 @@ function AddRankedCount(data, rank, is_dantai) {
   if (!data) {
     return;
   }
-  const rank_key = "rank" + rank.toString();
+  const rank_key = "rank" + rank.toString() + "_events";
   data[rank_key] = (data[rank_key] ? data[rank_key] : 0) + 1;
   if (is_dantai) {
-    data["dantai_ranked"] =
-      (data["dantai_ranked"] ? data["dantai_ranked"] : 0) + 1;
+    data["ranked_dantai_events"] =
+      (data["ranked_dantai_events"] ? data["ranked_dantai_events"] : 0) + 1;
   }
 }
 
@@ -271,29 +270,24 @@ const GetTotal = async (req, res) => {
     if (b.total !== a.total || (b.total === 0 && a.total === 0)) {
       return b.total - a.total;
     }
-    // if total scores are same, compare the numbers of ranked events at 1~4 each
+    // if total scores are same, compare the numbers of ranked events at 1st~4th each
     for (let i = 1; i <= 4; ++i) {
-      console.log(
-        `total scores are same bw ${b.id} & ${a.id} at score ${a.total}`,
-      );
-      const rank_key = "rank" + i.toString();
+      const rank_key = "rank" + i.toString() + "_events";
       if (!a[rank_key]) a[rank_key] = 0;
       if (!b[rank_key]) b[rank_key] = 0;
       if (b[rank_key] !== a[rank_key]) {
-        console.log(
-          `rank ${rank_key} are different! ${b[rank_key]} & ${a[rank_key]} at score ${a.total}`,
-        );
         return b[rank_key] - a[rank_key];
       }
     }
     // if the numbers of ranked events are same at all ranks, compare the sum of ranked dantai events
-    if (!a["dantai_ranked"]) a["dantai_ranked"] = 0;
-    if (!b["dantai_ranked"]) b["dantai_ranked"] = 0;
-    if (b["dantai_ranked"] === a["dantai_ranked"]) {
-      b["same_as"] = a.id;
-      a["same_as"] = b.id;
+    if (!a["ranked_dantai_events"]) a["ranked_dantai_events"] = 0;
+    if (!b["ranked_dantai_events"]) b["ranked_dantai_events"] = 0;
+    // if even the sum of ranked dantai events are the same, mark two groups to be the same rank by linking each other
+    if (b["ranked_dantai_events"] === a["ranked_dantai_events"]) {
+      b["same_rank_as"] = a.id;
+      a["same_rank_as"] = b.id;
     }
-    return b["dantai_ranked"] - a["dantai_ranked"];
+    return b["ranked_dantai_events"] - a["ranked_dantai_events"];
   });
   let prev_total = -1;
   let prev_id = -1;
@@ -301,16 +295,19 @@ const GetTotal = async (req, res) => {
     if (item.total) {
       if (
         item.total !== prev_total ||
-        !item["same_as"] ||
-        item["same_as"] !== prev_id
+        !item["same_rank_as"] ||
+        item["same_rank_as"] !== prev_id
       ) {
+        // "+ 1" because rank starts from 1
         item.rank = index + 1;
       } else {
+        // if this group's rank is same as previous one
         item.rank = sorted_group_data[index - 1].rank;
       }
       prev_total = item.total;
       prev_id = item.id;
     } else {
+      // if total score = 0
       item.rank = null;
     }
   });
