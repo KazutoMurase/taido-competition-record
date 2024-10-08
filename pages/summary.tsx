@@ -20,7 +20,8 @@ const Summary: React.FC<{ params }> = ({ params }) => {
   const ToBack = () => {
     router.back();
   };
-  const hide = params.production_test === "1";
+  const { from_admin } = router.query;
+  const hide = params.production_test === "1" && !from_admin;
   const [data, setData] = useState([]);
 
   const fetchData = async () => {

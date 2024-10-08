@@ -24,7 +24,7 @@ export default function Home({ params }) {
     router.push("/admin/notification_request");
   };
   const ToSummary = () => {
-    router.push("/summary");
+    router.push("/summary?from_admin=true");
   };
   const ToTotal = () => {
     router.push("/total");
