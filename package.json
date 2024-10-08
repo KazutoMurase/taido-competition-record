@@ -23,6 +23,7 @@
     "csv-parse": "^5.5.2",
     "date-fns": "^2.30.0",
     "gray-matter": "^4.0.3",
+    "json2csv": "^6.0.0-alpha.2",
     "konva": "^9.2.3",
     "next": "latest",
     "pg": "^8.11.3",
