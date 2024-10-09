@@ -9,17 +9,21 @@ import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import { useTheme } from "@mui/material/styles";
 import { GetEventName } from "../../lib/get_event_name";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 
 const Home = () => {
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const [tabIndex, setTabIndex] = React.useState(0);
+  const [tabIndex, setTabIndex] = React.useState(1);
   const { block_number, schedule_id, event_id } = router.query;
   if (block_number === undefined) {
     return <></>;
   }
   const handleTabChange = (event, newValue) => {
+    if (newValue === 0) {
+      router.push("/admin/block?block_number=" + block_number);
+    }
     setTabIndex(newValue);
   };
   const onBack = () => {
@@ -36,11 +40,14 @@ const Home = () => {
               onChange={handleTabChange}
               aria-label="Record Tabs"
             >
+              <Tab key="back" icon={<ArrowBackIosIcon fontSize="small" />} />
               <Tab key="main" label="記録" />
-              <Tab key="result" label="トーナメント" />
+              <Tab key="result" label="競技テーブル" />
             </Tabs>
             <Box>
               {tabIndex === 0 ? (
+                <></>
+              ) : tabIndex === 1 ? (
                 <TableProgressOnBlock
                   block_number={block_number}
                   event_name={event_name}
@@ -96,11 +103,14 @@ const Home = () => {
               onChange={handleTabChange}
               aria-label="Record Tabs"
             >
+              <Tab key="back" icon={<ArrowBackIosIcon fontSize="small" />} />
               <Tab key="main" label="記録" />
               <Tab key="result" label="トーナメント" />
             </Tabs>
             <Box>
               {tabIndex === 0 ? (
+                <></>
+              ) : tabIndex === 1 ? (
                 <GamesOnBlock
                   block_number={block_number}
                   event_name={event_name}

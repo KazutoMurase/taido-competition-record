@@ -240,7 +240,7 @@ function CheckTable({
                 )}
                 <th>棄権</th>
                 <th></th>
-                <th></th>
+                {is_mobile ? <></> : <th></th>}
               </tr>
               {data.items?.map((item, index) => (
                 <tr key={item["id"]} className={checkStyles.column}>
@@ -263,45 +263,88 @@ function CheckTable({
                       onChange={() => handleRetireStatesChange(item.id, true)}
                     />
                   </td>
-                  <td>
-                    <Button
-                      variant="contained"
-                      type="submit"
-                      size={is_mobile ? "small" : "medium"}
-                      onClick={(e) =>
-                        onSubmit(
-                          block_number,
-                          item.id,
-                          item.name,
-                          event_id,
-                          is_test,
-                          forceFetchData,
-                        )
-                      }
-                      style={!item["requested"] ? null : activeButtonStyle}
-                    >
-                      {!item["requested"] ? "　呼び出し　" : "リクエスト済"}
-                    </Button>
-                  </td>
-                  <td>
-                    <Button
-                      variant="contained"
-                      type="submit"
-                      size={is_mobile ? "small" : "medium"}
-                      onClick={(e) =>
-                        onClear(
-                          item.id,
-                          event_id,
-                          GetCourtId(block_number),
-                          is_test,
-                          forceFetchData,
-                        )
-                      }
-                      disabled={!item["requested"]}
-                    >
-                      キャンセル
-                    </Button>
-                  </td>
+                  {is_mobile ? (
+                    <td>
+                      <Button
+                        variant="contained"
+                        type="submit"
+                        size={is_mobile ? "small" : "medium"}
+                        onClick={(e) =>
+                          onSubmit(
+                            block_number,
+                            item.id,
+                            item.name,
+                            event_id,
+                            is_test,
+                            forceFetchData,
+                          )
+                        }
+                        style={!item["requested"] ? null : activeButtonStyle}
+                      >
+                        {!item["requested"] ? "　呼び出し　" : "リクエスト済"}
+                      </Button>
+                      <br />
+                      <Button
+                        variant="contained"
+                        type="submit"
+                        size={is_mobile ? "small" : "medium"}
+                        onClick={(e) =>
+                          onClear(
+                            item.id,
+                            event_id,
+                            GetCourtId(block_number),
+                            is_test,
+                            forceFetchData,
+                          )
+                        }
+                        disabled={!item["requested"]}
+                      >
+                        キャンセル
+                      </Button>
+                    </td>
+                  ) : (
+                    <>
+                      <td>
+                        <Button
+                          variant="contained"
+                          type="submit"
+                          size={is_mobile ? "small" : "medium"}
+                          onClick={(e) =>
+                            onSubmit(
+                              block_number,
+                              item.id,
+                              item.name,
+                              event_id,
+                              is_test,
+                              forceFetchData,
+                            )
+                          }
+                          style={!item["requested"] ? null : activeButtonStyle}
+                        >
+                          {!item["requested"] ? "　呼び出し　" : "リクエスト済"}
+                        </Button>
+                      </td>
+                      <td>
+                        <Button
+                          variant="contained"
+                          type="submit"
+                          size={is_mobile ? "small" : "medium"}
+                          onClick={(e) =>
+                            onClear(
+                              item.id,
+                              event_id,
+                              GetCourtId(block_number),
+                              is_test,
+                              forceFetchData,
+                            )
+                          }
+                          disabled={!item["requested"]}
+                        >
+                          キャンセル
+                        </Button>
+                      </td>
+                    </>
+                  )}
                 </tr>
               ))}
             </tbody>

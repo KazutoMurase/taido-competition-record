@@ -242,7 +242,7 @@ function CheckPlayers({
                 )}
                 <th>棄権</th>
                 <th></th>
-                <th></th>
+                {is_mobile ? <></> : <th></th>}
               </tr>
               {data.items?.map((item, index) => (
                 <tr key={item["id"]} className={checkStyles.column}>

@@ -439,16 +439,24 @@ const GetTableResult: React.FC<{
           {}
           <p />
           {is_mobile ? <></> : <Summary winners={resultWinners} />}
-          <Grid
-            container
-            justifyContent="center"
-            alignItems="center"
-            style={{ height: "80px" }}
-          >
-            <Button variant="contained" type="submit" onClick={(e) => onBack()}>
-              戻る
-            </Button>
-          </Grid>
+          {is_mobile ? (
+            <></>
+          ) : (
+            <Grid
+              container
+              justifyContent="center"
+              alignItems="center"
+              style={{ height: "80px" }}
+            >
+              <Button
+                variant="contained"
+                type="submit"
+                onClick={(e) => onBack()}
+              >
+                戻る
+              </Button>
+            </Grid>
+          )}
         </Box>
       </Container>
     </div>
