@@ -42,18 +42,27 @@ const Home = () => {
     event_name.includes("tenkai")
   ) {
     return (
-      <div style={isMobile ? { width: "100%" } : {}}>
+      <div style={isMobile ? { width: "110%" } : {}}>
         {isMobile ? (
           <Box>
-            <Tabs
-              value={tabIndex}
-              onChange={handleTabChange}
-              aria-label="Record Tabs"
+            <Box
+              sx={{
+                position: "sticky",
+                top: 0,
+                zIndex: 1000,
+                backgroundColor: "white",
+              }}
             >
-              <Tab key="back" icon={<ArrowBackIosIcon fontSize="small" />} />
-              <Tab key="main" label="点呼" />
-              <Tab key="result" label="競技テーブル" />
-            </Tabs>
+              <Tabs
+                value={tabIndex}
+                onChange={handleTabChange}
+                aria-label="Record Tabs"
+              >
+                <Tab key="back" icon={<ArrowBackIosIcon fontSize="small" />} />
+                <Tab key="main" label="点呼" />
+                <Tab key="result" label="競技テーブル" />
+              </Tabs>
+            </Box>
             <Box>
               {tabIndex === 0 ? (
                 <></>
