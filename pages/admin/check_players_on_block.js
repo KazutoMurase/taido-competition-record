@@ -20,8 +20,17 @@ const Home = () => {
     return <></>;
   }
   const event_name = GetEventName(event_id);
+  const localStateKey =
+    "retire_states_" + block_number + "_" + schedule_id + "_" + event_id;
+  const leftLocalStateKey =
+    "left_retire_states_" + block_number + "_" + schedule_id + "_" + event_id;
+  const rightLocalStateKey =
+    "right_retire_states_" + block_number + "_" + schedule_id + "_" + event_id;
   const handleTabChange = (event, newValue) => {
     if (newValue === 0) {
+      localStorage.removeItem(localStateKey);
+      localStorage.removeItem(leftLocalStateKey);
+      localStorage.removeItem(rightLocalStateKey);
       router.push("/admin/block?block_number=" + block_number);
     }
     setTabIndex(newValue);
