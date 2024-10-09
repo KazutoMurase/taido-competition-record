@@ -11,8 +11,8 @@ const Home = () => {
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const [tabIndex, setTabIndex] = React.useState(1);
-  const { block_number, schedule_id, event_id } = router.query;
+  const { block_number, schedule_id, event_id, tab_index } = router.query;
+  const [tabIndex, setTabIndex] = React.useState(tab_index ? tab_index : 1);
   if (block_number === undefined) {
     return <></>;
   }
@@ -23,7 +23,8 @@ const Home = () => {
     "%26schedule_id=" +
     schedule_id +
     "%26event_id=" +
-    event_id;
+    event_id +
+    "%26tab_index=2";
   const handleTabChange = (event, newValue) => {
     if (newValue === 0) {
       router.push("/admin/block?block_number=" + block_number);
