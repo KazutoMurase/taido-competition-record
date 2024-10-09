@@ -6,6 +6,7 @@ import GetResult from "../../components/get_result";
 import GetTableResult from "../../components/get_table_result";
 import { useRouter } from "next/router";
 import { GetEventName } from "../../lib/get_event_name";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { Box, Tabs, Tab, useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
@@ -13,13 +14,16 @@ const Home = () => {
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const [tabIndex, setTabIndex] = React.useState(0);
+  const [tabIndex, setTabIndex] = React.useState(1);
   const { block_number, schedule_id, event_id } = router.query;
   if (block_number === undefined) {
     return <></>;
   }
   const event_name = GetEventName(event_id);
   const handleTabChange = (event, newValue) => {
+    if (newValue === 0) {
+      router.push("/admin/block?block_number=" + block_number);
+    }
     setTabIndex(newValue);
   };
   if (event_name === "dantai") {
@@ -38,19 +42,31 @@ const Home = () => {
     event_name.includes("tenkai")
   ) {
     return (
-      <div style={isMobile ? { width: "100%" } : {}}>
+      <div style={isMobile ? { width: "110%" } : {}}>
         {isMobile ? (
           <Box>
-            <Tabs
-              value={tabIndex}
-              onChange={handleTabChange}
-              aria-label="Record Tabs"
+            <Box
+              sx={{
+                position: "sticky",
+                top: 0,
+                zIndex: 1000,
+                backgroundColor: "white",
+              }}
             >
-              <Tab key="main" label="点呼" />
-              <Tab key="result" label="トーナメント" />
-            </Tabs>
+              <Tabs
+                value={tabIndex}
+                onChange={handleTabChange}
+                aria-label="Record Tabs"
+              >
+                <Tab key="back" icon={<ArrowBackIosIcon fontSize="small" />} />
+                <Tab key="main" label="点呼" />
+                <Tab key="result" label="競技テーブル" />
+              </Tabs>
+            </Box>
             <Box>
               {tabIndex === 0 ? (
+                <></>
+              ) : tabIndex === 1 ? (
                 <CheckTable
                   block_number={block_number}
                   schedule_id={schedule_id}
@@ -87,19 +103,31 @@ const Home = () => {
     );
   } else if (event_name.includes("dantai_zissen")) {
     return (
-      <div style={isMobile ? { width: "100%" } : {}}>
+      <div style={isMobile ? { width: "110%" } : {}}>
         {isMobile ? (
           <Box>
-            <Tabs
-              value={tabIndex}
-              onChange={handleTabChange}
-              aria-label="Record Tabs"
+            <Box
+              sx={{
+                position: "sticky",
+                top: 0,
+                zIndex: 1000,
+                backgroundColor: "white",
+              }}
             >
-              <Tab key="main" label="点呼" />
-              <Tab key="result" label="トーナメント" />
-            </Tabs>
+              <Tabs
+                value={tabIndex}
+                onChange={handleTabChange}
+                aria-label="Record Tabs"
+              >
+                <Tab key="back" icon={<ArrowBackIosIcon fontSize="small" />} />
+                <Tab key="main" label="点呼" />
+                <Tab key="result" label="トーナメント" />
+              </Tabs>
+            </Box>
             <Box>
               {tabIndex === 0 ? (
+                <></>
+              ) : tabIndex === 1 ? (
                 <CheckDantai
                   block_number={block_number}
                   schedule_id={schedule_id}
@@ -136,19 +164,31 @@ const Home = () => {
     );
   } else {
     return (
-      <div style={isMobile ? { width: "100%" } : {}}>
+      <div style={isMobile ? { width: "110%" } : {}}>
         {isMobile ? (
           <Box>
-            <Tabs
-              value={tabIndex}
-              onChange={handleTabChange}
-              aria-label="Record Tabs"
+            <Box
+              sx={{
+                position: "sticky",
+                top: 0,
+                zIndex: 1000,
+                backgroundColor: "white",
+              }}
             >
-              <Tab key="main" label="点呼" />
-              <Tab key="result" label="トーナメント" />
-            </Tabs>
+              <Tabs
+                value={tabIndex}
+                onChange={handleTabChange}
+                aria-label="Record Tabs"
+              >
+                <Tab key="back" icon={<ArrowBackIosIcon fontSize="small" />} />
+                <Tab key="main" label="点呼" />
+                <Tab key="result" label="トーナメント" />
+              </Tabs>
+            </Box>
             <Box>
               {tabIndex === 0 ? (
+                <></>
+              ) : tabIndex === 1 ? (
                 <CheckPlayers
                   block_number={block_number}
                   schedule_id={schedule_id}

@@ -2,6 +2,7 @@ import React from "react";
 import RecordResult from "../../components/record_result";
 import GetResult from "../../components/get_result";
 import { GetEventName } from "../../lib/get_event_name";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { useRouter } from "next/router";
 import { Box, Tabs, Tab, useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
@@ -10,8 +11,8 @@ const Home = () => {
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const [tabIndex, setTabIndex] = React.useState(0);
-  const { block_number, schedule_id, event_id } = router.query;
+  const { block_number, schedule_id, event_id, tab_index } = router.query;
+  const [tabIndex, setTabIndex] = React.useState(tab_index ? tab_index : 1);
   if (block_number === undefined) {
     return <></>;
   }
@@ -22,8 +23,12 @@ const Home = () => {
     "%26schedule_id=" +
     schedule_id +
     "%26event_id=" +
-    event_id;
+    event_id +
+    "%26tab_index=2";
   const handleTabChange = (event, newValue) => {
+    if (newValue === 0) {
+      router.push("/admin/block?block_number=" + block_number);
+    }
     setTabIndex(newValue);
   };
   return (
@@ -35,11 +40,14 @@ const Home = () => {
             onChange={handleTabChange}
             aria-label="Record Tabs"
           >
+            <Tab key="back" icon={<ArrowBackIosIcon fontSize="small" />} />
             <Tab key="main" label="記録" />
             <Tab key="result" label="トーナメント" />
           </Tabs>
           <Box>
             {tabIndex === 0 ? (
+              <></>
+            ) : tabIndex === 1 ? (
               <RecordResult
                 block_number={block_number}
                 event_name={event_name}
