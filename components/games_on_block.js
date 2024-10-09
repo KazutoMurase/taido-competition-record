@@ -51,6 +51,15 @@ function GamesOnBlock({
     setSelectedRadioButton(event.target.value);
   };
   const router = useRouter();
+  const leftLocalStateKey =
+    "left_retire_states_" + block_number + "_" + schedule_id + "_" + event_name;
+  const rightLocalStateKey =
+    "right_retire_states_" +
+    block_number +
+    "_" +
+    schedule_id +
+    "_" +
+    event_name;
 
   const [data, setData] = useState([]);
   const fetchData = useCallback(async () => {
@@ -64,10 +73,19 @@ function GamesOnBlock({
     );
     const result = await response.json();
     if (result.length === 0) {
+      localStorage.removeItem(leftLocalStateKey);
+      localStorage.removeItem(rightLocalStateKey);
       router.push("block?block_number=" + block_number);
     }
     setData(result);
-  }, [block_number, schedule_id, event_name, router]);
+  }, [
+    block_number,
+    schedule_id,
+    event_name,
+    router,
+    leftLocalStateKey,
+    rightLocalStateKey,
+  ]);
   useEffect(() => {
     const interval = setInterval(() => {
       fetchData();
@@ -88,6 +106,33 @@ function GamesOnBlock({
 
   const [leftRetireStates, setLeftRetireStates] = useState([]);
   const [rightRetireStates, setRightRetireStates] = useState([]);
+  const [getLocalState, setGetLocalState] = useState(false);
+  useEffect(() => {
+    const localLeftRetireStates = localStorage.getItem(leftLocalStateKey);
+    if (localLeftRetireStates) {
+      setLeftRetireStates(JSON.parse(localLeftRetireStates));
+    }
+    const localRightRetireStates = localStorage.getItem(rightLocalStateKey);
+    if (localRightRetireStates) {
+      setRightRetireStates(JSON.parse(localRightRetireStates));
+    }
+    setGetLocalState(true);
+  }, [leftLocalStateKey, rightLocalStateKey]);
+
+  useEffect(() => {
+    if (getLocalState) {
+      localStorage.setItem(leftLocalStateKey, JSON.stringify(leftRetireStates));
+    }
+  }, [getLocalState, leftRetireStates, leftLocalStateKey]);
+
+  useEffect(() => {
+    if (getLocalState) {
+      localStorage.setItem(
+        rightLocalStateKey,
+        JSON.stringify(rightRetireStates),
+      );
+    }
+  }, [getLocalState, rightRetireStates, rightLocalStateKey]);
 
   const handleLeftRetireStatesChange = (id) => {
     setLeftRetireStates((prevStates) => {

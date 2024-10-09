@@ -26,10 +26,21 @@ const Home = () => {
     }
     setTabIndex(newValue);
   };
+  const event_name = GetEventName(event_id);
+  const leftLocalStateKey =
+    "left_retire_states_" + block_number + "_" + schedule_id + "_" + event_name;
+  const rightLocalStateKey =
+    "right_retire_states_" +
+    block_number +
+    "_" +
+    schedule_id +
+    "_" +
+    event_name;
   const onBack = () => {
+    localStorage.removeItem(leftLocalStateKey);
+    localStorage.removeItem(rightLocalStateKey);
     router.back();
   };
-  const event_name = GetEventName(event_id);
   if (event_name.includes("dantai_hokei") || event_name.includes("tenkai")) {
     return (
       <div style={isMobile ? { width: "100%" } : {}}>
