@@ -7,17 +7,22 @@ import Image from "next/image";
 
 export const getServerSideProps = async () => {
   const competitionTitle = process.env.COMPETITION_TITLE;
+  const show_total = process.env.SHOW_TOTAL_IN_PUBLIC === "1";
   return {
     props: {
       competitionTitle,
+      show_total,
     },
   };
 };
 
-export default function Home({ competitionTitle }) {
+export default function Home({ competitionTitle, show_total }) {
   const router = useRouter();
   const ToSummary = () => {
     router.push("/summary");
+  };
+  const ToTotal = () => {
+    router.push("/total");
   };
   // TODO: make it optional
   const show_image = false;
@@ -95,6 +100,24 @@ export default function Home({ competitionTitle }) {
             サマリー
           </Button>
         </Grid>
+        {show_total ? (
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            style={{ height: "40px" }}
+          >
+            <Button
+              variant="contained"
+              type="submit"
+              onClick={(e) => ToTotal()}
+            >
+              総合得点表
+            </Button>
+          </Grid>
+        ) : (
+          <></>
+        )}
       </Container>
     </div>
   );
