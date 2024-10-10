@@ -45,7 +45,13 @@ const PopupComponent = ({
   );
 };
 
-function ResetButton({ database_name, event_names, block_names, text }) {
+function ResetButton({
+  database_name,
+  event_names,
+  block_names,
+  text,
+  is_mobile,
+}) {
   const handlePopup = () => {
     const popupWindow = window.open("", "_blank", "width=350,height=50");
 
@@ -69,10 +75,11 @@ function ResetButton({ database_name, event_names, block_names, text }) {
       />,
     );
   };
+  const minWidth = is_mobile ? "200px" : "840px";
   return (
     <div>
       <Container maxWidth="md">
-        <Box style={{ minWidth: "840px" }}>
+        <Box style={{ minWidth: minWidth }}>
           <Grid
             container
             justifyContent="center"
