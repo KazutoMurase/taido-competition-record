@@ -1,5 +1,4 @@
 import React from "react";
-import { useEffect, useState } from "react";
 import GetResult from "../../components/get_result";
 import { useRouter } from "next/router";
 import { GetEventName } from "../../lib/get_event_name";

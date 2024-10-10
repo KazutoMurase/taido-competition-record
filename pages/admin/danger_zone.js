@@ -33,9 +33,7 @@ const Home = ({ params }) => {
     const result = await response.json();
     let tmp_blocks = [];
     result.map((item) => {
-      if (!item.name.includes("X") && !item.name.includes("Y")) {
-        tmp_blocks.push("block_" + item.name[1].toLowerCase());
-      }
+      tmp_blocks.push("block_" + item.name[1].toLowerCase());
     });
     setBlocks(tmp_blocks);
   };

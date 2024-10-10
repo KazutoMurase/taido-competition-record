@@ -59,10 +59,6 @@ export default function Home({ params }) {
         <br />
         <br />
         {courts.map((item, index) => {
-          // TODO: split into "test_court_type"
-          if (item.name.includes("X") || item.name.includes("Y")) {
-            return <></>;
-          }
           return (
             <>
               <Grid

@@ -31,14 +31,11 @@ create table test_notification_request
  primary key(id),
  foreign key (event_id) references event_type(id),
  foreign key (player_id) references test_players(id),
- foreign key (court_id) references court_type(id));
+ foreign key (court_id) references test_court_type(id));
 
 \copy test_groups from 'test_groups.csv' csv header;
-\copy test_players from 'test_players.csv' csv header;
 \copy test_court_type from 'test_court_type.csv' csv header;
-
-insert into court_type(id,name) values (24, 'Xコート');
-insert into court_type(id,name) values (25, 'Yコート');
+\copy test_players from 'test_players.csv' csv header;
 
 create table test_hokei_man
 (id integer not null,
