@@ -9,7 +9,10 @@ import SyncDisabledIcon from "@mui/icons-material/SyncDisabled";
 import SyncIcon from "@mui/icons-material/Sync";
 
 export const getServerSideProps = async (context) => {
-  const params = { production_test: process.env.PRODUCTION_TEST };
+  const params = {
+    production_test: process.env.PRODUCTION_TEST,
+    show_total: process.env.SHOW_TOTAL_IN_ADMIN === "1",
+  };
   return {
     props: { params },
   };
@@ -115,16 +118,24 @@ export default function Home({ params }) {
             サマリー
           </Button>
         </Grid>
-        <Grid
-          container
-          justifyContent="center"
-          alignItems="center"
-          style={{ height: "40px" }}
-        >
-          <Button variant="contained" type="submit" onClick={(e) => ToTotal()}>
-            総合得点表
-          </Button>
-        </Grid>
+        {params.show_total ? (
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            style={{ height: "40px" }}
+          >
+            <Button
+              variant="contained"
+              type="submit"
+              onClick={(e) => ToTotal()}
+            >
+              総合得点表
+            </Button>
+          </Grid>
+        ) : (
+          <></>
+        )}
         <br />
         <br />
         <br />
