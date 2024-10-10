@@ -23,5 +23,5 @@ id,name,name_en,order_id,existence,full_name,description
 21,'個人実戦(壮年の部) 男子',zissen_sonen_man,21,0,'個人実戦(壮年の部) 男子',''
 22,'個人実戦(壮年の部) 女子',zissen_sonen_woman,22,0,'個人実戦(壮年の部) 女子',''
 23,'個人法形(制の法形)',hokei_sei,23,0,'個人法形(制の法形)',''
-24,'個人法形(命) 有段者の部',hokei_men,24,0,'個人法形(命) 有段者の部',''
+24,'個人法形(命) 有段者の部',hokei_mei,24,0,'個人法形(命) 有段者の部',''
 25,'個人法形(命) 新人/級位の部',hokei_mei_kyuui_newcommer,25,0,'個人法形(命) 新人/級位の部',''

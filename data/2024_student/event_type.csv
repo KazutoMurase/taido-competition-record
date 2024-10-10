@@ -23,6 +23,6 @@ id,name,name_en,order_id,existence,full_name,description
 21,'個人実戦(壮年の部) 男子',zissen_sonen_man,0,0,'',''
 22,'個人実戦(壮年の部) 女子',zissen_sonen_woman,0,0,'',''
 23,'個人法形(制の法形)',hokei_sei,0,0,'',''
-24,'個人法形(命) 有段者の部',hokei_men,0,0,'',''
+24,'個人法形(命) 有段者の部',hokei_mei,0,0,'',''
 25,'個人法形(命) 新人/級位の部',hokei_mei_kyuui_newcommer,0,0,'',''
 26,'新人団体法形',dantai_hokei_newcommer,9,1,'新人団体法形競技','旋体・旋陰から選択 令和 6年 4 月以降に躰道部に入部した 5 級以下の男女|1 チーム 5 名（ 4 名以下不可）　旋体の場合は男子 3 名以上、旋陰の場合は女子 3 名以上の人員構成とする'
