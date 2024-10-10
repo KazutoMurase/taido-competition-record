@@ -54,12 +54,45 @@ function CheckPlayers({
   is_test = false,
 }) {
   const router = useRouter();
+  const leftLocalStateKey =
+    "left_retire_states_" + block_number + "_" + schedule_id + "_" + event_id;
+  const rightLocalStateKey =
+    "right_retire_states_" + block_number + "_" + schedule_id + "_" + event_id;
   function onBack() {
+    localStorage.removeItem(leftLocalStateKey);
+    localStorage.removeItem(rightLocalStateKey);
     router.push("block?block_number=" + block_number);
   }
 
   const [leftRetireStates, setLeftRetireStates] = useState([]);
   const [rightRetireStates, setRightRetireStates] = useState([]);
+  const [getLocalState, setGetLocalState] = useState(false);
+  useEffect(() => {
+    const localLeftRetireStates = localStorage.getItem(leftLocalStateKey);
+    if (localLeftRetireStates) {
+      setLeftRetireStates(JSON.parse(localLeftRetireStates));
+    }
+    const localRightRetireStates = localStorage.getItem(rightLocalStateKey);
+    if (localRightRetireStates) {
+      setRightRetireStates(JSON.parse(localRightRetireStates));
+    }
+    setGetLocalState(true);
+  }, [leftLocalStateKey, rightLocalStateKey]);
+
+  useEffect(() => {
+    if (getLocalState) {
+      localStorage.setItem(leftLocalStateKey, JSON.stringify(leftRetireStates));
+    }
+  }, [getLocalState, leftRetireStates, leftLocalStateKey]);
+
+  useEffect(() => {
+    if (getLocalState) {
+      localStorage.setItem(
+        rightLocalStateKey,
+        JSON.stringify(rightRetireStates),
+      );
+    }
+  }, [getLocalState, rightRetireStates, rightLocalStateKey]);
 
   const handleLeftRetireStatesChange = (id, is_retired) => {
     setLeftRetireStates((prevRadios) => {
@@ -85,6 +118,8 @@ function CheckPlayers({
   };
 
   function onFinish(block_number, schedule_id, data, is_test) {
+    localStorage.removeItem(leftLocalStateKey);
+    localStorage.removeItem(rightLocalStateKey);
     const num_players = data.length;
     let num_checked = 0;
     for (let i = 0; i < num_players; i++) {

@@ -63,11 +63,28 @@ function CheckTable({
   is_test = false,
 }) {
   const router = useRouter();
+  const localStateKey =
+    "retire_states_" + block_number + "_" + schedule_id + "_" + event_id;
   function onBack() {
+    localStorage.removeItem(localStateKey);
     router.push("block?block_number=" + block_number);
   }
 
   const [retireStates, setRetireStates] = useState([]);
+  const [getLocalState, setGetLocalState] = useState(false);
+  useEffect(() => {
+    const localRetireStates = localStorage.getItem(localStateKey);
+    if (localRetireStates) {
+      setRetireStates(JSON.parse(localRetireStates));
+    }
+    setGetLocalState(true);
+  }, [localStateKey]);
+
+  useEffect(() => {
+    if (getLocalState) {
+      localStorage.setItem(localStateKey, JSON.stringify(retireStates));
+    }
+  }, [getLocalState, retireStates, localStateKey]);
 
   const handleRetireStatesChange = (id, is_retired) => {
     setRetireStates((prevRadios) => {
@@ -82,6 +99,7 @@ function CheckTable({
   };
 
   function onFinish(block_number, schedule_id, data, is_test) {
+    localStorage.removeItem(localStateKey);
     const num_groups = data.length;
     let num_checked = 0;
     for (let i = 0; i < num_groups; i++) {
