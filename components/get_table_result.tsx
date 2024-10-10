@@ -333,7 +333,10 @@ const GetTableResult: React.FC<{
 
   const fetchEventInfo = useCallback(async () => {
     const response = await fetch(
-      "/api/get_event_info?event_name=" + event_name,
+      "/api/get_event_info?event_name=" +
+        (event_name.includes("test")
+          ? event_name.replace("test_", "")
+          : event_name),
     );
     const result = await response.json();
     if (
