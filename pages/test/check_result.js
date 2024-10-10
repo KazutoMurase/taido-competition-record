@@ -1,10 +1,16 @@
 import React from "react";
 import GetResult from "../../components/get_result";
 import { useRouter } from "next/router";
+import { Box, Tabs, Tab, useMediaQuery } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { GetEventName } from "../../lib/get_event_name";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 
 const Home = () => {
   const router = useRouter();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [tabIndex, setTabIndex] = React.useState(1);
   const { block_number, schedule_id, event_id, back_url } = router.query;
   if (block_number === undefined) {
     return <></>;
@@ -19,13 +25,34 @@ const Home = () => {
     event_id +
     "%26back_url=block?block_number=" +
     block_number;
+  const handleTabChange = (event, newValue) => {
+    if (newValue === 0) {
+      router.push("/test/block?block_number=" + block_number);
+    }
+    setTabIndex(newValue);
+  };
   return (
     <>
+      {isMobile ? (
+        <Box>
+          <Tabs
+            value={tabIndex}
+            onChange={handleTabChange}
+            aria-label="Record Tabs"
+          >
+            <Tab key="back" icon={<ArrowBackIosIcon fontSize="small" />} />
+            <Tab key="result" label="トーナメント" />
+          </Tabs>
+        </Box>
+      ) : (
+        <></>
+      )}
       <GetResult
         editable={true}
         event_name={event_name}
         returnUrl={return_url}
         block_number={block_number}
+        is_mobile={isMobile}
         backUrl={back_url}
       />
     </>
