@@ -918,7 +918,10 @@ function GetResult({
     fetchData();
     async function fetchEventDescription() {
       const response = await fetch(
-        "/api/get_event_info?event_name=" + event_name,
+        "/api/get_event_info?event_name=" +
+          (event_name.includes("test")
+            ? event_name.replace("test_", "")
+            : event_name),
       );
       const result = await response.json();
       if (
