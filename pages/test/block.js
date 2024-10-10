@@ -4,6 +4,8 @@ import { useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import Block from "../../components/block";
 import ResetButton from "../../components/reset";
+import Container from "@mui/material/Container";
+import Grid from "@mui/material/Grid";
 
 const Home = () => {
   const router = useRouter();
@@ -28,21 +30,27 @@ const Home = () => {
   } else if (block_number === "z") {
     event_names = ["test_dantai_hokei_woman"];
   }
+  const minWidth = isMobile ? "200px" : "720px";
   return (
-    <>
-      <Block
-        block_number={block_number}
-        update_interval={6000}
-        is_mobile={isMobile}
-        return_url="/test"
-      />
-      <ResetButton
-        database_name="test"
-        event_names={event_names}
-        block_names={["block_" + block_number]}
-        text="初期化"
-      />
-    </>
+    <Container maxWith="md">
+      <Grid container justifyContent="center" alignItems="center">
+        <Block
+          block_number={block_number}
+          update_interval={6000}
+          is_mobile={isMobile}
+          return_url="/test"
+        />
+      </Grid>
+      <Grid container justifyContent="center" alignItems="center">
+        <ResetButton
+          database_name="test"
+          event_names={event_names}
+          block_names={["block_" + block_number]}
+          text="初期化"
+          is_mobile={isMobile}
+        />
+      </Grid>
+    </Container>
   );
 };
 
