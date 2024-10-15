@@ -65,13 +65,14 @@ const Confirm = async (req, res) => {
     sorted_data[i]["sum_score"] = sum_score ? sum_score / 10 : null;
   }
   const grouped_data = sorted_data.reduce((result, data) => {
-    if (!result[data.round]) {
-      result[data.round] = [];
+    const round_key = "round" + data.round.toString();
+    if (!result[round_key]) {
+      result[round_key] = [];
     }
-    result[data.round].push(data);
+    result[round_key].push(data);
     return result;
   }, {});
-  const ranked_data = Object.values(grouped_data).flatMap((round_group) => {
+  Object.values(grouped_data).map((round_group) => {
     round_group.sort((a, b) => {
       if (b.sum_score === a.sum_score) {
         return b.main_score - a.main_score;
@@ -83,23 +84,36 @@ const Confirm = async (req, res) => {
     });
     return round_group;
   });
-  const final_round_num = Object.entries(grouped_data).length;
-  if (final_round_num > 1) {
+  const round_num = Object.entries(grouped_data).length;
+  if (round_num > 1) {
+    const final_round_key = "round" + round_num.toString();
+    const preliminary_round_num = round_num - 1;
     const winners_num =
-      grouped_data[final_round_num].length / (final_round_num - 1);
-    const final_round_start_id = grouped_data[final_round_num][0].id;
-    for (let i = 1; i < final_round_num; i++) {
-      const data = grouped_data[i];
+      grouped_data[final_round_key].length / preliminary_round_num;
+    const final_round_start_id = grouped_data[final_round_key].toSorted(
+      (a, b) => a.id - b.id,
+    )[0].id;
+    for (let i = 1; i < round_num; i++) {
+      const round_key = "round" + i.toString();
+      const data = grouped_data[round_key];
+      console.log(`grouped_data[${round_key}] = `);
+      console.log(data);
       for (const item of data) {
         if (item.rank && item.rank <= winners_num) {
+          // When multiple preliminary blocks exist, order becomes
+          // "Block A rank 3" -> "Block B rank 3" -> "Block A rank 2"  -> "Block B rank 2", ...
           const target_id =
             final_round_start_id +
-            (winners_num - item.rank) * (final_round_num - 1) +
-            (i - 1);
+            winners_num * preliminary_round_num -
+            item.rank * preliminary_round_num +
+            i -
+            1;
           query = "update " + event_name + " set group_id = $1 where id = $2";
+          // console.log(
+          //   `target_id(${target_id}) =  ${final_round_start_id} + ${winners_num} * ${preliminary_round_num} - ${item.rank} * ${preliminary_round_num} + ${i} - 1`,
+          // );
           let values = [item.group_id, target_id];
-          console.log(values);
-          let result = await client.query(query, values);
+          await client.query(query, values);
         }
       }
     }
