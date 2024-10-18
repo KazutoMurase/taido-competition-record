@@ -87,7 +87,10 @@ const Confirm = async (req, res) => {
   if (final_round_num > 1) {
     const winners_num =
       grouped_data[final_round_num].length / (final_round_num - 1);
-    const final_round_start_id = grouped_data[final_round_num][0].id;
+    // ranked_data might collapse the order, need to sort again
+    const final_round_start_id = grouped_data[final_round_num].sort(
+      (a, b) => a.id - b.id,
+    )[0].id;
     for (let i = 1; i < final_round_num; i++) {
       const data = grouped_data[i];
       for (const item of data) {

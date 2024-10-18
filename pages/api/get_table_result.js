@@ -117,11 +117,10 @@ const GetResult = async (req, res) => {
     const latest_update_timestamp = (await Get(latest_update_key)) || 0;
     if (cached_data && latest_update_timestamp < cached_data.timestamp) {
       console.log("using cache");
-      //return res.json(cached_data.data);
+      return res.json(cached_data.data);
     }
     console.log("get new data");
     const data = await GetFromDB(req, res);
-    console.log(data);
     await Set(cache_key, { data: data, timestamp: Date.now() });
     res.json(data);
   } catch (error) {
