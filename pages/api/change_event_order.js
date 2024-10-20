@@ -22,7 +22,7 @@ const ChangeEventOrder = async (req, res) => {
       "_games t2 where t1.schedule_id in ($1,$2) and t2.schedule_id in ($2,$1) and t1.schedule_id <> t2.schedule_id";
     values = [target_schedule_id, target_schedule_id + 1];
     result = await client.query(query, values);
-    const key = "time_schedule_for_" + block_name;
+    const key = "change_event_order_for_" + block_name;
     const timestamp = Date.now();
     await Set(key, timestamp);
     res.json({});

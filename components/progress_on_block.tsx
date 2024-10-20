@@ -1,13 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
-import Button from "@mui/material/Button";
 import checkStyles from "../styles/checks.module.css";
-import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
-import Typography from "@mui/material/Typography";
 import { GetEventName } from "../lib/get_event_name";
-import { StaticGameData } from "../pages/api/get_static_games_on_block";
+import { GameIdsData } from "../pages/api/get_game_ids_on_block";
 
 interface CurrentScheduleData {
   // corresponds to schedule_id in block_<block_number>_games table and id in block_<block_number> table
@@ -84,7 +80,7 @@ const ProgressOnBlock: React.FC<{
   const [currentScheduleData, setCurrentScheduleData] =
     useState<CurrentScheduleData>();
   const [timeSchedules, setTimeSchedules] = useState<TimeScheduleData[]>([]);
-  const [games, setGames] = useState<StaticGameData[]>([]);
+  const [games, setGames] = useState<GameIdsData[]>([]);
   const [scheduleTables, setScheduleTables] = useState<JSX.Element[]>([]);
 
   const fetchData = useCallback(async () => {
@@ -93,7 +89,7 @@ const ProgressOnBlock: React.FC<{
       .then((data) => {
         setTimeSchedules(data);
       });
-    fetch("/api/get_static_games_on_block?block_number=" + block_number)
+    fetch("/api/get_game_ids_on_block?block_number=" + block_number)
       .then((response) => response.json())
       .then((data) => setGames(data));
   }, [block_number]);

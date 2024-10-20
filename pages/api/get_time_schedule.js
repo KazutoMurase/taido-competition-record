@@ -66,14 +66,22 @@ const GetTimeSchedule = async (req, res) => {
     // try to use cache
     const block_name = "block_" + req.query.block_number;
     const latest_update_key = "update_complete_players_for_" + block_name;
+    const latest_change_event_order_key =
+      "change_event_order_for_" + block_name;
     const cache_key = "time_schedule_for_" + block_name;
     const latest_update_timestamp = (await Get(latest_update_key)) || 0;
+    const latest_change_event_order_timestamp =
+      (await Get(latest_change_event_order_key)) || 0;
     const cached_data = await Get(cache_key);
-    if (cached_data && latest_update_timestamp < cached_data.timestamp) {
-      console.log("using cache");
+    if (
+      cached_data &&
+      latest_update_timestamp < cached_data.timestamp &&
+      latest_change_event_order_timestamp < cached_data.timestamp
+    ) {
+      console.log(`using cache for ${cache_key}`);
       return res.json(cached_data.data);
     }
-    console.log("get new data");
+    console.log(`get new data for ${cache_key}`);
     const data = await GetFromDB(req, res);
     console.log(data);
     await Set(cache_key, { data: data, timestamp: Date.now() });
