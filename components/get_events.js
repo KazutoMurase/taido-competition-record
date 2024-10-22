@@ -22,7 +22,7 @@ function GetEvents() {
   }, []);
   const events = data.map((item, index) => {
     const event_name = GetEventName(item["id"]);
-    if (!item["existence"]) {
+    if (event_name === "dantai" || !item["existence"]) {
       return <></>;
     }
     return (
