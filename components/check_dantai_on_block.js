@@ -144,14 +144,10 @@ function CheckDantai({
       schedule_id: schedule_id,
       block_number: block_number,
     };
-    if (GetEventName(event_id) !== "dantai") {
-      post["left_retire_array"] = leftRetireStates;
-      post["right_retire_array"] = rightRetireStates;
-      post["all_checked"] = num_checked === num_players;
-      post["is_test"] = is_test;
-    } else {
-      post["all_checked"] = true;
-    }
+    post["left_retire_array"] = leftRetireStates;
+    post["right_retire_array"] = rightRetireStates;
+    post["all_checked"] = num_checked === num_players;
+    post["is_test"] = is_test;
     console.log(post);
     axios
       .post("/api/complete_players_check", post)
@@ -276,31 +272,27 @@ function CheckDantai({
             >
               {!all_requested ? "全体呼び出し" : "全体リクエスト済"}
             </Button>
-            {GetEventName(event_id) !== "dantai" ? (
-              <Button
-                variant="contained"
-                type="submit"
-                onClick={(e) =>
-                  onClear(
-                    null,
-                    event_id,
-                    GetCourtId(block_number),
-                    is_test,
-                    forceFetchData,
-                  )
-                }
-                disabled={!all_requested}
-              >
-                キャンセル
-              </Button>
-            ) : (
-              <></>
-            )}
+            <Button
+              variant="contained"
+              type="submit"
+              onClick={(e) =>
+                onClear(
+                  null,
+                  event_id,
+                  GetCourtId(block_number),
+                  is_test,
+                  forceFetchData,
+                )
+              }
+              disabled={!all_requested}
+            >
+              キャンセル
+            </Button>
           </Grid>
           <table border="1">
             <tbody>
               <tr className={checkStyles.column}>
-                {GetEventName(event_id) === "dantai" ? <></> : <th>色</th>}
+                <th>色</th>
                 <th>団体名</th>
                 {is_mobile ? (
                   <th>
@@ -317,27 +309,19 @@ function CheckDantai({
               </tr>
               {data.items?.map((item, index) => (
                 <tr key={item["id"]} className={checkStyles.column}>
-                  {GetEventName(event_id) === "dantai" ? (
-                    <></>
-                  ) : (
-                    <td>
-                      <SquareTwoToneIcon
-                        sx={{ fontSize: squareColorFontSize }}
-                        htmlColor={item["color"] === "red" ? "red" : "gray"}
-                      />
-                    </td>
-                  )}
+                  <td>
+                    <SquareTwoToneIcon
+                      sx={{ fontSize: squareColorFontSize }}
+                      htmlColor={item["color"] === "red" ? "red" : "gray"}
+                    />
+                  </td>
                   <td>{item["name"].replace("'", "").replace("'", "")}</td>
                   <td className={checkStyles.elem}>
                     <input
                       type="radio"
                       name={index}
                       className={checkStyles.large_checkbox}
-                      checked={
-                        GetEventName(event_id) === "dantai"
-                          ? null
-                          : CheckState(item, false)
-                      }
+                      checked={CheckState(item, false)}
                       onChange={() =>
                         item.is_left
                           ? handleLeftRetireStatesChange(item.game_id, false)
@@ -350,11 +334,7 @@ function CheckDantai({
                       type="radio"
                       name={index}
                       className={checkStyles.large_checkbox}
-                      checked={
-                        GetEventName(event_id) === "dantai"
-                          ? null
-                          : CheckState(item, true)
-                      }
+                      checked={CheckState(item, true)}
                       onChange={() =>
                         item.is_left
                           ? handleLeftRetireStatesChange(item.game_id, true)
