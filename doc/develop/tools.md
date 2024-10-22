@@ -14,7 +14,7 @@ tools/format.bash
 ## データの抽出
 
 作業中コンテナのデータを抽出したい場合は本レポジトリのルートで以下を実行する。
-export以下にcsv形式で保存される。
+result以下にcsv形式で保存される。
 
 ```bash
 tools/export.bash http://localhost:3000
