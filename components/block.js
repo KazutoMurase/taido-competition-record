@@ -19,20 +19,6 @@ function ShowDetails(
   ToUpdate,
   ToFinish,
 ) {
-  if (GetEventName(item["event_id"]) === "dantai") {
-    return (
-      <>
-        <Button
-          variant="contained"
-          type="submit"
-          onClick={(e) => ToFinish(item["id"], block_number)}
-          disabled={item["id"] !== current.id || !item["players_checked"]}
-        >
-          競技終了
-        </Button>
-      </>
-    );
-  }
   if (is_mobile) {
     return (
       <>

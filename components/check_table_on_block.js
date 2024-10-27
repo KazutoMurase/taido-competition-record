@@ -222,26 +222,22 @@ function CheckTable({
             >
               {!all_requested ? "全体呼び出し" : "全体リクエスト済"}
             </Button>
-            {GetEventName(event_id) !== "dantai" ? (
-              <Button
-                variant="contained"
-                type="submit"
-                onClick={(e) =>
-                  onClear(
-                    null,
-                    event_id,
-                    GetCourtId(block_number),
-                    is_test,
-                    forceFetchData,
-                  )
-                }
-                disabled={!all_requested}
-              >
-                キャンセル
-              </Button>
-            ) : (
-              <></>
-            )}
+            <Button
+              variant="contained"
+              type="submit"
+              onClick={(e) =>
+                onClear(
+                  null,
+                  event_id,
+                  GetCourtId(block_number),
+                  is_test,
+                  forceFetchData,
+                )
+              }
+              disabled={!all_requested}
+            >
+              キャンセル
+            </Button>
           </Grid>
           <table border="1">
             <tbody>

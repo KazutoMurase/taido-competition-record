@@ -35,21 +35,7 @@ const Home = () => {
     }
     setTabIndex(newValue);
   };
-  if (event_name === "dantai") {
-    return (
-      <>
-        <CheckDantai
-          block_number={block_number}
-          schedule_id={schedule_id}
-          event_id={event_id}
-          update_interval={3000}
-        />
-      </>
-    );
-  } else if (
-    event_name.includes("dantai_hokei") ||
-    event_name.includes("tenkai")
-  ) {
+  if (event_name.includes("dantai_hokei") || event_name.includes("tenkai")) {
     return (
       <div style={isMobile ? { width: "110%" } : {}}>
         {isMobile ? (
