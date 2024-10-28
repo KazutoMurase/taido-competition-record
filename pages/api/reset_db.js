@@ -29,7 +29,7 @@ const parseAsync = (fileData) => {
 async function UpdateEventFromCSV(client, db_name, event_name) {
   const csvFilePath = path.join(
     process.cwd(),
-    "/data/" + db_name + "/" + event_name + ".csv",
+    "/data/" + db_name + "/original/" + event_name + ".csv",
   );
   const fileData = fs.readFileSync(csvFilePath, "utf-8");
   const records = await parseAsync(fileData);
@@ -68,7 +68,7 @@ async function UpdateEventFromCSV(client, db_name, event_name) {
 async function UpdateTableEventFromCSV(client, db_name, event_name) {
   const csvFilePath = path.join(
     process.cwd(),
-    "/data/" + db_name + "/" + event_name + ".csv",
+    "/data/" + db_name + "/original/" + event_name + ".csv",
   );
   const fileData = fs.readFileSync(csvFilePath, "utf-8");
   const records = await parseAsync(fileData);
@@ -97,7 +97,7 @@ async function UpdateTableEventFromCSV(client, db_name, event_name) {
 async function UpdateBlockFromCSV(client, db_name, block_name) {
   const csvFilePath = path.join(
     process.cwd(),
-    "/data/" + db_name + "/" + block_name + "_games.csv",
+    "/data/" + db_name + "/original/" + block_name + "_games.csv",
   );
   const fileData = fs.readFileSync(csvFilePath, "utf-8");
   const records = await parseAsync(fileData);
