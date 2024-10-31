@@ -1,3 +1,54 @@
+create table groups
+(id integer not null,
+name text not null,
+primary key(id));
+
+create table event_type
+(id integer not null,
+ name text not null,
+ existence integer not null,
+ primary key(id));
+
+create table court_type
+(id integer not null,
+ name text not null,
+ primary key(id));
+
+create table players
+(id integer not null,
+group_id integer not null,
+name text not null,
+name_kana text not null,
+zissen_man_player_id integer unique,
+hokei_man_player_id integer unique,
+zissen_woman_player_id integer unique,
+hokei_woman_player_id integer unique,
+hokei_sonen_player_id integer unique,
+hokei_newcommer_player_id integer unique,
+zissen_kyuui_man_player_id integer unique,
+hokei_kyuui_man_player_id integer unique,
+zissen_kyuui_woman_player_id integer unique,
+hokei_kyuui_woman_player_id integer unique,
+primary key(id),
+foreign key (group_id) references groups(id));
+
+create table notification_request
+(id serial not null,
+ event_id integer not null,
+ player_id integer unique,
+ group_id integer,
+ group_name text,
+ court_id integer not null,
+ primary key(id),
+ foreign key (event_id) references event_type(id),
+ foreign key (player_id) references players(id),
+ foreign key (court_id) references court_type(id));
+
+\copy groups from 'groups.csv' csv header;
+\copy event_type from 'event_type.csv' csv header;
+\copy court_type from 'court_type.csv' csv header;
+\copy players from 'players.csv' csv header;
+
 create table hokei_man
 (id integer not null,
 left_player_id integer,
@@ -247,28 +298,19 @@ create table current_block_d
 \copy block_a from 'block_a.csv' csv header;
 \copy block_a_games from 'block_a_games.csv' csv header;
 
-insert into current_block_a(id, game_id) values (13, 1);
+insert into current_block_a(id, game_id) values (1, 1);
 
 \copy block_b from 'block_b.csv' csv header;
 \copy block_b_games from 'block_b_games.csv' csv header;
 
-insert into current_block_b(id, game_id) values (13, 1);
+insert into current_block_b(id, game_id) values (1, 1);
 
 \copy block_c from 'block_c.csv' csv header;
 \copy block_c_games from 'block_c_games.csv' csv header;
 
-insert into current_block_c(id, game_id) values (10, 1);
+insert into current_block_c(id, game_id) values (1, 1);
 
 \copy block_d from 'block_d.csv' csv header;
 \copy block_d_games from 'block_d_games.csv' csv header;
 
-insert into current_block_d(id, game_id) values (10, 1);
-
-create table awarded_players
-(id integer not null,
-award_name text not null,
-player_id integer,
-foreign key (player_id) references players(id),
-primary key (id));
-
-\copy awarded_players from 'awarded_players.csv' csv header;
+insert into current_block_d(id, game_id) values (1, 1);
