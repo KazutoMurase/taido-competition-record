@@ -12,8 +12,8 @@ pip install -r requirements.txt
 
 ## トーナメント用DB作成 ##
 
-大会Excelファイルを入力すると自動で出力してくれる。
+大会Excelファイルと出力先ディレクトリを入力すると自動で出力してくれる。
 
 ```bash
-scripts/generate_tournament_db_from_xl.py --path (FILE_PATH_TO_EXCEL_FILE)
+scripts/generate_tournament_db_from_xl.py --file-path (FILE_PATH_TO_EXCEL_FILE) --output-path (OUTPUT_DIRECTORY)
 ```
