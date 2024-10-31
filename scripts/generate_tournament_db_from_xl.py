@@ -69,7 +69,9 @@ def check_number(sheet, row, col):
 def check_towards_top(sheet, row, col):
     i = 1
     while (sheet[row-i][col-1].border.right.style == 'thin' or
-           sheet[row-i][col].border.left.style == 'thin'):
+           sheet[row-i][col-1].border.right.style == 'dashed' or
+           sheet[row-i][col].border.left.style == 'thin' or
+           sheet[row-i][col].border.left.style == 'dashed'):
         i += 1
     return i - 1
 
@@ -77,7 +79,9 @@ def check_towards_top(sheet, row, col):
 def check_towards_bottom(sheet, row, col):
     i = 1
     while (sheet[row+i][col-1].border.right.style == 'thin' or
-           sheet[row+i][col].border.left.style == 'thin'):
+           sheet[row+i][col-1].border.right.style == 'dashed' or
+           sheet[row+i][col].border.left.style == 'thin' or
+           sheet[row+i][col].border.left.style == 'dashed'):
         i += 1
     return i - 1
 
@@ -86,7 +90,9 @@ def check_towards_left(sheet, row, col):
     i = 1
     while (not isinstance(sheet[row+1][col-i], MergedCell) and
            (sheet[row][col-i].border.bottom.style == 'thin' or
-           sheet[row+1][col-i].border.top.style == 'thin')):
+            sheet[row][col-i].border.bottom.style == 'dashed' or
+            sheet[row+1][col-i].border.top.style == 'thin' or
+            sheet[row+1][col-i].border.top.style == 'dashed')):
         i += 1
     return i - 1
 
@@ -95,7 +101,9 @@ def check_towards_right(sheet, row, col):
     i = 1
     while (not isinstance(sheet[row+1][col+i], MergedCell) and
             (sheet[row][col+i].border.bottom.style == 'thin' or
-             sheet[row+1][col+i].border.top.style == 'thin')):
+             sheet[row][col+i].border.bottom.style == 'dashed' or
+             sheet[row+1][col+i].border.top.style == 'thin' or
+             sheet[row+1][col+i].border.top.style == 'dashed')):
         i += 1
     return i
 
@@ -116,6 +124,9 @@ def search_left_block(sheet, games, game, row, col):
         if match:
             ref_cell = match.group(0).replace('=IF((', '')
             game.left_id = sheet[ref_cell].value
+    else:
+        print (f"failed to find next upper item in {sheet[row][col]}")
+
 
     update_row = check_towards_bottom(sheet, row, col)
     update_col = check_towards_left(sheet, row + update_row, col)
@@ -132,6 +143,8 @@ def search_left_block(sheet, games, game, row, col):
         if match:
             ref_cell = match.group(0).replace('=IF((', '')
             game.right_id = sheet[ref_cell].value
+    else:
+        print (f"failed to find next lower item in {sheet[row][col]}")
 
 
 def search_right_block(sheet, games, game, row, col):
@@ -160,6 +173,10 @@ def search_right_block(sheet, games, game, row, col):
             if match:
                 ref_cell = match.group(0).replace('=IF((', '')
                 game.right_id = sheet[ref_cell].value
+            else:
+                print (f"failed to find next upper item in {sheet[row][col]}")
+        else:
+            print (f"failed to find next upper item in {sheet[row][col]}")
 
     update_row = check_towards_bottom(sheet, row, col)
     update_col = check_towards_right(sheet, row + update_row, col)
@@ -176,6 +193,17 @@ def search_right_block(sheet, games, game, row, col):
         if match:
             ref_cell = match.group(0).replace('=IF((', '')
             game.left_id = sheet[ref_cell].value
+    else:
+        id = check_number(sheet, row + update_row, col + update_col)
+        if isinstance(id, int):
+            lower_game = Game(id=id)
+            lower_game.next_left = game.id
+            games.append(lower_game)
+            search_right_block(sheet, games, lower_game,
+                               row + update_row + 1, col + update_col)
+        else:
+            print (f"failed to find next lower item in {sheet[row][col]}")
+
 
 @click.command()
 @click.option("--file-path", type=click.Path(exists=True, dir_okay=False), required=True)
