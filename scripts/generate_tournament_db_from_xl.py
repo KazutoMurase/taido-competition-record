@@ -5,6 +5,17 @@ from openpyxl.cell import MergedCell
 import os
 import re
 
+name_db_map = {
+    "男実": "zissen_man",
+    "女実": "zissen_woman",
+    "男法": "hokei_man",
+    "女法": "hokei_woman",
+    "男実": "zissen_man",
+    "男団実": "dantai_zissen_man",
+    "女団実": "dantai_zissen_woman",
+    "壮年法": "hokei_sonen"
+}
+
 
 class Game:
     def __init__(self, id):
@@ -139,6 +150,16 @@ def search_right_block(sheet, games, game, row, col):
         if match:
             ref_cell = match.group(0).replace('=IF((', '')
             game.right_id = sheet[ref_cell].value
+    else:
+        # might check wrong row due to merged cell
+        update_col = check_towards_right(sheet, row - update_row, col)
+        id = check_number(sheet, row - update_row, col + update_col)
+        if isinstance(id, str):
+            pattern = r"=IF\(\([A-Z]+[0-9]+"
+            match = re.match(pattern, id)
+            if match:
+                ref_cell = match.group(0).replace('=IF((', '')
+                game.right_id = sheet[ref_cell].value
 
     update_row = check_towards_bottom(sheet, row, col)
     update_col = check_towards_right(sheet, row + update_row, col)
@@ -196,7 +217,11 @@ def main(file_path, output_path):
         # search left/right block
         search_left_block(sheet, games, left_semi_final, target_row+index, target_col-left_index)
         search_right_block(sheet, games, right_semi_final, target_row+index, target_col+right_index)
-        with open(f'{output_path}/{name}.csv', 'w') as f:
+        if name in name_db_map:
+            file_name = name_db_map[name]
+        else:
+            file_name = name
+        with open(f'{output_path}/{file_name}.csv', 'w') as f:
             if '団' in name:
                 f.write('id,left_group_id,right_group_id,next_left_id,next_right_id,left_group_flag,left_retire,right_retire\n')
             else:
