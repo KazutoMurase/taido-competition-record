@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
+import click
 import openpyxl
 from openpyxl.cell import MergedCell
+import os
 import re
 
 
@@ -71,6 +73,7 @@ def check_towards_left(sheet, row, col):
         i += 1
     return i - 1
 
+
 def check_towards_right(sheet, row, col):
     i = 1
     while (not isinstance(sheet[row+1][col+i], MergedCell) and
@@ -78,6 +81,7 @@ def check_towards_right(sheet, row, col):
              sheet[row+1][col+i].border.top.style == 'thin')):
         i += 1
     return i
+
 
 def search_left_block(sheet, games, game, row, col):
     update_row = check_towards_top(sheet, row, col)
@@ -89,6 +93,12 @@ def search_left_block(sheet, games, game, row, col):
         games.append(upper_game)
         search_left_block(sheet, games, upper_game,
                           row - update_row, col - update_col)
+    elif isinstance(id, str):
+        pattern = r"=IF\(\([A-Z]+[0-9]+"
+        match = re.match(pattern, id)
+        if match:
+            ref_cell = match.group(0).replace('=IF((', '')
+            game.left_id = sheet[ref_cell].value
 
     update_row = check_towards_bottom(sheet, row, col)
     update_col = check_towards_left(sheet, row + update_row, col)
@@ -99,6 +109,12 @@ def search_left_block(sheet, games, game, row, col):
         games.append(lower_game)
         search_left_block(sheet, games, lower_game,
                           row + update_row, col - update_col)
+    elif isinstance(id, str):
+        pattern = r"=IF\(\([A-Z]+[0-9]+"
+        match = re.match(pattern, id)
+        if match:
+            ref_cell = match.group(0).replace('=IF((', '')
+            game.right_id = sheet[ref_cell].value
 
 
 def search_right_block(sheet, games, game, row, col):
@@ -107,58 +123,81 @@ def search_right_block(sheet, games, game, row, col):
     id = check_number(sheet, row - update_row - 1, col + update_col)
     if isinstance(id, int):
         upper_game = Game(id=id)
-        upper_game.next_left = game.id
+        upper_game.next_right = game.id
         games.append(upper_game)
         search_right_block(sheet, games, upper_game,
                            row - update_row - 1, col + update_col)
+    elif isinstance(id, str):
+        pattern = r"=IF\(\([A-Z]+[0-9]+"
+        match = re.match(pattern, id)
+        if match:
+            ref_cell = match.group(0).replace('=IF((', '')
+            game.right_id = sheet[ref_cell].value
 
     update_row = check_towards_bottom(sheet, row, col)
     update_col = check_towards_right(sheet, row + update_row, col)
     id = check_number(sheet, row + update_row + 1, col + update_col)
     if isinstance(id, int):
         lower_game = Game(id=id)
-        lower_game.next_right = game.id
+        lower_game.next_left = game.id
         games.append(lower_game)
         search_right_block(sheet, games, lower_game,
                            row + update_row + 1, col + update_col)
+    elif isinstance(id, str):
+        pattern = r"=IF\(\([A-Z]+[0-9]+"
+        match = re.match(pattern, id)
+        if match:
+            ref_cell = match.group(0).replace('=IF((', '')
+            game.left_id = sheet[ref_cell].value
+
+@click.command()
+@click.option("--file-path", type=click.Path(exists=True, dir_okay=False), required=True)
+@click.option("--output-path", type=click.Path(dir_okay=True), required=True)
+def main(file_path, output_path):
+    os.makedirs(output_path, exist_ok=True)
+    wb = openpyxl.load_workbook(file_path)
+    for name in wb.sheetnames:
+        sheet = wb[name]
+        start_cell = None
+        for row in sheet.iter_rows():
+            for cell in row:
+                cell_value = cell.value if cell.value is not None else ''
+                if cell_value == '決勝':
+                    start_cell = cell
+                    break
+        if start_cell is None:
+            continue
+        games = []
+        target_row, target_col = start_cell.row, start_cell.column
+        index = check_towards_bottom(sheet, target_row, target_col)
+        final_num = check_number(sheet, target_row+index+1, target_col)
+        if final_num is None:
+            continue
+        # before_final / final
+        before_final_game = Game(id=final_num-1)
+        final_game = Game(id=final_num)
+        games.append(before_final_game)
+        games.append(final_game)
+        left_index = check_towards_left(sheet, target_row+index, target_col)
+        right_index = check_towards_right(sheet, target_row+index, target_col)
+        # semi finals
+        left_semi_final = Game(id=check_number(sheet, target_row+index, target_col-left_index-1))
+        left_semi_final.next_left = final_num
+        right_semi_final = Game(id=check_number(sheet, target_row+index, target_col+right_index))
+        right_semi_final.next_right = final_num
+        games.append(left_semi_final)
+        games.append(right_semi_final)
+        # search left/right block
+        search_left_block(sheet, games, left_semi_final, target_row+index, target_col-left_index)
+        search_right_block(sheet, games, right_semi_final, target_row+index, target_col+right_index)
+        with open(f'{output_path}/{name}.csv', 'w') as f:
+            if '団' in name:
+                f.write('id,left_group_id,right_group_id,next_left_id,next_right_id,left_group_flag,left_retire,right_retire\n')
+            else:
+                f.write('id,left_player_id,right_player_id,next_left_id,next_right_id,left_player_flag,left_retire,right_retire\n')
+            for game in sorted(games):
+                f.write(f"{game}\n")
 
 
-wb = openpyxl.load_workbook('2024_student.xlsm')
-
-for name in wb.get_sheet_names():
-    sheet = wb.get_sheet_by_name(name)
-    start_cell = None
-    for row in sheet.iter_rows():
-        for cell in row:
-            cell_value = cell.value if cell.value is not None else ''
-            if cell_value == '決勝':
-                start_cell = cell
-    if start_cell is None:
-        continue
-    print (f"{name}")
-    games = []
-    target_row, target_col = start_cell.row, start_cell.column
-    index = check_towards_bottom(sheet, target_row, target_col)
-    final_num = check_number(sheet, target_row+index+1, target_col)
-    if final_num is None:
-        continue
-    # before_final / final
-    before_final_game = Game(id=final_num-1)
-    final_game = Game(id=final_num)
-    games.append(before_final_game)
-    games.append(final_game)
-    left_index = check_towards_left(sheet, target_row+index, target_col)
-    right_index = check_towards_right(sheet, target_row+index, target_col)
-    # semi finals
-    left_semi_final = Game(id=check_number(sheet, target_row+index, target_col-left_index-1))
-    left_semi_final.next_left = final_num
-    right_semi_final = Game(id=check_number(sheet, target_row+index, target_col+right_index))
-    right_semi_final.next_right = final_num
-    games.append(left_semi_final)
-    games.append(right_semi_final)
-
-    search_left_block(sheet, games, left_semi_final, target_row+index, target_col-left_index)
-    search_right_block(sheet, games, right_semi_final, target_row+index, target_col+right_index)
-    print (f"length: {len(games)}")
-    for game in sorted(games):
-        print (f"{game}")
+if __name__ == "__main__":
+    main()
