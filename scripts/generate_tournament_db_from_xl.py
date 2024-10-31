@@ -41,8 +41,14 @@ def check_number(sheet, row, col):
           (isinstance(sheet[row][col-1].value, int) or
            "=IF" not in sheet[row][col-1].value)):
         value = sheet[row][col-1].value
-    else:
+    elif (sheet[row-1][col].value is not None and
+          (isinstance(sheet[row-1][col].value, int) or
+           "=IF" not in sheet[row-1][col].value)):
         value = sheet[row-1][col].value
+    elif (sheet[row][col-1].value is not None):
+        return sheet[row][col-1].value
+    else:
+        return sheet[row-1][col].value
     number = refer_number(sheet, value)
     if isinstance(number, str) and '※' in number:
         number = int(number.replace('※', ''))
