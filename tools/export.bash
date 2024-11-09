@@ -1,9 +1,9 @@
 #!/bin/bash
 
-mkdir -p data/$COMPETITION_NAME/result
-
 source .env
 URL=$1
+
+mkdir -p data/$COMPETITION_NAME/result
 
 for csv_file in data/$COMPETITION_NAME/original/*.csv
 do
