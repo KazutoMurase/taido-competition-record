@@ -1,6 +1,7 @@
 # 結果出力
 
 以下のように実行することで、途中結果や最終結果CSVをdata/(大会名)/result以下にエクスポート出来る。
+その後.env以下のUSE\_LOCAL\_DB="1"、USE\_RESULT\_DATA="1"に設定することで、エクスポート結果を用いたシステムを立ち上げる事が出来る。
 
 ```bash
 tools/export.bash (URL)
