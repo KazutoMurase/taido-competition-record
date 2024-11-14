@@ -1,12 +1,32 @@
 import GetClient from "../../lib/db_client";
 import { GetTableResult } from "../../lib/get_table_result";
+import { GetTotalResult } from "../../lib/get_total_result";
 
 const GetWinners = async (req, res) => {
   try {
     const client = await GetClient();
     const event_name = req.query.event_name;
     let query;
-    if (event_name.includes("tenkai") || event_name.includes("dantai_hokei")) {
+    if (event_name.includes("total")) {
+      const result = await GetTotalResult(
+        event_name,
+        req.query.use_different_personal_scores,
+      );
+      let winners = {};
+      for (let i = 0; i < result.length; i++) {
+        if (result[i].rank && result[i].rank <= 4) {
+          winners[result[i].rank] = {
+            id: result[i].id,
+            group: result[i].name.replace(/['"]+/g, ""),
+          };
+        }
+      }
+      res.json(winners);
+      return;
+    } else if (
+      event_name.includes("tenkai") ||
+      event_name.includes("dantai_hokei")
+    ) {
       const result = await GetTableResult(event_name);
       let final_num = 0;
       let final_finished_num = 0;
