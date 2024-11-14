@@ -9,7 +9,10 @@ import { ShowWinner } from "../components/show_summary";
 import { InferGetServerSidePropsType, GetServerSideProps } from "next";
 
 export const getServerSideProps = async (context) => {
-  const params = { production_test: process.env.PRODUCTION_TEST };
+  const params = {
+    production_test: process.env.PRODUCTION_TEST,
+    show_award_in_public: process.env.SHOW_AWARD_IN_PUBLIC,
+  };
   return {
     props: { params },
   };
@@ -22,6 +25,9 @@ const Summary: React.FC<{ params }> = ({ params }) => {
   };
   const { from_admin } = router.query;
   const hide = params.production_test === "1" && !from_admin;
+  const hide_award =
+    (params.production_test === "1" || params.show_award_in_public === "0") &&
+    !from_admin;
   const [data, setData] = useState([]);
 
   const fetchData = async () => {
@@ -67,7 +73,7 @@ const Summary: React.FC<{ params }> = ({ params }) => {
         alignItems="center"
         style={{ height: "320px" }}
       >
-        <GetAwardedPlayers hide={hide} />
+        <GetAwardedPlayers hide={hide_award} />
       </Grid>
       <Grid
         container
