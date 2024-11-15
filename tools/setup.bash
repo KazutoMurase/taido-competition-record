@@ -16,7 +16,8 @@ if [ "${USE_LOCAL_DB}" == "1" ]; then
         else
             cd /ws/data/$COMPETITION_NAME/result && sudo -u postgres psql -d taido_record < ../original/generate_tables.sql
         fi
-        cd /ws/data/test && sudo -u postgres psql -d taido_record < generate_tables.sql
+        cd /ws/data/test/static && sudo -u postgres psql -d taido_record < generate_tables.sql
+        cd /ws/data/test/original && sudo -u postgres psql -d taido_record < generate_tables.sql
     fi
 fi
 
