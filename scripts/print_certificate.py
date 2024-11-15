@@ -70,9 +70,9 @@ def on_button_click(row, col, url_base, row_text, event_names, input_words_dir, 
             elif (group_name[-1] == "県" or
                   group_name[-1] == "道" or
                   group_name[-1] == "府"):
-                name = group_name
+                name = group_name + "チーム"
             else:
-                name = group_name + "地区"
+                name = group_name + "地区チーム"
             doc_name = "賞状_団体.docx"
         elif "total" in event_names[row]:
             group_name = response.json()[f"{col+1}"]["group"]
