@@ -15,7 +15,7 @@ import shutil
 
 col_text = ["優勝", "第二位", "第三位"]
 # TODO: get from awarded_players
-awards_text = ["最優秀選手賞", "優秀選手賞1", "優秀選手賞2", "日本武藝躰道本院杯"]
+awards_text = ["最優秀選手賞", "優秀選手賞1", "優秀選手賞2"]
 
 app = QApplication(sys.argv)
 
@@ -54,16 +54,41 @@ def on_button_click(row, col, url_base, row_text, event_names, input_words_dir, 
     response = requests.get(url)
     if response.status_code == 200:
         if row < 0:
-            name = response.json()[col]["name"]
+            name = response.json()[col]["name"].replace('　', ' ')
+            doc_name = "賞状_総合.docx"
         elif ("dantai" in event_names[row] or
               "tenkai" in event_names[row]):
-            name = response.json()[f"{col+1}"]["group"]
+            group_name = response.json()[f"{col+1}"]["group"]
+            if (group_name[-1].isalpha() and
+                group_name[-1].isascii()):
+                if (group_name[-2] == "県" or
+                    group_name[-2] == "道" or
+                    group_name[-2] == "府"):
+                    name = group_name[:-1] + chr(ord(group_name[-1]) + 0xFEE0) + "チーム"
+                else:
+                    name = group_name[:-1] + "地区" + chr(ord(group_name[-1]) + 0xFEE0) + "チーム"
+            elif (group_name[-1] == "県" or
+                  group_name[-1] == "道" or
+                  group_name[-1] == "府"):
+                name = group_name
+            else:
+                name = group_name + "地区"
+            doc_name = "賞状_団体.docx"
         elif "total" in event_names[row]:
-            name = response.json()[f"{col+1}"]["group"]
+            group_name = response.json()[f"{col+1}"]["group"]
+            if (group_name[-1] == "県" or
+                group_name[-1] == "道" or
+                group_name[-1] == "府"):
+                name = group_name
+            else:
+                name = group_name + "地区"
+            event += rank
+            doc_name = "賞状_総合.docx"
         else:
             name = response.json()[f"{col+1}"]["name"].replace('　', ' ')
+            doc_name = "賞状_個人.docx"
 
-    docx_file = f'{input_words_dir}/base.docx'
+    docx_file = f'{input_words_dir}/{doc_name}'
     temp_dir = 'temp_unzip_dir'
 
     with zipfile.ZipFile(docx_file, 'r') as zip_ref:
@@ -125,7 +150,7 @@ class MyApp(QWidget):
         main_layout = QHBoxLayout()
 
         button_layout = QGridLayout()
-        for row in range(len(row_text)-1):
+        for row in range(len(row_text)):
             label = QLabel(f'{row_text[row]}', self)
             button_layout.addWidget(label, row, 0)
             for col in range(3):
