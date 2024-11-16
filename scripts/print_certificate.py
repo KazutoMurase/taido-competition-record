@@ -42,7 +42,8 @@ def exec_print(doc_path, open_only):
         word.Quit()
 
 
-def on_button_click(row, col, url_base, row_text, event_names, input_words_dir, open_only):
+def on_button_click(row, col, url_base, row_text, event_names,
+                    input_words_dir, open_only, check_image):
     if row < 0:
         rank = ""
         event = awards_text[col].replace("1", "").replace("2", "")
@@ -55,7 +56,7 @@ def on_button_click(row, col, url_base, row_text, event_names, input_words_dir, 
     if response.status_code == 200:
         if row < 0:
             name = response.json()[col]["name"].replace('　', ' ')
-            doc_name = "賞状_総合.docx"
+            doc_name = "賞状_総合"
         elif ("dantai" in event_names[row] or
               "tenkai" in event_names[row]):
             group_name = response.json()[f"{col+1}"]["group"]
@@ -73,7 +74,7 @@ def on_button_click(row, col, url_base, row_text, event_names, input_words_dir, 
                 name = group_name + "チーム"
             else:
                 name = group_name + "地区チーム"
-            doc_name = "賞状_団体.docx"
+            doc_name = "賞状_団体"
         elif "total" in event_names[row]:
             group_name = response.json()[f"{col+1}"]["group"]
             if (group_name[-1] == "県" or
@@ -83,12 +84,14 @@ def on_button_click(row, col, url_base, row_text, event_names, input_words_dir, 
             else:
                 name = group_name + "地区"
             event += rank
-            doc_name = "賞状_総合.docx"
+            doc_name = "賞状_総合"
         else:
             name = response.json()[f"{col+1}"]["name"].replace('　', ' ')
-            doc_name = "賞状_個人.docx"
-
-    docx_file = f'{input_words_dir}/{doc_name}'
+            doc_name = "賞状_個人"
+    if check_image:
+        docx_file = f'{input_words_dir}/{doc_name}_画像入り.docx'
+    else:
+        docx_file = f'{input_words_dir}/{doc_name}.docx'
     temp_dir = 'temp_unzip_dir'
 
     with zipfile.ZipFile(docx_file, 'r') as zip_ref:
@@ -131,8 +134,8 @@ def on_button_click(row, col, url_base, row_text, event_names, input_words_dir, 
     button.setStyleSheet("background-color: lightgreen; color: black;")
 
 
-class MyApp(QWidget):
-    def __init__(self, url, input_words_dir, open_only):
+class PrintCertificate(QWidget):
+    def __init__(self, url, input_words_dir, open_only, check_image):
         super().__init__()
         self.setWindowTitle('賞状印刷')
         self.setGeometry(100, 100, 400, 300)
@@ -158,7 +161,8 @@ class MyApp(QWidget):
                 button.clicked.connect(partial(on_button_click,
                                                row, col, url,
                                                row_text, event_names,
-                                               input_words_dir, open_only))
+                                               input_words_dir, open_only,
+                                               check_image))
                 if os.path.exists(f'{col_text[col]}_{row_text[row]}.docx'):
                     button.setStyleSheet("background-color: lightgreen; color: black;")
                 button_layout.addWidget(button, row, col+1)
@@ -168,7 +172,8 @@ class MyApp(QWidget):
             button = QPushButton(f'{awards_text[col]}', self)
             button.clicked.connect(partial(on_button_click, -1, col, url,
                                            row_text, event_names,
-                                           input_words_dir, open_only))
+                                           input_words_dir, open_only,
+                                           check_image))
             if os.path.exists(f'{awards_text[col].replace("1", "").replace("2", "")}.docx'):
                 button.setStyleSheet("background-color: lightgreen; color: black;")
             button_layout.addWidget(button, len(row_text), col+1)
@@ -182,8 +187,9 @@ class MyApp(QWidget):
 @click.option("--url", type=str, required=True)
 @click.option("--input-words-dir", type=click.Path(dir_okay=True), required=True)
 @click.option("--open-only", type=bool, default=False)
-def main(url, input_words_dir, open_only):
-    window = MyApp(url, input_words_dir, open_only)
+@click.option("--check-image", type=bool, default=False)
+def main(url, input_words_dir, open_only, check_image):
+    window = PrintCertificate(url, input_words_dir, open_only, check_image)
     window.show()
     sys.exit(app.exec_())
 
