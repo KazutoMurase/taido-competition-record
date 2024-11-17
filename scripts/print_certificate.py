@@ -30,8 +30,7 @@ def exec_print(doc_path, open_only):
     word.Visible = open_only
     doc = word.Documents.Open(doc_path)
     if not open_only:
-        # TODO: set printer name
-        printer_name = "Your Printer Name"
+        printer_name = "Canon PRO-1000 series XPS"
         word.ActivePrinter = printer_name
         doc.PrintOut(
             Background=True,
