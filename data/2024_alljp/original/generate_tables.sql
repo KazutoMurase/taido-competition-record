@@ -325,6 +325,7 @@ create table awarded_players
 (id integer not null,
 award_name text not null,
 player_id integer,
+name text,
 foreign key (player_id) references players(id),
 primary key (id));
 

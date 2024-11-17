@@ -1,7 +1,15 @@
 import Grid from "@mui/material/Grid";
 
 export function ShowWinner(item) {
-  if (item["name"] !== undefined) {
+  if (item["free_name"]) {
+    return (
+      <div>
+        <b style={{ fontSize: item["free_name"] > 6 ? "12px" : "16px" }}>
+          {item["free_name"]}
+        </b>
+      </div>
+    );
+  } else if (item["name"] !== undefined) {
     return (
       <>
         <div style={{ fontSize: "10px" }}>{item["name_kana"]}</div>
