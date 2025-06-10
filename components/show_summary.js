@@ -1,20 +1,35 @@
 import Grid from "@mui/material/Grid";
 
-function ShowWinner(item) {
-  if (item["name"] !== undefined) {
+export function ShowWinner(item) {
+  if (item["free_name"]) {
+    return (
+      <div>
+        <b style={{ fontSize: item["free_name"] > 6 ? "12px" : "16px" }}>
+          {item["free_name"]}
+        </b>
+      </div>
+    );
+  } else if (item["name"] !== undefined) {
     return (
       <>
         <div style={{ fontSize: "10px" }}>{item["name_kana"]}</div>
         <b style={{ fontSize: "16px" }}>{item["name"]}</b>
-        <div style={{ fontSize: "12px" }}>
-          {item["group"].replace("'", "【").replace("'", "】")}
+        <div
+          style={{
+            fontSize: item["group"]?.length > 8 ? "8px" : "12px",
+            minWidth: "100px",
+          }}
+        >
+          {item["group"]?.replace("'", "【").replace("'", "】")}
         </div>
       </>
     );
   } else {
     return (
-      <div style={{ fontSize: "16px" }}>
-        {item["group"].replace("'", "").replace("'", "")}
+      <div>
+        <b style={{ fontSize: item["group"]?.length > 6 ? "12px" : "16px" }}>
+          {item["group"]?.replace("'", "").replace("'", "")}
+        </b>
       </div>
     );
   }

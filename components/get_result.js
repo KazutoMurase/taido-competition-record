@@ -10,7 +10,7 @@ import { Layer, Stage, Rect, Text } from "react-konva";
 import Grid from "@mui/material/Grid";
 import Summary from "./show_summary";
 
-function CreateDantaiText(item, lineWidth) {
+function CreateDantaiText(item, lineWidth, y_padding, hide = false) {
   const is_left = item["block_pos"] === "left";
   const is_right = item["block_pos"] === "right";
   const has_left = "has_left" in item;
@@ -21,7 +21,7 @@ function CreateDantaiText(item, lineWidth) {
         <>
           <Text
             x={is_left ? 10 : 630}
-            y={item["left_begin_y"] - 5}
+            y={item["left_begin_y"] - 5 + y_padding}
             text={item["left_group_name"].replace("'", "").replace("'", "")}
             fontSize={item["left_group_name"].length < 8 ? 18 : 14}
             width={200}
@@ -29,7 +29,7 @@ function CreateDantaiText(item, lineWidth) {
           />
           <Rect
             x={is_left ? 130 : 625}
-            y={item["left_begin_y"] + 2}
+            y={item["left_begin_y"] + 2 + y_padding}
             width={["left_group_name"].length * 80}
             height={1}
             fill="black"
@@ -37,7 +37,7 @@ function CreateDantaiText(item, lineWidth) {
           />
           <Text
             x={is_left ? 10 : 630}
-            y={item["right_begin_y"] - 5}
+            y={item["right_begin_y"] - 5 + y_padding}
             text={item["right_group_name"].replace("'", "").replace("'", "")}
             fontSize={item["right_group_name"].length < 8 ? 18 : 14}
             width={200}
@@ -45,7 +45,7 @@ function CreateDantaiText(item, lineWidth) {
           />
           <Rect
             x={is_left ? 130 : 625}
-            y={item["right_begin_y"]}
+            y={item["right_begin_y"] + y_padding}
             width={["right_group_name"].length * 80}
             height={1}
             fill="black"
@@ -59,7 +59,7 @@ function CreateDantaiText(item, lineWidth) {
         <>
           <Text
             x={is_left ? 10 : 630}
-            y={item["left_begin_y"] - 5}
+            y={item["left_begin_y"] - 5 + y_padding}
             text={item["left_group_name"].replace("'", "").replace("'", "")}
             fontSize={item["left_group_name"].length < 8 ? 18 : 14}
             width={200}
@@ -67,7 +67,7 @@ function CreateDantaiText(item, lineWidth) {
           />
           <Rect
             x={is_left ? 130 : 625}
-            y={item["left_begin_y"] + 2}
+            y={item["left_begin_y"] + 2 + y_padding}
             width={["left_group_name"].length * 80}
             height={1}
             fill="black"
@@ -81,7 +81,7 @@ function CreateDantaiText(item, lineWidth) {
         <>
           <Text
             x={is_left ? 10 : 630}
-            y={item["right_begin_y"] - 5}
+            y={item["right_begin_y"] - 5 + y_padding}
             text={item["right_group_name"].replace("'", "").replace("'", "")}
             fontSize={item["right_group_name"].length < 8 ? 18 : 14}
             width={200}
@@ -89,7 +89,7 @@ function CreateDantaiText(item, lineWidth) {
           />
           <Rect
             x={is_left ? 130 : 625}
-            y={item["right_begin_y"] + 2}
+            y={item["right_begin_y"] + 2 + y_padding}
             width={["right_group_name"].length * 80}
             height={1}
             fill="black"
@@ -99,9 +99,9 @@ function CreateDantaiText(item, lineWidth) {
       );
     }
   } else if ("fake_round" in item) {
-    const x = 220 + lineWidth + (item["fake_round"] - 2) * 30;
+    const x = 150 + lineWidth + (item["fake_round"] - 2) * 30;
     const width =
-      620 -
+      690 -
       lineWidth -
       (item["fake_round"] - 2) * 30 -
       (220 + lineWidth + (item["fake_round"] - 2) * 30);
@@ -109,8 +109,12 @@ function CreateDantaiText(item, lineWidth) {
       <>
         <Text
           x={x - 80}
-          y={item["left_begin_y"] - 10}
-          text={item["left_group_name"]?.replace("'", "").replace("'", "")}
+          y={item["left_begin_y"] - 10 + y_padding}
+          text={
+            hide
+              ? ""
+              : item["left_group_name"]?.replace("'", "").replace("'", "")
+          }
           fontSize={
             (item["left_group_name"] !== null &&
               item["left_group_name"].length) < 8
@@ -120,8 +124,12 @@ function CreateDantaiText(item, lineWidth) {
         />
         <Text
           x={x + width + 10}
-          y={item["left_begin_y"] - 10}
-          text={item["right_group_name"]?.replace("'", "").replace("'", "")}
+          y={item["left_begin_y"] - 10 + y_padding}
+          text={
+            hide
+              ? ""
+              : item["right_group_name"]?.replace("'", "").replace("'", "")
+          }
           fontSize={
             (item["right_group_name"] !== null &&
               item["right_group_name"].length) < 8
@@ -135,7 +143,23 @@ function CreateDantaiText(item, lineWidth) {
   return <></>;
 }
 
-function CreateText(item, lineWidth, hide = false) {
+function GetGroupNameFontSize(group_name) {
+  if (!group_name) {
+    return 10;
+  }
+  if (group_name.length < 8) {
+    return 14;
+  }
+  if (group_name.length < 9) {
+    return 13;
+  }
+  if (group_name.length < 10) {
+    return 12;
+  }
+  return 10;
+}
+
+function CreateText(item, lineWidth, y_padding, hide = false) {
   const is_left = item["block_pos"] === "left";
   const is_right = item["block_pos"] === "right";
   const has_left = "has_left" in item;
@@ -145,86 +169,86 @@ function CreateText(item, lineWidth, hide = false) {
       return (
         <>
           <Text
-            x={is_left ? 10 : 630}
-            y={item["left_begin_y"] - 20}
+            x={is_left ? 0 : 630}
+            y={item["left_begin_y"] - 20 + y_padding}
             text={item["left_name_kana"]}
             fontSize={10}
           />
           <Rect
             x={is_left ? 0 : 625}
-            y={item["left_begin_y"] - 16}
+            y={item["left_begin_y"] - 16 + y_padding}
             width={["left_name_kana"].length * 110}
             height={1}
             fill="black"
             visible={"left_out" in item}
           />
           <Text
-            x={is_left ? 10 : 630}
-            y={item["left_begin_y"] - 5}
+            x={is_left ? 0 : 630}
+            y={item["left_begin_y"] - 5 + y_padding}
             text={item["left_name"]}
             fontSize={item["left_name"].length < 8 ? 18 : 14}
           />
           <Rect
             x={is_left ? 0 : 625}
-            y={item["left_begin_y"] + 2}
+            y={item["left_begin_y"] + 2 + y_padding}
             width={["left_name"].length * 110}
             height={1}
             fill="black"
             visible={"left_out" in item}
           />
           <Text
-            x={is_left ? 130 : 750}
-            y={item["left_begin_y"]}
+            x={is_left ? 120 : 750}
+            y={item["left_begin_y"] + y_padding}
             text={item["left_group_name"].replace("'", "【").replace("'", "】")}
-            fontSize={item["left_group_name"].length < 8 ? 14 : 12}
+            fontSize={GetGroupNameFontSize(item["left_group_name"])}
           />
           <Rect
-            x={is_left ? 130 : 750}
-            y={item["left_begin_y"] + 5}
+            x={is_left ? 120 : 750}
+            y={item["left_begin_y"] + 5 + y_padding}
             width={["left_group_name"].length * 80}
             height={1}
             fill="black"
             visible={"left_out" in item}
           />
           <Text
-            x={is_left ? 10 : 630}
-            y={item["right_begin_y"] - 20}
+            x={is_left ? 0 : 630}
+            y={item["right_begin_y"] - 20 + y_padding}
             text={item["right_name_kana"]}
             fontSize={10}
           />
           <Rect
             x={is_left ? 0 : 625}
-            y={item["right_begin_y"] - 18}
+            y={item["right_begin_y"] - 18 + y_padding}
             width={["right_name_kana"].length * 110}
             height={1}
             fill="black"
             visible={"right_out" in item}
           />
           <Text
-            x={is_left ? 10 : 630}
-            y={item["right_begin_y"] - 5}
+            x={is_left ? 0 : 630}
+            y={item["right_begin_y"] - 5 + y_padding}
             text={item["right_name"]}
             fontSize={item["right_name"].length < 8 ? 18 : 14}
           />
           <Rect
             x={is_left ? 0 : 625}
-            y={item["right_begin_y"]}
+            y={item["right_begin_y"] + y_padding}
             width={["right_name"].length * 110}
             height={1}
             fill="black"
             visible={"right_out" in item}
           />
           <Text
-            x={is_left ? 130 : 750}
-            y={item["right_begin_y"]}
+            x={is_left ? 120 : 750}
+            y={item["right_begin_y"] + y_padding}
             text={item["right_group_name"]
               .replace("'", "【")
               .replace("'", "】")}
-            fontSize={item["right_group_name"].length < 8 ? 14 : 12}
+            fontSize={GetGroupNameFontSize(item["right_group_name"])}
           />
           <Rect
-            x={is_left ? 130 : 750}
-            y={item["right_begin_y"] + 5}
+            x={is_left ? 120 : 750}
+            y={item["right_begin_y"] + 5 + y_padding}
             width={["right_group_name"].length * 80}
             height={1}
             fill="black"
@@ -237,7 +261,7 @@ function CreateText(item, lineWidth, hide = false) {
       return (
         <>
           <Text
-            x={is_left ? 10 : 630}
+            x={is_left ? 0 : 630}
             y={item["left_begin_y"] - 20}
             text={item["left_name_kana"]}
             fontSize={10}
@@ -251,7 +275,7 @@ function CreateText(item, lineWidth, hide = false) {
             visible={"left_out" in item}
           />
           <Text
-            x={is_left ? 10 : 630}
+            x={is_left ? 0 : 630}
             y={item["left_begin_y"] - 5}
             text={item["left_name"]}
             fontSize={item["left_name"].length < 8 ? 18 : 14}
@@ -265,13 +289,13 @@ function CreateText(item, lineWidth, hide = false) {
             visible={"left_out" in item}
           />
           <Text
-            x={is_left ? 130 : 750}
+            x={is_left ? 120 : 750}
             y={item["left_begin_y"]}
             text={item["left_group_name"].replace("'", "【").replace("'", "】")}
-            fontSize={item["left_group_name"].length < 8 ? 14 : 12}
+            fontSize={GetGroupNameFontSize(item["left_group_name"])}
           />
           <Rect
-            x={is_left ? 130 : 750}
+            x={is_left ? 120 : 750}
             y={item["left_begin_y"] + 5}
             width={["left_group_name"].length * 80}
             height={1}
@@ -285,7 +309,7 @@ function CreateText(item, lineWidth, hide = false) {
       return (
         <>
           <Text
-            x={is_left ? 10 : 630}
+            x={is_left ? 0 : 630}
             y={item["right_begin_y"] - 20}
             text={item["right_name_kana"]}
             fontSize={10}
@@ -299,7 +323,7 @@ function CreateText(item, lineWidth, hide = false) {
             visible={"right_out" in item}
           />
           <Text
-            x={is_left ? 10 : 630}
+            x={is_left ? 0 : 630}
             y={item["right_begin_y"] - 5}
             text={item["right_name"]}
             fontSize={item["right_name"].length < 8 ? 18 : 14}
@@ -313,15 +337,15 @@ function CreateText(item, lineWidth, hide = false) {
             visible={"right_out" in item}
           />
           <Text
-            x={is_left ? 130 : 750}
+            x={is_left ? 120 : 750}
             y={item["right_begin_y"]}
             text={item["right_group_name"]
               .replace("'", "【")
               .replace("'", "】")}
-            fontSize={item["right_group_name"].length < 8 ? 14 : 12}
+            fontSize={GetGroupNameFontSize(item["right_group_name"])}
           />
           <Rect
-            x={is_left ? 130 : 750}
+            x={is_left ? 120 : 750}
             y={item["right_begin_y"] + 5}
             width={["right_group_name"].length * 80}
             height={1}
@@ -342,7 +366,7 @@ function CreateText(item, lineWidth, hide = false) {
       <>
         <Text
           x={x - 220}
-          y={item["left_begin_y"] - 10}
+          y={item["left_begin_y"] - 10 + y_padding}
           text={hide ? "" : item["left_name"]}
           fontSize={
             (item["left_name"] !== null && item["left_name"].length) < 8
@@ -352,23 +376,23 @@ function CreateText(item, lineWidth, hide = false) {
         />
         <Text
           x={x - 220}
-          y={item["left_begin_y"] - 30}
+          y={item["left_begin_y"] - 30 + y_padding}
           text={hide ? "" : item["left_name_kana"]}
           fontSize={12}
         />
         <Text
           x={x - 110}
-          y={item["left_begin_y"] - 5}
+          y={item["left_begin_y"] - 5 + y_padding}
           text={
             item["left_group_name"] !== null && !hide
               ? item["left_group_name"].replace("'", "【").replace("'", "】")
               : ""
           }
-          fontSize={14}
+          fontSize={GetGroupNameFontSize(item["left_group_name"])}
         />
         <Text
           x={x + width + 10}
-          y={item["left_begin_y"] - 10}
+          y={item["left_begin_y"] - 10 + y_padding}
           text={hide ? "" : item["right_name"]}
           fontSize={
             (item["right_name"] !== null && item["right_name"].length) < 8
@@ -378,19 +402,19 @@ function CreateText(item, lineWidth, hide = false) {
         />
         <Text
           x={x + width + 10}
-          y={item["left_begin_y"] - 30}
+          y={item["left_begin_y"] - 30 + y_padding}
           text={hide ? "" : item["right_name_kana"]}
           fontSize={12}
         />
         <Text
-          x={x + width + 130}
-          y={item["left_begin_y"] - 5}
+          x={x + width + 120}
+          y={item["left_begin_y"] - 5 + y_padding}
           text={
             item["right_group_name"] !== null && !hide
               ? item["right_group_name"].replace("'", "【").replace("'", "】")
               : ""
           }
-          fontSize={14}
+          fontSize={GetGroupNameFontSize(item["right_group_name"])}
         />
       </>
     );
@@ -425,6 +449,7 @@ function CreateBlock(
   const is_left = item["block_pos"] === "left";
   const is_right = item["block_pos"] === "right";
   const pointX = is_left ? 220 : 620;
+  const y_padding = maxHeight < 200 ? 50 : 0;
   if (!is_left && !is_right) {
     if ("left_begin_y" in item && "right_begin_y" in item) {
       const x = 220 + lineWidth + (item["round"] - 2) * 30;
@@ -452,34 +477,34 @@ function CreateBlock(
         <>
           <Rect
             x={x}
-            y={item["left_begin_y"]}
+            y={item["left_begin_y"] + y_padding}
             width={width / 2}
             height={left_winner ? 5 : 1}
             fill={left_winner ? "red" : "black"}
           />
           <Rect
             x={x + width / 2}
-            y={item["left_begin_y"]}
+            y={item["left_begin_y"] + y_padding}
             width={width / 2}
             height={right_winner ? 5 : 1}
             fill={right_winner ? "red" : "black"}
           />
           <Rect
             x={x + width / 2}
-            y={item["left_begin_y"]}
+            y={item["left_begin_y"] + y_padding}
             width={left_winner || right_winner ? 5 : 1}
             height={-50 + (maxHeight ? 20 : 0)}
             fill={left_winner || right_winner ? "red" : "black"}
           />
           <Text
             x={x + width / 2 - 20}
-            y={item["left_begin_y"] - 70 + (maxHeight ? 20 : 0)}
+            y={item["left_begin_y"] - 70 + (maxHeight ? 20 : 0) + y_padding}
             text={"決勝"}
             fontSize={18}
           />
           <Text
             x={x + width / 2 - 8}
-            y={item["left_begin_y"] + 5}
+            y={item["left_begin_y"] + 5 + y_padding}
             text={item["id"]}
             fill={"gray"}
             fontSize={12}
@@ -488,7 +513,7 @@ function CreateBlock(
           />
           <Rect
             x={x + width / 2 - 16}
-            y={item["left_begin_y"] - 5}
+            y={item["left_begin_y"] - 5 + y_padding}
             width={30}
             height={30}
             strokeWidth={2}
@@ -498,7 +523,7 @@ function CreateBlock(
           />
           <Text
             x={x + width / 2 - 10}
-            y={item["left_begin_y"] - 15}
+            y={item["left_begin_y"] - 15 + y_padding}
             text={
               event_name.includes("hokei") &&
               left_flag !== null &&
@@ -512,7 +537,7 @@ function CreateBlock(
           />
           <Text
             x={x + width / 2 + 8}
-            y={item["left_begin_y"] - 15}
+            y={item["left_begin_y"] - 15 + y_padding}
             text={
               event_name.includes("hokei") &&
               left_flag !== null &&
@@ -552,34 +577,34 @@ function CreateBlock(
         <>
           <Rect
             x={x}
-            y={item["left_begin_y"]}
+            y={item["left_begin_y"] + y_padding}
             width={width / 2}
             height={left_winner ? 5 : 1}
             fill={left_winner ? "red" : "black"}
           />
           <Rect
             x={x + width / 2}
-            y={item["left_begin_y"]}
+            y={item["left_begin_y"] + y_padding}
             width={width / 2}
             height={right_winner ? 5 : 1}
             fill={right_winner ? "red" : "black"}
           />
           <Rect
             x={x + width / 2}
-            y={item["left_begin_y"]}
+            y={item["left_begin_y"] + y_padding}
             width={left_winner || right_winner ? 5 : 1}
             height={-50}
             fill={left_winner || right_winner ? "red" : "black"}
           />
           <Text
             x={x + width / 2 - 20}
-            y={item["left_begin_y"] - 70}
+            y={item["left_begin_y"] - 70 + y_padding}
             text={"三決"}
             fontSize={18}
           />
           <Rect
             x={x + width / 2 - 16}
-            y={item["left_begin_y"] - 5}
+            y={item["left_begin_y"] - 5 + y_padding}
             width={30}
             height={30}
             strokeWidth={2}
@@ -589,7 +614,7 @@ function CreateBlock(
           />
           <Text
             x={x + width / 2 - 8}
-            y={item["left_begin_y"] + 5}
+            y={item["left_begin_y"] + 5 + y_padding}
             text={item["id"]}
             fill={"gray"}
             fontSize={12}
@@ -598,7 +623,7 @@ function CreateBlock(
           />
           <Text
             x={x + width / 2 - 10}
-            y={item["left_begin_y"] - 15}
+            y={item["left_begin_y"] - 15 + y_padding}
             text={
               event_name.includes("hokei") &&
               left_flag !== null &&
@@ -612,7 +637,7 @@ function CreateBlock(
           />
           <Text
             x={x + width / 2 + 8}
-            y={item["left_begin_y"] - 15}
+            y={item["left_begin_y"] - 15 + y_padding}
             text={
               event_name.includes("hokei") &&
               left_flag !== null &&
@@ -685,7 +710,7 @@ function CreateBlock(
             (has_left ? lineWidth + (item["round"] - 2) * 30 : 0) *
               (is_left ? 1 : -1)
           }
-          y={item["left_begin_y"]}
+          y={item["left_begin_y"] + y_padding}
           fill={
             left_winner ||
             (has_left && right_winner && item["left_name"] !== null)
@@ -709,7 +734,7 @@ function CreateBlock(
             (has_right ? lineWidth + (item["round"] - 2) * 30 : 0) *
               (is_left ? 1 : -1)
           }
-          y={item["right_begin_y"]}
+          y={item["right_begin_y"] + y_padding}
           fill={
             right_winner ||
             (has_right && left_winner && item["right_name"] !== null)
@@ -733,7 +758,10 @@ function CreateBlock(
               ? pointX + lineWidth + (item["round"] - 1) * 30 - 10
               : pointX - lineWidth - (item["round"] - 1) * 30
           }
-          y={is_left ? item["left_begin_y"] - 15 : item["left_begin_y"] + 4}
+          y={
+            (is_left ? item["left_begin_y"] - 15 : item["left_begin_y"] + 4) +
+            y_padding
+          }
           text={
             event_name.includes("hokei") &&
             left_flag !== null &&
@@ -751,7 +779,10 @@ function CreateBlock(
               ? pointX + lineWidth + (item["round"] - 1) * 30 - 10
               : pointX - lineWidth - (item["round"] - 1) * 30
           }
-          y={is_left ? item["right_begin_y"] + 4 : item["right_begin_y"] - 15}
+          y={
+            (is_left ? item["right_begin_y"] + 4 : item["right_begin_y"] - 15) +
+            y_padding
+          }
           text={
             event_name.includes("hokei") &&
             left_flag !== null &&
@@ -769,7 +800,9 @@ function CreateBlock(
               ? pointX + lineWidth + (item["round"] - 1) * 30
               : pointX - lineWidth - (item["round"] - 1) * 30
           }
-          y={is_left ? item["left_begin_y"] : item["right_begin_y"]}
+          y={
+            (is_left ? item["left_begin_y"] : item["right_begin_y"]) + y_padding
+          }
           fill={upper_focus ? "red" : "black"}
           width={upper_focus ? 5 : 1}
           height={
@@ -787,7 +820,8 @@ function CreateBlock(
           }
           y={
             (item["left_begin_y"] + item["right_begin_y"]) * 0.5 +
-            ("offset_y" in item ? item["offset_y"] : 0)
+            ("offset_y" in item ? item["offset_y"] : 0) +
+            y_padding
           }
           fill={lower_focus ? "red" : "black"}
           width={lower_focus ? 5 : 1}
@@ -809,7 +843,8 @@ function CreateBlock(
             (item["left_begin_y"] + item["right_begin_y"]) * 0.5 -
             5 +
             ("offset_y" in item ? item["offset_y"] : 0) -
-            10
+            10 +
+            y_padding
           }
           width={30}
           height={30}
@@ -827,7 +862,8 @@ function CreateBlock(
           y={
             (item["left_begin_y"] + item["right_begin_y"]) * 0.5 -
             5 +
-            ("offset_y" in item ? item["offset_y"] : 0)
+            ("offset_y" in item ? item["offset_y"] : 0) +
+            y_padding
           }
           text={item["id"] < 10 ? " " + item["id"] : item["id"]}
           fill={"gray"}
@@ -849,6 +885,7 @@ function GetResult({
   event_name = null,
   block_number = null,
   hide = false,
+  is_mobile = false,
 }) {
   const router = useRouter();
   if (returnUrl === null) {
@@ -863,6 +900,10 @@ function GetResult({
   };
 
   const [data, setData] = useState([]);
+  const [eventInfo, setEventInfo] = useState({
+    full_name: "",
+    description: [],
+  });
   const [lineWidth, setLineWidth] = useState(50);
   useEffect(() => {
     async function fetchData() {
@@ -875,6 +916,29 @@ function GetResult({
       }
     }
     fetchData();
+    async function fetchEventDescription() {
+      const response = await fetch(
+        "/api/get_event_info?event_name=" +
+          (event_name.includes("test")
+            ? event_name.replace("test_", "")
+            : event_name),
+      );
+      const result = await response.json();
+      if (
+        result.length > 0 &&
+        result[0]["full_name"] &&
+        result[0]["description"]
+      ) {
+        // use "|" as a separator
+        setEventInfo({
+          full_name: result[0]["full_name"].replace(/['"]+/g, ""),
+          description: result[0]["description"]
+            .replace(/['"]+/g, "")
+            .split("|"),
+        });
+      }
+    }
+    fetchEventDescription();
     if (updateInterval > 0) {
       const interval = setInterval(() => {
         fetchData();
@@ -894,57 +958,7 @@ function GetResult({
       maxHeight = data[i]["right_begin_y"];
     }
   }
-  // TODO: from DB
-  let event_full_name;
-  let event_description = [];
-  if (event_name.includes("dantai_zissen_woman")) {
-    event_full_name = "女子団体実戦競技";
-    event_description = ["試合時間 1分30秒"];
-  } else if (event_name.includes("dantai_zissen_man")) {
-    event_full_name = "男子団体実戦競技";
-    event_description = ["試合時間 1分30秒"];
-  } else if (event_name.includes("dantai_zissen")) {
-    event_full_name = "団体実戦競技";
-    event_description = ["試合時間 1分30秒"];
-  } else if (event_name.includes("hokei_man")) {
-    event_full_name = "男子段位個人法形競技";
-    event_description = ["1 ・ 2 回戦：運体の法形 / 3 回戦以降：転体の法形"];
-  } else if (event_name.includes("zissen_man")) {
-    event_full_name = "男子段位個人実戦競技";
-    event_description = ["試合時間  1分30秒", "胴プロテクター着用厳守"];
-  } else if (event_name.includes("hokei_woman")) {
-    event_full_name = "女子段位個人法形競技";
-    event_description = ["1 ・ 2 回戦：運陰の法形 / 3 回戦以降：転陰の法形"];
-  } else if (event_name.includes("zissen_woman")) {
-    event_full_name = "女子段位個人実戦競技";
-    event_description = ["試合時間  1分30秒", "胴プロテクター着用厳守"];
-  } else if (event_name.includes("hokei_sonen")) {
-    event_full_name = "壮年法形競技";
-    event_description = [
-      "1.2 回戦勢命（表のみ）、3 回戦以降　活命・延命から選択",
-    ];
-  } else if (event_name.includes("hokei_newcommer")) {
-    event_full_name = "新人運足八法競技";
-    event_description = [""];
-  } else if (event_name.includes("hokei_kyuui_man")) {
-    event_full_name = "男子級位個人法形競技";
-    event_description = ["体の法形から自由選択"];
-  } else if (event_name.includes("zissen_kyuui_man")) {
-    event_full_name = "男子級位個人実戦競技";
-    event_description = [
-      "試合時間 1分30秒",
-      "胴プロテクター・面ピット着用厳守",
-    ];
-  } else if (event_name.includes("hokei_kyuui_woman")) {
-    event_full_name = "女子級位個人法形競技";
-    event_description = ["陰の法形から自由選択"];
-  } else if (event_name.includes("zissen_kyuui_woman")) {
-    event_full_name = "女子級位個人実戦競技";
-    event_description = [
-      "試合時間  1分30秒",
-      "胴プロテクター・面ピット着用厳守",
-    ];
-  }
+
   // calc num of players
   let num_of_players = 0;
   for (let i = 0; i < sortedData.length; i++) {
@@ -1082,76 +1096,182 @@ function GetResult({
     winner3 = null;
     winner4 = null;
   }
+  const y_padding = maxHeight < 200 ? 50 : 0;
+  const areaWidth = is_mobile ? "340px" : "850px";
+  const areaWidthNum = is_mobile ? 340 : 850;
+  const stageScale = is_mobile ? 0.8 : 1;
+  const [stagePosX, setStagePosX] = useState(0);
+  const [stagePosY, setStagePosY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [lastTouchPosX, setLastTouchPosX] = useState(0);
+  const [lastTouchPosY, setLastTouchPosY] = useState(0);
+  useEffect(() => {
+    if (is_mobile) {
+      const savedPosX = localStorage.getItem(event_name + "stagePosX");
+      if (savedPosX) {
+        setStagePosX(savedPosX);
+      }
+      const savedPosY = localStorage.getItem(event_name + "stagePosY");
+      if (savedPosY) {
+        setStagePosY(savedPosY);
+      }
+    }
+  }, [is_mobile, event_name]);
+  const handleTouchStart = (event) => {
+    event.evt.preventDefault();
+    const point = event.target.getStage().getPointerPosition();
+    setLastTouchPosX(point.x);
+    setLastTouchPosY(point.y);
+    setIsDragging(true);
+  };
+
+  const handleTouchMove = (event) => {
+    if (!isDragging || !lastTouchPosX || !lastTouchPosY) return;
+
+    event.evt.preventDefault();
+    const point = event.target.getStage().getPointerPosition();
+    const deltaX = point.x - lastTouchPosX;
+    const deltaY = point.y - lastTouchPosY;
+    const nextStagePosX = parseFloat(stagePosX + deltaX);
+    const nextStagePosY = parseFloat(stagePosY + deltaY);
+    if (nextStagePosX > 0) {
+      setStagePosX(0);
+    } else if (nextStagePosX < -400) {
+      setStagePosX(-400);
+    } else {
+      setStagePosX(nextStagePosX);
+    }
+    if (nextStagePosY > 0) {
+      setStagePosY(0);
+    } else if (nextStagePosY < -maxHeight * 0.8) {
+      setStagePosY(-maxHeight * 0.8);
+    } else {
+      setStagePosY(nextStagePosY);
+    }
+    localStorage.setItem(event_name + "stagePosX", stagePosX);
+    localStorage.setItem(event_name + "stagePosY", stagePosY);
+    setLastTouchPosX(point.x);
+    setLastTouchPosY(point.y);
+  };
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    setLastTouchPosX(null);
+    setLastTouchPosY(null);
+  };
   return (
     <div>
       <Container maxWidth="md">
-        <Box style={{ minWidth: "850px" }}>
+        <Box style={{ minWidth: areaWidth }}>
+          {is_mobile ? (
+            <></>
+          ) : (
+            <>
+              <Grid
+                container
+                justifyContent="center"
+                alignItems="center"
+                style={{ height: "70px" }}
+              >
+                <h1>
+                  <u>
+                    {eventInfo.full_name +
+                      (num_of_players > 0
+                        ? "　" +
+                          num_of_players +
+                          (event_name.includes("dantai") ? "チーム" : "人")
+                        : "")}
+                  </u>
+                </h1>
+              </Grid>
+              {eventInfo.description.map((text, index) => (
+                <Grid
+                  key={index}
+                  container
+                  justifyContent="center"
+                  alignItems="center"
+                  style={{ height: "20px" }}
+                >
+                  {text}
+                </Grid>
+              ))}
+            </>
+          )}
+          <br />
           <Grid
             container
             justifyContent="center"
             alignItems="center"
-            style={{ height: "70px" }}
+            style={{ height: maxHeight + 50 + y_padding }}
           >
-            <h1>
-              <u>
-                {event_full_name +
-                  (num_of_players > 0
-                    ? "　" +
-                      num_of_players +
-                      (event_name.includes("dantai") ? "チーム" : "人")
-                    : "")}
-              </u>
-            </h1>
+            <Box
+              sx={{
+                width: areaWidth,
+                height: maxHeight + 50 + y_padding,
+                overflow: "hidden",
+                margin: "0 auto",
+                position: "relative",
+              }}
+            >
+              <Stage
+                width={areaWidthNum}
+                height={is_mobile ? 600 : maxHeight + 50 + y_padding}
+                x={stagePosX}
+                y={stagePosY}
+                scaleX={stageScale}
+                scaleY={stageScale}
+                style={{ cursor: isDragging ? "grabbing" : "grab" }}
+                onTouchStart={is_mobile ? handleTouchStart : null}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+              >
+                <Layer>
+                  {sortedData.map((item, index) =>
+                    CreateBlock(
+                      item,
+                      lineWidth,
+                      maxHeight,
+                      editable,
+                      event_name,
+                      returnUrl,
+                      hide,
+                    ),
+                  )}
+                  {sortedData.map((item, index) =>
+                    event_name.includes("dantai")
+                      ? CreateDantaiText(item, lineWidth, y_padding, hide)
+                      : CreateText(item, lineWidth, y_padding, hide),
+                  )}
+                </Layer>
+              </Stage>
+            </Box>
           </Grid>
-          {event_description.map((text, index) => (
+          {is_mobile ? (
+            <></>
+          ) : (
+            <Summary
+              winners={{ 1: winner1, 2: winner2, 3: winner3, 4: winner4 }}
+            />
+          )}
+          {is_mobile ? (
+            <></>
+          ) : (
             <Grid
-              key={index}
               container
               justifyContent="center"
               alignItems="center"
-              style={{ height: "20px" }}
+              style={{ height: "80px" }}
             >
-              {text}
+              <Button
+                variant="contained"
+                type="submit"
+                onClick={(e) => onBack()}
+              >
+                戻る
+              </Button>
             </Grid>
-          ))}
-          <br />
-          <Stage width={850} height={maxHeight + 50}>
-            <Layer>
-              {sortedData.map((item, index) =>
-                CreateBlock(
-                  item,
-                  lineWidth,
-                  maxHeight,
-                  editable,
-                  event_name,
-                  returnUrl,
-                  hide,
-                ),
-              )}
-              {sortedData.map((item, index) =>
-                event_name.includes("dantai")
-                  ? CreateDantaiText(item, lineWidth)
-                  : CreateText(item, lineWidth, hide),
-              )}
-            </Layer>
-          </Stage>
-          <Summary
-            winners={{ 1: winner1, 2: winner2, 3: winner3, 4: winner4 }}
-          />
-          <Grid
-            container
-            justifyContent="center"
-            alignItems="center"
-            style={{ height: "80px" }}
-          >
-            <Button variant="contained" type="submit" onClick={(e) => onBack()}>
-              戻る
-            </Button>
-          </Grid>
+          )}
         </Box>
       </Container>
-      <br />
-      <br />
     </div>
   );
 }

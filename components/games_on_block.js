@@ -26,17 +26,16 @@ function onMoveDown(order_id, block_number, schedule_id, function_after_post) {
 }
 
 function ShowHokeiType(item, event_name) {
-  if (event_name === "hokei_sonen") {
-    return <td>{item["round"] <= 2 ? "勢命" : "活命/延命"}</td>;
+  if (event_name === "hokei_sonen" || event_name.includes("hokei_mei")) {
+    return <td>{item["round"] <= 2 ? "勢命" : "命の法形"}</td>;
   } else if (event_name === "hokei_newcommer") {
-    return <td>-</td>;
-  } else if (
-    event_name === "hokei_kyuui_man" ||
-    event_name === "hokei_kyuui_woman"
-  ) {
-    return <td>自由法形</td>;
+    return <td>旋の法形</td>;
+  } else if (event_name.includes("hokei_kyuui")) {
+    return <td>体/陰の法形</td>;
+  } else if (event_name.includes("hokei_sei")) {
+    return <td>制の法形</td>;
   }
-  return <td>{item["round"] <= 2 ? "運の法形" : "転の法形"}</td>;
+  return <td>{item["round"] <= 2 ? "運の法形" : "自由法形"}</td>;
 }
 
 function GamesOnBlock({
@@ -44,6 +43,7 @@ function GamesOnBlock({
   event_name,
   schedule_id,
   update_interval,
+  is_mobile,
 }) {
   const [selectedRadioButton, setSelectedRadioButton] = useState(null);
 
@@ -51,6 +51,15 @@ function GamesOnBlock({
     setSelectedRadioButton(event.target.value);
   };
   const router = useRouter();
+  const leftLocalStateKey =
+    "left_retire_states_" + block_number + "_" + schedule_id + "_" + event_name;
+  const rightLocalStateKey =
+    "right_retire_states_" +
+    block_number +
+    "_" +
+    schedule_id +
+    "_" +
+    event_name;
 
   const [data, setData] = useState([]);
   const fetchData = useCallback(async () => {
@@ -64,10 +73,19 @@ function GamesOnBlock({
     );
     const result = await response.json();
     if (result.length === 0) {
+      localStorage.removeItem(leftLocalStateKey);
+      localStorage.removeItem(rightLocalStateKey);
       router.push("block?block_number=" + block_number);
     }
     setData(result);
-  }, [block_number, schedule_id, event_name, router]);
+  }, [
+    block_number,
+    schedule_id,
+    event_name,
+    router,
+    leftLocalStateKey,
+    rightLocalStateKey,
+  ]);
   useEffect(() => {
     const interval = setInterval(() => {
       fetchData();
@@ -88,6 +106,33 @@ function GamesOnBlock({
 
   const [leftRetireStates, setLeftRetireStates] = useState([]);
   const [rightRetireStates, setRightRetireStates] = useState([]);
+  const [getLocalState, setGetLocalState] = useState(false);
+  useEffect(() => {
+    const localLeftRetireStates = localStorage.getItem(leftLocalStateKey);
+    if (localLeftRetireStates) {
+      setLeftRetireStates(JSON.parse(localLeftRetireStates));
+    }
+    const localRightRetireStates = localStorage.getItem(rightLocalStateKey);
+    if (localRightRetireStates) {
+      setRightRetireStates(JSON.parse(localRightRetireStates));
+    }
+    setGetLocalState(true);
+  }, [leftLocalStateKey, rightLocalStateKey]);
+
+  useEffect(() => {
+    if (getLocalState) {
+      localStorage.setItem(leftLocalStateKey, JSON.stringify(leftRetireStates));
+    }
+  }, [getLocalState, leftRetireStates, leftLocalStateKey]);
+
+  useEffect(() => {
+    if (getLocalState) {
+      localStorage.setItem(
+        rightLocalStateKey,
+        JSON.stringify(rightRetireStates),
+      );
+    }
+  }, [getLocalState, rightRetireStates, rightLocalStateKey]);
 
   const handleLeftRetireStatesChange = (id) => {
     setLeftRetireStates((prevStates) => {
@@ -148,10 +193,11 @@ function GamesOnBlock({
       break;
     }
   }
+  const minWidth = is_mobile ? "400px" : "950px";
   return (
     <div>
       <Container maxWidth="md">
-        <Box style={{ minWidth: "950px" }}>
+        <Box style={{ minWidth: minWidth }}>
           <Grid container justifyContent="flex-start" alignItems="center">
             <table border="1">
               <tbody>
@@ -171,9 +217,43 @@ function GamesOnBlock({
                   ) : (
                     <th>選手(カナ)</th>
                   )}
-                  <th>順序変更</th>
-                  {event_name.includes("zissen") ? <th>赤棄権</th> : <></>}
-                  {event_name.includes("zissen") ? <th>白棄権</th> : <></>}
+                  {is_mobile ? (
+                    <th>
+                      順序
+                      <br />
+                      変更
+                    </th>
+                  ) : (
+                    <th>順序変更</th>
+                  )}
+                  {event_name.includes("zissen") ? (
+                    <th>
+                      {is_mobile ? (
+                        <>
+                          赤<br />
+                          棄権
+                        </>
+                      ) : (
+                        "赤棄権"
+                      )}
+                    </th>
+                  ) : (
+                    <></>
+                  )}
+                  {event_name.includes("zissen") ? (
+                    <th>
+                      {is_mobile ? (
+                        <>
+                          白<br />
+                          棄権
+                        </>
+                      ) : (
+                        "白棄権"
+                      )}
+                    </th>
+                  ) : (
+                    <></>
+                  )}
                 </tr>
                 {data.map((item, index) => (
                   <tr
@@ -202,27 +282,59 @@ function GamesOnBlock({
                       </td>
                     )}
                     <td>
-                      {showText(
-                        item["left_color"],
-                        item["left_retire"],
-                        item["left_name"],
-                        item["right_retire"],
-                        item["right_name"],
-                        item["id"],
-                        "left",
-                      )}
-                      {showText(
-                        item["left_color"],
-                        item["left_retire"],
-                        item["left_name_kana"]
-                          ? "(" + item["left_name_kana"] + ")"
-                          : "",
-                        item["right_retire"],
-                        item["right_name_kana"]
-                          ? "(" + item["right_name_kana"] + ")"
-                          : "",
-                        item["id"],
-                        "left",
+                      {is_mobile ? (
+                        <>
+                          <div style={{ fontSize: "15px" }}>
+                            {showText(
+                              item["left_color"],
+                              item["left_retire"],
+                              item["left_name_kana"]
+                                ? item["left_name_kana"]
+                                : "",
+                              item["right_retire"],
+                              item["right_name_kana"]
+                                ? item["right_name_kana"]
+                                : "",
+                              item["id"],
+                              "left",
+                              "15px",
+                            )}
+                          </div>
+                          {showText(
+                            item["left_color"],
+                            item["left_retire"],
+                            item["left_name"],
+                            item["right_retire"],
+                            item["right_name"],
+                            item["id"],
+                            "left",
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          {showText(
+                            item["left_color"],
+                            item["left_retire"],
+                            item["left_name"],
+                            item["right_retire"],
+                            item["right_name"],
+                            item["id"],
+                            "left",
+                          )}
+                          {showText(
+                            item["left_color"],
+                            item["left_retire"],
+                            item["left_name_kana"]
+                              ? "(" + item["left_name_kana"] + ")"
+                              : "",
+                            item["right_retire"],
+                            item["right_name_kana"]
+                              ? "(" + item["right_name_kana"] + ")"
+                              : "",
+                            item["id"],
+                            "left",
+                          )}
+                        </>
                       )}
                     </td>
                     <td>
@@ -241,33 +353,66 @@ function GamesOnBlock({
                       </td>
                     )}
                     <td>
-                      {showText(
-                        item["left_color"],
-                        item["right_retire"],
-                        item["right_name"],
-                        item["left_retire"],
-                        item["left_name"],
-                        item["id"],
-                        "right",
-                      )}
-                      {showText(
-                        item["left_color"],
-                        item["right_retire"],
-                        item["right_name_kana"]
-                          ? "(" + item["right_name_kana"] + ")"
-                          : "",
-                        item["left_retire"],
-                        item["left_name_kana"]
-                          ? "(" + item["left_name_kana"] + ")"
-                          : "",
-                        item["id"],
-                        "right",
+                      {is_mobile ? (
+                        <>
+                          <div style={{ fontSize: "15px" }}>
+                            {showText(
+                              item["left_color"],
+                              item["right_retire"],
+                              item["right_name_kana"]
+                                ? item["right_name_kana"]
+                                : "",
+                              item["left_retire"],
+                              item["left_name_kana"]
+                                ? item["left_name_kana"]
+                                : "",
+                              item["id"],
+                              "right",
+                              "15px",
+                            )}
+                          </div>
+                          {showText(
+                            item["left_color"],
+                            item["right_retire"],
+                            item["right_name"],
+                            item["left_retire"],
+                            item["left_name"],
+                            item["id"],
+                            "right",
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          {showText(
+                            item["left_color"],
+                            item["right_retire"],
+                            item["right_name"],
+                            item["left_retire"],
+                            item["left_name"],
+                            item["id"],
+                            "right",
+                          )}
+                          {showText(
+                            item["left_color"],
+                            item["right_retire"],
+                            item["right_name_kana"]
+                              ? "(" + item["right_name_kana"] + ")"
+                              : "",
+                            item["left_retire"],
+                            item["left_name_kana"]
+                              ? "(" + item["left_name_kana"] + ")"
+                              : "",
+                            item["id"],
+                            "right",
+                          )}
+                        </>
                       )}
                     </td>
                     <td>
                       <Button
                         variant="contained"
                         type="submit"
+                        size={is_mobile ? "small" : "medium"}
                         disabled={
                           current_order_id > item["order_id"] ||
                           last_order_id === item["order_id"]

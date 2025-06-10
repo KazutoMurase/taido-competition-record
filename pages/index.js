@@ -4,11 +4,28 @@ import Container from "@mui/material/Container";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Image from "next/image";
-import GetEvents from "../components/get_events";
-import topImage from "../public/top.jpeg";
 
-export default function Home() {
+export const getServerSideProps = async () => {
+  const competitionTitle = process.env.COMPETITION_TITLE;
+  const show_total = process.env.SHOW_TOTAL_IN_PUBLIC === "1";
+  return {
+    props: {
+      competitionTitle,
+      show_total,
+    },
+  };
+};
+
+export default function Home({ competitionTitle, show_total }) {
   const router = useRouter();
+  const ToSummary = () => {
+    router.push("/summary");
+  };
+  const ToTotal = () => {
+    router.push("/total");
+  };
+  // TODO: make it optional
+  const show_image = false;
   return (
     <div>
       <br />
@@ -20,17 +37,21 @@ export default function Home() {
           style={{ height: "100px" }}
         >
           <h1>
-            <u>第1回 創玄杯 躰道競技大会</u>
+            <u>{competitionTitle}</u>
           </h1>
         </Grid>
-        <Grid
-          container
-          justifyContent="center"
-          alignItems="center"
-          style={{ height: "350px" }}
-        >
-          <Image src={topImage} height={300} alt="" />
-        </Grid>
+        {show_image ? (
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            style={{ height: "350px" }}
+          >
+            <Image src={topImage} height={300} alt="" />
+          </Grid>
+        ) : (
+          <></>
+        )}
         <Grid
           container
           justifyContent="center"
@@ -65,6 +86,38 @@ export default function Home() {
             競技結果一覧
           </Button>
         </Grid>
+        <Grid
+          container
+          justifyContent="center"
+          alignItems="center"
+          style={{ height: "80px" }}
+        >
+          <Button
+            variant="contained"
+            type="submit"
+            onClick={(e) => ToSummary()}
+          >
+            サマリー
+          </Button>
+        </Grid>
+        {show_total ? (
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            style={{ height: "40px" }}
+          >
+            <Button
+              variant="contained"
+              type="submit"
+              onClick={(e) => ToTotal()}
+            >
+              総合得点表
+            </Button>
+          </Grid>
+        ) : (
+          <></>
+        )}
       </Container>
     </div>
   );

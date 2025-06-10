@@ -13,6 +13,19 @@ const CompletePlayersCheck = async (req, res) => {
     let result = await client.query(query);
     const event_name =
       (is_test ? "test_" : "") + GetEventName(result.rows[0].event_id);
+    if ("retire_array" in req.body) {
+      for (let i = 0; i < req.body.retire_array.length; i++) {
+        let item = req.body.retire_array[i];
+        query =
+          "update " +
+          event_name +
+          " set retire = " +
+          (item.is_retired ? 1 : 0) +
+          " where id = " +
+          item.id;
+        result = await client.query(query);
+      }
+    }
     if ("left_retire_array" in req.body) {
       for (let i = 0; i < req.body.left_retire_array.length; i++) {
         let item = req.body.left_retire_array[i];

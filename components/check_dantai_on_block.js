@@ -9,12 +9,7 @@ import SquareTwoToneIcon from "@mui/icons-material/SquareTwoTone";
 import checkStyles from "../styles/checks.module.css";
 import { useRouter } from "next/router";
 import { GetEventName } from "../lib/get_event_name";
-
-function GetCourtId(block_number) {
-  const code = block_number.charCodeAt(0);
-  // ASCII code of 'a' is 97
-  return code >= 97 && code <= 122 ? code - 96 : null;
-}
+import { GetCourtId } from "../lib/get_court_id";
 
 function onSubmit(
   block_number,
@@ -24,21 +19,7 @@ function onSubmit(
   is_test,
   function_after_post,
 ) {
-  // TODO: FIXME
-  let court_id;
-  if (block_number === "a") {
-    court_id = 1;
-  } else if (block_number === "b") {
-    court_id = 2;
-  } else if (block_number === "c") {
-    court_id = 3;
-  } else if (block_number === "d") {
-    court_id = 4;
-  } else if (block_number === "x") {
-    court_id = 24;
-  } else if (block_number === "y") {
-    court_id = 25;
-  }
+  const court_id = GetCourtId(block_number);
   let post = {
     event_id: event_id,
     group_id: group_id,
@@ -78,15 +59,49 @@ function CheckDantai({
   schedule_id,
   event_id,
   update_interval,
+  is_mobile,
   is_test = false,
 }) {
   const router = useRouter();
+  const leftLocalStateKey =
+    "left_retire_states_" + block_number + "_" + schedule_id + "_" + event_id;
+  const rightLocalStateKey =
+    "right_retire_states_" + block_number + "_" + schedule_id + "_" + event_id;
   function onBack() {
+    localStorage.removeItem(leftLocalStateKey);
+    localStorage.removeItem(rightLocalStateKey);
     router.push("block?block_number=" + block_number);
   }
 
   const [leftRetireStates, setLeftRetireStates] = useState([]);
   const [rightRetireStates, setRightRetireStates] = useState([]);
+  const [getLocalState, setGetLocalState] = useState(false);
+  useEffect(() => {
+    const localLeftRetireStates = localStorage.getItem(leftLocalStateKey);
+    if (localLeftRetireStates) {
+      setLeftRetireStates(JSON.parse(localLeftRetireStates));
+    }
+    const localRightRetireStates = localStorage.getItem(rightLocalStateKey);
+    if (localRightRetireStates) {
+      setRightRetireStates(JSON.parse(localRightRetireStates));
+    }
+    setGetLocalState(true);
+  }, [leftLocalStateKey, rightLocalStateKey]);
+
+  useEffect(() => {
+    if (getLocalState) {
+      localStorage.setItem(leftLocalStateKey, JSON.stringify(leftRetireStates));
+    }
+  }, [getLocalState, leftRetireStates, leftLocalStateKey]);
+
+  useEffect(() => {
+    if (getLocalState) {
+      localStorage.setItem(
+        rightLocalStateKey,
+        JSON.stringify(rightRetireStates),
+      );
+    }
+  }, [getLocalState, rightRetireStates, rightLocalStateKey]);
 
   const handleLeftRetireStatesChange = (id, is_retired) => {
     setLeftRetireStates((prevRadios) => {
@@ -112,6 +127,8 @@ function CheckDantai({
   };
 
   function onFinish(block_number, schedule_id, data, is_test) {
+    localStorage.removeItem(leftLocalStateKey);
+    localStorage.removeItem(rightLocalStateKey);
     const num_players = data.length;
     let num_checked = 0;
     for (let i = 0; i < num_players; i++) {
@@ -127,14 +144,10 @@ function CheckDantai({
       schedule_id: schedule_id,
       block_number: block_number,
     };
-    if (GetEventName(event_id) !== "dantai") {
-      post["left_retire_array"] = leftRetireStates;
-      post["right_retire_array"] = rightRetireStates;
-      post["all_checked"] = num_checked === num_players;
-      post["is_test"] = is_test;
-    } else {
-      post["all_checked"] = true;
-    }
+    post["left_retire_array"] = leftRetireStates;
+    post["right_retire_array"] = rightRetireStates;
+    post["all_checked"] = num_checked === num_players;
+    post["is_test"] = is_test;
     console.log(post);
     axios
       .post("/api/complete_players_check", post)
@@ -208,10 +221,12 @@ function CheckDantai({
       elem.court_id == GetCourtId(block_number)
     );
   });
+  const minWidth = is_mobile ? "200px" : "720px";
+  const squareColorFontSize = is_mobile ? 30 : 60;
   return (
     <div>
       <Container maxWidth="md">
-        <Box style={{ minWidth: "720px" }}>
+        <Box style={{ minWidth: minWidth }}>
           <Grid
             container
             justifyContent="center"
@@ -257,65 +272,56 @@ function CheckDantai({
             >
               {!all_requested ? "全体呼び出し" : "全体リクエスト済"}
             </Button>
-            {GetEventName(event_id) !== "dantai" ? (
-              <Button
-                variant="contained"
-                type="submit"
-                onClick={(e) =>
-                  onClear(
-                    null,
-                    event_id,
-                    GetCourtId(block_number),
-                    is_test,
-                    forceFetchData,
-                  )
-                }
-                disabled={!all_requested}
-              >
-                キャンセル
-              </Button>
-            ) : (
-              <></>
-            )}
+            <Button
+              variant="contained"
+              type="submit"
+              onClick={(e) =>
+                onClear(
+                  null,
+                  event_id,
+                  GetCourtId(block_number),
+                  is_test,
+                  forceFetchData,
+                )
+              }
+              disabled={!all_requested}
+            >
+              キャンセル
+            </Button>
           </Grid>
           <table border="1">
             <tbody>
               <tr className={checkStyles.column}>
-                {GetEventName(event_id) === "dantai" ? <></> : <th>色</th>}
+                <th>色</th>
                 <th>団体名</th>
-                <th>点呼完了</th>
+                {is_mobile ? (
+                  <th>
+                    点呼
+                    <br />
+                    完了
+                  </th>
+                ) : (
+                  <th>点呼完了</th>
+                )}
                 <th>棄権</th>
-                <th>
-                  {data.items && data.items.length > 0 && "all" in data.items[0]
-                    ? "敗退"
-                    : ""}
-                </th>
                 <th></th>
-                <th></th>
+                {is_mobile ? <></> : <th></th>}
               </tr>
               {data.items?.map((item, index) => (
                 <tr key={item["id"]} className={checkStyles.column}>
-                  {GetEventName(event_id) === "dantai" ? (
-                    <></>
-                  ) : (
-                    <td>
-                      <SquareTwoToneIcon
-                        sx={{ fontSize: 60 }}
-                        htmlColor={item["color"] === "red" ? "red" : "gray"}
-                      />
-                    </td>
-                  )}
+                  <td>
+                    <SquareTwoToneIcon
+                      sx={{ fontSize: squareColorFontSize }}
+                      htmlColor={item["color"] === "red" ? "red" : "gray"}
+                    />
+                  </td>
                   <td>{item["name"].replace("'", "").replace("'", "")}</td>
                   <td className={checkStyles.elem}>
                     <input
                       type="radio"
                       name={index}
                       className={checkStyles.large_checkbox}
-                      checked={
-                        GetEventName(event_id) === "dantai"
-                          ? null
-                          : CheckState(item, false)
-                      }
+                      checked={CheckState(item, false)}
                       onChange={() =>
                         item.is_left
                           ? handleLeftRetireStatesChange(item.game_id, false)
@@ -328,11 +334,7 @@ function CheckDantai({
                       type="radio"
                       name={index}
                       className={checkStyles.large_checkbox}
-                      checked={
-                        GetEventName(event_id) === "dantai"
-                          ? null
-                          : CheckState(item, true)
-                      }
+                      checked={CheckState(item, true)}
                       onChange={() =>
                         item.is_left
                           ? handleLeftRetireStatesChange(item.game_id, true)
@@ -340,54 +342,88 @@ function CheckDantai({
                       }
                     />
                   </td>
-                  <td>
-                    {"all" in item ? (
-                      <input
-                        type="radio"
-                        name={index}
-                        className={checkStyles.large_checkbox}
-                      />
-                    ) : (
-                      <></>
-                    )}
-                  </td>
-                  <td>
-                    <Button
-                      variant="contained"
-                      type="submit"
-                      onClick={(e) =>
-                        onSubmit(
-                          block_number,
-                          item.id,
-                          item.name,
-                          event_id,
-                          is_test,
-                          forceFetchData,
-                        )
-                      }
-                      style={!item["requested"] ? null : activeButtonStyle}
-                    >
-                      {!item["requested"] ? "　呼び出し　" : "リクエスト済"}
-                    </Button>
-                  </td>
-                  <td>
-                    <Button
-                      variant="contained"
-                      type="submit"
-                      onClick={(e) =>
-                        onClear(
-                          item.id,
-                          event_id,
-                          GetCourtId(block_number),
-                          is_test,
-                          forceFetchData,
-                        )
-                      }
-                      disabled={!item["requested"]}
-                    >
-                      キャンセル
-                    </Button>
-                  </td>
+                  {is_mobile ? (
+                    <td>
+                      <Button
+                        variant="contained"
+                        type="submit"
+                        size={is_mobile ? "small" : "medium"}
+                        onClick={(e) =>
+                          onSubmit(
+                            block_number,
+                            item.id,
+                            item.name,
+                            event_id,
+                            is_test,
+                            forceFetchData,
+                          )
+                        }
+                        style={!item["requested"] ? null : activeButtonStyle}
+                      >
+                        {!item["requested"] ? "　呼び出し　" : "リクエスト済"}
+                      </Button>
+                      <br />
+                      <Button
+                        variant="contained"
+                        type="submit"
+                        size={is_mobile ? "small" : "medium"}
+                        onClick={(e) =>
+                          onClear(
+                            item.id,
+                            event_id,
+                            GetCourtId(block_number),
+                            is_test,
+                            forceFetchData,
+                          )
+                        }
+                        disabled={!item["requested"]}
+                      >
+                        キャンセル
+                      </Button>
+                    </td>
+                  ) : (
+                    <>
+                      <td>
+                        <Button
+                          variant="contained"
+                          type="submit"
+                          size={is_mobile ? "small" : "medium"}
+                          onClick={(e) =>
+                            onSubmit(
+                              block_number,
+                              item.id,
+                              item.name,
+                              event_id,
+                              is_test,
+                              forceFetchData,
+                            )
+                          }
+                          style={!item["requested"] ? null : activeButtonStyle}
+                        >
+                          {!item["requested"] ? "　呼び出し　" : "リクエスト済"}
+                        </Button>
+                      </td>
+                      <td>
+                        <Button
+                          variant="contained"
+                          type="submit"
+                          size={is_mobile ? "small" : "medium"}
+                          onClick={(e) =>
+                            onClear(
+                              item.id,
+                              event_id,
+                              GetCourtId(block_number),
+                              is_test,
+                              forceFetchData,
+                            )
+                          }
+                          disabled={!item["requested"]}
+                        >
+                          キャンセル
+                        </Button>
+                      </td>
+                    </>
+                  )}
                 </tr>
               ))}
             </tbody>

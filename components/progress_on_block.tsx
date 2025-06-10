@@ -1,13 +1,10 @@
 import React, { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
-import Button from "@mui/material/Button";
 import checkStyles from "../styles/checks.module.css";
-import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
+import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
-import Typography from "@mui/material/Typography";
 import { GetEventName } from "../lib/get_event_name";
-import { StaticGameData } from "../pages/api/get_static_games_on_block";
+import { GameIdsData } from "../pages/api/get_game_ids_on_block";
 
 interface CurrentScheduleData {
   // corresponds to schedule_id in block_<block_number>_games table and id in block_<block_number> table
@@ -28,31 +25,12 @@ interface TimeScheduleData {
   players_checked: number;
 }
 
-// TODO: 実大会競技名が固まったら別ファイルにMap作成
-const test_event_id_vs_event_name: Map<number, string> = new Map([
-  [0, "全日程終了"],
-  [1, "男子段位個人実戦"],
-  [2, "男子段位個人法形"],
-  [3, "女子段位個人実戦"],
-  [4, "女子段位個人法形"],
-  [5, "壮年法形"],
-  [6, "女子団体実戦"],
-  [7, "男子団体実戦"],
-  [8, "男子団体法形"],
-  [9, "女子団体法形"],
-  [10, "男子団体展開"],
-  [11, "女子団体展開"],
-  [12, "新人運足八法"],
-  [13, "男子級位個人実戦"],
-  [14, "男子級位個人法形"],
-  [15, "女子級位個人実戦"],
-  [16, "女子級位個人法形"],
-  [17, "団体実戦"],
-]);
-
 function GetGamesText(schedule) {
   if (!schedule.games_text) {
     return "";
+  }
+  if (schedule.before_final && schedule.final) {
+    return "【三決・決勝】" + schedule.games_text;
   }
   if (schedule.before_final) {
     return "【三決】" + schedule.games_text;
@@ -72,7 +50,7 @@ const ProgressOnBlock: React.FC<{
   const [currentScheduleData, setCurrentScheduleData] =
     useState<CurrentScheduleData>();
   const [timeSchedules, setTimeSchedules] = useState<TimeScheduleData[]>([]);
-  const [games, setGames] = useState<StaticGameData[]>([]);
+  const [games, setGames] = useState<GameIdsData[]>([]);
   const [scheduleTables, setScheduleTables] = useState<JSX.Element[]>([]);
 
   const fetchData = useCallback(async () => {
@@ -81,7 +59,7 @@ const ProgressOnBlock: React.FC<{
       .then((data) => {
         setTimeSchedules(data);
       });
-    fetch("/api/get_static_games_on_block?block_number=" + block_number)
+    fetch("/api/get_game_ids_on_block?block_number=" + block_number)
       .then((response) => response.json())
       .then((data) => setGames(data));
   }, [block_number]);
@@ -130,16 +108,14 @@ const ProgressOnBlock: React.FC<{
         >
           <td>{schedule.time_schedule?.replace(/['"]+/g, "")}</td>
           <td>
-            {GetEventName(schedule.event_id) === "dantai" ? (
-              <>{test_event_id_vs_event_name.get(schedule.event_id)}</>
-            ) : (
+            {
               <a
                 className="color-disabled"
                 href={"results/" + GetEventName(schedule.event_id)}
               >
-                {test_event_id_vs_event_name.get(schedule.event_id)}
+                {schedule.name?.replace(/['"]+/g, "")}
               </a>
-            )}
+            }
           </td>
           <td>{GetGamesText(schedule)}</td>
           <td>
@@ -165,27 +141,29 @@ const ProgressOnBlock: React.FC<{
         justifyItems: "center",
       }}
     >
-      <Box style={{ minWidth: "500px" }}>
-        <Grid
-          container
-          justifyContent="center"
-          alignItems="center"
-          style={{ height: "80px" }}
-        >
-          <h1>{block_number.toUpperCase() + "コート"}</h1>
-        </Grid>
-        <table align="center" border={1}>
-          <thead>
-            <tr className={checkStyles.column}>
-              <th>時間</th>
-              <th>競技</th>
-              <th>試合一覧</th>
-              <th>次の試合</th>
-            </tr>
-          </thead>
-          <tbody>{scheduleTables}</tbody>
-        </table>
-      </Box>
+      <Container maxWidth="md">
+        <Box>
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            style={{ height: "80px" }}
+          >
+            <h1>{block_number.toUpperCase() + "コート"}</h1>
+          </Grid>
+          <table align="center" border={1}>
+            <thead>
+              <tr className={checkStyles.column}>
+                <th>時間</th>
+                <th>競技</th>
+                <th>試合一覧</th>
+                <th>次の試合</th>
+              </tr>
+            </thead>
+            <tbody>{scheduleTables}</tbody>
+          </table>
+        </Box>
+      </Container>
     </div>
   );
 };

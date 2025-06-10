@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import React from "react";
 import Container from "@mui/material/Container";
@@ -8,7 +9,10 @@ import SyncDisabledIcon from "@mui/icons-material/SyncDisabled";
 import SyncIcon from "@mui/icons-material/Sync";
 
 export const getServerSideProps = async (context) => {
-  const params = { production_test: process.env.PRODUCTION_TEST };
+  const params = {
+    production_test: process.env.PRODUCTION_TEST,
+    show_total: process.env.SHOW_TOTAL_IN_ADMIN === "1",
+  };
   return {
     props: { params },
   };
@@ -22,7 +26,23 @@ export default function Home({ params }) {
   const ToNotificationRequest = () => {
     router.push("/admin/notification_request");
   };
+  const ToSummary = () => {
+    router.push("/summary?from_admin=true");
+  };
+  const ToTotal = () => {
+    router.push("/total");
+  };
   const hide = params.production_test === "1";
+  const [courts, setCourts] = useState([]);
+
+  const fetchCourts = async () => {
+    const response = await fetch("/api/get_courts");
+    const result = await response.json();
+    setCourts(result);
+  };
+  useEffect(() => {
+    fetchCourts();
+  }, []);
   return (
     <div>
       <br />
@@ -41,74 +61,28 @@ export default function Home({ params }) {
         <br />
         <br />
         <br />
-        <Grid
-          container
-          justifyContent="center"
-          alignItems="center"
-          style={{ height: "1vh" }}
-        >
-          <Button
-            variant="contained"
-            type="submit"
-            onClick={(e) => ToBlock("a")}
-          >
-            Aコート
-          </Button>
-        </Grid>
-        <br />
-        <br />
-        <Grid
-          container
-          justifyContent="center"
-          alignItems="center"
-          style={{ height: "1vh" }}
-        >
-          <Button
-            variant="contained"
-            type="submit"
-            onClick={(e) => ToBlock("b")}
-          >
-            Bコート
-          </Button>
-        </Grid>
-        <br />
-        <br />
-        <Grid
-          container
-          justifyContent="center"
-          alignItems="center"
-          style={{ height: "1vh" }}
-        >
-          <Button
-            variant="contained"
-            type="submit"
-            onClick={(e) => ToBlock("c")}
-          >
-            Cコート
-          </Button>
-        </Grid>
-        <br />
-        <br />
-        <Grid
-          container
-          justifyContent="center"
-          alignItems="center"
-          style={{ height: "1vh" }}
-        >
-          <br />
-          <br />
-          <Button
-            variant="contained"
-            type="submit"
-            onClick={(e) => ToBlock("d")}
-          >
-            Dコート
-          </Button>
-        </Grid>
-        <br />
-        <br />
-        <br />
-        <br />
+        {courts.map((item, index) => {
+          return (
+            <>
+              <Grid
+                container
+                justifyContent="center"
+                alignItems="center"
+                style={{ height: "1vh" }}
+              >
+                <Button
+                  variant="contained"
+                  type="submit"
+                  onClick={(e) => ToBlock(item.name[1].toLowerCase())}
+                >
+                  {item.name.replace(/['"]+/g, "")}
+                </Button>
+              </Grid>
+              <br />
+              <br />
+            </>
+          );
+        })}
         <Grid
           container
           justifyContent="center"
@@ -122,6 +96,58 @@ export default function Home({ params }) {
           >
             司会用
           </Button>
+        </Grid>
+        <br />
+        <br />
+        <br />
+        <Grid
+          container
+          justifyContent="center"
+          alignItems="center"
+          style={{ height: "80px" }}
+        >
+          <Button
+            variant="contained"
+            type="submit"
+            onClick={(e) => ToSummary()}
+          >
+            サマリー
+          </Button>
+        </Grid>
+        {params.show_total ? (
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            style={{ height: "40px" }}
+          >
+            <Button
+              variant="contained"
+              type="submit"
+              onClick={(e) => ToTotal()}
+            >
+              総合得点表
+            </Button>
+          </Grid>
+        ) : (
+          <></>
+        )}
+        <br />
+        <br />
+        <br />
+        <br />
+        <Grid container justifyContent="center">
+          {hide ? (
+            <>
+              一般公開用ページへの結果反映：<b>OFF</b>
+              <SyncDisabledIcon color="disabled" />
+            </>
+          ) : (
+            <>
+              一般公開用ページへの結果反映：<b>ON</b>
+              <SyncIcon color="primary" />
+            </>
+          )}
         </Grid>
         <br />
         <br />

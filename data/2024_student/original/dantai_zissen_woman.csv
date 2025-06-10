@@ -1,0 +1,11 @@
+id,left_group_id,right_group_id,next_left_id,next_right_id,left_group_flag,left_retire,right_retire
+1,7,10,,3,,,
+2,5,6,,6,,,
+3,4,,7,,,,
+4,9,1,,7,,,
+5,2,3,,8,,,
+6,8,,8,,,,
+7,,,10,,,,
+8,,,,10,,,
+9,,,,,,,
+10,,,,,,,

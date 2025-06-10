@@ -7,7 +7,7 @@ import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import FlagCircleRoundedIcon from "@mui/icons-material/FlagCircleRounded";
 
-function ShowRedFlags(event_name, selectedRadioButton) {
+function ShowRedFlags(event_name, selectedRadioButton, fontSize) {
   const flag = parseInt(selectedRadioButton);
   if (event_name.includes("hokei")) {
     if (flag === 4) {
@@ -16,29 +16,29 @@ function ShowRedFlags(event_name, selectedRadioButton) {
     return (
       <>
         {flag >= 1 ? (
-          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" />
+          <FlagCircleRoundedIcon sx={{ fontSize: fontSize }} htmlColor="red" />
         ) : null}
         {flag >= 2 ? (
-          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" />
+          <FlagCircleRoundedIcon sx={{ fontSize: fontSize }} htmlColor="red" />
         ) : null}
         {flag >= 3 ? (
-          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" />
+          <FlagCircleRoundedIcon sx={{ fontSize: fontSize }} htmlColor="red" />
         ) : null}
       </>
     );
   } else if (event_name.includes("zissen")) {
     return (
       <>
-        <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="white" />
+        <FlagCircleRoundedIcon sx={{ fontSize: fontSize }} htmlColor="white" />
         {flag === 0 ? (
-          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="red" />
+          <FlagCircleRoundedIcon sx={{ fontSize: fontSize }} htmlColor="red" />
         ) : null}
       </>
     );
   }
 }
 
-function ShowWhiteFlags(event_name, selectedRadioButton) {
+function ShowWhiteFlags(event_name, selectedRadioButton, fontSize) {
   const flag = parseInt(selectedRadioButton);
   if (event_name.includes("hokei")) {
     if (flag === -1 || flag === -2) {
@@ -47,22 +47,22 @@ function ShowWhiteFlags(event_name, selectedRadioButton) {
     return (
       <>
         {flag <= 0 ? (
-          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="gray" />
+          <FlagCircleRoundedIcon sx={{ fontSize: fontSize }} htmlColor="gray" />
         ) : null}
         {flag <= 1 ? (
-          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="gray" />
+          <FlagCircleRoundedIcon sx={{ fontSize: fontSize }} htmlColor="gray" />
         ) : null}
         {flag <= 2 ? (
-          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="gray" />
+          <FlagCircleRoundedIcon sx={{ fontSize: fontSize }} htmlColor="gray" />
         ) : null}
       </>
     );
   } else if (event_name.includes("zissen")) {
     return (
       <>
-        <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="white" />
+        <FlagCircleRoundedIcon sx={{ fontSize: fontSize }} htmlColor="white" />
         {flag === 1 ? (
-          <FlagCircleRoundedIcon sx={{ fontSize: 60 }} htmlColor="gray" />
+          <FlagCircleRoundedIcon sx={{ fontSize: fontSize }} htmlColor="gray" />
         ) : null}
       </>
     );
@@ -91,7 +91,7 @@ function ShowRightName(data, is_dantai) {
   }
 }
 
-function UpdateResult({ event_name, id, return_url }) {
+function UpdateResult({ event_name, id, is_mobile, return_url }) {
   const [selectedRadioButton, setSelectedRadioButton] = useState(null);
 
   const handleRadioButtonChange = (event) => {
@@ -208,11 +208,15 @@ function UpdateResult({ event_name, id, return_url }) {
     no_game_red_winner = -1;
     no_game_white_winner = 2;
   }
-
+  const minWidth = is_mobile ? "250px" : "850px";
+  const flagFontSize = is_mobile ? 50 : 60;
   return (
     <div>
       <Container maxWidth="md">
-        <Box style={{ minWidth: "900px" }}>
+        <Box
+          textAlign={is_mobile ? "center" : "left"}
+          style={{ minWidth: minWidth }}
+        >
           <Grid
             container
             justifyContent="center"
@@ -237,8 +241,8 @@ function UpdateResult({ event_name, id, return_url }) {
             </Button>
           </Grid>
           <Grid container>
-            <Grid item xs={3} />
-            <Grid item xs={4} style={{ height: "220px" }}>
+            <Grid item xs={is_mobile ? 0 : 3} />
+            <Grid item xs={is_mobile ? 6 : 4} style={{ height: "220px" }}>
               <Button
                 variant="contained"
                 type="submit"
@@ -246,14 +250,22 @@ function UpdateResult({ event_name, id, return_url }) {
               >
                 赤不戦勝
               </Button>
-              <h1>
-                {data.left_color === "white"
-                  ? ShowRightName(data, event_name.includes("dantai"))
-                  : ShowLeftName(data, event_name.includes("dantai"))}
-              </h1>
-              {ShowRedFlags(event_name, selectedRadioButton)}
+              {is_mobile ? (
+                <h2>
+                  {data.left_color === "white"
+                    ? ShowRightName(data, event_name.includes("dantai"))
+                    : ShowLeftName(data, event_name.includes("dantai"))}
+                </h2>
+              ) : (
+                <h1>
+                  {data.left_color === "white"
+                    ? ShowRightName(data, event_name.includes("dantai"))
+                    : ShowLeftName(data, event_name.includes("dantai"))}
+                </h1>
+              )}
+              {ShowRedFlags(event_name, selectedRadioButton, flagFontSize)}
             </Grid>
-            <Grid item xs={4} style={{ height: "220px" }}>
+            <Grid item xs={is_mobile ? 6 : 4} style={{ height: "220px" }}>
               <Button
                 variant="contained"
                 type="submit"
@@ -263,12 +275,20 @@ function UpdateResult({ event_name, id, return_url }) {
               >
                 白不戦勝
               </Button>
-              <h1>
-                {data.left_color === "white"
-                  ? ShowLeftName(data, event_name.includes("dantai"))
-                  : ShowRightName(data, event_name.includes("dantai"))}
-              </h1>
-              {ShowWhiteFlags(event_name, selectedRadioButton)}
+              {is_mobile ? (
+                <h2>
+                  {data.left_color === "white"
+                    ? ShowLeftName(data, event_name.includes("dantai"))
+                    : ShowRightName(data, event_name.includes("dantai"))}
+                </h2>
+              ) : (
+                <h1>
+                  {data.left_color === "white"
+                    ? ShowLeftName(data, event_name.includes("dantai"))
+                    : ShowRightName(data, event_name.includes("dantai"))}
+                </h1>
+              )}
+              {ShowWhiteFlags(event_name, selectedRadioButton, flagFontSize)}
             </Grid>
             <br />
             <Grid

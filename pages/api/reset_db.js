@@ -29,7 +29,7 @@ const parseAsync = (fileData) => {
 async function UpdateEventFromCSV(client, db_name, event_name) {
   const csvFilePath = path.join(
     process.cwd(),
-    "/data/" + db_name + "/" + event_name + ".csv",
+    "/data/" + db_name + "/original/" + event_name + ".csv",
   );
   const fileData = fs.readFileSync(csvFilePath, "utf-8");
   const records = await parseAsync(fileData);
@@ -37,8 +37,8 @@ async function UpdateEventFromCSV(client, db_name, event_name) {
   const type_name = is_dantai ? "group" : "player";
   let query;
   for (const record of records) {
-    const left_id = is_dantai ? record.left_player_id : record.left_group_id;
-    const right_id = is_dantai ? record.right_player_id : record.right_group_id;
+    const left_id = is_dantai ? record.left_group_id : record.left_player_id;
+    const right_id = is_dantai ? record.right_group_id : record.right_player_id;
     query = {
       text:
         "UPDATE " +
@@ -49,27 +49,12 @@ async function UpdateEventFromCSV(client, db_name, event_name) {
         type_name +
         "_id = $2 WHERE id = $3",
       values: [
-        record.left_id !== "" ? parseInt(record.left_id) : null,
-        record.right_id !== "" ? parseInt(record.right_id) : null,
+        left_id !== "" && parseInt(left_id) ? parseInt(left_id) : null,
+        right_id !== "" && parseInt(right_id) ? parseInt(right_id) : null,
         record.id,
       ],
     };
-    // before_final / final
-    if (record.next_left_id === "" && record.next_right_id === "") {
-      query = {
-        text:
-          "UPDATE " +
-          event_name +
-          " SET left_" +
-          type_name +
-          "_id = $1," +
-          " right_" +
-          type_name +
-          "_id = $2 WHERE id = $3",
-        values: [null, null, record.id],
-      };
-      client.query(query);
-    }
+    await client.query(query);
   }
   query =
     "UPDATE " +
@@ -80,10 +65,39 @@ async function UpdateEventFromCSV(client, db_name, event_name) {
   await client.query(query);
 }
 
+async function UpdateTableEventFromCSV(client, db_name, event_name) {
+  const csvFilePath = path.join(
+    process.cwd(),
+    "/data/" + db_name + "/original/" + event_name + ".csv",
+  );
+  const fileData = fs.readFileSync(csvFilePath, "utf-8");
+  const records = await parseAsync(fileData);
+  let query;
+  for (const record of records) {
+    query = {
+      text: "UPDATE " + event_name + " SET group_id = $1 WHERE id = $2",
+      values: [record.group_id ? parseInt(record.group_id) : null, record.id],
+    };
+    await client.query(query);
+  }
+  if (event_name.includes("tenkai")) {
+    query =
+      "UPDATE " +
+      event_name +
+      " SET main_score=null, sub1_score=null, sub2_score=null, sub3_score=null, sub4_score=null, sub5_score=null, elapsed_time=null, penalty=null, retire=null";
+  } else {
+    query =
+      "UPDATE " +
+      event_name +
+      " SET main_score=null, sub1_score=null, sub2_score=null, penalty=null, retire=null";
+  }
+  await client.query(query);
+}
+
 async function UpdateBlockFromCSV(client, db_name, block_name) {
   const csvFilePath = path.join(
     process.cwd(),
-    "/data/" + db_name + "/" + block_name + "_games.csv",
+    "/data/" + db_name + "/original/" + block_name + "_games.csv",
   );
   const fileData = fs.readFileSync(csvFilePath, "utf-8");
   const records = await parseAsync(fileData);
@@ -107,14 +121,22 @@ const ResetDb = async (req, res) => {
     const is_test = db_name === "test";
     for (let i = 0; i < req.body.event_names.length; i++) {
       console.log("reset " + req.body.event_names[i]);
-      await UpdateEventFromCSV(client, db_name, req.body.event_names[i]);
+      if (
+        req.body.event_names[i].includes("dantai_hokei") ||
+        req.body.event_names[i].includes("tenkai")
+      ) {
+        await UpdateTableEventFromCSV(client, db_name, req.body.event_names[i]);
+      } else {
+        await UpdateEventFromCSV(client, db_name, req.body.event_names[i]);
+      }
     }
     for (let i = 0; i < req.body.block_names.length; i++) {
       console.log("reset " + req.body.block_names[i]);
       await UpdateBlockFromCSV(client, db_name, req.body.block_names[i]);
     }
-    let query =
-      "DELETE FROM " + (is_test ? "test_" : "") + "notification_request";
+    let query = "UPDATE awarded_players SET player_id=null";
+    await client.query(query);
+    query = "DELETE FROM " + (is_test ? "test_" : "") + "notification_request";
     await client.query(query);
     // update timestamp to current
     const timestamp = Date.now();

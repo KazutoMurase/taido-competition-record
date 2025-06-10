@@ -1,14 +1,60 @@
 import GetClient from "../../lib/db_client";
+import { GetTableResult } from "../../lib/get_table_result";
+import { GetTotalResult } from "../../lib/get_total_result";
 
 const GetWinners = async (req, res) => {
   try {
     const client = await GetClient();
     const event_name = req.query.event_name;
     let query;
-    if (event_name.includes("dantai")) {
+    if (event_name.includes("total")) {
+      const result = await GetTotalResult(
+        event_name,
+        req.query.use_different_personal_scores,
+      );
+      let winners = {};
+      for (let i = 0; i < result.length; i++) {
+        if (result[i].rank && result[i].rank <= 4) {
+          winners[result[i].rank] = {
+            id: result[i].id,
+            group: result[i].name.replace(/['"]+/g, ""),
+          };
+        }
+      }
+      res.json(winners);
+      return;
+    } else if (
+      event_name.includes("tenkai") ||
+      event_name.includes("dantai_hokei")
+    ) {
+      const result = await GetTableResult(event_name);
+      let final_num = 0;
+      let final_finished_num = 0;
+      for (let i = 0; i < result.length; i++) {
+        if (result[i].is_final) {
+          final_num += 1;
+          if (result[i]["sum_score"] || result[i]["retire"]) {
+            final_finished_num += 1;
+          }
+        }
+      }
+      let winners = {};
+      if (final_num === final_finished_num) {
+        for (let i = 0; i < result.length; i++) {
+          if (result[i].is_final && result[i].rank) {
+            winners[result[i].rank] = {
+              id: result[i].id,
+              group: result[i].name,
+            };
+          }
+        }
+      }
+      res.json(winners);
+      return;
+    } else if (event_name.includes("dantai")) {
       const groups_name = event_name + "_groups";
       query =
-        "SELECT t1.id, t1.left_group_id AS left_id, t2.name AS left_name, t1.right_group_id AS right_id, t3.name AS right_name, t1.left_group_flag FROM " +
+        "SELECT t1.id, t1.left_group_id AS left_id, t2.name AS left_group, t1.right_group_id AS right_id, t3.name AS right_group, t1.left_group_flag FROM " +
         event_name +
         " AS t1 LEFT JOIN " +
         groups_name +

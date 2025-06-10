@@ -1,0 +1,9 @@
+id,group_id,name,name_kana,test_zissen_man_player_id,test_hokei_man_player_id,test_zissen_woman_player_id,test_hokei_woman_player_id,test_kyuui_zissen_man_player_id,test_kyuui_hokei_man_player_id,test_kyuui_zissen_woman_player_id,test_kyuui_hokei_woman_player_id,test_hokei_sei_player_id,test_hokei_mei_player_id,test_zissen_sonen_man_player_id,test_zissen_sonen_woman_player_id
+1,1,躰道　一郎,たいどう　いちろう,1,1,,,1,1,,,1,1,,
+2,2,躰道　二郎,たいどう　じろう,2,2,,,2,2,,,2,2,,
+3,3,躰道　三郎,たいどう　さぶろう,3,3,,,3,3,,,3,3,,
+4,4,躰道　四郎,たいどう　しろう,4,4,,,4,4,,,4,4,,
+5,5,躰道　一子,たいどう　いちこ,,,1,1,,,1,1,,,1,1
+6,6,躰道　二子,たいどう　にこ,,,2,2,,,2,2,,,2,2
+7,7,躰道　三子,たいどう　さんこ,,,3,3,,,3,3,,,3,3
+8,8,躰道　四子,たいどう　よんこ,,,4,4,,,4,4,,,4,4

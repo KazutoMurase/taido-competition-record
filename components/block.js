@@ -13,22 +13,55 @@ function ShowDetails(
   item,
   block_number,
   current,
+  is_mobile,
   ToCall,
   ToRecord,
   ToUpdate,
   ToFinish,
 ) {
-  if (GetEventName(item["event_id"]) === "dantai") {
+  if (is_mobile) {
     return (
       <>
+        <br />
+        <br />
         <Button
           variant="contained"
           type="submit"
-          onClick={(e) => ToFinish(item["id"], block_number)}
+          onClick={(e) => ToCall(block_number, item["id"], item["event_id"])}
           disabled={item["id"] !== current.id || !item["players_checked"]}
         >
-          競技終了
+          呼び出し
         </Button>
+        <br />
+        <br />
+        {item["id"] >= current.id ? (
+          <Button
+            variant="contained"
+            type="submit"
+            onClick={(e) =>
+              ToRecord(block_number, item["id"], item["event_id"])
+            }
+            disabled={item["id"] !== current.id || !item["players_checked"]}
+          >
+            　記録　
+          </Button>
+        ) : (
+          <></>
+        )}
+        {item["id"] < current.id ? (
+          <Button
+            variant="contained"
+            type="submit"
+            onClick={(e) =>
+              ToUpdate(block_number, item["id"], item["event_id"])
+            }
+            disabled={item["id"] > current.id || !item["players_checked"]}
+          >
+            結果修正
+          </Button>
+        ) : (
+          <></>
+        )}
       </>
     );
   }
@@ -64,7 +97,29 @@ function ShowDetails(
   );
 }
 
-function ShowGamesText(item) {
+function ShowTimeTable(time_table_text, is_mobile) {
+  if (is_mobile) {
+    if (time_table_text) {
+      const times = time_table_text.split("-");
+      if (times.length == 2) {
+        return (
+          <>
+            {times[0]}
+            <br />
+            -
+            <br />
+            {times[1]}
+          </>
+        );
+      }
+      return time_table_text;
+    }
+    return "";
+  }
+  return time_table_text;
+}
+
+function ShowGamesText(item, is_mobile) {
   if (!item["games_text"]) {
     return "";
   }
@@ -75,19 +130,32 @@ function ShowGamesText(item) {
   if (item["final"]) {
     prefix += "決勝";
   }
-  if (prefix !== "") {
+  if (prefix !== "" && !is_mobile) {
     prefix = "【" + prefix + "】";
   }
-  if (
-    item["name"]?.includes("団体展開") ||
-    item["name"]?.includes("団体法形")
-  ) {
-    return prefix + "";
+  if (is_mobile) {
+    const elems = item["games_text"]?.split(",");
+    if (elems) {
+      return (
+        <>
+          {prefix}
+          <br />
+          {elems.map((value, index) => {
+            return (
+              <>
+                {value}
+                {index % 2 === 1 ? <br /> : <>,</>}
+              </>
+            );
+          })}
+        </>
+      );
+    }
   }
   return prefix + item["games_text"];
 }
 
-function Block({ block_number, update_interval, return_url }) {
+function Block({ block_number, update_interval, is_mobile, return_url }) {
   const router = useRouter();
   const ToCheck = (block_number, id, name, event_id) => {
     router.push(
@@ -112,9 +180,20 @@ function Block({ block_number, update_interval, return_url }) {
     );
   };
   const ToRecord = (block_number, id, event_id) => {
+    let record_url;
+    if (
+      GetEventName(event_id).includes("dantai_hokei") ||
+      GetEventName(event_id).includes("tenkai")
+    ) {
+      record_url = "record_table_result";
+    } else {
+      record_url = "record_result";
+    }
     router.push(
       return_url +
-        "/record_result?block_number=" +
+        "/" +
+        record_url +
+        "?block_number=" +
         block_number +
         "&schedule_id=" +
         id +
@@ -123,9 +202,20 @@ function Block({ block_number, update_interval, return_url }) {
     );
   };
   const ToUpdate = (block_number, id, event_id) => {
+    let check_url;
+    if (
+      GetEventName(event_id).includes("dantai_hokei") ||
+      GetEventName(event_id).includes("tenkai")
+    ) {
+      check_url = "check_table_result";
+    } else {
+      check_url = "check_result";
+    }
     router.push(
       return_url +
-        "/check_result?block_number=" +
+        "/" +
+        check_url +
+        "?block_number=" +
         block_number +
         "&schedule_id=" +
         id +
@@ -189,10 +279,11 @@ function Block({ block_number, update_interval, return_url }) {
   const doneButtonStyle = {
     backgroundColor: "purple",
   };
+  const minWidth = is_mobile ? "400px" : "1000px";
   return (
     <div>
       <Container maxWidth="md">
-        <Box style={{ minWidth: "1000px" }}>
+        <Box style={{ minWidth: minWidth }}>
           <Grid
             container
             justifyContent="center"
@@ -206,7 +297,15 @@ function Block({ block_number, update_interval, return_url }) {
               <tr className={checkStyles.column}>
                 <th>競技</th>
                 <th>時間</th>
-                <th>試合番号</th>
+                {is_mobile ? (
+                  <th>
+                    試合
+                    <br />
+                    番号
+                  </th>
+                ) : (
+                  <th>試合番号</th>
+                )}
                 <th>試合数</th>
                 <th></th>
               </tr>
@@ -217,8 +316,13 @@ function Block({ block_number, update_interval, return_url }) {
                   bgcolor={item["id"] === current.id ? "yellow" : "white"}
                 >
                   <td>{item["name"]?.replace(/['"]+/g, "")}</td>
-                  <td>{item["time_schedule"]?.replace(/['"]+/g, "")}</td>
-                  <td>{ShowGamesText(item)}</td>
+                  <td>
+                    {ShowTimeTable(
+                      item["time_schedule"]?.replace(/['"]+/g, ""),
+                      is_mobile,
+                    )}
+                  </td>
+                  <td>{ShowGamesText(item, is_mobile)}</td>
                   <td>
                     {"game_count" in item ? item["game_count"] + "試合" : ""}
                   </td>
@@ -237,17 +341,22 @@ function Block({ block_number, update_interval, return_url }) {
                         }
                         style={item["players_checked"] ? doneButtonStyle : null}
                       >
-                        {item["players_checked"] ? "点呼完了" : "点呼"}
+                        {item["players_checked"]
+                          ? "点呼完了"
+                          : is_mobile
+                            ? "　点呼　"
+                            : "点呼"}
                       </Button>
                     ) : (
                       <></>
                     )}
-                    &nbsp;&nbsp;
+                    {is_mobile ? <></> : <>&nbsp;&nbsp;</>}
                     {item["event_id"] > 0 ? (
                       ShowDetails(
                         item,
                         block_number,
                         current,
+                        is_mobile,
                         ToCall,
                         ToRecord,
                         ToUpdate,

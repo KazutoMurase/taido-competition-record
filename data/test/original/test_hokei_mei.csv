@@ -1,0 +1,5 @@
+id,left_player_id,right_player_id,next_left_id,next_right_id,left_player_flag,left_retire,right_retire
+1,1,2,4,,,,
+2,3,4,,4,,,
+3,,,,,,,
+4,,,,,,,
