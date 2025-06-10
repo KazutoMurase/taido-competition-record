@@ -1,0 +1,90 @@
+steps:
+  - name: gcr.io/cloud-builders/git
+    args:
+      - '-c'
+      - |
+        ssh-keyscan -t rsa github.com > /root/.ssh/known_hosts
+        echo "$$SSH_KEY" >> /root/.ssh/id_rsa
+        chmod 400 /root/.ssh/id_rsa
+    entrypoint: bash
+    secretEnv:
+      - SSH_KEY
+    volumes:
+      - name: ssh
+        path: /root/.ssh
+  - name: gcr.io/cloud-builders/git
+    args:
+      - clone
+      - '--recurse-submodules'
+      - 'git@github.com:KazutoMurase/taido-competition-record'
+    volumes:
+      - name: ssh
+        path: /root/.ssh
+  - name: gcr.io/cloud-builders/docker
+    script: >
+      docker build -t
+      asia-northeast1-docker.pkg.dev/taido-student-competition-2024/ar-docker-repo/deploy-image
+      taido-competition-record
+  - name: gcr.io/cloud-builders/docker
+    script: >
+      docker push
+      asia-northeast1-docker.pkg.dev/taido-student-competition-2024/ar-docker-repo/deploy-image
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    args:
+      - run
+      - deploy
+      - competition-records
+      - '--image'
+      - >-
+        asia-northeast1-docker.pkg.dev/taido-student-competition-2024/ar-docker-repo/deploy-image
+      - '--region'
+      - asia-northeast1
+      - '--allow-unauthenticated'
+      - '--port'
+      - '3000'
+      - '--memory'
+      - 4Gi
+      - '--cpu'
+      - '4'
+      - '--cpu-boost'
+      - '--no-cpu-throttling'
+      - '--max-instances'
+      - '1'
+      - '--min-instances'
+      - '0'
+      - '--add-cloudsql-instances'
+      - 'taido-student-competition-2024:asia-northeast1:competition-database'
+      - '--update-env-vars'
+      - COMPETITION_NAME=2024_student
+      - '--update-env-vars'
+      - PGSQL_DATABASE=postgres
+      - '--update-env-vars'
+      - >-
+        PGSQL_HOST=/cloudsql/taido-student-competition-2024:asia-northeast1:competition-database
+      - '--update-env-vars'
+      - PGSQL_PASSWORD=postgres
+      - '--update-env-vars'
+      - PGSQL_USER=postgres
+      - '--update-env-vars'
+      - PRODUCTION=1
+      - '--update-env-vars'
+      - PRODUCTION_TEST=0
+      - '--update-env-vars'
+      - REDISHOST=10.93.169.147
+      - '--update-env-vars'
+      - REDISPORT=6379
+      - '--update-env-vars'
+      - USE_LOCAL_DB=0
+      - '--update-env-vars'
+      - USE_LOCAL_REDIS=0
+    entrypoint: gcloud
+images:
+  - >-
+    asia-northeast1-docker.pkg.dev/taido-student-competition-2024/ar-docker-repo/deploy-image
+options:
+  logging: CLOUD_LOGGING_ONLY
+availableSecrets:
+  secretManager:
+    - versionName: >-
+        projects/taido-student-competition-2024/secrets/deploy-key-1/versions/latest
+      env: SSH_KEY

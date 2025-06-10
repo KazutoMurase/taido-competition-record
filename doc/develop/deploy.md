@@ -58,6 +58,7 @@ gcloud services enable \
 ## 3. Artifact RegistryにDockerリポジトリを作成
 GCPコンソールからArtifact Registryを開き、Dockerリポジトリを作成する
 - 名前: ar-docker-repo
+    - 任意に設定可能。ここで設定したリポジトリ名を以後`$ARTIFACT_REGISTRY_REPO_NAME`とする
 - 形式: Docker
 - モード: 標準
 - ロケーションタイプ: リージョン asia-northeast1
@@ -68,13 +69,24 @@ GCPコンソールからArtifact Registryを開き、Dockerリポジトリを作
 GCPコンソールからCloud SQLを開き、インスタンスを作成する
 - エディション: Enterprise（サンドボックス）
 - バージョン: PostgreSQL 17
-- インスタンスID: 任意
-    - ここで設定したインスタンスIDを以後`$CLOUDSQL_INSTANCE_ID`とする
+- インスタンスID: postgres-instance
+    - 任意に設定可能。ここで設定したインスタンスIDを以後`$CLOUDSQL_INSTANCE_ID`とする
 - パスワード: postgres
 - リージョン: asia-northeast1
 - 可用性: シングルゾーン
 
-## 5. GitHubとのCloud Build連携
+## 5. cloudbuild.yamlファイルの作成
+CIにおいて実行する内容を定義するcloudbuild.yamlファイルを作成する。
+実行内容は基本的には毎回共通だが、各種リソースのIDなどを埋め込む必要があるため、.envに記載した内容を元にyamlファイルを生成するスクリプトを用意している。
+
+- ./ci/.envに必要な変数を記入して、以下を実行する。
+```
+./ci/generate-cloudbuild.sh
+```
+
+- `cloudbuild_$PROJECT_ID.yaml`というファイルが生成される。
+
+## 6. GitHubとのCloud Build連携
 
 GCPコンソールから`Cloud Build`→プロジェクトを選択 →`リポジトリを接続`→GitHub
 - GitHubアカウントをOAuthで接続（リポジトリの管理者レベルの権限が必要、適宜依頼する）
@@ -82,11 +94,18 @@ GCPコンソールから`Cloud Build`→プロジェクトを選択 →`リポ�
 
 (参考) [ビルドトリガーの作成と管理 | Cloud Build Documentation | Google Cloud](https://cloud.google.com/build/docs/automating-builds/create-manage-triggers?hl=ja)
 
-## 6. Cloud Buildトリガーの作成
+## 7. Cloud Buildトリガーの作成
+GCPコンソールを開き、Cloud Buildから接続済みのリポジトリを選んでトリガーを作成する
+- 名前: 任意
+- リージョン: global
+- 説明: 任意
+- イベント: ブランチにpushする
+- リポジトリサービス: Cloud Buildリポジトリ
+- 構成: Cloud Build構成ファイル（yamlまたはjson）
+- CloudBuild構成ファイルの場所: `/ci/cloudbuild_$PROJECT_ID.yaml`
+- サービスアカウント: 手順2(1)で作成したアカウントを選択
 
-TODO: 加筆
-
-## 7. CloudSQLの初期テーブル作成
+## 8. CloudSQLの初期テーブル作成
 ```bash
 # 手元のデータベース定義ファイルとテスト用ファイルをアップロード
 gcloud cloud-shell scp --recurse localhost:data/$COMPETITION_NAME cloudshell:~/
@@ -101,7 +120,7 @@ cd ../test
 gcloud sql connect $CLOUDSQL_INSTANCE_ID –user=postgres --quiet < generate_tables.sql
 ```
 
-## 8. Cloud Run公開アクセスの許可
+## 9. Cloud Run公開アクセスの許可
 ```bash
 # Cloud Run サービスの初回デプロイ（この時点では失敗してもOK）
 gcloud run deploy $IMAGE_NAME \
