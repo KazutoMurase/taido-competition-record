@@ -143,7 +143,7 @@ def search_left_block(sheet, games, game, row, col):
             ref_cell = match.group(0).replace('=IF((', '')
             game.left_id = sheet[ref_cell].value
         else:
-            for i in range(3):
+            for i in range(4):
                 value = sheet[row - update_row - 1][col - update_col - 1 - i].value
                 if isinstance(value, float):
                     game.left_id = int(value)
@@ -173,7 +173,7 @@ def search_left_block(sheet, games, game, row, col):
             ref_cell = match.group(0).replace('=IF((', '')
             game.right_id = sheet[ref_cell].value
         else:
-            for i in range(3):
+            for i in range(4):
                 value = sheet[row + update_row][col - update_col - 1 - i].value
                 if isinstance(value, float):
                     game.right_id = int(value)
@@ -204,7 +204,7 @@ def search_right_block(sheet, games, game, row, col):
             ref_cell = match.group(0).replace('=IF((', '')
             game.right_id = sheet[ref_cell].value
         else:
-            for i in range(3):
+            for i in range(4):
                 value = sheet[row - update_row - 1][col + update_col + i].value
                 if isinstance(value, float):
                     game.right_id = int(value)
@@ -219,12 +219,22 @@ def search_right_block(sheet, games, game, row, col):
                 ref_cell = match.group(0).replace('=IF((', '')
                 game.right_id = sheet[ref_cell].value
             else:
-                for i in range(3):
+                for i in range(4):
                     value = sheet[row - update_row - 1][col + update_col + i].value
                     if isinstance(value, float):
                         game.right_id = int(value)
+            if game.left_id == "":
+                print (f"failed to find next upper item in {sheet[row][col]}")
         else:
-            print (f"failed to find next upper item in {sheet[row][col]}")
+            for i in range(4):
+                if isinstance(sheet[row - update_row][col + update_col + i], MergedCell):
+                    value = sheet[row - update_row + 1][col + update_col + i].value
+                else:
+                    value = sheet[row - update_row][col + update_col + i].value
+                if isinstance(value, float):
+                    game.right_id = int(value)
+            if game.right_id == "":
+                print (f"failed to find next upper item in {sheet[row][col]}")
 
     update_row = check_towards_bottom(sheet, row, col)
     update_col = check_towards_right(sheet, row + update_row, col)
@@ -248,10 +258,15 @@ def search_right_block(sheet, games, game, row, col):
             ref_cell = match.group(0).replace('=IF((', '')
             game.left_id = sheet[ref_cell].value
         else:
-            for i in range(3):
-                value = sheet[row + update_row + 1][col + update_col + i].value
+            for i in range(4):
+                if isinstance(sheet[row + update_row + 1][col + update_col + i], MergedCell):
+                    value = sheet[row + update_row][col + update_col + i].value
+                else:
+                    value = sheet[row + update_row + 1][col + update_col + i].value
                 if isinstance(value, float):
                     game.left_id = int(value)
+            if game.left_id == "":
+                print (f"failed to find next upper item in {sheet[row][col]}")
     else:
         id = check_number(sheet, row + update_row, col + update_col)
         if isinstance(id, int):
@@ -267,7 +282,15 @@ def search_right_block(sheet, games, game, row, col):
             search_right_block(sheet, games, lower_game,
                                row + update_row + 1, col + update_col)
         else:
-            print (f"failed to find next lower item in {sheet[row][col]}")
+            for i in range(4):
+                if isinstance(sheet[row + update_row][col + update_col + i], MergedCell):
+                    value = sheet[row + update_row + 1][col + update_col + i].value
+                else:
+                    value = sheet[row + update_row][col + update_col + i].value
+                if isinstance(value, float):
+                    game.left_id = int(value)
+            if game.left_id == "":
+                print (f"failed to find next lower item in {sheet[row][col]}")
 
 
 @click.command()
