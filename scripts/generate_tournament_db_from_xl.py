@@ -50,10 +50,12 @@ def check_number(sheet, row, col):
         value = sheet[row][col].value
     elif (sheet[row][col-1].value is not None and
           (isinstance(sheet[row][col-1].value, int) or
+           isinstance(sheet[row][col-1].value, float) or
            "=IF" not in sheet[row][col-1].value)):
         value = sheet[row][col-1].value
     elif (sheet[row-1][col].value is not None and
           (isinstance(sheet[row-1][col].value, int) or
+           isinstance(sheet[row-1][col].value, float) or
            "=IF" not in sheet[row-1][col].value)):
         value = sheet[row-1][col].value
     elif (sheet[row][col-1].value is not None):
@@ -61,27 +63,33 @@ def check_number(sheet, row, col):
     else:
         return sheet[row-1][col].value
     number = refer_number(sheet, value)
-    if isinstance(number, str) and '※' in number:
+    if isinstance(number, float):
+        number = int(number)
+    elif isinstance(number, str) and '※' in number:
         number = int(number.replace('※', ''))
     return number
 
 
 def check_towards_top(sheet, row, col):
     i = 1
-    while (sheet[row-i][col-1].border.right.style == 'thin' or
-           sheet[row-i][col-1].border.right.style == 'dashed' or
-           sheet[row-i][col].border.left.style == 'thin' or
-           sheet[row-i][col].border.left.style == 'dashed'):
+    while ((sheet[row-i][col-1].border.right is not None and
+            (sheet[row-i][col-1].border.right.style == 'thin' or
+             sheet[row-i][col-1].border.right.style == 'dashed')) or
+           (sheet[row-i][col].border.left is not None and
+            (sheet[row-i][col].border.left.style == 'thin' or
+             sheet[row-i][col].border.left.style == 'dashed'))):
         i += 1
     return i - 1
 
 
 def check_towards_bottom(sheet, row, col):
     i = 1
-    while (sheet[row+i][col-1].border.right.style == 'thin' or
-           sheet[row+i][col-1].border.right.style == 'dashed' or
-           sheet[row+i][col].border.left.style == 'thin' or
-           sheet[row+i][col].border.left.style == 'dashed'):
+    while ((sheet[row+i][col-1].border.right is not None and
+            (sheet[row+i][col-1].border.right.style == 'thin' or
+             sheet[row+i][col-1].border.right.style == 'dashed')) or
+           (sheet[row+i][col].border.left is not None and
+            (sheet[row+i][col].border.left.style == 'thin' or
+           sheet[row+i][col].border.left.style == 'dashed'))):
         i += 1
     return i - 1
 
@@ -89,10 +97,12 @@ def check_towards_bottom(sheet, row, col):
 def check_towards_left(sheet, row, col):
     i = 1
     while (not isinstance(sheet[row+1][col-i], MergedCell) and
-           (sheet[row][col-i].border.bottom.style == 'thin' or
-            sheet[row][col-i].border.bottom.style == 'dashed' or
-            sheet[row+1][col-i].border.top.style == 'thin' or
-            sheet[row+1][col-i].border.top.style == 'dashed')):
+           ((sheet[row][col-i].border.bottom is not None and
+             (sheet[row][col-i].border.bottom.style == 'thin' or
+              sheet[row][col-i].border.bottom.style == 'dashed')) or
+            (sheet[row+1][col-i].border.top is not None and
+             (sheet[row+1][col-i].border.top.style == 'thin' or
+              sheet[row+1][col-i].border.top.style == 'dashed')))):
         i += 1
     return i - 1
 
@@ -100,10 +110,12 @@ def check_towards_left(sheet, row, col):
 def check_towards_right(sheet, row, col):
     i = 1
     while (not isinstance(sheet[row+1][col+i], MergedCell) and
-            (sheet[row][col+i].border.bottom.style == 'thin' or
-             sheet[row][col+i].border.bottom.style == 'dashed' or
-             sheet[row+1][col+i].border.top.style == 'thin' or
-             sheet[row+1][col+i].border.top.style == 'dashed')):
+           ((sheet[row][col+i].border.bottom is not None and
+             (sheet[row][col+i].border.bottom.style == 'thin' or
+              sheet[row][col+i].border.bottom.style == 'dashed')) or
+            (sheet[row+1][col+i].border.top is not None and
+             (sheet[row+1][col+i].border.top.style == 'thin' or
+              sheet[row+1][col+i].border.top.style == 'dashed')))):
         i += 1
     return i
 
@@ -118,12 +130,23 @@ def search_left_block(sheet, games, game, row, col):
         games.append(upper_game)
         search_left_block(sheet, games, upper_game,
                           row - update_row, col - update_col)
+    elif isinstance(id, float):
+        upper_game = Game(id=int(id))
+        upper_game.next_left = game.id
+        games.append(upper_game)
+        search_left_block(sheet, games, upper_game,
+                          row - update_row, col - update_col)
     elif isinstance(id, str):
         pattern = r"=IF\(\([A-Z]+[0-9]+"
         match = re.match(pattern, id)
         if match:
             ref_cell = match.group(0).replace('=IF((', '')
             game.left_id = sheet[ref_cell].value
+        else:
+            for i in range(3):
+                value = sheet[row - update_row - 1][col - update_col - 1 - i].value
+                if isinstance(value, float):
+                    game.left_id = int(value)
     else:
         print (f"failed to find next upper item in {sheet[row][col]}")
 
@@ -137,12 +160,23 @@ def search_left_block(sheet, games, game, row, col):
         games.append(lower_game)
         search_left_block(sheet, games, lower_game,
                           row + update_row, col - update_col)
+    elif isinstance(id, float):
+        lower_game = Game(id=int(id))
+        lower_game.next_right = game.id
+        games.append(lower_game)
+        search_left_block(sheet, games, lower_game,
+                          row + update_row, col - update_col)
     elif isinstance(id, str):
         pattern = r"=IF\(\([A-Z]+[0-9]+"
         match = re.match(pattern, id)
         if match:
             ref_cell = match.group(0).replace('=IF((', '')
             game.right_id = sheet[ref_cell].value
+        else:
+            for i in range(3):
+                value = sheet[row + update_row][col - update_col - 1 - i].value
+                if isinstance(value, float):
+                    game.right_id = int(value)
     else:
         print (f"failed to find next lower item in {sheet[row][col]}")
 
@@ -157,12 +191,23 @@ def search_right_block(sheet, games, game, row, col):
         games.append(upper_game)
         search_right_block(sheet, games, upper_game,
                            row - update_row - 1, col + update_col)
+    elif isinstance(id, float):
+        upper_game = Game(id=int(id))
+        upper_game.next_right = game.id
+        games.append(upper_game)
+        search_right_block(sheet, games, upper_game,
+                           row - update_row - 1, col + update_col)
     elif isinstance(id, str):
         pattern = r"=IF\(\([A-Z]+[0-9]+"
         match = re.match(pattern, id)
         if match:
             ref_cell = match.group(0).replace('=IF((', '')
             game.right_id = sheet[ref_cell].value
+        else:
+            for i in range(3):
+                value = sheet[row - update_row - 1][col + update_col + i].value
+                if isinstance(value, float):
+                    game.right_id = int(value)
     else:
         # might check wrong row due to merged cell
         update_col = check_towards_right(sheet, row - update_row, col)
@@ -174,7 +219,10 @@ def search_right_block(sheet, games, game, row, col):
                 ref_cell = match.group(0).replace('=IF((', '')
                 game.right_id = sheet[ref_cell].value
             else:
-                print (f"failed to find next upper item in {sheet[row][col]}")
+                for i in range(3):
+                    value = sheet[row - update_row - 1][col + update_col + i].value
+                    if isinstance(value, float):
+                        game.right_id = int(value)
         else:
             print (f"failed to find next upper item in {sheet[row][col]}")
 
@@ -187,16 +235,33 @@ def search_right_block(sheet, games, game, row, col):
         games.append(lower_game)
         search_right_block(sheet, games, lower_game,
                            row + update_row + 1, col + update_col)
+    elif isinstance(id, float):
+        lower_game = Game(id=int(id))
+        lower_game.next_left = game.id
+        games.append(lower_game)
+        search_right_block(sheet, games, lower_game,
+                           row + update_row + 1, col + update_col)
     elif isinstance(id, str):
         pattern = r"=IF\(\([A-Z]+[0-9]+"
         match = re.match(pattern, id)
         if match:
             ref_cell = match.group(0).replace('=IF((', '')
             game.left_id = sheet[ref_cell].value
+        else:
+            for i in range(3):
+                value = sheet[row + update_row + 1][col + update_col + i].value
+                if isinstance(value, float):
+                    game.left_id = int(value)
     else:
         id = check_number(sheet, row + update_row, col + update_col)
         if isinstance(id, int):
             lower_game = Game(id=id)
+            lower_game.next_left = game.id
+            games.append(lower_game)
+            search_right_block(sheet, games, lower_game,
+                               row + update_row + 1, col + update_col)
+        elif isinstance(id, float):
+            lower_game = Game(id=int(id))
             lower_game.next_left = game.id
             games.append(lower_game)
             search_right_block(sheet, games, lower_game,
