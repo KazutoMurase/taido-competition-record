@@ -223,7 +223,7 @@ def search_right_block(sheet, games, game, row, col):
                     value = sheet[row - update_row - 1][col + update_col + i].value
                     if isinstance(value, float):
                         game.right_id = int(value)
-            if game.left_id == "":
+            if game.right_id == "":
                 print (f"failed to find next upper item in {sheet[row][col]}")
         else:
             for i in range(4):
