@@ -26,6 +26,8 @@ gcloud config set project PROJECT_ID
     - Secret Manager シークレット参照: `roles/secretmanager.secretAccessor`
     - Cloud Run 管理者: `roles/run.admin`
     - Service Usage 管理者: `roles/serviceusage.serviceUsageAdmin`
+    - サービスアカウントユーザー: `roles/iam.serviceAccountUser`
+
 
 ### (2) サービスアカウントのJSON鍵を作成・ダウンロード
 - 作成したアカウントの`キー`タブ → `キーを追加`→`新しい鍵を作成`→`JSON`
@@ -52,7 +54,8 @@ gcloud services enable \
   artifactregistry.googleapis.com \
   cloudbuild.googleapis.com \
   servicenetworking.googleapis.com \
-  secretmanager.googleapis.com
+  secretmanager.googleapis.com \
+  cloudshell.googleapis.com
 ```
 
 ## 3. Artifact RegistryにDockerリポジトリを作成
@@ -85,6 +88,7 @@ CIにおいて実行する内容を定義するcloudbuild.yamlファイルを作
 ```
 
 - `cloudbuild_$PROJECT_ID.yaml`というファイルが生成される。
+- 作成したファイルをコミットしてmainブランチに取り込んでおく。
 
 ## 6. GitHubとのCloud Build連携
 
@@ -103,37 +107,56 @@ GCPコンソールを開き、Cloud Buildから接続済みのリポジトリを
 - リポジトリサービス: Cloud Buildリポジトリ
 - 構成: Cloud Build構成ファイル（yamlまたはjson）
 - CloudBuild構成ファイルの場所: `/ci/cloudbuild_$PROJECT_ID.yaml`
+    - 手順5で作成したファイルを参照する
 - サービスアカウント: 手順2(1)で作成したアカウントを選択
 
-## 8. CloudSQLの初期テーブル作成
+## 8. 初回イメージの手動ビルドとpush
+Cloud Buildのトリガーの動作前に、Cloud Runへのデプロイに必要なDockerイメージをArtifact Registryに一度手動でpushする。
+($IMAGE_NAMEは手順5で.envファイルに設定したイメージ名)
+
 ```bash
-# 手元のデータベース定義ファイルとテスト用ファイルをアップロード
-gcloud cloud-shell scp --recurse localhost:data/$COMPETITION_NAME cloudshell:~/
-gcloud cloud-shell scp --recurse localhost:data/test
-
-gcloud cloud-shell ssh
-
-gcloud sql connect $CLOUDSQL_INSTANCE_ID --user=postgres --quiet < localfile.sql
-cd ./data/$COMPETITION_NAME
-gcloud sql connect $CLOUDSQL_INSTANCE_ID –user=postgres --quiet < generate_tables.sql
-cd ../test
-gcloud sql connect $CLOUDSQL_INSTANCE_ID –user=postgres --quiet < generate_tables.sql
+gcloud auth configure-docker asia-northeast1-docker.pkg.dev
+docker build -t asia-northeast1-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REGISTRY_REPO_NAME/$IMAGE_NAME .
+docker push asia-northeast1-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REGISTRY_REPO_NAME/$IMAGE_NAME
 ```
 
 ## 9. Cloud Run公開アクセスの許可
 ```bash
-# Cloud Run サービスの初回デプロイ（この時点では失敗してもOK）
+# Cloud Run サービスの初回デプロイ
 gcloud run deploy $IMAGE_NAME \
-  --image=asia-northeast1-docker.pkg.dev/$PROJECT_ID/ar-docker-repo/$IMAGE_NAME \
+  --image=asia-northeast1-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REGISTRY_REPO_NAME/$IMAGE_NAME \
   --region=asia-northeast1 \
   --platform=managed \
   --allow-unauthenticated
+```
+成功すると以下のように表示され、サービスにアクセスするためのURLが確認できる。
+```
+Deploying container to Cloud Run service [$IMAGE_NAME] in project [$PROJECT_ID] region [asia-northeast1]
+...
+Service URL: https://$IMAGE_NAME-$ランダムなハッシュ値-uc.a.run.app
+```
 
-# 明示的に allUsers に roles/run.invoker を付与
-gcloud beta run services add-iam-policy-binding $IMAGE_NAME \
-  --region=asia-northeast1 \
-  --member=allUsers \
-  --role=roles/run.invoker
+## 10. CloudSQLの初期テーブル作成
+- Cloud SQL Auth Proxy(Cloud SQLインスタンスへの接続のための公式バイナリ)をダウンロードする
+
+    - 参考：[Cloud SQL Auth Proxy をダウンロードしてインストールする](https://cloud.google.com/sql/docs/postgres/sql-proxy?hl=ja#install)
+- ローカルにpsqlをインストール
+
+```bash
+chmod +x cloud-sql-proxy
+
+# プロキシ起動
+./cloud-sql-proxy --credentials-file=key.json $PROJECT_ID:$REGION:$INSTANCE_NAME &
+
+export PGPASSWORD=postgres
+cd ./data/test/static
+psql -h 127.0.0.1 -p 5432 -U postgres -d postgres -f generate_tables.sql
+cd ../original
+psql -h 127.0.0.1 -p 5432 -U postgres -d postgres -f generate_tables.sql
+cd ../../$COMPETITION_NAME/static
+psql -h 127.0.0.1 -p 5432 -U postgres -d postgres -f generate_tables.sql
+cd ../original
+psql -h 127.0.0.1 -p 5432 -U postgres -d postgres -f generate_tables.sql
 ```
 
 (参考) [公開（未認証）アクセスを許可する | Cloud Run Documentation | Google Cloud](https://cloud.google.com/run/docs/authenticating/public?hl=ja#gcloud)
