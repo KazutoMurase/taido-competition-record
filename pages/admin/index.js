@@ -149,6 +149,23 @@ export default function Home({ params }) {
             </>
           )}
         </Grid>
+        <br />
+        <br />
+        <br />
+        <br />
+        <Grid container justifyContent="center">
+          {hide ? (
+            <>
+              一般公開用ページへの結果反映：<b>OFF</b>
+              <SyncDisabledIcon color="disabled" />
+            </>
+          ) : (
+            <>
+              一般公開用ページへの結果反映：<b>ON</b>
+              <SyncIcon color="primary" />
+            </>
+          )}
+        </Grid>
       </Container>
     </div>
   );

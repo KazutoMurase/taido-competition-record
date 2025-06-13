@@ -10,3 +10,6 @@ node_modules/
 
 # mdbook output
 book/
+
+# service account json key
+key.json
