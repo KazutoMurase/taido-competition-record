@@ -217,7 +217,7 @@ create table test_dantai_hokei_man_groups
 (id integer not null,
 group_id integer not null,
 name text not null,
-foreign key (group_id) references groups(id),
+foreign key (group_id) references test_groups(id),
 primary key(id));
 
 create table test_dantai_hokei_man
@@ -236,7 +236,7 @@ create table test_dantai_hokei_woman_groups
 (id integer not null,
 group_id integer not null,
 name text not null,
-foreign key (group_id) references groups(id),
+foreign key (group_id) references test_groups(id),
 primary key(id));
 
 create table test_dantai_hokei_woman
@@ -255,7 +255,7 @@ create table test_dantai_hokei_groups
 (id integer not null,
 group_id integer not null,
 name text not null,
-foreign key (group_id) references groups(id),
+foreign key (group_id) references test_groups(id),
 primary key(id));
 
 create table test_dantai_hokei
@@ -274,7 +274,7 @@ create table test_dantai_hokei_newcommer_groups
 (id integer not null,
 group_id integer not null,
 name text not null,
-foreign key (group_id) references groups(id),
+foreign key (group_id) references test_groups(id),
 primary key(id));
 
 create table test_dantai_hokei_newcommer
@@ -293,7 +293,7 @@ create table test_tenkai_man_groups
 (id integer not null,
 group_id integer not null,
 name text not null,
-foreign key (group_id) references groups(id),
+foreign key (group_id) references test_groups(id),
 primary key(id));
 
 create table test_tenkai_man
@@ -316,7 +316,7 @@ create table test_tenkai_woman_groups
 (id integer not null,
 group_id integer not null,
 name text not null,
-foreign key (group_id) references groups(id),
+foreign key (group_id) references test_groups(id),
 primary key(id));
 
 create table test_tenkai_woman
@@ -339,7 +339,7 @@ create table test_tenkai_groups
 (id integer not null,
 group_id integer not null,
 name text not null,
-foreign key (group_id) references groups(id),
+foreign key (group_id) references test_groups(id),
 primary key(id));
 
 create table test_tenkai

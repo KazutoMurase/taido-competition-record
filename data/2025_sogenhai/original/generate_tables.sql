@@ -263,3 +263,13 @@ insert into current_block_c(id, game_id) values (1, 1);
 \copy block_d_games from 'block_d_games.csv' csv header;
 
 insert into current_block_d(id, game_id) values (1, 1);
+
+create table awarded_players
+(id integer not null,
+award_name text not null,
+player_id integer,
+name text,
+foreign key (player_id) references players(id),
+primary key (id));
+
+\copy awarded_players from 'awarded_players.csv' csv header;
