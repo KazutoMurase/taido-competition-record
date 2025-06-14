@@ -11,15 +11,15 @@ from PyQt5.QtCore import Qt
 
 
 class BlockCSVEditor(QWidget):
-    def __init__(self, tournament_name, block_name):
+    def __init__(self, competition_name, block_name):
         super().__init__()
-        self.tournament_name = tournament_name
+        self.competition_name = competition_name
         self.block_name = block_name
         # ファイルパス設定
-        self.base_dir = f"data/{tournament_name}/original"
+        self.base_dir = f"data/{competition_name}/original"
         self.csv_file = f"{self.base_dir}/block_{block_name.lower()}.csv"
         self.games_file = f"{self.base_dir}/block_{block_name.lower()}_games.csv"
-        self.event_type_file = f"data/{tournament_name}/static/event_type.csv"
+        self.event_type_file = f"data/{competition_name}/static/event_type.csv"
         # データ格納用
         self.data = []
         self.games_data = []
@@ -31,14 +31,14 @@ class BlockCSVEditor(QWidget):
         self.load_csv_data()
 
     def init_ui(self):
-        self.setWindowTitle(f'Block {self.block_name.upper()} CSV Editor - {self.tournament_name}')
+        self.setWindowTitle(f'Block {self.block_name.upper()} CSV Editor - {self.competition_name}')
         self.setGeometry(100, 100, 800, 600)
         main_layout = QVBoxLayout()
-        # ヘッダー（Tournament名とBlock名の入力欄）
+        # ヘッダー（Competition名とBlock名の入力欄）
         header_layout = QHBoxLayout()
-        header_layout.addWidget(QLabel("Tournament:"))
-        self.tournament_input = QLineEdit(self.tournament_name)
-        header_layout.addWidget(self.tournament_input)
+        header_layout.addWidget(QLabel("Competition:"))
+        self.competition_input = QLineEdit(self.competition_name)
+        header_layout.addWidget(self.competition_input)
 
         header_layout.addWidget(QLabel("Block:"))
         self.block_input = QLineEdit(self.block_name)
@@ -355,24 +355,24 @@ class BlockCSVEditor(QWidget):
             self.clear_form()
 
     def update_paths(self):
-        """Tournament名とBlock名を更新してパスを再設定"""
-        new_tournament = self.tournament_input.text().strip()
+        """Competition名とBlock名を更新してパスを再設定"""
+        new_competition = self.competition_input.text().strip()
         new_block = self.block_input.text().strip()
 
-        if not new_tournament or not new_block:
-            QMessageBox.warning(self, "Warning", "Tournament名とBlock名を入力してください。")
+        if not new_competition or not new_block:
+            QMessageBox.warning(self, "Warning", "Competition名とBlock名を入力してください。")
             return
 
         # 内部変数を更新
-        self.tournament_name = new_tournament
+        self.competition_name = new_competition
         self.block_name = new_block
         # ファイルパスを更新
-        self.base_dir = f"data/{self.tournament_name}/original"
+        self.base_dir = f"data/{self.competition_name}/original"
         self.csv_file = f"{self.base_dir}/block_{self.block_name.lower()}.csv"
         self.games_file = f"{self.base_dir}/block_{self.block_name.lower()}_games.csv"
-        self.event_type_file = f"data/{self.tournament_name}/static/event_type.csv"
+        self.event_type_file = f"data/{self.competition_name}/static/event_type.csv"
         # ウィンドウタイトルを更新
-        self.setWindowTitle(f'Block {self.block_name.upper()} CSV Editor - {self.tournament_name}')
+        self.setWindowTitle(f'Block {self.block_name.upper()} CSV Editor - {self.competition_name}')
         # データを再読み込み
         self.data = []
         self.games_data = []
@@ -470,13 +470,13 @@ def main():
     app = QApplication(sys.argv)
     # コマンドライン引数またはダイアログで大会名とブロック名を取得
     if len(sys.argv) >= 3:
-        tournament_name = sys.argv[1]
+        competition_name = sys.argv[1]
         block_name = sys.argv[2]
     else:
         # ダイアログで入力を求める
-        tournament_name, ok1 = QInputDialog.getText(None, "Tournament Name",
-                                                   "Enter tournament name (e.g., 2025_sogenhai):")
-        if not ok1 or not tournament_name:
+        competition_name, ok1 = QInputDialog.getText(None, "Competition Name",
+                                                   "Enter competition name (e.g., 2025_sogenhai):")
+        if not ok1 or not competition_name:
             sys.exit()
 
         block_name, ok2 = QInputDialog.getText(None, "Block Name",
@@ -484,7 +484,7 @@ def main():
         if not ok2 or not block_name:
             sys.exit()
 
-    window = BlockCSVEditor(tournament_name, block_name)
+    window = BlockCSVEditor(competition_name, block_name)
     window.show()
 
     sys.exit(app.exec_())
