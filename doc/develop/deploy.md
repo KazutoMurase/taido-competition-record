@@ -66,7 +66,7 @@ GCPコンソールからArtifact Registryを開き、Dockerリポジトリを作
 - モード: 標準
 - ロケーションタイプ: リージョン asia-northeast1
 - 説明: 大会名が区別できるように適宜
-- 不変のイメージタグ: 有効
+- 不変のイメージタグ: 無効
 
 ## 4. Cloud SQL インスタンスの作成
 GCPコンソールからCloud SQLを開き、インスタンスを作成する
@@ -112,7 +112,7 @@ GCPコンソールを開き、Cloud Buildから接続済みのリポジトリを
 
 ## 8. 初回イメージの手動ビルドとpush
 Cloud Buildのトリガーの動作前に、Cloud Runへのデプロイに必要なDockerイメージをArtifact Registryに一度手動でpushする。
-($IMAGE_NAMEは手順5で.envファイルに設定したイメージ名)
+($IMAGE_NAME, $CLOUD_RUN_DEPLOY_NAMEは手順5で.envファイルに設定したイメージ名)
 
 ```bash
 gcloud auth configure-docker asia-northeast1-docker.pkg.dev
@@ -121,13 +121,15 @@ docker push asia-northeast1-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REGISTRY_REPO_N
 ```
 
 ## 9. Cloud Run公開アクセスの許可
+手動で一度デプロイしておく。リソース設定はCI buildで追って反映させる。
 ```bash
 # Cloud Run サービスの初回デプロイ
-gcloud run deploy $IMAGE_NAME \
+gcloud run deploy $CLOUD_RUN_DEPLOY_NAME \
   --image=asia-northeast1-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REGISTRY_REPO_NAME/$IMAGE_NAME \
   --region=asia-northeast1 \
   --platform=managed \
   --allow-unauthenticated
+  --update-env-vars PRODUCTION=1 \
 ```
 成功すると以下のように表示され、サービスにアクセスするためのURLが確認できる。
 ```

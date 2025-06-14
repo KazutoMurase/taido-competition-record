@@ -13,3 +13,7 @@ book/
 
 # service account json key
 key.json
+cloud-sql-proxy
+
+# venv for generate db script
+venv/

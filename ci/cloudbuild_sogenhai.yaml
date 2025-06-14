@@ -21,7 +21,7 @@ steps:
       [
         'run',
         'deploy',
-        '2025-sogenhai',
+        'taido-competition-record',
         '--image',
         'asia-northeast1-docker.pkg.dev/sogenhai/ar-docker-repo/taido-competition-record',
         '--region',
