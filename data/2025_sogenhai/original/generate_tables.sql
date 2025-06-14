@@ -72,8 +72,8 @@ next_right_id integer,
 left_player_flag integer,
 left_retire integer,
 right_retire integer,
-foreign key (left_player_id) references players(hokei_man_player_id),
-foreign key (right_player_id) references players(hokei_man_player_id),
+foreign key (left_player_id) references players(hokei_kyuui_man_player_id),
+foreign key (right_player_id) references players(hokei_kyuui_man_player_id),
 primary key(id));
 
 create table hokei_kyuui_woman
@@ -85,8 +85,8 @@ next_right_id integer,
 left_player_flag integer,
 left_retire integer,
 right_retire integer,
-foreign key (left_player_id) references players(hokei_woman_player_id),
-foreign key (right_player_id) references players(hokei_woman_player_id),
+foreign key (left_player_id) references players(hokei_kyuui_woman_player_id),
+foreign key (right_player_id) references players(hokei_kyuui_woman_player_id),
 primary key(id));
 
 create table zissen_kyuui_man
@@ -98,8 +98,8 @@ next_right_id integer,
 left_player_flag integer,
 left_retire integer,
 right_retire integer,
-foreign key (left_player_id) references players(zissen_man_player_id),
-foreign key (right_player_id) references players(zissen_man_player_id),
+foreign key (left_player_id) references players(zissen_kyuui_man_player_id),
+foreign key (right_player_id) references players(zissen_kyuui_man_player_id),
 primary key(id));
 
 create table zissen_kyuui_woman
@@ -111,8 +111,8 @@ next_right_id integer,
 left_player_flag integer,
 left_retire integer,
 right_retire integer,
-foreign key (left_player_id) references players(zissen_woman_player_id),
-foreign key (right_player_id) references players(zissen_woman_player_id),
+foreign key (left_player_id) references players(zissen_kyuui_woman_player_id),
+foreign key (right_player_id) references players(zissen_kyuui_woman_player_id),
 primary key(id));
 
 \copy hokei_man from 'hokei_man.csv' csv header;
