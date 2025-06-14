@@ -34,10 +34,20 @@ class BlockCSVEditor(QWidget):
         self.setWindowTitle(f'Block {self.block_name.upper()} CSV Editor - {self.tournament_name}')
         self.setGeometry(100, 100, 800, 600)
         main_layout = QVBoxLayout()
-        # ヘッダー
+        # ヘッダー（Tournament名とBlock名の入力欄）
         header_layout = QHBoxLayout()
-        header_layout.addWidget(QLabel(f"Tournament: {self.tournament_name}"))
-        header_layout.addWidget(QLabel(f"Block: {self.block_name.upper()}"))
+        header_layout.addWidget(QLabel("Tournament:"))
+        self.tournament_input = QLineEdit(self.tournament_name)
+        header_layout.addWidget(self.tournament_input)
+
+        header_layout.addWidget(QLabel("Block:"))
+        self.block_input = QLineEdit(self.block_name)
+        header_layout.addWidget(self.block_input)
+
+        self.update_path_button = QPushButton("Update")
+        self.update_path_button.clicked.connect(self.update_paths)
+        header_layout.addWidget(self.update_path_button)
+
         main_layout.addLayout(header_layout)
         # テーブル
         self.table = QTableWidget()
@@ -68,7 +78,7 @@ class BlockCSVEditor(QWidget):
         form_layout.addRow("タイムスケジュール:", self.time_input)
 
         self.before_final_cb = QCheckBox()
-        form_layout.addRow("準決勝:", self.before_final_cb)
+        form_layout.addRow("三決:", self.before_final_cb)
 
         self.final_cb = QCheckBox()
         form_layout.addRow("決勝:", self.final_cb)
@@ -344,6 +354,36 @@ class BlockCSVEditor(QWidget):
             self.update_table()
             self.clear_form()
 
+    def update_paths(self):
+        """Tournament名とBlock名を更新してパスを再設定"""
+        new_tournament = self.tournament_input.text().strip()
+        new_block = self.block_input.text().strip()
+
+        if not new_tournament or not new_block:
+            QMessageBox.warning(self, "Warning", "Tournament名とBlock名を入力してください。")
+            return
+
+        # 内部変数を更新
+        self.tournament_name = new_tournament
+        self.block_name = new_block
+        # ファイルパスを更新
+        self.base_dir = f"data/{self.tournament_name}/original"
+        self.csv_file = f"{self.base_dir}/block_{self.block_name.lower()}.csv"
+        self.games_file = f"{self.base_dir}/block_{self.block_name.lower()}_games.csv"
+        self.event_type_file = f"data/{self.tournament_name}/static/event_type.csv"
+        # ウィンドウタイトルを更新
+        self.setWindowTitle(f'Block {self.block_name.upper()} CSV Editor - {self.tournament_name}')
+        # データを再読み込み
+        self.data = []
+        self.games_data = []
+        self.event_types = {}
+
+        self.load_event_types()
+        self.load_games_data()
+        self.load_csv_data()
+
+        QMessageBox.information(self, "Success", "パスが更新されました。")
+
     def generate_csv(self):
         """CSVファイルを生成"""
         if not self.data:
@@ -428,7 +468,6 @@ class BlockCSVEditor(QWidget):
 
 def main():
     app = QApplication(sys.argv)
-
     # コマンドライン引数またはダイアログで大会名とブロック名を取得
     if len(sys.argv) >= 3:
         tournament_name = sys.argv[1]
