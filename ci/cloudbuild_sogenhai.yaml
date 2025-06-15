@@ -63,12 +63,12 @@ steps:
         'USE_LOCAL_DB=0',
         '--update-env-vars',
         'USE_LOCAL_REDIS=1',
-	'--update-env-vars',
-	'SHOW_TOTAL_IN_ADMIN=0',
-	'--update-env-vars',
-	'USERNAME=sogenhai',
-	'--update-env-vars',
-	'PASSWORD=nerima2506'
+        '--update-env-vars',
+        'SHOW_TOTAL_IN_ADMIN=0',
+        '--update-env-vars',
+        'USERNAME=sogenhai',
+        '--update-env-vars',
+        'PASSWORD=nerima2506'
       ]
 
 images:
