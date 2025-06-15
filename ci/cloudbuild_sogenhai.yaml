@@ -54,7 +54,7 @@ steps:
         '--update-env-vars',
         'PRODUCTION=1',
         '--update-env-vars',
-        'PRODUCTION_TEST=0',
+        'PRODUCTION_TEST=1',
         '--update-env-vars',
         'REDISHOST=localhost',
         '--update-env-vars',
@@ -62,7 +62,13 @@ steps:
         '--update-env-vars',
         'USE_LOCAL_DB=0',
         '--update-env-vars',
-        'USE_LOCAL_REDIS=1'
+        'USE_LOCAL_REDIS=1',
+	'--update-env-vars',
+	'SHOW_TOTAL_IN_ADMIN=0',
+	'--update-env-vars',
+	'USERNAME=sogenhai',
+	'--update-env-vars',
+	'PASSWORD=nerima2506'
       ]
 
 images:
