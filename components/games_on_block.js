@@ -25,17 +25,18 @@ function onMoveDown(order_id, block_number, schedule_id, function_after_post) {
     });
 }
 
+// TODO(murase): extract from database
 function ShowHokeiType(item, event_name) {
   if (event_name === "hokei_sonen" || event_name.includes("hokei_mei")) {
     return <td>{item["round"] <= 2 ? "勢命" : "命の法形"}</td>;
   } else if (event_name === "hokei_newcommer") {
-    return <td>旋の法形</td>;
+    return <td>運足八法</td>;
   } else if (event_name.includes("hokei_kyuui")) {
-    return <td>体/陰の法形</td>;
+    return <td>変体/変陰</td>;
   } else if (event_name.includes("hokei_sei")) {
     return <td>制の法形</td>;
   }
-  return <td>{item["round"] <= 2 ? "運の法形" : "自由法形"}</td>;
+  return <td>変体/変陰</td>;
 }
 
 function GamesOnBlock({
