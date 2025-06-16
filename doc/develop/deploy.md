@@ -157,11 +157,11 @@ chmod +x cloud-sql-proxy
 ./cloud-sql-proxy --credentials-file=key.json $PROJECT_ID:$REGION:$INSTANCE_NAME &
 
 export PGPASSWORD=postgres
-cd ../../$COMPETITION_NAME/static
+cd ./data/$COMPETITION_NAME/static
 psql -h 127.0.0.1 -p 5432 -U postgres -d postgres -f generate_tables.sql
 cd ../original
 psql -h 127.0.0.1 -p 5432 -U postgres -d postgres -f generate_tables.sql
-cd ./data/test/static
+cd ../../test/static
 psql -h 127.0.0.1 -p 5432 -U postgres -d postgres -f generate_tables.sql
 cd ../original
 psql -h 127.0.0.1 -p 5432 -U postgres -d postgres -f generate_tables.sql
