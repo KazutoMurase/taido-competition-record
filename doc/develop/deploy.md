@@ -141,7 +141,7 @@ Service URL: https://$IMAGE_NAME-$ランダムなハッシュ値-uc.a.run.app
 ## 10. CloudSQLの初期テーブル作成
 - ローカルにpsqlをインストール
 
-例: Ubuntu
+例: Ubuntu22.04
 ```bash
 sudo apt install postgresql-client-common postgresql-client-14
 ```
