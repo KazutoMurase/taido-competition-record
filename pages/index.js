@@ -4,6 +4,7 @@ import Container from "@mui/material/Container";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Image from "next/image";
+import topImage from "../public/top.jpeg";
 
 export const getServerSideProps = async () => {
   const competitionTitle = process.env.COMPETITION_TITLE;
@@ -25,7 +26,7 @@ export default function Home({ competitionTitle, show_total }) {
     router.push("/total");
   };
   // TODO: make it optional
-  const show_image = false;
+  const show_image = true;
   return (
     <div>
       <br />
