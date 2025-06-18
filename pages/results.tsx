@@ -24,14 +24,14 @@ const Results: React.FC = () => {
           </h1>
           <GetEvents />
           <Grid
-          container
-          justifyContent="center"
-          alignItems="center"
-          style={{ height: "100px" }}
-        >
-          <Button variant="contained" type="submit" onClick={(e) => onBack()}>
-            戻る
-          </Button>
+            container
+            justifyContent="center"
+            alignItems="center"
+            style={{ height: "100px" }}
+          >
+            <Button variant="contained" type="submit" onClick={(e) => onBack()}>
+              戻る
+            </Button>
           </Grid>
         </Grid>
       </Container>
