@@ -143,6 +143,16 @@ function CreateDantaiText(item, lineWidth, y_padding, hide = false) {
   return <></>;
 }
 
+function GetSplitName(name) {
+  if (!name) {
+    return name;
+  }
+  if (name.length > 9) {
+    return name.slice(0, 9) + "\n" + name.slice(9);
+  }
+  return name;
+}
+
 function GetGroupNameFontSize(group_name) {
   if (!group_name) {
     return 10;
@@ -184,8 +194,8 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
           />
           <Text
             x={is_left ? 0 : 630}
-            y={item["left_begin_y"] - 5 + y_padding}
-            text={item["left_name"]}
+            y={item["left_begin_y"] - 7 + y_padding}
+            text={GetSplitName(item["left_name"])}
             fontSize={item["left_name"].length < 8 ? 18 : 14}
           />
           <Rect
@@ -198,7 +208,7 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
           />
           <Text
             x={is_left ? 120 : 750}
-            y={item["left_begin_y"] + y_padding}
+            y={item["left_begin_y"] - 2 + y_padding}
             text={item["left_group_name"].replace("'", "【").replace("'", "】")}
             fontSize={GetGroupNameFontSize(item["left_group_name"])}
           />
@@ -226,8 +236,8 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
           />
           <Text
             x={is_left ? 0 : 630}
-            y={item["right_begin_y"] - 5 + y_padding}
-            text={item["right_name"]}
+            y={item["right_begin_y"] - 7 + y_padding}
+            text={GetSplitName(item["right_name"])}
             fontSize={item["right_name"].length < 8 ? 18 : 14}
           />
           <Rect
@@ -240,7 +250,7 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
           />
           <Text
             x={is_left ? 120 : 750}
-            y={item["right_begin_y"] + y_padding}
+            y={item["right_begin_y"] - 2 + y_padding}
             text={item["right_group_name"]
               .replace("'", "【")
               .replace("'", "】")}
@@ -276,8 +286,8 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
           />
           <Text
             x={is_left ? 0 : 630}
-            y={item["left_begin_y"] - 5}
-            text={item["left_name"]}
+            y={item["left_begin_y"] - 7}
+            text={GetSplitName(item["left_name"])}
             fontSize={item["left_name"].length < 8 ? 18 : 14}
           />
           <Rect
@@ -290,7 +300,7 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
           />
           <Text
             x={is_left ? 120 : 750}
-            y={item["left_begin_y"]}
+            y={item["left_begin_y"] - 2}
             text={item["left_group_name"].replace("'", "【").replace("'", "】")}
             fontSize={GetGroupNameFontSize(item["left_group_name"])}
           />
@@ -324,8 +334,8 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
           />
           <Text
             x={is_left ? 0 : 630}
-            y={item["right_begin_y"] - 5}
-            text={item["right_name"]}
+            y={item["right_begin_y"] - 7}
+            text={GetSplitName(item["right_name"])}
             fontSize={item["right_name"].length < 8 ? 18 : 14}
           />
           <Rect
@@ -338,7 +348,7 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
           />
           <Text
             x={is_left ? 120 : 750}
-            y={item["right_begin_y"]}
+            y={item["right_begin_y"] - 2}
             text={item["right_group_name"]
               .replace("'", "【")
               .replace("'", "】")}
@@ -367,7 +377,7 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
         <Text
           x={x - 220}
           y={item["left_begin_y"] - 10 + y_padding}
-          text={hide ? "" : item["left_name"]}
+          text={hide ? "" : GetSplitName(item["left_name"])}
           fontSize={
             (item["left_name"] !== null && item["left_name"].length) < 8
               ? 18
@@ -393,7 +403,7 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
         <Text
           x={x + width + 10}
           y={item["left_begin_y"] - 10 + y_padding}
-          text={hide ? "" : item["right_name"]}
+          text={hide ? "" : GetSplitName(item["right_name"])}
           fontSize={
             (item["right_name"] !== null && item["right_name"].length) < 8
               ? 18

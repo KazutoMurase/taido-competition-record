@@ -66,7 +66,7 @@ GCPコンソールからArtifact Registryを開き、Dockerリポジトリを作
 - モード: 標準
 - ロケーションタイプ: リージョン asia-northeast1
 - 説明: 大会名が区別できるように適宜
-- 不変のイメージタグ: 有効
+- 不変のイメージタグ: 無効
 
 ## 4. Cloud SQL インスタンスの作成
 GCPコンソールからCloud SQLを開き、インスタンスを作成する
@@ -115,7 +115,7 @@ GCPコンソールを開き、Cloud Buildから接続済みのリポジトリを
 
 ## 8. 初回イメージの手動ビルドとpush
 Cloud Buildのトリガーの動作前に、Cloud Runへのデプロイに必要なDockerイメージをArtifact Registryに一度手動でpushする。
-($IMAGE_NAMEは手順5で.envファイルに設定したイメージ名)
+($IMAGE_NAME, $CLOUD_RUN_DEPLOY_NAMEは手順5で.envファイルに設定したイメージ名)
 
 ```bash
 gcloud auth configure-docker asia-northeast1-docker.pkg.dev
@@ -124,13 +124,15 @@ docker push asia-northeast1-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REGISTRY_REPO_N
 ```
 
 ## 9. Cloud Run公開アクセスの許可
+手動で一度デプロイしておく。リソース設定はCI buildで追って反映させる。
 ```bash
 # Cloud Run サービスの初回デプロイ
-gcloud run deploy $IMAGE_NAME \
+gcloud run deploy $CLOUD_RUN_DEPLOY_NAME \
   --image=asia-northeast1-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REGISTRY_REPO_NAME/$IMAGE_NAME \
   --region=asia-northeast1 \
   --platform=managed \
   --allow-unauthenticated
+  --update-env-vars PRODUCTION=1 \
 ```
 成功すると以下のように表示され、サービスにアクセスするためのURLが確認できる。
 ```
@@ -140,10 +142,16 @@ Service URL: https://$IMAGE_NAME-$ランダムなハッシュ値-uc.a.run.app
 ```
 
 ## 10. CloudSQLの初期テーブル作成
+- ローカルにpsqlをインストール
+
+例: Ubuntu22.04
+```bash
+sudo apt install postgresql-client-common postgresql-client-14
+```
+
 - Cloud SQL Auth Proxy(Cloud SQLインスタンスへの接続のための公式バイナリ)をダウンロードする
 
     - 参考：[Cloud SQL Auth Proxy をダウンロードしてインストールする](https://cloud.google.com/sql/docs/postgres/sql-proxy?hl=ja#install)
-- ローカルにpsqlをインストール
 
 ```bash
 chmod +x cloud-sql-proxy
@@ -152,17 +160,31 @@ chmod +x cloud-sql-proxy
 ./cloud-sql-proxy --credentials-file=key.json $PROJECT_ID:$REGION:$INSTANCE_NAME &
 
 export PGPASSWORD=postgres
-cd ./data/test/static
+cd ./data/$COMPETITION_NAME/static
 psql -h 127.0.0.1 -p 5432 -U postgres -d postgres -f generate_tables.sql
 cd ../original
 psql -h 127.0.0.1 -p 5432 -U postgres -d postgres -f generate_tables.sql
-cd ../../$COMPETITION_NAME/static
+cd ../../test/static
 psql -h 127.0.0.1 -p 5432 -U postgres -d postgres -f generate_tables.sql
 cd ../original
 psql -h 127.0.0.1 -p 5432 -U postgres -d postgres -f generate_tables.sql
 ```
 
 (参考) [公開（未認証）アクセスを許可する | Cloud Run Documentation | Google Cloud](https://cloud.google.com/run/docs/authenticating/public?hl=ja#gcloud)
+
+データベースの変更を一括で行いたい場合に、一度全削除してから行う方法は以下。
+
+```bash
+psql -h 127.0.0.1 -p 5432 -U postgres -d postgres
+
+DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;
+```
+
+接続が必要なくなったら、cloud-sql-proxyのプロセスは落としておくとよい。　
+```bash
+ps aux | grep -v grep | grep cloud-sql-proxy | tr -s " " | cut -d" " -f2 | xargs kill $1
+```
 
 ## オプショナル. Memorystoreの利用（必要に応じて）
 MemorystoreはredisをCloud側で立ててくれるサービス。Cloud Runのインスタンス数を2個以上にスケーリングする可能性がある場合は使う必要がある([参考](https://github.com/KazutoMurase/taido-competition-record/issues/125))が、これまでの運用実績では必要な場面は無し。

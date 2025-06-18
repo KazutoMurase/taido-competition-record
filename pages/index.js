@@ -15,6 +15,7 @@ import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import FlagIcon from "@mui/icons-material/Flag";
 import MilitaryTechIcon from "@mui/icons-material/MilitaryTech";
 import Image from "next/image";
+import topImage from "../public/top.jpeg";
 
 export const getServerSideProps = async () => {
   const competitionTitle = process.env.COMPETITION_TITLE;
@@ -31,7 +32,7 @@ export default function Home({ competitionTitle, show_total }) {
   const router = useRouter();
 
   // TODO: make it optional
-  const show_image = false;
+  const show_image = true;
   const cardList = [
     {
       label: "時程表",

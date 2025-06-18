@@ -121,12 +121,16 @@ const ProgressOnBlock: React.FC<{
           <TableCell>{schedule.time_schedule?.replace(/['"]+/g, "")}</TableCell>
           <TableCell>
             {
+              GetEventName(schedule.event_id) == "dantai" ? (
+                <>{schedule.name?.replace(/['"]+/g, "")}</>
+              ) : (
               <a
                 className="color-disabled"
                 href={"results/" + GetEventName(schedule.event_id)}
               >
                 {schedule.name?.replace(/['"]+/g, "")}
               </a>
+              )
             }
           </TableCell>
           <TableCell
