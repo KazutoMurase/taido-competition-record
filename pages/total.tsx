@@ -177,7 +177,7 @@ const Total: React.FC<{ params }> = ({ params }) => {
         <Box style={{ minWidth: "850px" }}>
           <Grid container justifyContent="center" alignItems="center">
             <h2>得点表＜総合＞</h2>
-            <table align="center" border={1}>
+            <table align="center" border={1} className="default">
               <thead>
                 <tr>
                   <td style={{ width: "150px", padding: 2 }} rowSpan={3}>

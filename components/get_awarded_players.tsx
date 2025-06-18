@@ -36,7 +36,7 @@ const GetAwardedPlayers: React.FC<{
     return <></>;
   }
   return (
-    <table border={1} style={{ width: "400px" }}>
+    <table className="default" border={1} style={{ width: "400px" }}>
       <tbody>{resultTable}</tbody>
     </table>
   );

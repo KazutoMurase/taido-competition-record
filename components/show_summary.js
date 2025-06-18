@@ -43,7 +43,11 @@ function Summary({ winners }) {
       alignItems="center"
       style={{ height: "120px" }}
     >
-      <table border="1" style={{ width: "800px", "table-layout": "fixed" }}>
+      <table
+        className="default"
+        border="1"
+        style={{ width: "800px", "table-layout": "fixed" }}
+      >
         <tbody>
           <tr style={{ fontSize: "12px" }}>
             <td>優勝　</td>
