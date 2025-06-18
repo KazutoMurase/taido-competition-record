@@ -151,7 +151,7 @@ const ProgressOnBlock: React.FC<{
       );
     });
     setScheduleTables(tables);
-  }, [block_number, currentScheduleData, timeSchedules, games, hide]);
+  }, [block_number, currentScheduleData, timeSchedules, games, hide, isMobile]);
 
   return (
     <div

@@ -33,14 +33,6 @@ const MyApp: NextPage<AppProps> = ({ Component, pageProps }) => {
     <div className="app">
       <Head>
         <title>躰道大会管理システム</title>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP&display=swap"
-          rel="stylesheet"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap"
-          rel="stylesheet"
-        />
       </Head>
       <ThemeProvider theme={theme}>
         <Component {...pageProps} />
