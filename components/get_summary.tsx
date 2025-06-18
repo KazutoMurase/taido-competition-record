@@ -64,7 +64,7 @@ const GetSummary: React.FC<{
         container
         justifyContent="center"
         alignItems="center"
-        style={{ height: "30px" }}
+        style={{ height: "30px", marginTop: "20px" }}
       >
         {event_name}
       </Grid>
