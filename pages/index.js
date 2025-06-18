@@ -91,6 +91,7 @@ export default function Home({ competitionTitle, show_total }) {
         )}
         {cardList.map((card, index) => (
           <Grid
+            key={`grid-${index}`}
             container
             justifyContent="center"
             alignItems="center"
