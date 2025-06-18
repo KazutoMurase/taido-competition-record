@@ -66,6 +66,7 @@ img {
 table {
   border-collapse: separate;
   border-spacing: 0;
+  border: none;
 }
 
 table th:first-child {
@@ -74,10 +75,54 @@ table th:first-child {
 
 table th:last-child {
   border-radius: 0 5px 0 0;
-  border-right: 1px solid #3c6690;
 }
 
 table th {
+  text-align: center;
+  color: white;
+  font: bold;
+  background: #1976d2;
+  border-left: none;
+  border-right: none;
+  border-bottom: 1px solid #3c6690;
+  padding: 8px;
+  white-space: nowrap;
+}
+
+table td {
+  text-align: center;
+  border-left: none;
+  border-right: none;
+  border-bottom: 1px solid #a8b7c5;
+  border-top: none;
+  padding: 8px;
+  white-space: nowrap;
+  font-size: 20px;
+}
+
+table tr:last-child td:first-child {
+  border-radius: 0 0 0 5px;
+}
+
+table tr:last-child td:last-child {
+  border-radius: 0 0 5px 0;
+}
+
+table.default {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+table.default th:first-child {
+  border-radius: 5px 0 0 0;
+}
+
+table.default th:last-child {
+  border-radius: 0 5px 0 0;
+  border-right: 1px solid #3c6690;
+}
+
+table.default th {
   text-align: center;
   color: white;
   background: linear-gradient(#829ebc, #225588);
@@ -89,30 +134,34 @@ table th {
   white-space: nowrap;
 }
 
-table td {
+table.default td {
   text-align: center;
   border-left: 1px solid #a8b7c5;
   border-bottom: 1px solid #a8b7c5;
-  border-top: none;
+  border-top: 1px solid #a8b7c5;
   box-shadow: 0px -3px 5px 1px #eee inset;
   padding: 10px 0;
   white-space: nowrap;
 }
 
-table td:last-child {
-  border-right: 1px solid #a8b7c5;
-}
-
-table tr:last-child td:first-child {
+table.default tr:last-child td:first-child {
   border-radius: 0 0 0 5px;
 }
 
-table tr:last-child td:last-child {
-  border-radius: 0 0 5px 0;
+table.default td:last-child {
+  border-right: 1px solid #a8b7c5;
 }
 
 @media print {
   button {
     display: none !important;
   }
+}
+
+h2.competition-title {
+  font-family: "Noto Serif JP", serif;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  line-height: 1.5;
+  color: #2c2c2c;
 }

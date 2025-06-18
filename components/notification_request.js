@@ -8,6 +8,13 @@ import Grid from "@mui/material/Grid";
 import FlagCircleRoundedIcon from "@mui/icons-material/FlagCircleRounded";
 import SquareTwoToneIcon from "@mui/icons-material/SquareTwoTone";
 import checkStyles from "../styles/checks.module.css";
+import {
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+} from "@mui/material";
 
 function onClearAll(is_test, function_after_post) {
   let post = { is_test: is_test };
@@ -114,55 +121,71 @@ function NotificationRequest({
               <u>呼び出しリスト</u>
             </h2>
           </Grid>
-          <table border="1">
-            <tbody>
-              <tr className={checkStyles.column}>
-                <th>競技</th>
-                <th>選手/団体名</th>
-                <th>コート</th>
-                <th>所属</th>
-                <th></th>
-              </tr>
-              {data.map((item, index) => (
-                <tr key={item["id"]} className={checkStyles.column}>
-                  <td>
-                    {item["event_name"].replace("'", "").replace("'", "")}
-                  </td>
-                  <td>{ShowName(item, is_mobile)}</td>
-                  <td>
-                    {is_mobile
-                      ? item["court_name"]
-                          .replace(/['"]+/g, "")
-                          .replace("コート", "")
-                      : item["court_name"].replace(/['"]+/g, "")}
-                  </td>
-                  <td>
-                    {"name" in item
-                      ? item["group_name"].replace("'", "").replace("'", "")
-                      : ""}
-                  </td>
-                  <td>
-                    <Button
-                      variant="contained"
-                      type="submit"
-                      size={is_mobile ? "small" : "medium"}
-                      onClick={(e) => onClear(item, is_test, forceFetchData)}
-                    >
-                      {is_mobile ? (
-                        <>
-                          呼び出し
-                          <br />
-                          完了
-                        </>
-                      ) : (
-                        "呼び出し完了"
-                      )}
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <Table border="1" sx={{ width: "100%" }}>
+            <TableHead>
+              <TableRow className={checkStyles.column}>
+                <TableCell>競技</TableCell>
+                <TableCell>選手/団体名</TableCell>
+                <TableCell>コート</TableCell>
+                <TableCell>所属</TableCell>
+                <TableCell></TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {data.length === 0 ? (
+                <>
+                  <TableCell />
+                  <TableCell sx={{ "font-size": "20px" }}>
+                    呼び出し待ちはありません
+                  </TableCell>
+                  <TableCell />
+                  <TableCell />
+                  <TableCell />
+                </>
+              ) : (
+                data.map((item, index) => (
+                  <TableRow key={item["id"]} className={checkStyles.column}>
+                    <TableCell sx={{ "font-size": "20px" }}>
+                      {item["event_name"].replace("'", "").replace("'", "")}
+                    </TableCell>
+                    <TableCell sx={{ "font-size": "20px" }}>
+                      {ShowName(item, is_mobile)}
+                    </TableCell>
+                    <TableCell sx={{ "font-size": "20px" }}>
+                      {is_mobile
+                        ? item["court_name"]
+                            .replace(/['"]+/g, "")
+                            .replace("コート", "")
+                        : item["court_name"].replace(/['"]+/g, "")}
+                    </TableCell>
+                    <TableCell sx={{ "font-size": "20px" }}>
+                      {"name" in item
+                        ? item["group_name"].replace("'", "").replace("'", "")
+                        : ""}
+                    </TableCell>
+                    <TableCell sx={{ "font-size": "20px" }}>
+                      <Button
+                        variant="contained"
+                        type="submit"
+                        size={is_mobile ? "small" : "medium"}
+                        onClick={(e) => onClear(item, is_test, forceFetchData)}
+                      >
+                        {is_mobile ? (
+                          <>
+                            呼び出し
+                            <br />
+                            完了
+                          </>
+                        ) : (
+                          "呼び出し完了"
+                        )}
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
           <br />
           <Grid
             container

@@ -3,6 +3,17 @@ import checkStyles from "../styles/checks.module.css";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
+import {
+  useMediaQuery,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  TableContainer,
+} from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+
 import { GetEventName } from "../lib/get_event_name";
 import { GameIdsData } from "../pages/api/get_game_ids_on_block";
 
@@ -52,6 +63,8 @@ const ProgressOnBlock: React.FC<{
   const [timeSchedules, setTimeSchedules] = useState<TimeScheduleData[]>([]);
   const [games, setGames] = useState<GameIdsData[]>([]);
   const [scheduleTables, setScheduleTables] = useState<JSX.Element[]>([]);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const fetchData = useCallback(async () => {
     fetch("/api/get_time_schedule?block_number=" + block_number)
@@ -97,17 +110,16 @@ const ProgressOnBlock: React.FC<{
       setScheduleTables([]);
       return;
     }
-    const tables: JSX.Element[] = [];
-    timeSchedules.forEach((schedule) => {
+    const tables: JSX.Element[] = timeSchedules.map((schedule) => {
       const isCurrentEvent = hide ? 0 : schedule.id === currentScheduleData.id;
-      tables.push(
-        <tr
+      return (
+        <TableRow
           key={schedule.id}
           className={checkStyles.column}
-          style={{ backgroundColor: isCurrentEvent ? "yellow" : "white" }}
+          style={{ backgroundColor: isCurrentEvent ? "#90caf9" : "white" }}
         >
-          <td>{schedule.time_schedule?.replace(/['"]+/g, "")}</td>
-          <td>
+          <TableCell>{schedule.time_schedule?.replace(/['"]+/g, "")}</TableCell>
+          <TableCell>
             {GetEventName(schedule.event_id) == "dantai" ? (
               <>{schedule.name?.replace(/['"]+/g, "")}</>
             ) : (
@@ -118,9 +130,15 @@ const ProgressOnBlock: React.FC<{
                 {schedule.name?.replace(/['"]+/g, "")}
               </a>
             )}
-          </td>
-          <td>{GetGamesText(schedule)}</td>
-          <td>
+          </TableCell>
+          <TableCell
+            sx={
+              isMobile ? { whiteSpace: "normal", wordBreak: "break-word" } : {}
+            }
+          >
+            {GetGamesText(schedule)}
+          </TableCell>
+          <TableCell>
             {isCurrentEvent
               ? games.find(
                   (game) =>
@@ -128,12 +146,12 @@ const ProgressOnBlock: React.FC<{
                     game.order_id === currentScheduleData.game_id,
                 )?.game_id
               : "-"}
-          </td>
-        </tr>,
+          </TableCell>
+        </TableRow>
       );
     });
     setScheduleTables(tables);
-  }, [block_number, currentScheduleData, timeSchedules, games, hide]);
+  }, [block_number, currentScheduleData, timeSchedules, games, hide, isMobile]);
 
   return (
     <div
@@ -143,27 +161,32 @@ const ProgressOnBlock: React.FC<{
         justifyItems: "center",
       }}
     >
-      <Container maxWidth="md">
+      <Container
+        maxWidth="md"
+        sx={{ "padding-left": "0px", "padding-right": "0px" }}
+      >
         <Box>
           <Grid
             container
             justifyContent="center"
             alignItems="center"
-            style={{ height: "80px" }}
+            style={{ height: isMobile ? "5px" : "80px" }}
           >
-            <h1>{block_number.toUpperCase() + "コート"}</h1>
+            {!isMobile && <h1>{block_number.toUpperCase() + "コート"}</h1>}
           </Grid>
-          <table align="center" border={1}>
-            <thead>
-              <tr className={checkStyles.column}>
-                <th>時間</th>
-                <th>競技</th>
-                <th>試合一覧</th>
-                <th>次の試合</th>
-              </tr>
-            </thead>
-            <tbody>{scheduleTables}</tbody>
-          </table>
+          <TableContainer>
+            <Table aria-label="schedule table">
+              <TableHead>
+                <TableRow className={checkStyles.column}>
+                  <TableCell sx={{ width: "20%" }}>時間</TableCell>
+                  <TableCell sx={{ width: "30%" }}>競技</TableCell>
+                  <TableCell sx={{ width: "35%" }}>試合一覧</TableCell>
+                  <TableCell sx={{ width: "20%" }}>次の試合</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>{scheduleTables}</TableBody>
+            </Table>
+          </TableContainer>
         </Box>
       </Container>
     </div>

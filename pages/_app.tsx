@@ -2,14 +2,41 @@ import type { NextPage } from "next";
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import "../styles/global.css";
+import { createTheme, ThemeProvider } from "@mui/material";
 
 const MyApp: NextPage<AppProps> = ({ Component, pageProps }) => {
+  const theme = createTheme({
+    components: {
+      MuiTableCell: {
+        styleOverrides: {
+          root: {
+            "&.MuiTableCell-root": {
+              padding: "4px",
+              textAlign: "center",
+              fontFamily: "Noto Sans",
+            },
+            // 条件付きスタイル
+            [".admin &"]: {
+              fontSize: "20px",
+            },
+          },
+          head: {
+            color: "white",
+            fontWeight: "bold",
+            fontSize: "18px",
+          },
+        },
+      },
+    },
+  });
   return (
     <div className="app">
       <Head>
         <title>躰道大会管理システム</title>
       </Head>
-      <Component {...pageProps} />
+      <ThemeProvider theme={theme}>
+        <Component {...pageProps} />
+      </ThemeProvider>
     </div>
   );
 };

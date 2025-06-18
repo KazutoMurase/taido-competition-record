@@ -79,8 +79,8 @@ GCPコンソールからCloud SQLを開き、インスタンスを作成する
 - 可用性: シングルゾーン
 
 ## 5. cloudbuild.yamlファイルの作成
-CIにおいて実行する内容を定義するcloudbuild.yamlファイルを作成する。
-実行内容は基本的には毎回共通だが、各種リソースのIDなどを埋め込む必要があるため、.envに記載した内容を元にyamlファイルを生成するスクリプトを用意している。
+CIにおいて実行する内容を定義するyamlファイルを作成する。Cloud Buildの実行時にこのファイルを参照させる。
+実行内容は基本的には毎回共通(cloudbuild-template.yamlに記述)だが、各種リソースのIDなどを埋め込む必要があるため、.envに記載した内容を元にyamlファイルを生成するスクリプトを用意している。
 
 - ./ci/.envに必要な変数を記入して、以下を実行する。
 ```
@@ -89,6 +89,9 @@ CIにおいて実行する内容を定義するcloudbuild.yamlファイルを作
 
 - `cloudbuild_$PROJECT_ID.yaml`というファイルが生成される。
 - 作成したファイルをコミットしてmainブランチに取り込んでおく。
+
+なお、CPUやメモリなど各種リソース設定値についてもcloudbuild-template.yamlに設定している。
+設定値の妥当性については[issue #213](https://github.com/KazutoMurase/taido-competition-record/issues/213)を参照。
 
 ## 6. GitHubとのCloud Build連携
 
