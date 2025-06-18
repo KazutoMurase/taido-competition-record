@@ -38,19 +38,19 @@ export default function Home({ competitionTitle, show_total }) {
       label: "時程表",
       icon: <ScheduleIcon sx={{ mr: 1, color: "primary.main" }} />,
       path: "/progress_check",
-      color: "primary.main"
+      color: "primary.main",
     },
     {
       label: "競技結果一覧",
       icon: <FlagIcon sx={{ mr: 1, color: "#f44336" }} />,
       path: "/results",
-      color: "#f44336"
+      color: "#f44336",
     },
     {
       label: "サマリー",
       icon: <MilitaryTechIcon sx={{ mr: 1, color: "#ffc107" }} />,
       path: "/summary",
-      color: "#ffc107"
+      color: "#ffc107",
     },
     ...(show_total
       ? [
@@ -58,7 +58,7 @@ export default function Home({ competitionTitle, show_total }) {
             label: "総合得点表",
             icon: <EmojiEventsIcon sx={{ mr: 1, color: "primary.main" }} />,
             path: "/total",
-            color: "primary.main"
+            color: "primary.main",
           },
         ]
       : []),

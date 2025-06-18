@@ -10,14 +10,20 @@ const MyApp: NextPage<AppProps> = ({ Component, pageProps }) => {
       MuiTableCell: {
         styleOverrides: {
           root: {
-            padding: "4px",
-            textAlign: "center",
-            fontFamily: "Noto Sans",
+            "&.MuiTableCell-root": {
+              padding: "4px",
+              textAlign: "center",
+              fontFamily: "Noto Sans",
+            },
+            // 条件付きスタイル
+            [".admin &"]: {
+              fontSize: "20px",
+            },
           },
           head: {
             color: "white",
             fontWeight: "bold",
-            fontSize: "15px",
+            fontSize: "18px",
           },
         },
       },

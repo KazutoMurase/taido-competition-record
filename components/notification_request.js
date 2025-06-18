@@ -13,7 +13,7 @@ import {
   TableHead,
   TableBody,
   TableRow,
-  TableCell
+  TableCell,
 } from "@mui/material";
 
 function onClearAll(is_test, function_after_post) {
@@ -136,7 +136,7 @@ function NotificationRequest({
                 <>
                   <TableCell />
                   <TableCell sx={{ "font-size": "20px" }}>
-                    リストは空です
+                    呼び出し待ちはありません
                   </TableCell>
                   <TableCell />
                   <TableCell />
