@@ -23,9 +23,16 @@ const Results: React.FC = () => {
             <u>競技結果一覧</u>
           </h1>
           <GetEvents />
+          <Grid
+          container
+          justifyContent="center"
+          alignItems="center"
+          style={{ height: "100px" }}
+        >
           <Button variant="contained" type="submit" onClick={(e) => onBack()}>
             戻る
           </Button>
+          </Grid>
         </Grid>
       </Container>
     </div>
