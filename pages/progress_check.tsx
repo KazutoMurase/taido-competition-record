@@ -2,7 +2,15 @@ import React from "react";
 import { useEffect, useState } from "react";
 import { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import { useRouter } from "next/router";
-import { Grid, Button, Box, Tabs, Tab, useMediaQuery } from "@mui/material";
+import {
+  Grid,
+  Button,
+  Box,
+  Tabs,
+  Tab,
+  useMediaQuery,
+  Typography,
+} from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
 import ProgressOnBlock from "../components/progress_on_block";
@@ -53,9 +61,21 @@ const ProgressCheck: React.FC = ({
             value={tabIndex}
             onChange={handleTabChange}
             aria-label="Progress Tabs"
+            variant="fullWidth"
+            sx={{ maxWidth: "none" }}
           >
             {courts.map((court) => (
-              <Tab key={court} label={`${court.toUpperCase()}コート`} />
+              <Tab
+                key={court}
+                label={
+                  <Box textAlign="center">
+                    <Typography variant="h5" fontWeight="bold">
+                      {court.toUpperCase()}
+                    </Typography>
+                    コート
+                  </Box>
+                }
+              />
             ))}
           </Tabs>
           <Box>
