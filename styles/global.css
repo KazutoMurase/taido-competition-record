@@ -66,6 +66,7 @@ img {
 table {
   border-collapse: separate;
   border-spacing: 0;
+  border: none;
 }
 
 table th:first-child {
@@ -96,7 +97,6 @@ table td {
   border-top: none;
   padding: 8px;
   white-space: nowrap;
-  font-family: "Noto Sans";
   font-size: 20px;
 }
 

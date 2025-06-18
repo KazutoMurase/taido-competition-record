@@ -10,9 +10,14 @@ const MyApp: NextPage<AppProps> = ({ Component, pageProps }) => {
       MuiTableCell: {
         styleOverrides: {
           root: {
-            padding: '4px',
-            textAlign: 'center',
+            padding: "4px",
+            textAlign: "center",
             fontFamily: "Noto Sans",
+          },
+          head: {
+            color: "white",
+            fontWeight: "bold",
+            fontSize: "15px",
           },
         },
       },

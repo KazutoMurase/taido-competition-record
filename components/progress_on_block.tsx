@@ -120,18 +120,16 @@ const ProgressOnBlock: React.FC<{
         >
           <TableCell>{schedule.time_schedule?.replace(/['"]+/g, "")}</TableCell>
           <TableCell>
-            {
-              GetEventName(schedule.event_id) == "dantai" ? (
-                <>{schedule.name?.replace(/['"]+/g, "")}</>
-              ) : (
+            {GetEventName(schedule.event_id) == "dantai" ? (
+              <>{schedule.name?.replace(/['"]+/g, "")}</>
+            ) : (
               <a
                 className="color-disabled"
                 href={"results/" + GetEventName(schedule.event_id)}
               >
                 {schedule.name?.replace(/['"]+/g, "")}
               </a>
-              )
-            }
+            )}
           </TableCell>
           <TableCell
             sx={
@@ -180,46 +178,10 @@ const ProgressOnBlock: React.FC<{
             <Table aria-label="schedule table">
               <TableHead>
                 <TableRow className={checkStyles.column}>
-                  <TableCell
-                    sx={{
-                      color: "white",
-                      fontWeight: "bold",
-                      textAlign: "center",
-                      width: "20%",
-                    }}
-                  >
-                    時間
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      color: "white",
-                      fontWeight: "bold",
-                      textAlign: "center",
-                      width: "30%",
-                    }}
-                  >
-                    競技
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      color: "white",
-                      fontWeight: "bold",
-                      textAlign: "center",
-                      width: "35%",
-                    }}
-                  >
-                    試合一覧
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      color: "white",
-                      fontWeight: "bold",
-                      textAlign: "center",
-                      width: "20%",
-                    }}
-                  >
-                    次の試合
-                  </TableCell>
+                  <TableCell sx={{ width: "20%" }}>時間</TableCell>
+                  <TableCell sx={{ width: "30%" }}>競技</TableCell>
+                  <TableCell sx={{ width: "35%" }}>試合一覧</TableCell>
+                  <TableCell sx={{ width: "20%" }}>次の試合</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>{scheduleTables}</TableBody>
