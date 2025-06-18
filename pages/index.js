@@ -1,8 +1,19 @@
 import { useRouter } from "next/router";
 import React from "react";
 import Container from "@mui/material/Container";
-import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
+import {
+  Card,
+  CardActionArea,
+  CardContent,
+  Typography,
+  Box,
+} from "@mui/material";
+import ScheduleIcon from "@mui/icons-material/Schedule";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import FlagIcon from "@mui/icons-material/Flag";
+import MilitaryTechIcon from "@mui/icons-material/MilitaryTech";
 import Image from "next/image";
 
 export const getServerSideProps = async () => {
@@ -18,14 +29,39 @@ export const getServerSideProps = async () => {
 
 export default function Home({ competitionTitle, show_total }) {
   const router = useRouter();
-  const ToSummary = () => {
-    router.push("/summary");
-  };
-  const ToTotal = () => {
-    router.push("/total");
-  };
+
   // TODO: make it optional
   const show_image = false;
+  const cardList = [
+    {
+      label: "時程表",
+      icon: <ScheduleIcon sx={{ mr: 1, color: "primary.main" }} />,
+      path: "/progress_check",
+      color: "primary.main"
+    },
+    {
+      label: "競技結果一覧",
+      icon: <FlagIcon sx={{ mr: 1, color: "#f44336" }} />,
+      path: "/results",
+      color: "#f44336"
+    },
+    {
+      label: "サマリー",
+      icon: <MilitaryTechIcon sx={{ mr: 1, color: "#ffc107" }} />,
+      path: "/summary",
+      color: "#ffc107"
+    },
+    ...(show_total
+      ? [
+          {
+            label: "総合得点表",
+            icon: <EmojiEventsIcon sx={{ mr: 1, color: "primary.main" }} />,
+            path: "/total",
+            color: "primary.main"
+          },
+        ]
+      : []),
+  ];
   return (
     <div>
       <br />
@@ -36,9 +72,9 @@ export default function Home({ competitionTitle, show_total }) {
           alignItems="center"
           style={{ height: "100px" }}
         >
-          <h1>
+          <h2 className="competition-title">
             <u>{competitionTitle}</u>
-          </h1>
+          </h2>
         </Grid>
         {show_image ? (
           <Grid
@@ -52,72 +88,42 @@ export default function Home({ competitionTitle, show_total }) {
         ) : (
           <></>
         )}
-        <Grid
-          container
-          justifyContent="center"
-          alignItems="center"
-          style={{ height: "60px" }}
-        >
-          <Button
-            variant="contained"
-            style={{ minWidth: "110px" }}
-            type="submit"
-            onClick={(e) => {
-              router.push("/progress_check");
-            }}
-          >
-            時程表
-          </Button>
-        </Grid>
-        <Grid
-          container
-          justifyContent="center"
-          alignItems="center"
-          style={{ height: "60px" }}
-        >
-          <Button
-            variant="contained"
-            style={{ minWidth: "110px" }}
-            type="submit"
-            onClick={(e) => {
-              router.push("/results");
-            }}
-          >
-            競技結果一覧
-          </Button>
-        </Grid>
-        <Grid
-          container
-          justifyContent="center"
-          alignItems="center"
-          style={{ height: "80px" }}
-        >
-          <Button
-            variant="contained"
-            type="submit"
-            onClick={(e) => ToSummary()}
-          >
-            サマリー
-          </Button>
-        </Grid>
-        {show_total ? (
+        {cardList.map((card, index) => (
           <Grid
             container
             justifyContent="center"
             alignItems="center"
-            style={{ height: "40px" }}
+            style={{ height: "100px" }}
           >
-            <Button
-              variant="contained"
-              type="submit"
-              onClick={(e) => ToTotal()}
+            <Card
+              sx={{
+                width: { xs: "100%", md: "80%" },
+                height: "75%",
+                display: "flex",
+                borderLeft: 20,
+                borderColor: card.color,
+                minWidth: 140,
+              }}
+              key={index}
+              elevation={2}
             >
-              総合得点表
-            </Button>
+              <CardActionArea
+                onClick={() => {
+                  router.push(card.path);
+                }}
+                sx={{ display: "flex", alignItems: "center", p: 1 }}
+              >
+                {card.icon}
+                <CardContent sx={{ p: 0 }}>
+                  <Typography variant="h6">{card.label}</Typography>
+                </CardContent>
+                <Box sx={{ pr: 2, display: "flex", alignItems: "center" }}>
+                  <ChevronRightIcon sx={{ color: card.color }} />
+                </Box>
+              </CardActionArea>
+            </Card>
           </Grid>
-        ) : (
-          <></>
-        )}
+        ))}
       </Container>
     </div>
   );
