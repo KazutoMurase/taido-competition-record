@@ -21,8 +21,9 @@ if [ "${USE_LOCAL_DB}" == "1" ]; then
     fi
 fi
 
-export COMPETITION_TITLE=`cat /ws/data/$COMPETITION_NAME/title.txt`
-export NEXT_PUBLIC_COMPETITION_TITLE=`cat /ws/data/$COMPETITION_NAME/title.txt`
+export COMPETITION_TITLE=$(cat /ws/data/$COMPETITION_NAME/title.txt)
+export NEXT_PUBLIC_COMPETITION_TITLE=$(cat /ws/data/$COMPETITION_NAME/title.txt)
+export TOP_IMAGE_PATH=$(cat "/ws/data/${COMPETITION_NAME}/top_image_path.txt" 2>/dev/null || echo "")
 
 
 if [ -z "${PRODUCTION}" ]; then

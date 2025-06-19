@@ -15,24 +15,23 @@ import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import FlagIcon from "@mui/icons-material/Flag";
 import MilitaryTechIcon from "@mui/icons-material/MilitaryTech";
 import Image from "next/image";
-import topImage from "../public/top.jpeg";
 
 export const getServerSideProps = async () => {
   const competitionTitle = process.env.COMPETITION_TITLE;
   const show_total = process.env.SHOW_TOTAL_IN_PUBLIC === "1";
+  const topImagePath = process.env.TOP_IMAGE_PATH || "";
   return {
     props: {
       competitionTitle,
       show_total,
+      topImagePath,
     },
   };
 };
 
-export default function Home({ competitionTitle, show_total }) {
+export default function Home({ competitionTitle, show_total, topImagePath }) {
   const router = useRouter();
 
-  // TODO: make it optional
-  const show_image = true;
   const cardList = [
     {
       label: "時程表",
@@ -77,14 +76,14 @@ export default function Home({ competitionTitle, show_total }) {
             <u>{competitionTitle}</u>
           </h2>
         </Grid>
-        {show_image ? (
+        {topImagePath !== "" ? (
           <Grid
             container
             justifyContent="center"
             alignItems="center"
             style={{ height: "350px" }}
           >
-            <Image src={topImage} height={300} alt="" />
+            <Image src={"/" + topImagePath} width={300} height={300} alt="" />
           </Grid>
         ) : (
           <></>
