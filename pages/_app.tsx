@@ -36,7 +36,9 @@ const MyApp: NextPage<AppProps> = ({ Component, pageProps }) => {
   const isTestPage = router.pathname.startsWith("/test");
   const [competitionTitle, setCompetitionTitle] = useState("");
   useEffect(() => {
-    setCompetitionTitle(process.env.NEXT_PUBLIC_COMPETITION_TITLE || "競技会");
+    setCompetitionTitle(
+      process.env.NEXT_PUBLIC_COMPETITION_TITLE || "躰道 大会速報",
+    );
   }, []);
   return (
     <div className="app">
