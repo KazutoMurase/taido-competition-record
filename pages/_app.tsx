@@ -1,8 +1,10 @@
 import type { NextPage } from "next";
 import type { AppProps } from "next/app";
 import Head from "next/head";
+import { useRouter } from "next/router";
 import "../styles/global.css";
 import { createTheme, ThemeProvider } from "@mui/material";
+import { useEffect, useState } from "react";
 
 const MyApp: NextPage<AppProps> = ({ Component, pageProps }) => {
   const theme = createTheme({
@@ -29,10 +31,23 @@ const MyApp: NextPage<AppProps> = ({ Component, pageProps }) => {
       },
     },
   });
+  const router = useRouter();
+  const isAdminPage = router.pathname.startsWith("/admin");
+  const isTestPage = router.pathname.startsWith("/test");
+  const [competitionTitle, setCompetitionTitle] = useState("");
+  useEffect(() => {
+    setCompetitionTitle(process.env.NEXT_PUBLIC_COMPETITION_TITLE || "競技会");
+  }, []);
   return (
     <div className="app">
       <Head>
-        <title>躰道大会管理システム</title>
+        <title>
+          {isAdminPage
+            ? "躰道 大会管理システム"
+            : isTestPage
+              ? "躰道 大会管理システムテスト"
+              : competitionTitle}
+        </title>
       </Head>
       <ThemeProvider theme={theme}>
         <Component {...pageProps} />
