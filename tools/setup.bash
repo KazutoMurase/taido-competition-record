@@ -22,6 +22,7 @@ if [ "${USE_LOCAL_DB}" == "1" ]; then
 fi
 
 export COMPETITION_TITLE=`cat /ws/data/$COMPETITION_NAME/title.txt`
+export NEXT_PUBLIC_COMPETITION_TITLE=`cat /ws/data/$COMPETITION_NAME/title.txt`
 
 
 if [ -z "${PRODUCTION}" ]; then
