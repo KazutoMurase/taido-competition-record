@@ -153,6 +153,13 @@ function GetSplitName(name) {
   return name;
 }
 
+function GetGroupNameWithBracket(group_name) {
+  if (group_name === "''") {
+    return "";
+  }
+  return group_name.replace(/['"]+/s, "【").replace(/['"]+/s, "】");
+}
+
 function GetGroupNameFontSize(group_name) {
   if (!group_name) {
     return 10;
@@ -209,7 +216,7 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
           <Text
             x={is_left ? 120 : 750}
             y={item["left_begin_y"] - 2 + y_padding}
-            text={item["left_group_name"].replace("'", "【").replace("'", "】")}
+            text={GetGroupNameWithBracket(item["left_group_name"])}
             fontSize={GetGroupNameFontSize(item["left_group_name"])}
           />
           <Rect
@@ -251,9 +258,7 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
           <Text
             x={is_left ? 120 : 750}
             y={item["right_begin_y"] - 2 + y_padding}
-            text={item["right_group_name"]
-              .replace("'", "【")
-              .replace("'", "】")}
+            text={GetGroupNameWithBracket(item["right_group_name"])}
             fontSize={GetGroupNameFontSize(item["right_group_name"])}
           />
           <Rect
@@ -301,7 +306,7 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
           <Text
             x={is_left ? 120 : 750}
             y={item["left_begin_y"] - 2}
-            text={item["left_group_name"].replace("'", "【").replace("'", "】")}
+            text={GetGroupNameWithBracket(item["left_group_name"])}
             fontSize={GetGroupNameFontSize(item["left_group_name"])}
           />
           <Rect
@@ -349,9 +354,7 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
           <Text
             x={is_left ? 120 : 750}
             y={item["right_begin_y"] - 2}
-            text={item["right_group_name"]
-              .replace("'", "【")
-              .replace("'", "】")}
+            text={GetGroupNameWithBracket(item["right_group_name"])}
             fontSize={GetGroupNameFontSize(item["right_group_name"])}
           />
           <Rect
@@ -395,7 +398,7 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
           y={item["left_begin_y"] - 5 + y_padding}
           text={
             item["left_group_name"] !== null && !hide
-              ? item["left_group_name"].replace("'", "【").replace("'", "】")
+              ? GetGroupNameWithBracket(item["left_group_name"])
               : ""
           }
           fontSize={GetGroupNameFontSize(item["left_group_name"])}
@@ -421,7 +424,7 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
           y={item["left_begin_y"] - 5 + y_padding}
           text={
             item["right_group_name"] !== null && !hide
-              ? item["right_group_name"].replace("'", "【").replace("'", "】")
+              ? GetGroupNameWithBracket(item["right_group_name"])
               : ""
           }
           fontSize={GetGroupNameFontSize(item["right_group_name"])}
