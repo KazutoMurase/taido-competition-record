@@ -190,6 +190,13 @@ function ShowRightName(data, is_mobile) {
   );
 }
 
+function ShowGroupName(group_name) {
+  if (group_name === "") {
+    return "　";
+  }
+  return group_name;
+}
+
 function RecordResult({
   block_number,
   event_name,
@@ -327,8 +334,8 @@ function RecordResult({
                 </Button>
                 <h3>
                   {data.left_color === "white"
-                    ? data.right_group_name
-                    : data.left_group_name}
+                    ? ShowGroupName(data.right_group_name)
+                    : ShowGroupName(data.left_group_name)}
                 </h3>
                 {data.left_color === "white"
                   ? ShowRightName(data, is_mobile)
@@ -359,8 +366,8 @@ function RecordResult({
                 </Button>
                 <h3>
                   {data.left_color === "white"
-                    ? data.left_group_name
-                    : data.right_group_name}
+                    ? ShowGroupName(data.left_group_name)
+                    : ShowGroupName(data.right_group_name)}
                 </h3>
                 {data.left_color === "white"
                   ? ShowLeftName(data, is_mobile)
