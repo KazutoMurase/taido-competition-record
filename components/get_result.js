@@ -925,7 +925,7 @@ function GetResult({
       setData(result);
       if (result.length > 0) {
         const roundNum = result.sort((a, b) => b.round - a.round)[0].round;
-        setLineWidth((!roundNum || roundNum > 6) ? 25 : 50);
+        setLineWidth(roundNum > 6 ? 25 : 50);
       }
     }
     fetchData();
