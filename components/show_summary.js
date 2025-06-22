@@ -1,5 +1,12 @@
 import Grid from "@mui/material/Grid";
 
+function GetGroupNameWithBracket(group_name) {
+  if (group_name === "''") {
+    return "　";
+  }
+  return group_name.replace(/['"]+/s, "【").replace(/['"]+/s, "】");
+}
+
 export function ShowWinner(item) {
   if (item["free_name"]) {
     return (
@@ -20,7 +27,7 @@ export function ShowWinner(item) {
             minWidth: "100px",
           }}
         >
-          {item["group"]?.replace("'", "【").replace("'", "】")}
+          {GetGroupNameWithBracket(item["group"])}
         </div>
       </>
     );
