@@ -225,7 +225,7 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
             width={["left_group_name"].length * 80}
             height={1}
             fill="black"
-            visible={"left_out" in item}
+            visible={"left_out" in item && item["left_group_name"] !== "''"}
           />
           <Text
             x={is_left ? 0 : 630}
@@ -267,7 +267,7 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
             width={["right_group_name"].length * 80}
             height={1}
             fill="black"
-            visible={"right_out" in item}
+            visible={"right_out" in item && item["right_group_name"] !== "''"}
           />
         </>
       );
@@ -315,7 +315,7 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
             width={["left_group_name"].length * 80}
             height={1}
             fill="black"
-            visible={"left_out" in item}
+            visible={"left_out" in item && item["left_group_name"] !== "''"}
           />
         </>
       );
@@ -363,7 +363,7 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
             width={["right_group_name"].length * 80}
             height={1}
             fill="black"
-            visible={"right_out" in item}
+            visible={"right_out" in item && item["right_group_name"] !== "''"}
           />
         </>
       );
