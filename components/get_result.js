@@ -924,7 +924,9 @@ function GetResult({
       const result = await response.json();
       setData(result);
       if (result.length > 0) {
-        const roundNum = result.sort((a, b) => b.round - a.round)[0].round;
+        const roundNum = Math.max(
+          ...result.map((d) => Number(d.round)).filter((n) => !isNaN(n)),
+        );
         setLineWidth(roundNum > 6 ? 25 : 50);
       }
     }
