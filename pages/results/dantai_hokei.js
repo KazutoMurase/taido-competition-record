@@ -1,4 +1,6 @@
 import React from "react";
+import Head from "next/head";
+import { useState, useEffect } from "react";
 import { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import GetTableResult from "../../components/get_table_result";
 
@@ -11,9 +13,27 @@ export const getServerSideProps = async (context) => {
 
 const Home = ({ params }) => {
   const hide = params.production_test === "1";
+  const [title, setTitle] = useState([]);
+  const fetchData = async () => {
+    const response = await fetch("/api/get_events");
+    const result = await response.json();
+    for (let i = 0; i < result.length; i++) {
+      if (result[i].name_en === "dantai_hokei") {
+        setTitle(result[i].name.replace(/['"]+/g, ""));
+      }
+    }
+  };
+  useEffect(() => {
+    fetchData();
+  }, []);
   return (
     <>
-      <GetTableResult event_name="dantai_hokei" hide={hide} />
+      <Head>
+        <title>{title}</title>
+      </Head>
+      <main>
+        <GetTableResult event_name="dantai_hokei" hide={hide} />
+      </main>
     </>
   );
 };
