@@ -575,6 +575,30 @@ function CreateBlock(
             text={"決勝"}
             fontSize={18}
           />
+          <Rect
+            x={x + width / 2 - 16}
+            y={item["left_begin_y"] - 5 + y_padding}
+            width={30}
+            height={30}
+            strokeWidth={isCurrentGame ? 4 : 0}
+            stroke={
+              isCurrentGame
+                ? blinkState
+                  ? "#ff9800"
+                  : "transparent"
+                : "transparent"
+            }
+            fill={
+              isCurrentGame
+                ? blinkState
+                  ? "#ffe0b2"
+                  : "transparent"
+                : "transparent"
+            }
+            cornerRadius={5}
+            onClick={(e) => onUpdate(item["id"], editable)}
+            onTap={(e) => onUpdate(item["id"], editable)}
+          />
           <Text
             x={x + width / 2 - 8}
             y={item["left_begin_y"] + 5 + y_padding}
@@ -584,27 +608,15 @@ function CreateBlock(
             onClick={(e) => onUpdate(item["id"], editable)}
             onTap={(e) => onUpdate(item["id"], editable)}
           />
-          <Rect
-            x={x + width / 2 - 16}
-            y={item["left_begin_y"] - 5 + y_padding}
-            width={30}
-            height={30}
-            strokeWidth={isCurrentGame ? 4 : 0}
-            stroke={isCurrentGame ? "#ff9800" : "transparent"}
-            fill={isCurrentGame ? "#ffe0b2" : "transparent"}
-            cornerRadius={5}
-            onClick={(e) => onUpdate(item["id"], editable)}
-            onTap={(e) => onUpdate(item["id"], editable)}
-          />
           <Text
-            x={x + width / 2 + 20}
-            y={item["left_begin_y"] - 15 + y_padding}
+            x={x + width / 2 - 8}
+            y={item["left_begin_y"] + 27 + y_padding}
             text={
               isCurrentGame && matchedBlockKey
                 ? matchedBlockKey.toUpperCase()
                 : ""
             }
-            fontSize={10}
+            fontSize={20}
             fill={
               isCurrentGame
                 ? blinkState
@@ -714,14 +726,41 @@ function CreateBlock(
             text={"三決"}
             fontSize={18}
           />
+          <Text
+            x={x + width / 2 - 8}
+            y={item["left_begin_y"] + 27 + y_padding}
+            text={
+              isCurrentGame && matchedBlockKey
+                ? matchedBlockKey.toUpperCase()
+                : ""
+            }
+            fontSize={20}
+            fill={
+              isCurrentGame
+                ? blinkState
+                  ? "#ff5722"
+                  : "transparent"
+                : "#ff5722"
+            }
+            fontStyle={"bold"}
+            visible={isCurrentGame}
+          />
           <Rect
             x={x + width / 2 - 16}
             y={item["left_begin_y"] - 5 + y_padding}
             width={30}
             height={30}
-            strokeWidth={isCurrentGame ? 4 : 0}
-            stroke={isCurrentGame ? "#ff9800" : "transparent"}
-            fill={isCurrentGame ? "#ffe0b2" : "transparent"}
+            strokeWidth={isCurrentGame ? (blinkState ? 4 : 0) : 0}
+            stroke={
+              isCurrentGame ? (blinkState ? "#ff9800" : "transparent") : "black"
+            }
+            fill={
+              isCurrentGame
+                ? blinkState
+                  ? "#ffe0b2"
+                  : "transparent"
+                : "transparent"
+            }
             cornerRadius={5}
             onClick={(e) => onUpdate(item["id"], editable)}
             onTap={(e) => onUpdate(item["id"], editable)}
@@ -1018,8 +1057,8 @@ function CreateBlock(
         <Text
           x={
             is_left
-              ? pointX + lineWidth + (item["round"] - 1) * 30 + 15
-              : pointX - lineWidth - (item["round"] - 1) * 30 - 25
+              ? pointX + lineWidth + (item["round"] - 1) * 30 + 10
+              : pointX - lineWidth - (item["round"] - 1) * 30 - 20
           }
           y={
             (item["left_begin_y"] + item["right_begin_y"]) * 0.5 -
