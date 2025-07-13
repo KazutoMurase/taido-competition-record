@@ -479,6 +479,7 @@ function CreateBlock(
   hide,
   currentGameIds = [],
   blinkState = true,
+  fromAdmin = false,
 ) {
   const router = useRouter();
 
@@ -854,6 +855,13 @@ function CreateBlock(
       } else if (event_name.includes("zissen") && left_flag === 2) {
         item["right_out"] = true;
       }
+    } else {
+      if (fromAdmin && item["left_retire"] === 1) {
+        item["left_out"] = true;
+      }
+      if (fromAdmin && item["right_retire"] === 1) {
+        item["right_out"] = true;
+      }
     }
     return (
       <>
@@ -1094,6 +1102,7 @@ function GetResult({
   hide = false,
   show_highlight = true,
   is_mobile = false,
+  fromAdmin = false,
 }) {
   const router = useRouter();
   if (returnUrl === null) {
@@ -1136,6 +1145,7 @@ function GetResult({
     async function fetchData() {
       const response = await fetch("/api/get_result?event_name=" + event_name);
       const result = await response.json();
+      console.log(result);
       setData(result);
       if (result.length > 0) {
         const roundNum = Math.max(
@@ -1498,6 +1508,7 @@ function GetResult({
                         ]),
                       ),
                       blinkState,
+                      fromAdmin,
                     ),
                   )}
                   {sortedData.map((item, index) =>

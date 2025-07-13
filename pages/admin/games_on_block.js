@@ -137,6 +137,7 @@ const Home = () => {
                   event_name={event_name}
                   block_number={block_number}
                   is_mobile={isMobile}
+                  fromAdmin={true}
                 />
               )}
             </Box>
@@ -164,6 +165,7 @@ const Home = () => {
               updateInterval={3000}
               event_name={event_name}
               block_number={block_number}
+              fromAdmin={true}
             />
           </>
         )}

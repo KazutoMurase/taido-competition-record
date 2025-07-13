@@ -59,7 +59,7 @@ async function GetFromDB(req, res) {
       : "players";
     const groups = event_name.includes("test") ? "test_groups" : "groups";
     query =
-      "SELECT t1.id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t2.name_kana AS left_name_kana, t4.name AS left_group_name, t3.name AS right_name, t3.name_kana AS right_name_kana, t5.name AS right_group_name, t1.left_player_flag FROM " +
+      "SELECT t1.id, t1.next_left_id, t1.next_right_id, t2.name AS left_name, t2.name_kana AS left_name_kana, t4.name AS left_group_name, t3.name AS right_name, t3.name_kana AS right_name_kana, t5.name AS right_group_name, t1.left_player_flag, t1.left_retire, t1.right_retire FROM " +
       event_name +
       " AS t1 LEFT JOIN " +
       players_name +

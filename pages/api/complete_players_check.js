@@ -63,6 +63,9 @@ const CompletePlayersCheck = async (req, res) => {
     const key = "update_complete_players_for_block_" + req.body.block_number;
     const timestamp = Date.now();
     await Set(key, timestamp);
+    // for retire state updates in admin
+    const result_key = "latest_update_result_for_" + event_name + "_timestamp";
+    await Set(result_key, timestamp);
     res.json({});
   } catch (error) {
     console.log(error);

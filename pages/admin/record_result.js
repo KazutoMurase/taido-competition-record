@@ -62,6 +62,7 @@ const Home = () => {
                 returnUrl={return_url}
                 block_number={block_number}
                 is_mobile={isMobile}
+                fromAdmin={true}
               />
             )}
           </Box>
@@ -80,6 +81,7 @@ const Home = () => {
             event_name={event_name}
             returnUrl={return_url}
             block_number={block_number}
+            fromAdmin={true}
           />
         </>
       )}
