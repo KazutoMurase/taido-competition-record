@@ -1145,7 +1145,6 @@ function GetResult({
     async function fetchData() {
       const response = await fetch("/api/get_result?event_name=" + event_name);
       const result = await response.json();
-      console.log(result);
       setData(result);
       if (result.length > 0) {
         const roundNum = Math.max(
