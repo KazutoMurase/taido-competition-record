@@ -1172,8 +1172,10 @@ function GetResult({
       const result = await response.json();
       setCourts(result);
     }
-    fetchCourts();
-    fetchCurrentBlock();
+    if (!hide) {
+      fetchCourts();
+      fetchCurrentBlock();
+    }
     if (updateInterval > 0) {
       const interval = setInterval(() => {
         fetchData();
