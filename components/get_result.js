@@ -181,7 +181,7 @@ function CreateText(
   lineWidth,
   y_padding,
   hide = false,
-  currentBlockData = null,
+  currentBlockDataArray = null,
   blinkState = true,
 ) {
   const is_left = item["block_pos"] === "left";
@@ -189,17 +189,30 @@ function CreateText(
   const has_left = "has_left" in item;
   const has_right = "has_right" in item;
 
-  // Check if current names match from tournament bracket
-  const isLeftPlayerCurrent =
-    currentBlockData &&
-    item["left_name"] &&
-    (item["left_name"] === currentBlockData.left_name ||
-      item["left_name"] === currentBlockData.right_name);
-  const isRightPlayerCurrent =
-    currentBlockData &&
-    item["right_name"] &&
-    (item["right_name"] === currentBlockData.left_name ||
-      item["right_name"] === currentBlockData.right_name);
+  // Check if current names match from any tournament bracket in the array
+  let isLeftPlayerCurrent = false;
+  let isRightPlayerCurrent = false;
+
+  if (currentBlockDataArray && Array.isArray(currentBlockDataArray)) {
+    for (const currentBlockData of currentBlockDataArray) {
+      if (
+        currentBlockData &&
+        item["left_name"] &&
+        (item["left_name"] === currentBlockData.left_name ||
+          item["left_name"] === currentBlockData.right_name)
+      ) {
+        isLeftPlayerCurrent = true;
+      }
+      if (
+        currentBlockData &&
+        item["right_name"] &&
+        (item["right_name"] === currentBlockData.left_name ||
+          item["right_name"] === currentBlockData.right_name)
+      ) {
+        isRightPlayerCurrent = true;
+      }
+    }
+  }
   if (is_left || is_right) {
     if (!has_left && !has_right) {
       return (
@@ -466,8 +479,7 @@ function CreateBlock(
   event_name,
   returnUrl,
   hide,
-  currentGameId = null,
-  block_number = null,
+  currentGameIds = [],
   blinkState = true,
 ) {
   const router = useRouter();
@@ -489,7 +501,18 @@ function CreateBlock(
   const is_right = item["block_pos"] === "right";
   const pointX = is_left ? 220 : 620;
   const y_padding = maxHeight < 200 ? 50 : 0;
-  const isCurrentGame = currentGameId && item["id"] === currentGameId;
+  // Check if item.id matches any value in currentGameIds object and get the block key
+  let isCurrentGame = false;
+  let matchedBlockKey = null;
+  if (currentGameIds) {
+    for (const [key, value] of Object.entries(currentGameIds)) {
+      if (value && item["id"] === value) {
+        isCurrentGame = true;
+        matchedBlockKey = key;
+        break;
+      }
+    }
+  }
   if (!is_left && !is_right) {
     if ("left_begin_y" in item && "right_begin_y" in item) {
       const x = 220 + lineWidth + (item["round"] - 2) * 30;
@@ -521,7 +544,6 @@ function CreateBlock(
             width={width / 2}
             height={left_winner ? 5 : 1}
             fill={left_winner ? "red" : "black"}
-            strokeWidth={isCurrentGame ? (blinkState ? 3 : 0) : 0}
             strokeWidth={isCurrentGame ? (blinkState ? 2 : 0) : 0}
             stroke={
               isCurrentGame ? (blinkState ? "#ff9800" : "transparent") : "black"
@@ -533,7 +555,6 @@ function CreateBlock(
             width={width / 2}
             height={right_winner ? 5 : 1}
             fill={right_winner ? "red" : "black"}
-            strokeWidth={isCurrentGame ? (blinkState ? 3 : 0) : 0}
             strokeWidth={isCurrentGame ? (blinkState ? 2 : 0) : 0}
             stroke={
               isCurrentGame ? (blinkState ? "#ff9800" : "transparent") : "black"
@@ -551,7 +572,6 @@ function CreateBlock(
                   ? "black"
                   : "black"
             }
-            strokeWidth={isCurrentGame ? (blinkState ? 3 : 0) : 0}
             strokeWidth={isCurrentGame ? (blinkState ? 2 : 0) : 0}
             stroke={
               isCurrentGame ? (blinkState ? "#ff9800" : "transparent") : "black"
@@ -600,7 +620,9 @@ function CreateBlock(
             x={x + width / 2 + 20}
             y={item["left_begin_y"] - 15 + y_padding}
             text={
-              isCurrentGame && block_number ? block_number.toUpperCase() : ""
+              isCurrentGame && matchedBlockKey
+                ? matchedBlockKey.toUpperCase()
+                : ""
             }
             fontSize={10}
             fill={
@@ -673,7 +695,6 @@ function CreateBlock(
             width={width / 2}
             height={left_winner ? 5 : 1}
             fill={left_winner ? "red" : "black"}
-            strokeWidth={isCurrentGame ? (blinkState ? 3 : 0) : 0}
             strokeWidth={isCurrentGame ? (blinkState ? 2 : 0) : 0}
             stroke={
               isCurrentGame ? (blinkState ? "#ff9800" : "transparent") : "black"
@@ -685,7 +706,6 @@ function CreateBlock(
             width={width / 2}
             height={right_winner ? 5 : 1}
             fill={right_winner ? "red" : "black"}
-            strokeWidth={isCurrentGame ? (blinkState ? 3 : 0) : 0}
             strokeWidth={isCurrentGame ? (blinkState ? 2 : 0) : 0}
             stroke={
               isCurrentGame ? (blinkState ? "#ff9800" : "transparent") : "black"
@@ -703,7 +723,6 @@ function CreateBlock(
                   ? "black"
                   : "black"
             }
-            strokeWidth={isCurrentGame ? (blinkState ? 3 : 0) : 0}
             strokeWidth={isCurrentGame ? (blinkState ? 2 : 0) : 0}
             stroke={
               isCurrentGame ? (blinkState ? "#ff9800" : "transparent") : "black"
@@ -854,7 +873,6 @@ function CreateBlock(
               ? 5
               : 1
           }
-          strokeWidth={isCurrentGame ? (blinkState ? 2 : 1) : 0}
           strokeWidth={isCurrentGame ? (blinkState ? 2 : 0) : 0}
           stroke={
             isCurrentGame ? (blinkState ? "#ff9800" : "transparent") : "black"
@@ -883,7 +901,6 @@ function CreateBlock(
               ? 5
               : 1
           }
-          strokeWidth={isCurrentGame ? (blinkState ? 2 : 1) : 0}
           strokeWidth={isCurrentGame ? (blinkState ? 2 : 0) : 0}
           stroke={
             isCurrentGame ? (blinkState ? "#ff9800" : "transparent") : "black"
@@ -948,7 +965,6 @@ function CreateBlock(
               (is_left ? -1 : 1) +
             ("offset_y" in item ? item["offset_y"] : 0)
           }
-          strokeWidth={isCurrentGame ? (blinkState ? 2 : 1) : 0}
           strokeWidth={isCurrentGame ? (blinkState ? 2 : 0) : 0}
           stroke={
             isCurrentGame ? (blinkState ? "#ff9800" : "transparent") : "black"
@@ -974,7 +990,6 @@ function CreateBlock(
             (lower_focus ? 4 : 0) -
             ("offset_y" in item ? item["offset_y"] : 0)
           }
-          strokeWidth={isCurrentGame ? (blinkState ? 2 : 1) : 0}
           strokeWidth={isCurrentGame ? (blinkState ? 2 : 0) : 0}
           stroke={
             isCurrentGame ? (blinkState ? "#ff9800" : "transparent") : "black"
@@ -1044,7 +1059,11 @@ function CreateBlock(
             ("offset_y" in item ? item["offset_y"] : 0) +
             y_padding
           }
-          text={isCurrentGame && block_number ? block_number.toUpperCase() : ""}
+          text={
+            isCurrentGame && matchedBlockKey
+              ? matchedBlockKey.toUpperCase()
+              : ""
+          }
           fontSize={20}
           fill={
             isCurrentGame ? (blinkState ? "#ff5722" : "transparent") : "#ff5722"
@@ -1064,7 +1083,7 @@ function GetResult({
   updateInterval = 10000,
   returnUrl = null,
   event_name = null,
-  block_number = "a",
+  block_number,
   hide = false,
   is_mobile = false,
 }) {
@@ -1086,7 +1105,10 @@ function GetResult({
     description: [],
   });
   const [lineWidth, setLineWidth] = useState(50);
-  const [currentBlockData, setCurrentBlockData] = useState(null);
+  const [currentBlockAData, setCurrentBlockAData] = useState(null);
+  const [currentBlockBData, setCurrentBlockBData] = useState(null);
+  const [currentBlockCData, setCurrentBlockCData] = useState(null);
+  const [currentBlockDData, setCurrentBlockDData] = useState(null);
   const [blinkState, setBlinkState] = useState(true);
   useEffect(() => {
     async function fetchData() {
@@ -1125,17 +1147,41 @@ function GetResult({
     }
     fetchEventDescription();
     async function fetchCurrentBlock() {
-      block_number = "a";
-      if (block_number) {
-        const response = await fetch(
-          `/api/current_block?block_number=${block_number}&event_name=${event_name}`,
-        );
-        const result = await response.json();
-        if (result) {
-          setCurrentBlockData(result);
-        } else {
-          setCurrentBlockData(null);
-        }
+      const response_a = await fetch(
+        `/api/current_block?block_number=a&event_name=${event_name}`,
+      );
+      const result_a = await response_a.json();
+      if (result_a) {
+        setCurrentBlockAData(result_a);
+      } else {
+        setCurrentBlockAData(null);
+      }
+      const response_b = await fetch(
+        `/api/current_block?block_number=b&event_name=${event_name}`,
+      );
+      const result_b = await response_b.json();
+      if (result_b) {
+        setCurrentBlockBData(result_b);
+      } else {
+        setCurrentBlockBData(null);
+      }
+      const response_c = await fetch(
+        `/api/current_block?block_number=c&event_name=${event_name}`,
+      );
+      const result_c = await response_c.json();
+      if (result_c) {
+        setCurrentBlockCData(result_c);
+      } else {
+        setCurrentBlockCData(null);
+      }
+      const response_d = await fetch(
+        `/api/current_block?block_number=d&event_name=${event_name}`,
+      );
+      const result_d = await response_d.json();
+      if (result_d) {
+        setCurrentBlockDData(result_d);
+      } else {
+        setCurrentBlockDData(null);
       }
     }
     fetchCurrentBlock();
@@ -1150,13 +1196,13 @@ function GetResult({
     }
   }, [event_name, updateInterval, block_number]);
   useEffect(() => {
-    if (currentBlockData) {
+    if (currentBlockAData) {
       const blinkInterval = setInterval(() => {
         setBlinkState((prev) => !prev);
       }, 500);
       return () => clearInterval(blinkInterval);
     }
-  }, [currentBlockData]);
+  }, [currentBlockAData]);
   const sortedData = data.sort((a, b) => a.id - b.id);
   let maxHeight = 0;
   for (let i = 0; i < data.length; i++) {
@@ -1443,8 +1489,12 @@ function GetResult({
                       event_name,
                       returnUrl,
                       hide,
-                      currentBlockData?.id,
-                      block_number,
+                      {
+                        A: currentBlockAData?.id,
+                        B: currentBlockBData?.id,
+                        C: currentBlockCData?.id,
+                        D: currentBlockDData?.id,
+                      },
                       blinkState,
                     ),
                   )}
@@ -1456,7 +1506,12 @@ function GetResult({
                           lineWidth,
                           y_padding,
                           hide,
-                          currentBlockData,
+                          [
+                            currentBlockAData,
+                            currentBlockBData,
+                            currentBlockCData,
+                            currentBlockDData,
+                          ],
                           blinkState,
                         ),
                   )}
