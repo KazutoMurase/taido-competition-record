@@ -1080,7 +1080,7 @@ function GetResult({
   const fetchCurrentBlock = useCallback(async () => {
     const blockData = {};
     for (const court of courts) {
-      const blockNumber = court.name.replace(/['"コート]/g, "");
+      const blockNumber = court.name.replace(/['"コート]/g, "").toLowerCase();
       const response = await fetch(
         `/api/current_block?block_number=${blockNumber}&event_name=${event_name}`,
       );
