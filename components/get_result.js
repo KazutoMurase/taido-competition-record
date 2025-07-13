@@ -194,20 +194,20 @@ function CreateText(
   let isRightPlayerCurrent = false;
 
   if (currentBlockDataArray && Array.isArray(currentBlockDataArray)) {
-    for (const currentBlockData of currentBlockDataArray) {
+    for (const currentBlockItem of currentBlockDataArray) {
       if (
-        currentBlockData &&
+        currentBlockItem &&
         item["left_name"] &&
-        (item["left_name"] === currentBlockData.left_name ||
-          item["left_name"] === currentBlockData.right_name)
+        (item["left_name"] === currentBlockItem.left_name ||
+          item["left_name"] === currentBlockItem.right_name)
       ) {
         isLeftPlayerCurrent = true;
       }
       if (
-        currentBlockData &&
+        currentBlockItem &&
         item["right_name"] &&
-        (item["right_name"] === currentBlockData.left_name ||
-          item["right_name"] === currentBlockData.right_name)
+        (item["right_name"] === currentBlockItem.left_name ||
+          item["right_name"] === currentBlockItem.right_name)
       ) {
         isRightPlayerCurrent = true;
       }
@@ -597,21 +597,9 @@ function CreateBlock(
             y={item["left_begin_y"] - 5 + y_padding}
             width={30}
             height={30}
-            strokeWidth={isCurrentGame ? (blinkState ? 4 : 0) : 0}
-            stroke={
-              isCurrentGame
-                ? blinkState
-                  ? "#ff9800"
-                  : "transparent"
-                : "transparent"
-            }
-            fill={
-              isCurrentGame
-                ? blinkState
-                  ? "#ffe0b2"
-                  : "transparent"
-                : "transparent"
-            }
+            strokeWidth={isCurrentGame ? 4 : 0}
+            stroke={isCurrentGame ? "#ff9800" : "transparent"}
+            fill={isCurrentGame ? "#ffe0b2" : "transparent"}
             cornerRadius={5}
             onClick={(e) => onUpdate(item["id"], editable)}
             onTap={(e) => onUpdate(item["id"], editable)}
@@ -739,21 +727,9 @@ function CreateBlock(
             y={item["left_begin_y"] - 5 + y_padding}
             width={30}
             height={30}
-            strokeWidth={isCurrentGame ? (blinkState ? 4 : 0) : 0}
-            stroke={
-              isCurrentGame
-                ? blinkState
-                  ? "#ff9800"
-                  : "transparent"
-                : "transparent"
-            }
-            fill={
-              isCurrentGame
-                ? blinkState
-                  ? "#ffe0b2"
-                  : "transparent"
-                : "transparent"
-            }
+            strokeWidth={isCurrentGame ? 4 : 0}
+            stroke={isCurrentGame ? "#ff9800" : "transparent"}
+            fill={isCurrentGame ? "#ffe0b2" : "transparent"}
             cornerRadius={5}
             onClick={(e) => onUpdate(item["id"], editable)}
             onTap={(e) => onUpdate(item["id"], editable)}
@@ -1105,11 +1081,33 @@ function GetResult({
     description: [],
   });
   const [lineWidth, setLineWidth] = useState(50);
-  const [currentBlockAData, setCurrentBlockAData] = useState(null);
-  const [currentBlockBData, setCurrentBlockBData] = useState(null);
-  const [currentBlockCData, setCurrentBlockCData] = useState(null);
-  const [currentBlockDData, setCurrentBlockDData] = useState(null);
+  const [currentBlockData, setCurrentBlockData] = useState({});
+  const [courts, setCourts] = useState([]);
   const [blinkState, setBlinkState] = useState(true);
+
+  const fetchCurrentBlock = async () => {
+    const blockData = {};
+    let hasAnyData = false;
+
+    for (const court of courts) {
+      // Extract letter from court name (e.g., "'Aコート'" -> "a")
+      const blockLetter = court.name.replace(/['"コート]/g, "").toLowerCase();
+      const response = await fetch(
+        `/api/current_block?block_number=${blockLetter}&event_name=${event_name}`,
+      );
+      const result = await response.json();
+      if (result) {
+        blockData[blockLetter.toUpperCase()] = result;
+        hasAnyData = true;
+      }
+    }
+
+    // Only update if we have new data, otherwise keep existing data
+    if (hasAnyData) {
+      setCurrentBlockData(blockData);
+    }
+  };
+
   useEffect(() => {
     async function fetchData() {
       const response = await fetch("/api/get_result?event_name=" + event_name);
@@ -1146,63 +1144,41 @@ function GetResult({
       }
     }
     fetchEventDescription();
-    async function fetchCurrentBlock() {
-      const response_a = await fetch(
-        `/api/current_block?block_number=a&event_name=${event_name}`,
-      );
-      const result_a = await response_a.json();
-      if (result_a) {
-        setCurrentBlockAData(result_a);
-      } else {
-        setCurrentBlockAData(null);
-      }
-      const response_b = await fetch(
-        `/api/current_block?block_number=b&event_name=${event_name}`,
-      );
-      const result_b = await response_b.json();
-      if (result_b) {
-        setCurrentBlockBData(result_b);
-      } else {
-        setCurrentBlockBData(null);
-      }
-      const response_c = await fetch(
-        `/api/current_block?block_number=c&event_name=${event_name}`,
-      );
-      const result_c = await response_c.json();
-      if (result_c) {
-        setCurrentBlockCData(result_c);
-      } else {
-        setCurrentBlockCData(null);
-      }
-      const response_d = await fetch(
-        `/api/current_block?block_number=d&event_name=${event_name}`,
-      );
-      const result_d = await response_d.json();
-      if (result_d) {
-        setCurrentBlockDData(result_d);
-      } else {
-        setCurrentBlockDData(null);
-      }
+    async function fetchCourts() {
+      const response = await fetch("/api/get_courts");
+      const result = await response.json();
+      setCourts(result);
     }
+    fetchCourts();
     fetchCurrentBlock();
     if (updateInterval > 0) {
       const interval = setInterval(() => {
         fetchData();
-        fetchCurrentBlock();
+        if (courts.length > 0) {
+          fetchCurrentBlock();
+        }
       }, updateInterval);
       return () => {
         clearInterval(interval);
       };
     }
   }, [event_name, updateInterval, block_number]);
+
   useEffect(() => {
-    if (currentBlockAData) {
+    if (courts.length > 0) {
+      fetchCurrentBlock();
+    }
+  }, [courts, event_name]);
+
+  useEffect(() => {
+    if (Object.keys(currentBlockData).length > 0) {
       const blinkInterval = setInterval(() => {
         setBlinkState((prev) => !prev);
       }, 500);
       return () => clearInterval(blinkInterval);
     }
-  }, [currentBlockAData]);
+  }, [currentBlockData]);
+
   const sortedData = data.sort((a, b) => a.id - b.id);
   let maxHeight = 0;
   for (let i = 0; i < data.length; i++) {
@@ -1489,12 +1465,12 @@ function GetResult({
                       event_name,
                       returnUrl,
                       hide,
-                      {
-                        A: currentBlockAData?.id,
-                        B: currentBlockBData?.id,
-                        C: currentBlockCData?.id,
-                        D: currentBlockDData?.id,
-                      },
+                      Object.fromEntries(
+                        Object.entries(currentBlockData).map(([key, value]) => [
+                          key,
+                          value?.id,
+                        ]),
+                      ),
                       blinkState,
                     ),
                   )}
@@ -1506,12 +1482,7 @@ function GetResult({
                           lineWidth,
                           y_padding,
                           hide,
-                          [
-                            currentBlockAData,
-                            currentBlockBData,
-                            currentBlockCData,
-                            currentBlockDData,
-                          ],
+                          Object.values(currentBlockData),
                           blinkState,
                         ),
                   )}
