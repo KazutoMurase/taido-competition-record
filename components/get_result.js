@@ -1131,10 +1131,7 @@ function GetResult({
           `/api/current_block?block_number=${block_number}&event_name=${event_name}`,
         );
         const result = await response.json();
-        console.log(result);
-        // Check if event_name matches
-        console.log(result);
-        if (result && result.event_name === event_name) {
+        if (result) {
           setCurrentBlockData(result);
         } else {
           setCurrentBlockData(null);

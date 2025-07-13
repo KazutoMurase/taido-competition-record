@@ -44,7 +44,10 @@ async function GetFromDB(req, res) {
     " AS t1 ON t0.id = t1.id" +
     " LEFT JOIN event_type AS t2 ON t1.event_id = t2.id";
   let result = await client.query(query);
-  let event_name = result.rows[0].event_name;
+  const event_name = req.query.event_name;
+  if (result.rows[0].event_name !== event_name) {
+    return [];
+  }
   if (
     req.query.schedule_id !== undefined &&
     parseInt(req.query.schedule_id) !== result.rows[0].id
@@ -267,7 +270,11 @@ const CurrentBlock = async (req, res) => {
       latestCompletePlayersTimestamp < cachedData.timestamp
     ) {
       console.log("using cache");
-      return res.json(cachedData.data);
+      if (cachedData.data["event_name"] === event_name) {
+        return res.json(cachedData.data);
+      } else {
+        return res.json([]);
+      }
     }
     console.log("get new data");
     const data = await GetFromDB(req, res);
