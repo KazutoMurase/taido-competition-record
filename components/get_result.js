@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import React from "react";
 React.useLayoutEffect = React.useEffect;
 import { useRouter } from "next/router";
@@ -176,11 +176,41 @@ function GetGroupNameFontSize(group_name) {
   return 10;
 }
 
-function CreateText(item, lineWidth, y_padding, hide = false) {
+function CreateText(
+  item,
+  lineWidth,
+  y_padding,
+  hide = false,
+  currentBlockDataArray = null,
+  blinkState = true,
+) {
   const is_left = item["block_pos"] === "left";
   const is_right = item["block_pos"] === "right";
   const has_left = "has_left" in item;
   const has_right = "has_right" in item;
+
+  let isLeftPlayerCurrent = false;
+  let isRightPlayerCurrent = false;
+  if (currentBlockDataArray && Array.isArray(currentBlockDataArray)) {
+    for (const currentBlockItem of currentBlockDataArray) {
+      if (
+        currentBlockItem &&
+        item["left_name"] &&
+        (item["left_name"] === currentBlockItem.left_name ||
+          item["left_name"] === currentBlockItem.right_name)
+      ) {
+        isLeftPlayerCurrent = true;
+      }
+      if (
+        currentBlockItem &&
+        item["right_name"] &&
+        (item["right_name"] === currentBlockItem.left_name ||
+          item["right_name"] === currentBlockItem.right_name)
+      ) {
+        isRightPlayerCurrent = true;
+      }
+    }
+  }
   if (is_left || is_right) {
     if (!has_left && !has_right) {
       return (
@@ -204,6 +234,8 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
             y={item["left_begin_y"] - 7 + y_padding}
             text={GetSplitName(item["left_name"])}
             fontSize={item["left_name"].length < 8 ? 18 : 14}
+            fill={isLeftPlayerCurrent ? "#ff5722" : "black"}
+            fontStyle={isLeftPlayerCurrent ? "bold" : "normal"}
           />
           <Rect
             x={is_left ? 0 : 625}
@@ -246,6 +278,8 @@ function CreateText(item, lineWidth, y_padding, hide = false) {
             y={item["right_begin_y"] - 7 + y_padding}
             text={GetSplitName(item["right_name"])}
             fontSize={item["right_name"].length < 8 ? 18 : 14}
+            fill={isRightPlayerCurrent ? "#ff5722" : "black"}
+            fontStyle={isRightPlayerCurrent ? "bold" : "normal"}
           />
           <Rect
             x={is_left ? 0 : 625}
@@ -443,6 +477,8 @@ function CreateBlock(
   event_name,
   returnUrl,
   hide,
+  currentGameIds = [],
+  blinkState = true,
 ) {
   const router = useRouter();
 
@@ -463,6 +499,18 @@ function CreateBlock(
   const is_right = item["block_pos"] === "right";
   const pointX = is_left ? 220 : 620;
   const y_padding = maxHeight < 200 ? 50 : 0;
+
+  let isCurrentGame = false;
+  let matchedBlockKey = null;
+  if (currentGameIds) {
+    for (const [key, value] of Object.entries(currentGameIds)) {
+      if (value && item["id"] === value) {
+        isCurrentGame = true;
+        matchedBlockKey = key;
+        break;
+      }
+    }
+  }
   if (!is_left && !is_right) {
     if ("left_begin_y" in item && "right_begin_y" in item) {
       const x = 220 + lineWidth + (item["round"] - 2) * 30;
@@ -494,6 +542,10 @@ function CreateBlock(
             width={width / 2}
             height={left_winner ? 5 : 1}
             fill={left_winner ? "red" : "black"}
+            strokeWidth={isCurrentGame ? (blinkState ? 2 : 0) : 0}
+            stroke={
+              isCurrentGame ? (blinkState ? "#ff9800" : "transparent") : "black"
+            }
           />
           <Rect
             x={x + width / 2}
@@ -501,6 +553,10 @@ function CreateBlock(
             width={width / 2}
             height={right_winner ? 5 : 1}
             fill={right_winner ? "red" : "black"}
+            strokeWidth={isCurrentGame ? (blinkState ? 2 : 0) : 0}
+            stroke={
+              isCurrentGame ? (blinkState ? "#ff9800" : "transparent") : "black"
+            }
           />
           <Rect
             x={x + width / 2}
@@ -508,12 +564,40 @@ function CreateBlock(
             width={left_winner || right_winner ? 5 : 1}
             height={-50 + (maxHeight ? 20 : 0)}
             fill={left_winner || right_winner ? "red" : "black"}
+            strokeWidth={isCurrentGame ? (blinkState ? 2 : 0) : 0}
+            stroke={
+              isCurrentGame ? (blinkState ? "#ff9800" : "transparent") : "black"
+            }
           />
           <Text
             x={x + width / 2 - 20}
             y={item["left_begin_y"] - 70 + (maxHeight ? 20 : 0) + y_padding}
             text={"決勝"}
             fontSize={18}
+          />
+          <Rect
+            x={x + width / 2 - 16}
+            y={item["left_begin_y"] - 5 + y_padding}
+            width={30}
+            height={30}
+            strokeWidth={isCurrentGame ? 4 : 0}
+            stroke={
+              isCurrentGame
+                ? blinkState
+                  ? "#ff9800"
+                  : "transparent"
+                : "transparent"
+            }
+            fill={
+              isCurrentGame
+                ? blinkState
+                  ? "#ffe0b2"
+                  : "transparent"
+                : "transparent"
+            }
+            cornerRadius={5}
+            onClick={(e) => onUpdate(item["id"], editable)}
+            onTap={(e) => onUpdate(item["id"], editable)}
           />
           <Text
             x={x + width / 2 - 8}
@@ -524,15 +608,24 @@ function CreateBlock(
             onClick={(e) => onUpdate(item["id"], editable)}
             onTap={(e) => onUpdate(item["id"], editable)}
           />
-          <Rect
-            x={x + width / 2 - 16}
-            y={item["left_begin_y"] - 5 + y_padding}
-            width={30}
-            height={30}
-            strokeWidth={2}
-            cornerRadius={5}
-            onClick={(e) => onUpdate(item["id"], editable)}
-            onTap={(e) => onUpdate(item["id"], editable)}
+          <Text
+            x={x + width / 2 - 8}
+            y={item["left_begin_y"] + 27 + y_padding}
+            text={
+              isCurrentGame && matchedBlockKey
+                ? matchedBlockKey.toUpperCase()
+                : ""
+            }
+            fontSize={20}
+            fill={
+              isCurrentGame
+                ? blinkState
+                  ? "#ff5722"
+                  : "transparent"
+                : "#ff5722"
+            }
+            fontStyle={"bold"}
+            visible={isCurrentGame}
           />
           <Text
             x={x + width / 2 - 10}
@@ -594,6 +687,10 @@ function CreateBlock(
             width={width / 2}
             height={left_winner ? 5 : 1}
             fill={left_winner ? "red" : "black"}
+            strokeWidth={isCurrentGame ? (blinkState ? 2 : 0) : 0}
+            stroke={
+              isCurrentGame ? (blinkState ? "#ff9800" : "transparent") : "black"
+            }
           />
           <Rect
             x={x + width / 2}
@@ -601,13 +698,27 @@ function CreateBlock(
             width={width / 2}
             height={right_winner ? 5 : 1}
             fill={right_winner ? "red" : "black"}
+            strokeWidth={isCurrentGame ? (blinkState ? 2 : 0) : 0}
+            stroke={
+              isCurrentGame ? (blinkState ? "#ff9800" : "transparent") : "black"
+            }
           />
           <Rect
             x={x + width / 2}
             y={item["left_begin_y"] + y_padding}
             width={left_winner || right_winner ? 5 : 1}
             height={-50}
-            fill={left_winner || right_winner ? "red" : "black"}
+            fill={
+              left_winner || right_winner
+                ? "red"
+                : isCurrentGame
+                  ? "black"
+                  : "black"
+            }
+            strokeWidth={isCurrentGame ? (blinkState ? 2 : 0) : 0}
+            stroke={
+              isCurrentGame ? (blinkState ? "#ff9800" : "transparent") : "black"
+            }
           />
           <Text
             x={x + width / 2 - 20}
@@ -615,12 +726,41 @@ function CreateBlock(
             text={"三決"}
             fontSize={18}
           />
+          <Text
+            x={x + width / 2 - 8}
+            y={item["left_begin_y"] + 27 + y_padding}
+            text={
+              isCurrentGame && matchedBlockKey
+                ? matchedBlockKey.toUpperCase()
+                : ""
+            }
+            fontSize={20}
+            fill={
+              isCurrentGame
+                ? blinkState
+                  ? "#ff5722"
+                  : "transparent"
+                : "#ff5722"
+            }
+            fontStyle={"bold"}
+            visible={isCurrentGame}
+          />
           <Rect
             x={x + width / 2 - 16}
             y={item["left_begin_y"] - 5 + y_padding}
             width={30}
             height={30}
-            strokeWidth={2}
+            strokeWidth={isCurrentGame ? (blinkState ? 4 : 0) : 0}
+            stroke={
+              isCurrentGame ? (blinkState ? "#ff9800" : "transparent") : "black"
+            }
+            fill={
+              isCurrentGame
+                ? blinkState
+                  ? "#ffe0b2"
+                  : "transparent"
+                : "transparent"
+            }
             cornerRadius={5}
             onClick={(e) => onUpdate(item["id"], editable)}
             onTap={(e) => onUpdate(item["id"], editable)}
@@ -740,6 +880,10 @@ function CreateBlock(
               ? 5
               : 1
           }
+          strokeWidth={isCurrentGame ? (blinkState ? 2 : 0) : 0}
+          stroke={
+            isCurrentGame ? (blinkState ? "#ff9800" : "transparent") : "black"
+          }
         />
         <Rect
           x={
@@ -763,6 +907,10 @@ function CreateBlock(
             (has_right && left_winner && item["right_name"] !== null)
               ? 5
               : 1
+          }
+          strokeWidth={isCurrentGame ? (blinkState ? 2 : 0) : 0}
+          stroke={
+            isCurrentGame ? (blinkState ? "#ff9800" : "transparent") : "black"
           }
         />
         <Text
@@ -824,6 +972,10 @@ function CreateBlock(
               (is_left ? -1 : 1) +
             ("offset_y" in item ? item["offset_y"] : 0)
           }
+          strokeWidth={isCurrentGame ? (blinkState ? 2 : 0) : 0}
+          stroke={
+            isCurrentGame ? (blinkState ? "#ff9800" : "transparent") : "black"
+          }
         />
         <Rect
           x={
@@ -845,6 +997,10 @@ function CreateBlock(
             (lower_focus ? 4 : 0) -
             ("offset_y" in item ? item["offset_y"] : 0)
           }
+          strokeWidth={isCurrentGame ? (blinkState ? 2 : 0) : 0}
+          stroke={
+            isCurrentGame ? (blinkState ? "#ff9800" : "transparent") : "black"
+          }
         />
         <Rect
           x={
@@ -861,7 +1017,21 @@ function CreateBlock(
           }
           width={30}
           height={30}
-          strokeWidth={2}
+          strokeWidth={isCurrentGame ? (blinkState ? 4 : 0) : 0}
+          stroke={
+            isCurrentGame
+              ? blinkState
+                ? "#ff9800"
+                : "transparent"
+              : "transparent"
+          }
+          fill={
+            isCurrentGame
+              ? blinkState
+                ? "#ffe0b2"
+                : "transparent"
+              : "transparent"
+          }
           cornerRadius={5}
           onClick={(e) => onUpdate(item["id"], editable)}
           onTap={(e) => onUpdate(item["id"], editable)}
@@ -884,6 +1054,30 @@ function CreateBlock(
           onClick={(e) => onUpdate(item["id"], editable)}
           onTap={(e) => onUpdate(item["id"], editable)}
         />
+        <Text
+          x={
+            is_left
+              ? pointX + lineWidth + (item["round"] - 1) * 30 + 10
+              : pointX - lineWidth - (item["round"] - 1) * 30 - 20
+          }
+          y={
+            (item["left_begin_y"] + item["right_begin_y"]) * 0.5 -
+            25 +
+            ("offset_y" in item ? item["offset_y"] : 0) +
+            y_padding
+          }
+          text={
+            isCurrentGame && matchedBlockKey
+              ? matchedBlockKey.toUpperCase()
+              : ""
+          }
+          fontSize={20}
+          fill={
+            isCurrentGame ? (blinkState ? "#ff5722" : "transparent") : "#ff5722"
+          }
+          fontStyle={"bold"}
+          visible={isCurrentGame}
+        />
       </>
     );
   }
@@ -898,6 +1092,7 @@ function GetResult({
   event_name = null,
   block_number = null,
   hide = false,
+  show_highlight = true,
   is_mobile = false,
 }) {
   const router = useRouter();
@@ -918,6 +1113,25 @@ function GetResult({
     description: [],
   });
   const [lineWidth, setLineWidth] = useState(50);
+  const [currentBlockData, setCurrentBlockData] = useState({});
+  const [courts, setCourts] = useState([]);
+  const [blinkState, setBlinkState] = useState(true);
+
+  const fetchCurrentBlock = useCallback(async () => {
+    const blockData = {};
+    for (const court of courts) {
+      const blockNumber = court.name.replace(/['"コート]/g, "").toLowerCase();
+      const response = await fetch(
+        `/api/current_block?block_number=${blockNumber}&event_name=${event_name}`,
+      );
+      const result = await response.json();
+      if (result) {
+        blockData[blockNumber] = result;
+      }
+    }
+    setCurrentBlockData({ ...blockData });
+  }, [courts, event_name]);
+
   useEffect(() => {
     async function fetchData() {
       const response = await fetch("/api/get_result?event_name=" + event_name);
@@ -954,15 +1168,43 @@ function GetResult({
       }
     }
     fetchEventDescription();
+    async function fetchCourts() {
+      const response = await fetch("/api/get_courts");
+      const result = await response.json();
+      setCourts(result);
+    }
+    if (!hide && show_highlight) {
+      fetchCourts();
+      fetchCurrentBlock();
+    }
     if (updateInterval > 0) {
       const interval = setInterval(() => {
         fetchData();
+        if (courts.length > 0) {
+          fetchCurrentBlock();
+        }
       }, updateInterval);
       return () => {
         clearInterval(interval);
       };
     }
-  }, [event_name, updateInterval]);
+  }, [event_name, updateInterval, block_number, courts.length]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (courts.length > 0) {
+      fetchCurrentBlock();
+    }
+  }, [courts.length]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (Object.keys(currentBlockData).length > 0) {
+      const blinkInterval = setInterval(() => {
+        setBlinkState((prev) => !prev);
+      }, 500);
+      return () => clearInterval(blinkInterval);
+    }
+  }, [currentBlockData]);
+
   const sortedData = data.sort((a, b) => a.id - b.id);
   let maxHeight = 0;
   for (let i = 0; i < data.length; i++) {
@@ -1249,12 +1491,26 @@ function GetResult({
                       event_name,
                       returnUrl,
                       hide,
+                      Object.fromEntries(
+                        Object.entries(currentBlockData).map(([key, value]) => [
+                          key,
+                          value?.id,
+                        ]),
+                      ),
+                      blinkState,
                     ),
                   )}
                   {sortedData.map((item, index) =>
                     event_name.includes("dantai")
                       ? CreateDantaiText(item, lineWidth, y_padding, hide)
-                      : CreateText(item, lineWidth, y_padding, hide),
+                      : CreateText(
+                          item,
+                          lineWidth,
+                          y_padding,
+                          hide,
+                          Object.values(currentBlockData),
+                          blinkState,
+                        ),
                   )}
                 </Layer>
               </Stage>

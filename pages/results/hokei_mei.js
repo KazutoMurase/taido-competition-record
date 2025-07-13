@@ -5,7 +5,10 @@ import { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import GetResult from "../../components/get_result";
 
 export const getServerSideProps = async (context) => {
-  const params = { production_test: process.env.PRODUCTION_TEST };
+  const params = {
+    production_test: process.env.PRODUCTION_TEST,
+    show_highlight_in_tournament: process.env.SHOW_HIGHLIGHT_IN_TOURNAMENT,
+  };
   return {
     props: { params },
   };
@@ -13,6 +16,7 @@ export const getServerSideProps = async (context) => {
 
 const Home = ({ params }) => {
   const hide = params.production_test === "1";
+  const show_highlight = params.show_highlight_in_tournament === "1";
   const [title, setTitle] = useState([]);
   const fetchData = async () => {
     const response = await fetch("/api/get_events");
@@ -32,7 +36,11 @@ const Home = ({ params }) => {
         <title>{title}</title>
       </Head>
       <main>
-        <GetResult event_name="hokei_mei" hide={hide} />
+        <GetResult
+          event_name="hokei_mei"
+          hide={hide}
+          show_highlight={show_highlight}
+        />
       </main>
     </>
   );
