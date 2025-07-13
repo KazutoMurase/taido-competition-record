@@ -1087,10 +1087,7 @@ function GetResult({
 
   const fetchCurrentBlock = async () => {
     const blockData = {};
-    let hasAnyData = false;
-
     for (const court of courts) {
-      // Extract letter from court name (e.g., "'Aコート'" -> "a")
       const blockLetter = court.name.replace(/['"コート]/g, "").toLowerCase();
       const response = await fetch(
         `/api/current_block?block_number=${blockLetter}&event_name=${event_name}`,
@@ -1098,14 +1095,12 @@ function GetResult({
       const result = await response.json();
       if (result) {
         blockData[blockLetter.toUpperCase()] = result;
-        hasAnyData = true;
       }
     }
-
-    // Only update if we have new data, otherwise keep existing data
-    if (hasAnyData) {
-      setCurrentBlockData(blockData);
-    }
+    setCurrentBlockData((prevData) => {
+      // Clear previous data and set new data
+      return { ...blockData };
+    });
   };
 
   useEffect(() => {
