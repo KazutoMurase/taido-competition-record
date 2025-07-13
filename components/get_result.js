@@ -1128,7 +1128,7 @@ function GetResult({
       block_number = "a";
       if (block_number) {
         const response = await fetch(
-          `/api/current_block?block_name=block_${block_number}&event_name=${event_name}`,
+          `/api/current_block?block_number=${block_number}&event_name=${event_name}`,
         );
         const result = await response.json();
         console.log(result);
@@ -1152,13 +1152,11 @@ function GetResult({
       };
     }
   }, [event_name, updateInterval, block_number]);
-
-  // Blinking effect for current game
   useEffect(() => {
     if (currentBlockData) {
       const blinkInterval = setInterval(() => {
         setBlinkState((prev) => !prev);
-      }, 500); // 500ms interval for blinking
+      }, 500);
       return () => clearInterval(blinkInterval);
     }
   }, [currentBlockData]);

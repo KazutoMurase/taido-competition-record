@@ -34,7 +34,7 @@ function update(sorted_data, item, block_indices, value, round) {
 
 async function GetFromDB(req, res) {
   const client = await GetClient();
-  const block_name = "block_" + (req.query.block_number || "a");
+  const block_name = "block_" + req.query.block_number;
   const current_block_name = "current_" + block_name;
   let query =
     "SELECT t0.id, t0.game_id, t2.name_en AS event_name from " +
@@ -239,11 +239,12 @@ async function GetFromDB(req, res) {
 
 const CurrentBlock = async (req, res) => {
   try {
-    const block_name = "block_" + (req.query.block_number || "a");
+    const block_name = "block_" + req.query.block_number;
     const current_block_name = "current_" + block_name;
     const event_name = req.query.event_name;
     const cacheKey = "current_" + block_name;
     const cachedData = await Get(cacheKey);
+
     // 'update_id_for_' +current_block_name can be checked,
     // but only game id should be enough in the current logic
     const latestGameIdUpdateKey = "update_game_id_for_" + current_block_name;
@@ -252,6 +253,7 @@ const CurrentBlock = async (req, res) => {
       "latest_update_result_for_" + event_name + "_timestamp";
     const latestCompletePlayersKey =
       "update_complete_players_for_" + block_name;
+
     const latestGameIdUpdateTimestamp = (await Get(latestGameIdUpdateKey)) || 0;
     const latestChangeOrderTimestamp = (await Get(latestChangeOrderKey)) || 0;
     const latestUpdateResultTimestamp = (await Get(latestUpdateResultKey)) || 0;
@@ -265,7 +267,7 @@ const CurrentBlock = async (req, res) => {
       latestCompletePlayersTimestamp < cachedData.timestamp
     ) {
       console.log("using cache");
-      //return res.json(cachedData.data);
+      return res.json(cachedData.data);
     }
     console.log("get new data");
     const data = await GetFromDB(req, res);
