@@ -189,10 +189,8 @@ function CreateText(
   const has_left = "has_left" in item;
   const has_right = "has_right" in item;
 
-  // Check if current names match from any tournament bracket in the array
   let isLeftPlayerCurrent = false;
   let isRightPlayerCurrent = false;
-
   if (currentBlockDataArray && Array.isArray(currentBlockDataArray)) {
     for (const currentBlockItem of currentBlockDataArray) {
       if (
@@ -501,7 +499,7 @@ function CreateBlock(
   const is_right = item["block_pos"] === "right";
   const pointX = is_left ? 220 : 620;
   const y_padding = maxHeight < 200 ? 50 : 0;
-  // Check if item.id matches any value in currentGameIds object and get the block key
+
   let isCurrentGame = false;
   let matchedBlockKey = null;
   if (currentGameIds) {
@@ -565,13 +563,7 @@ function CreateBlock(
             y={item["left_begin_y"] + y_padding}
             width={left_winner || right_winner ? 5 : 1}
             height={-50 + (maxHeight ? 20 : 0)}
-            fill={
-              left_winner || right_winner
-                ? "red"
-                : isCurrentGame
-                  ? "black"
-                  : "black"
-            }
+            fill={left_winner || right_winner ? "red" : "black"}
             strokeWidth={isCurrentGame ? (blinkState ? 2 : 0) : 0}
             stroke={
               isCurrentGame ? (blinkState ? "#ff9800" : "transparent") : "black"
@@ -1059,7 +1051,7 @@ function GetResult({
   updateInterval = 10000,
   returnUrl = null,
   event_name = null,
-  block_number,
+  block_number = null,
   hide = false,
   is_mobile = false,
 }) {
@@ -1088,17 +1080,16 @@ function GetResult({
   const fetchCurrentBlock = async () => {
     const blockData = {};
     for (const court of courts) {
-      const blockLetter = court.name.replace(/['"コート]/g, "").toLowerCase();
+      const blockNumber = court.name.replace(/['"コート]/g, "");
       const response = await fetch(
-        `/api/current_block?block_number=${blockLetter}&event_name=${event_name}`,
+        `/api/current_block?block_number=${blockNumber}&event_name=${event_name}`,
       );
       const result = await response.json();
       if (result) {
-        blockData[blockLetter.toUpperCase()] = result;
+        blockData[blockNumber] = result;
       }
     }
     setCurrentBlockData((prevData) => {
-      // Clear previous data and set new data
       return { ...blockData };
     });
   };
