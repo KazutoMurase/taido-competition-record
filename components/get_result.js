@@ -1092,6 +1092,7 @@ function GetResult({
   event_name = null,
   block_number = null,
   hide = false,
+  show_highlight = true,
   is_mobile = false,
 }) {
   const router = useRouter();
@@ -1172,7 +1173,7 @@ function GetResult({
       const result = await response.json();
       setCourts(result);
     }
-    if (!hide) {
+    if (!hide && show_highlight) {
       fetchCourts();
       fetchCurrentBlock();
     }
