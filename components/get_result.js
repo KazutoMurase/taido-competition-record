@@ -1019,7 +1019,7 @@ function CreateBlock(
           x={
             is_left
               ? pointX + lineWidth + (item["round"] - 1) * 30 + 15
-              : pointX - lineWidth - (item["round"] - 1) * 30 - 60
+              : pointX - lineWidth - (item["round"] - 1) * 30 - 25
           }
           y={
             (item["left_begin_y"] + item["right_begin_y"]) * 0.5 -
