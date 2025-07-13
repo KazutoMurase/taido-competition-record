@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import React from "react";
 React.useLayoutEffect = React.useEffect;
 import { useRouter } from "next/router";
@@ -1077,7 +1077,7 @@ function GetResult({
   const [courts, setCourts] = useState([]);
   const [blinkState, setBlinkState] = useState(true);
 
-  const fetchCurrentBlock = async () => {
+  const fetchCurrentBlock = useCallback(async () => {
     const blockData = {};
     for (const court of courts) {
       const blockNumber = court.name.replace(/['"コート]/g, "");
@@ -1089,10 +1089,8 @@ function GetResult({
         blockData[blockNumber] = result;
       }
     }
-    setCurrentBlockData((prevData) => {
-      return { ...blockData };
-    });
-  };
+    setCurrentBlockData({ ...blockData });
+  }, [courts, event_name]);
 
   useEffect(() => {
     async function fetchData() {
@@ -1148,13 +1146,13 @@ function GetResult({
         clearInterval(interval);
       };
     }
-  }, [event_name, updateInterval, block_number]);
+  }, [event_name, updateInterval, block_number, courts.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (courts.length > 0) {
       fetchCurrentBlock();
     }
-  }, [courts, event_name]);
+  }, [courts.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (Object.keys(currentBlockData).length > 0) {
