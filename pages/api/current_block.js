@@ -45,14 +45,13 @@ async function GetFromDB(req, res) {
     " LEFT JOIN event_type AS t2 ON t1.event_id = t2.id";
   let result = await client.query(query);
   const event_name = req.query.event_name;
-  if (result.rows[0].event_name !== event_name) {
-    if (event_name.includes("test_")) {
-      if (result.rows[0].event_name !== event_name.replace("test_", "")) {
-        return [];
-      }
-    } else {
-      return [];
-    }
+  const dbEventName = result.rows[0].event_name;
+  const isTestEvent = event_name.includes("test_");
+  const eventNameMatches = isTestEvent
+    ? dbEventName === event_name.replace("test_", "")
+    : dbEventName === event_name;
+  if (!eventNameMatches) {
+    return [];
   }
   if (
     req.query.schedule_id !== undefined &&
