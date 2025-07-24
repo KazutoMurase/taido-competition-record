@@ -46,7 +46,13 @@ async function GetFromDB(req, res) {
   let result = await client.query(query);
   const event_name = req.query.event_name;
   if (result.rows[0].event_name !== event_name) {
-    return [];
+    if (event_name.includes("test_")) {
+      if (result.rows[0].event_name !== event_name.replace("test_", "")) {
+        return [];
+      }
+    } else {
+      return [];
+    }
   }
   if (
     req.query.schedule_id !== undefined &&
