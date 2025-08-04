@@ -69,6 +69,15 @@ def check_number(sheet, row, col):
         number = int(number.replace('※', ''))
     return number
 
+def search_number_in_col(sheet, row, col, search_num=2):
+    search_indices = [0]
+    for i in range(search_num):
+        search_indices.extend([-(i+1), i+1])
+    for i in search_indices:
+        id = check_number(sheet, row + i, col)
+        if id is not None:
+            return id
+    return None
 
 def check_towards_top(sheet, row, col):
     i = 1
@@ -123,7 +132,7 @@ def check_towards_right(sheet, row, col):
 def search_left_block(sheet, games, game, row, col):
     update_row = check_towards_top(sheet, row, col)
     update_col = check_towards_left(sheet, row - update_row-1, col)
-    id = check_number(sheet, row - update_row - 1, col - update_col - 1)
+    id = search_number_in_col(sheet, row - update_row - 1, col - update_col - 1)
     if isinstance(id, int):
         upper_game = Game(id=id)
         upper_game.next_left = game.id
@@ -150,10 +159,9 @@ def search_left_block(sheet, games, game, row, col):
     else:
         print (f"failed to find next upper item in {sheet[row][col]}")
 
-
     update_row = check_towards_bottom(sheet, row, col)
     update_col = check_towards_left(sheet, row + update_row, col)
-    id = check_number(sheet, row + update_row, col - update_col - 1)
+    id = search_number_in_col(sheet, row + update_row, col - update_col - 1)
     if isinstance(id, int):
         lower_game = Game(id=id)
         lower_game.next_right = game.id
@@ -184,7 +192,7 @@ def search_left_block(sheet, games, game, row, col):
 def search_right_block(sheet, games, game, row, col):
     update_row = check_towards_top(sheet, row, col)
     update_col = check_towards_right(sheet, row - update_row-1, col)
-    id = check_number(sheet, row - update_row - 1, col + update_col)
+    id = search_number_in_col(sheet, row - update_row - 1, col + update_col)
     if isinstance(id, int):
         upper_game = Game(id=id)
         upper_game.next_right = game.id
@@ -238,7 +246,7 @@ def search_right_block(sheet, games, game, row, col):
 
     update_row = check_towards_bottom(sheet, row, col)
     update_col = check_towards_right(sheet, row + update_row, col)
-    id = check_number(sheet, row + update_row + 1, col + update_col)
+    id = search_number_in_col(sheet, row + update_row + 1, col + update_col)
     if isinstance(id, int):
         lower_game = Game(id=id)
         lower_game.next_left = game.id
@@ -268,7 +276,7 @@ def search_right_block(sheet, games, game, row, col):
             if game.left_id == "":
                 print (f"failed to find next upper item in {sheet[row][col]}")
     else:
-        id = check_number(sheet, row + update_row, col + update_col)
+        id = search_number_in_col(sheet, row + update_row, col + update_col)
         if isinstance(id, int):
             lower_game = Game(id=id)
             lower_game.next_left = game.id
@@ -316,6 +324,9 @@ def main(file_path, output_path):
         final_num = check_number(sheet, target_row+index+1, target_col)
         if final_num is None:
             continue
+        if 'ひな型' in name:
+            continue
+        print(name)
         # before_final / final
         before_final_game = Game(id=final_num-1)
         final_game = Game(id=final_num)
