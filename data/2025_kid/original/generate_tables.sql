@@ -197,6 +197,7 @@ primary key(id));
 \copy zissen_man from 'zissen_man.csv' csv header;
 \copy hokei_woman from 'hokei_woman.csv' csv header;
 \copy zissen_woman from 'zissen_woman.csv' csv header;
+\copy hokei_kyuui from 'hokei_kyuui.csv' csv header;
 \copy junior_high_hokei_man from 'junior_high_hokei_man.csv' csv header;
 \copy junior_high_zissen_man from 'junior_high_zissen_man.csv' csv header;
 \copy junior_high_hokei_woman from 'junior_high_hokei_woman.csv' csv header;
