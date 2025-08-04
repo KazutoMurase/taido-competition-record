@@ -11,7 +11,7 @@ const GetEvents = async (req, res) => {
       return res.json(cached_data.data);
     }
     const query =
-      "SELECT id, name, name_en, existence, order_id FROM event_type";
+      "SELECT id, full_name, name, name_en, existence, order_id FROM event_type";
     const result = await client.query(query);
     const sorted_data = result.rows.sort((a, b) => a.order_id - b.order_id);
     await Set(cache_key, { data: sorted_data });

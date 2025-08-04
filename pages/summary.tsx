@@ -38,6 +38,7 @@ const Summary: React.FC<{ params }> = ({ params }) => {
       if (result[i]["existence"] && result[i]["name_en"] != "finished") {
         event_infos.push({
           id: result[i]["id"],
+          full_name: result[i]["full_name"].replace(/['"]+/g, ""),
           name: result[i]["name"].replace(/['"]+/g, ""),
           name_en: result[i]["name_en"].replace(/['"]+/g, ""),
         });
@@ -62,7 +63,7 @@ const Summary: React.FC<{ params }> = ({ params }) => {
         <GetSummary
           key={event_info.id}
           event_id={event_info.id}
-          event_name={event_info.name}
+          event_name={event_info.full_name}
           event_name_en={event_info.name_en}
           hide={hide}
         />
