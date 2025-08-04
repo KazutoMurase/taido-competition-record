@@ -32,11 +32,17 @@ function ShowHokeiType(item, event_name) {
   } else if (event_name === "hokei_newcommer") {
     return <td>運足八法</td>;
   } else if (event_name.includes("hokei_kyuui")) {
-    return <td>変体/変陰</td>;
+    return <td>{item["round"] <= 2 ? "旋・運・変" : "自由法形"}</td>;
   } else if (event_name.includes("hokei_sei")) {
     return <td>制の法形</td>;
+  } else if (event_name.includes("junior_high")) {
+    return <td>{item["round"] <= 2 ? "旋・運・変" : "自由法形"}</td>;
+  } else if (event_name.includes("higher_grades")) {
+    return <td>{item["round"] <= 2 ? "旋・運" : "旋・運・変"}</td>;
+  } else if (event_name.includes("lower_grades")) {
+    return <td>{item["round"] <= 2 ? "旋" : "旋・運"}</td>;
   }
-  return <td>変体/変陰</td>;
+  return <td>{item["round"] <= 2 ? "変体/変陰" : "自由法形"}</td>;
 }
 
 function GamesOnBlock({

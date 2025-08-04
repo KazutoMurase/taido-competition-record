@@ -7,10 +7,11 @@ import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import checkStyles from "../styles/checks.module.css";
 import Summary from "./show_summary";
+import tableStyles from "../styles/TableResult.module.css";
 
 function MakeTable(event_name, resultTable, title, show_caption) {
   return (
-    <table align="center" border={1}>
+    <table className={tableStyles.table} align="center" border={1}>
       <thead>
         <tr>
           <td colSpan={14}>{title}</td>
