@@ -10,6 +10,7 @@ import SyncIcon from "@mui/icons-material/Sync";
 
 export const getServerSideProps = async (context) => {
   const params = {
+    competition_title: process.env.COMPETITION_TITLE,
     production_test: process.env.PRODUCTION_TEST,
     show_total: process.env.SHOW_TOTAL_IN_ADMIN === "1",
   };
@@ -28,6 +29,9 @@ export default function Home({ params }) {
   };
   const ToSummary = () => {
     router.push("/summary?from_admin=true");
+  };
+  const ToHighSchoolSummary = () => {
+    router.push("/high_school_summary?from_admin=true");
   };
   const ToTotal = () => {
     router.push("/total");
@@ -114,6 +118,24 @@ export default function Home({ params }) {
             サマリー
           </Button>
         </Grid>
+        {params.competition_title.includes("高校") ? (
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            style={{ height: "80px" }}
+          >
+            <Button
+              variant="contained"
+              type="submit"
+              onClick={(e) => ToHighSchoolSummary()}
+            >
+              高校生サマリー
+            </Button>
+          </Grid>
+        ) : (
+          <></>
+        )}
         {params.show_total ? (
           <Grid
             container
