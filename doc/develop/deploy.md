@@ -113,7 +113,7 @@ GCPコンソールを開き、Cloud Buildから接続済みのリポジトリを
     - 手順5で作成したファイルを参照する
 - サービスアカウント: 手順2(1)で作成したアカウントを選択
 
-## 8. 初回イメージの手動ビルドとpush
+## 8. 初回イメージの手動ビルドとpush (任意)
 Cloud Buildのトリガーの動作前に、Cloud Runへのデプロイに必要なDockerイメージをArtifact Registryに一度手動でpushする。
 ($IMAGE_NAME, $CLOUD_RUN_DEPLOY_NAMEは手順5で.envファイルに設定したイメージ名)
 
@@ -123,7 +123,7 @@ docker build -t asia-northeast1-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REGISTRY_RE
 docker push asia-northeast1-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REGISTRY_REPO_NAME/$IMAGE_NAME
 ```
 
-## 9. Cloud Run公開アクセスの許可
+## 9. Cloud Run公開アクセスの許可 (任意)
 手動で一度デプロイしておく。リソース設定はCI buildで追って反映させる。
 ```bash
 # Cloud Run サービスの初回デプロイ
