@@ -51,6 +51,16 @@ export default function Home({ competitionTitle, show_total, topImagePath }) {
       path: "/summary",
       color: "#ffc107",
     },
+    ...(competitionTitle.includes("高校生")
+      ? [
+          {
+            label: "高校生サマリー",
+            icon: <EmojiEventsIcon sx={{ mr: 1, color: "#ffc107" }} />,
+            path: "/high_school_summary",
+            color: "#ffc107",
+          },
+        ]
+      : []),
     ...(show_total
       ? [
           {

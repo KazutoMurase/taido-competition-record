@@ -1,7 +1,7 @@
 import Grid from "@mui/material/Grid";
 
 function GetGroupNameWithBracket(group_name) {
-  if (group_name === "''") {
+  if (group_name === null || group_name === "''") {
     return "　";
   }
   return group_name.replace(/['"]+/s, "【").replace(/['"]+/s, "】");

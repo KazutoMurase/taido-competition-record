@@ -36,7 +36,7 @@ const Summary: React.FC<{ params }> = ({ params }) => {
     const event_infos = [];
     for (let i = 0; i < result.length; i++) {
       if (
-        !result[i]["name"].includes("高校") &&
+        result[i]["name"].includes("高校") &&
         result[i]["existence"] &&
         result[i]["name_en"] != "finished"
       ) {
@@ -61,7 +61,7 @@ const Summary: React.FC<{ params }> = ({ params }) => {
         alignItems="center"
         style={{ height: "80px" }}
       >
-        <h1>サマリー</h1>
+        <h1>高校生サマリー</h1>
       </Grid>
       {data.map((event_info) => (
         <GetSummary
@@ -78,7 +78,7 @@ const Summary: React.FC<{ params }> = ({ params }) => {
         alignItems="center"
         style={{ height: "320px" }}
       >
-        <GetAwardedPlayers hide={hide_award} is_high_school_result={false} />
+        <GetAwardedPlayers hide={hide_award} is_high_school_result={true} />
       </Grid>
       <Grid
         container

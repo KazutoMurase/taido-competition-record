@@ -460,3 +460,5 @@ player_id integer,
 name text,
 foreign key (player_id) references players(id),
 primary key (id));
+
+\copy awarded_players from 'awarded_players.csv' csv header;
