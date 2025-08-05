@@ -328,6 +328,8 @@ function CreateText(
             y={item["left_begin_y"] - 7}
             text={GetSplitName(item["left_name"])}
             fontSize={item["left_name"].length < 8 ? 18 : 14}
+            fill={isLeftPlayerCurrent ? "#ff5722" : "black"}
+            fontStyle={isLeftPlayerCurrent ? "bold" : "normal"}
           />
           <Rect
             x={is_left ? 0 : 625}
@@ -376,6 +378,8 @@ function CreateText(
             y={item["right_begin_y"] - 7}
             text={GetSplitName(item["right_name"])}
             fontSize={item["right_name"].length < 8 ? 18 : 14}
+            fill={isRightPlayerCurrent ? "#ff5722" : "black"}
+            fontStyle={isRightPlayerCurrent ? "bold" : "normal"}
           />
           <Rect
             x={is_left ? 0 : 625}
