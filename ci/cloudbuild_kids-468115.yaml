@@ -62,7 +62,11 @@ steps:
         '--update-env-vars',
         'USE_LOCAL_DB=0',
         '--update-env-vars',
-        'USE_LOCAL_REDIS=1'
+        'USE_LOCAL_REDIS=1',
+        '--update-env-vars',
+        'USERNAME=kids',
+        '--update-env-vars',
+        'PASSWORD=miyagi2508'
       ]
 
 images:
