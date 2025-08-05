@@ -66,7 +66,7 @@ steps:
         '--update-env-vars',
         'USERNAME=kids',
         '--update-env-vars',
-        'PASSWORD=miyagi2508'
+        'PASSWORD=kesennuma2508'
       ]
 
 images:
