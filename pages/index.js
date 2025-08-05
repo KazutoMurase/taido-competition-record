@@ -80,7 +80,7 @@ export default function Home({ competitionTitle, show_total, topImagePath }) {
           container
           justifyContent="center"
           alignItems="center"
-          style={{ height: "100px" }}
+          style={{ height: "130px" }}
         >
           <h2 className="competition-title">
             <u>{competitionTitle}</u>
