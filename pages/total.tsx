@@ -17,29 +17,8 @@ export const getServerSideProps = async (context) => {
   };
 };
 
-const Total: React.FC<{ params }> = ({ params }) => {
-  const router = useRouter();
-  const ToBack = () => {
-    router.back();
-  };
-  const [events, setEvents] = useState([]);
-
-  const fetchEvents = async () => {
-    const response = await fetch("/api/get_events");
-    const result = await response.json();
-    setEvents(result);
-  };
-  useEffect(() => {
-    fetchEvents();
-  }, []);
-  // Perhaps score definition should be statics or database in future
-  const use_different_personal_scores = params.title.includes("全国学生");
-  const event_ids = [1, 2, 3, 4, 5, 7, 8, 10, 6, 9, 11, 26];
-  let personal_span = 0;
-  let dantai_span = 0;
+function GenerateItems(events, event_ids, header1, header2, spans) {
   let row_span = 1;
-  let header1 = [];
-  let header2 = [];
   let human_type = "";
   let same_human_type_length = 0;
   for (const id of event_ids) {
@@ -49,9 +28,9 @@ const Total: React.FC<{ params }> = ({ params }) => {
     }
     const event_name = GetEventName(id);
     if (event_name.includes("dantai") || event_name.includes("tenkai")) {
-      dantai_span += 1;
+      spans[1] += 1;
     } else {
-      personal_span += 1;
+      spans[0] += 1;
     }
     if (event_name.includes("sonen")) {
       if (human_type === "壮年") {
@@ -159,6 +138,31 @@ const Total: React.FC<{ params }> = ({ params }) => {
       </td>,
     );
   }
+}
+
+const Total: React.FC<{ params }> = ({ params }) => {
+  const router = useRouter();
+  const ToBack = () => {
+    router.back();
+  };
+  const [events, setEvents] = useState([]);
+
+  const fetchEvents = async () => {
+    const response = await fetch("/api/get_events");
+    const result = await response.json();
+    setEvents(result);
+  };
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+  // Perhaps score definition should be statics or database in future
+  const use_different_personal_scores = params.title.includes("全国学生");
+  const event_ids = [1, 2, 3, 4, 5, 7, 8, 10, 6, 9, 11, 26];
+  // personal, dantai
+  let spans = [0, 0];
+  let header1 = [];
+  let header2 = [];
+  GenerateItems(events, event_ids, header1, header2, spans);
   const [data, setData] = useState([]);
   useEffect(() => {
     async function fetchData() {
@@ -183,10 +187,10 @@ const Total: React.FC<{ params }> = ({ params }) => {
                   <td style={{ width: "150px", padding: 2 }} rowSpan={3}>
                     地区名
                   </td>
-                  <td colSpan={personal_span} style={{ padding: 2 }}>
+                  <td colSpan={spans[0]} style={{ padding: 2 }}>
                     個人種目競技
                   </td>
-                  <td colSpan={dantai_span} style={{ padding: 2 }}>
+                  <td colSpan={spans[1]} style={{ padding: 2 }}>
                     団体種目競技
                   </td>
                   <td rowSpan={3} style={{ width: "70px", padding: 2 }}>
