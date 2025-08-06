@@ -32,7 +32,7 @@ function ShowHokeiType(item, event_name) {
   } else if (event_name === "hokei_newcommer") {
     return <td>運足八法</td>;
   } else if (event_name.includes("hokei_kyuui")) {
-    return <td>{item["round"] <= 2 ? "旋・運・変" : "自由法形"}</td>;
+    return <td>{"旋・運・変"}</td>;
   } else if (event_name.includes("hokei_sei")) {
     return <td>制の法形</td>;
   } else if (event_name.includes("junior_high")) {
