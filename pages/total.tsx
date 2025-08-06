@@ -307,7 +307,7 @@ const Total: React.FC<{ params }> = ({ params }) => {
                 {data.map((elem) => {
                   return (
                     <tr key={elem.id}>
-                      <td style={{ padding: 1 }}>
+                      <td className={checkStyles.total}>
                         {elem.name?.replace(/['"]+/g, "")}
                       </td>
                       {event_ids.map((id) => {
