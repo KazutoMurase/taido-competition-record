@@ -96,8 +96,8 @@ table tr {
 
 table td {
   text-align: center;
-  border-left: none;
-  border-right: none;
+  border-left: 1px solid #dddddd;
+  border-right: 1px solid #dddddd;
   border-bottom: 1px solid #a8b7c5;
   border-top: none;
   padding: 8px;
