@@ -8,6 +8,7 @@
 - [開発用ツール](develop/tools.md)
 - [大会準備](develop/preparation.md)
 - [GCP環境へのデプロイ方法](develop/deploy.md)
+- [ユーティリティ](develop/utility.md)
 - [サイトの構成](site.md)
 - [結果出力](admin/export.md)
 
