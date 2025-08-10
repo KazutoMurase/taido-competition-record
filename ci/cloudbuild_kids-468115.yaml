@@ -54,7 +54,7 @@ steps:
         '--update-env-vars',
         'PRODUCTION=1',
         '--update-env-vars',
-        'PRODUCTION_TEST=1',
+        'PRODUCTION_TEST=0',
         '--update-env-vars',
         'SHOW_AWARD_IN_PUBLIC=0',
         '--update-env-vars',
