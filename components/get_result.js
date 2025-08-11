@@ -458,7 +458,7 @@ function CreateText(
           fontSize={12}
         />
         <Text
-          x={x + width + 120}
+          x={x + width + 130}
           y={item["left_begin_y"] - 5 + y_padding}
           text={
             item["right_group_name"] !== null && !hide
