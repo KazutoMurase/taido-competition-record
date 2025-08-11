@@ -82,6 +82,7 @@ const Home = () => {
             returnUrl={return_url}
             block_number={block_number}
             fromAdmin={true}
+            backUrl={"block?block_number=" + block_number}
           />
         </>
       )}
