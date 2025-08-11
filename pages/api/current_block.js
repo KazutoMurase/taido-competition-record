@@ -250,7 +250,8 @@ const CurrentBlock = async (req, res) => {
     const block_name = "block_" + req.query.block_number;
     const current_block_name = "current_" + block_name;
     const event_name = req.query.event_name;
-    const cacheKey = "current_" + block_name;
+    const cacheKey =
+      "current_" + block_name + (event_name ? "_for_" + event_name : "");
     const cachedData = await Get(cacheKey);
 
     // 'update_id_for_' +current_block_name can be checked,
@@ -283,7 +284,7 @@ const CurrentBlock = async (req, res) => {
     }
     console.log("get new data");
     const data = await GetFromDB(req, res);
-    if (data.length !== 0) {
+    if (req.query.schedule_id === undefined || data.length !== 0) {
       await Set(cacheKey, { data: data, timestamp: Date.now() });
     }
     res.json(data);
