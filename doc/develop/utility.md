@@ -41,7 +41,7 @@ curl (URL)/api/update_current_schedule?block=a&schedule_id=5
 
 ```bash
 # 選手名で更新
-curl (URL)/api/record_awards?id=1&name="(選手名)"
+curl "http://localhost:3000/api/record_awards?id=1&player_id=$(git grep "選手名" | cut -d":" -f2 | cut -d"," -f1)"
 # 選手IDで更新
 curl (URL)/api/record_awards?id=1&player_id=1
 ```
