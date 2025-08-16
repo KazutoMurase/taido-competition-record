@@ -311,13 +311,13 @@ function CreateText(
         <>
           <Text
             x={is_left ? 0 : 630}
-            y={item["left_begin_y"] - 20}
+            y={item["left_begin_y"] - 20 + y_padding}
             text={item["left_name_kana"]}
             fontSize={10}
           />
           <Rect
             x={is_left ? 0 : 625}
-            y={item["left_begin_y"] - 16}
+            y={item["left_begin_y"] - 16 + y_padding}
             width={["left_name_kana"].length * 110}
             height={1}
             fill="black"
@@ -325,7 +325,7 @@ function CreateText(
           />
           <Text
             x={is_left ? 0 : 630}
-            y={item["left_begin_y"] - 7}
+            y={item["left_begin_y"] - 7 + y_padding}
             text={GetSplitName(item["left_name"])}
             fontSize={item["left_name"].length < 8 ? 18 : 14}
             fill={isLeftPlayerCurrent ? "#ff5722" : "black"}
@@ -333,7 +333,7 @@ function CreateText(
           />
           <Rect
             x={is_left ? 0 : 625}
-            y={item["left_begin_y"] + 2}
+            y={item["left_begin_y"] + 2 + y_padding}
             width={["left_name"].length * 110}
             height={1}
             fill="black"
@@ -341,13 +341,13 @@ function CreateText(
           />
           <Text
             x={is_left ? 120 : 750}
-            y={item["left_begin_y"] - 2}
+            y={item["left_begin_y"] - 2 + y_padding}
             text={GetGroupNameWithBracket(item["left_group_name"])}
             fontSize={GetGroupNameFontSize(item["left_group_name"])}
           />
           <Rect
             x={is_left ? 120 : 750}
-            y={item["left_begin_y"] + 5}
+            y={item["left_begin_y"] + 5 + y_padding}
             width={["left_group_name"].length * 80}
             height={1}
             fill="black"
@@ -361,13 +361,13 @@ function CreateText(
         <>
           <Text
             x={is_left ? 0 : 630}
-            y={item["right_begin_y"] - 20}
+            y={item["right_begin_y"] - 20 + y_padding}
             text={item["right_name_kana"]}
             fontSize={10}
           />
           <Rect
             x={is_left ? 0 : 625}
-            y={item["right_begin_y"] - 16}
+            y={item["right_begin_y"] - 16 + y_padding}
             width={["right_name_kana"].length * 110}
             height={1}
             fill="black"
@@ -375,7 +375,7 @@ function CreateText(
           />
           <Text
             x={is_left ? 0 : 630}
-            y={item["right_begin_y"] - 7}
+            y={item["right_begin_y"] - 7 + y_padding}
             text={GetSplitName(item["right_name"])}
             fontSize={item["right_name"].length < 8 ? 18 : 14}
             fill={isRightPlayerCurrent ? "#ff5722" : "black"}
@@ -383,7 +383,7 @@ function CreateText(
           />
           <Rect
             x={is_left ? 0 : 625}
-            y={item["right_begin_y"] + 2}
+            y={item["right_begin_y"] + 2 + y_padding}
             width={["right_name"].length * 110}
             height={1}
             fill="black"
@@ -391,13 +391,13 @@ function CreateText(
           />
           <Text
             x={is_left ? 120 : 750}
-            y={item["right_begin_y"] - 2}
+            y={item["right_begin_y"] - 2 + y_padding}
             text={GetGroupNameWithBracket(item["right_group_name"])}
             fontSize={GetGroupNameFontSize(item["right_group_name"])}
           />
           <Rect
             x={is_left ? 120 : 750}
-            y={item["right_begin_y"] + 5}
+            y={item["right_begin_y"] + 5 + y_padding}
             width={["right_group_name"].length * 80}
             height={1}
             fill="black"
