@@ -1,6 +1,5 @@
 import GetClient from "../../lib/db_client";
 import { Get, Set } from "../../lib/redis_client";
-import { GetEventName } from "../../lib/get_event_name";
 
 function update(sorted_data, item, block_indices, value, round) {
   if ("prev_left_id" in item) {
@@ -121,6 +120,11 @@ async function GetFromDB(req, res, event_name) {
   }
   const result_schedule = await client.query(query);
   const sorted_data = result_schedule.rows.sort((a, b) => a.id - b.id);
+  query =
+    "SELECT early_round_type, later_round_type FROM event_type WHERE name_en = $1";
+  const result_round_type = await client.query(query, [event_name]);
+  const early_round_type = result_round_type.rows[0]["early_round_type"];
+  const later_round_type = result_round_type.rows[0]["later_round_type"];
   let sorted_block_data = result_block.rows.sort(
     (a, b) => a.order_id - b.order_id,
   );
@@ -132,8 +136,10 @@ async function GetFromDB(req, res, event_name) {
     } else if (!("round" in sorted_data[i])) {
       if (i === 0 || sorted_data[i - 1]["round"] === 1) {
         sorted_data[i]["round"] = 1;
+        sorted_data[i]["round_type"] = early_round_type;
       } else {
         sorted_data[i]["round"] = 2;
+        sorted_data[i]["round_type"] = early_round_type;
       }
     }
     const next_left_id = sorted_data[i]["next_left_id"];
@@ -152,25 +158,39 @@ async function GetFromDB(req, res, event_name) {
             sorted_data[
               sorted_data[parseInt(next_left_id) - 1]["prev_left_id"]
             ]["round"] = update_round - 1;
+            sorted_data[
+              sorted_data[parseInt(next_left_id) - 1]["prev_left_id"]
+            ]["round_type"] =
+              update_round - 1 > 2 ? later_round_type : early_round_type;
           } else if (
             "prev_right_id" in sorted_data[parseInt(next_left_id) - 1]
           ) {
             sorted_data[
               sorted_data[parseInt(next_left_id) - 1]["prev_right_id"]
             ]["round"] = update_round - 1;
+            sorted_data[
+              sorted_data[parseInt(next_left_id) - 1]["prev_right_id"]
+            ]["round_type"] =
+              update_round - 1 > 2 ? later_round_type : early_round_type;
           }
         } else {
           update_round = sorted_data[parseInt(next_left_id) - 1]["round"];
           if ("prev_left_id" in sorted_data[parseInt(next_left_id) - 1]) {
             sorted_data[i]["round"] = update_round - 1;
+            sorted_data[i]["round_type"] =
+              update_round - 1 > 2 ? later_round_type : early_round_type;
           } else if (
             "prev_right_id" in sorted_data[parseInt(next_left_id) - 1]
           ) {
             sorted_data[i]["round"] = update_round - 1;
+            sorted_data[i]["round_type"] =
+              update_round - 1 > 2 ? later_round_type : early_round_type;
           }
         }
       }
       sorted_data[parseInt(next_left_id) - 1]["round"] = update_round;
+      sorted_data[parseInt(next_left_id) - 1]["round_type"] =
+        update_round > 2 ? later_round_type : early_round_type;
       sorted_data[parseInt(next_left_id) - 1]["prev_left_id"] = i;
     }
     const next_right_id = sorted_data[i]["next_right_id"];
@@ -189,12 +209,20 @@ async function GetFromDB(req, res, event_name) {
             sorted_data[
               sorted_data[parseInt(next_right_id) - 1]["prev_left_id"]
             ]["round"] = update_round - 1;
+            sorted_data[
+              sorted_data[parseInt(next_right_id) - 1]["prev_left_id"]
+            ]["round_type"] =
+              update_round - 1 > 2 ? later_round_type : early_round_type;
           } else if (
             "prev_right_id" in sorted_data[parseInt(next_right_id) - 1]
           ) {
             sorted_data[
               sorted_data[parseInt(next_right_id) - 1]["prev_right_id"]
             ]["round"] = update_round - 1;
+            sorted_data[
+              sorted_data[parseInt(next_right_id) - 1]["prev_right_id"]
+            ]["round_type"] =
+              update_round - 1 > 2 ? later_round_type : early_round_type;
           }
         } else {
           update_round = sorted_data[parseInt(next_right_id) - 1]["round"];
@@ -204,10 +232,14 @@ async function GetFromDB(req, res, event_name) {
             "prev_right_id" in sorted_data[parseInt(next_right_id) - 1]
           ) {
             sorted_data[i]["round"] = update_round - 1;
+            sorted_data[i]["round_type"] =
+              update_round - 1 > 2 ? later_round_type : early_round_type;
           }
         }
       }
       sorted_data[parseInt(next_right_id) - 1]["round"] = update_round;
+      sorted_data[parseInt(next_right_id) - 1]["round_type"] =
+        update_round > 2 ? later_round_type : early_round_type;
       sorted_data[parseInt(next_right_id) - 1]["prev_right_id"] = i;
     }
   }
@@ -249,6 +281,8 @@ async function GetFromDB(req, res, event_name) {
     let id = parseInt(sorted_block_data[i]["id"]);
     if ("round" in sorted_data[id - 1]) {
       sorted_block_data[i]["round"] = sorted_data[id - 1]["round"];
+      sorted_block_data[i]["round_type"] =
+        sorted_data[id - 1]["round"] > 2 ? later_round_type : early_round_type;
     }
     if ("left_color" in sorted_data[id - 1]) {
       sorted_block_data[i]["left_color"] = sorted_data[id - 1]["left_color"];
