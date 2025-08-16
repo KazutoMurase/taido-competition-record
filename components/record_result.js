@@ -491,6 +491,9 @@ function RecordResult({
             <Button
               variant="contained"
               type="submit"
+              disabled={
+                selectedRadioButton === null && initialRadioButton === null
+              }
               onClick={(e) =>
                 onSubmit(
                   data,
