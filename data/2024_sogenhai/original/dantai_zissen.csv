@@ -1,8 +1,0 @@
-id,left_group_id,right_group_id,next_left_id,next_right_id,left_group_flag,left_retire,right_retire
-1,5,4,,4,,,
-2,7,3,,5,,,
-3,2,6,5,,,,
-4,1,,7,,,,
-5,,,,7,,,
-6,,,,,,,
-7,,,,,,,
