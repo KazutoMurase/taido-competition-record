@@ -11,6 +11,8 @@ create table event_type
  existence integer not null,
  full_name text not null,
  description text not null,
+ early_round_type text not null,
+ later_round_type text not null,
  primary key(id));
 
 create table court_type
