@@ -76,8 +76,8 @@ def search_number_in_col(sheet, row, col, search_num=2):
     for i in search_indices:
         id = check_number(sheet, row + i, col)
         if id is not None:
-            return id
-    return None
+            return (id, i)
+    return (None, None)
 
 def check_towards_top(sheet, row, col):
     i = 1
@@ -132,7 +132,7 @@ def check_towards_right(sheet, row, col):
 def search_left_block(sheet, games, game, row, col):
     update_row = check_towards_top(sheet, row, col)
     update_col = check_towards_left(sheet, row - update_row-1, col)
-    id = search_number_in_col(sheet, row - update_row - 1, col - update_col - 1)
+    id, _ = search_number_in_col(sheet, row - update_row - 1, col - update_col - 1)
     if isinstance(id, int):
         upper_game = Game(id=id)
         upper_game.next_left = game.id
@@ -161,7 +161,7 @@ def search_left_block(sheet, games, game, row, col):
 
     update_row = check_towards_bottom(sheet, row, col)
     update_col = check_towards_left(sheet, row + update_row, col)
-    id = search_number_in_col(sheet, row + update_row, col - update_col - 1)
+    id, _ = search_number_in_col(sheet, row + update_row, col - update_col - 1)
     if isinstance(id, int):
         lower_game = Game(id=id)
         lower_game.next_right = game.id
@@ -192,7 +192,7 @@ def search_left_block(sheet, games, game, row, col):
 def search_right_block(sheet, games, game, row, col):
     update_row = check_towards_top(sheet, row, col)
     update_col = check_towards_right(sheet, row - update_row-1, col)
-    id = search_number_in_col(sheet, row - update_row - 1, col + update_col)
+    id, _ = search_number_in_col(sheet, row - update_row - 1, col + update_col)
     if isinstance(id, int):
         upper_game = Game(id=id)
         upper_game.next_right = game.id
@@ -246,7 +246,7 @@ def search_right_block(sheet, games, game, row, col):
 
     update_row = check_towards_bottom(sheet, row, col)
     update_col = check_towards_right(sheet, row + update_row, col)
-    id = search_number_in_col(sheet, row + update_row + 1, col + update_col)
+    id, _ = search_number_in_col(sheet, row + update_row + 1, col + update_col)
     if isinstance(id, int):
         lower_game = Game(id=id)
         lower_game.next_left = game.id
@@ -276,7 +276,7 @@ def search_right_block(sheet, games, game, row, col):
             if game.left_id == "":
                 print (f"failed to find next upper item in {sheet[row][col]}")
     else:
-        id = search_number_in_col(sheet, row + update_row, col + update_col)
+        id, _ = search_number_in_col(sheet, row + update_row, col + update_col)
         if isinstance(id, int):
             lower_game = Game(id=id)
             lower_game.next_left = game.id
@@ -321,7 +321,9 @@ def main(file_path, output_path):
         games = []
         target_row, target_col = start_cell.row, start_cell.column
         index = check_towards_bottom(sheet, target_row, target_col)
-        final_num = check_number(sheet, target_row+index+1, target_col)
+        final_num, offset = search_number_in_col(sheet, target_row+index+1, target_col, 1)
+        if offset is not None:
+            index += offset
         if final_num is None:
             continue
         if 'ひな型' in name:
@@ -335,9 +337,11 @@ def main(file_path, output_path):
         left_index = check_towards_left(sheet, target_row+index, target_col)
         right_index = check_towards_right(sheet, target_row+index, target_col)
         # semi finals
-        left_semi_final = Game(id=check_number(sheet, target_row+index, target_col-left_index-1))
+        left_semi_final_id, _ = search_number_in_col(sheet, target_row+index, target_col-left_index-1)
+        left_semi_final = Game(id=left_semi_final_id)
         left_semi_final.next_left = final_num
-        right_semi_final = Game(id=check_number(sheet, target_row+index, target_col+right_index))
+        right_semi_final_id, _ = search_number_in_col(sheet, target_row+index, target_col+right_index)
+        right_semi_final = Game(id=right_semi_final_id)
         right_semi_final.next_right = final_num
         games.append(left_semi_final)
         games.append(right_semi_final)
