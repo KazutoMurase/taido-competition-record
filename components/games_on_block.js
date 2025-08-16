@@ -25,26 +25,6 @@ function onMoveDown(order_id, block_number, schedule_id, function_after_post) {
     });
 }
 
-// TODO(murase): extract from database
-function ShowHokeiType(item, event_name) {
-  if (event_name === "hokei_sonen" || event_name.includes("hokei_mei")) {
-    return <td>{item["round"] <= 2 ? "勢命" : "命の法形"}</td>;
-  } else if (event_name === "hokei_newcommer") {
-    return <td>運足八法</td>;
-  } else if (event_name.includes("hokei_kyuui")) {
-    return <td>{"旋・運・変"}</td>;
-  } else if (event_name.includes("hokei_sei")) {
-    return <td>制の法形</td>;
-  } else if (event_name.includes("junior_high")) {
-    return <td>{item["round"] <= 2 ? "旋・運・変" : "自由法形"}</td>;
-  } else if (event_name.includes("higher_grades")) {
-    return <td>{item["round"] <= 2 ? "旋・運" : "旋・運・変"}</td>;
-  } else if (event_name.includes("lower_grades")) {
-    return <td>{item["round"] <= 2 ? "旋" : "旋・運"}</td>;
-  }
-  return <td>{item["round"] <= 2 ? "変体/変陰" : "自由法形"}</td>;
-}
-
 function GamesOnBlock({
   block_number,
   event_name,
@@ -269,7 +249,7 @@ function GamesOnBlock({
                     bgcolor={"current" in item ? "yellow" : "white"}
                   >
                     {event_name.includes("hokei") ? (
-                      ShowHokeiType(item, event_name)
+                      <td>{item["round_type"].replace(/['"]+/g, "")}</td>
                     ) : (
                       <></>
                     )}
