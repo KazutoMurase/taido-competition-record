@@ -73,7 +73,9 @@ steps:
         '--update-env-vars',
         'USERNAME=adult',
         '--update-env-vars',
-        'PASSWORD=saitama2508'
+        'PASSWORD=saitama2508',
+        '--update-env-vars',
+        'SHOW_HIGHLIGHT_IN_TOURNAMENT=0'
       ]
 
 images:
