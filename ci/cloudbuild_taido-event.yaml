@@ -49,7 +49,7 @@ steps:
         '--add-cloudsql-instances',
         'taido-event:asia-northeast1:postgres-instance',
         '--update-env-vars',
-        'COMPETITION_NAME=2025_kid',
+        'COMPETITION_NAME=2025_adult',
         '--update-env-vars',
         'PGSQL_DATABASE=taido_record',
         '--update-env-vars',
