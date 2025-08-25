@@ -381,6 +381,14 @@ const GetTableResult: React.FC<{
         ")",
       3: "決　　勝",
     };
+  } else if (length === 5) {
+    titles = {
+      1: "予選　Aコート",
+      2: "予選　Bコート",
+      3: "予選　Cコート",
+      4: "予選　Dコート",
+      5: "決勝戦",
+    };
   }
   // TODO: make it optional
   let show_caption = false;
