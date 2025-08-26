@@ -11,10 +11,10 @@ if [ "${USE_LOCAL_DB}" == "1" ]; then
     else
         sudo -u postgres createdb taido_record
         cd /ws/data/$COMPETITION_NAME/static && sudo -u postgres psql -d taido_record < generate_tables.sql
-        if [ "${USE_RESULT_DATA}" == "0" ]; then
-            cd /ws/data/$COMPETITION_NAME/original && sudo -u postgres psql -d taido_record < generate_tables.sql
-        else
+        if [ "${USE_RESULT_DATA}" == "1" ]; then
             cd /ws/data/$COMPETITION_NAME/result && sudo -u postgres psql -d taido_record < ../original/generate_tables.sql
+        else
+            cd /ws/data/$COMPETITION_NAME/original && sudo -u postgres psql -d taido_record < generate_tables.sql
         fi
         cd /ws/data/test/static && sudo -u postgres psql -d taido_record < generate_tables.sql
         cd /ws/data/test/original && sudo -u postgres psql -d taido_record < generate_tables.sql
