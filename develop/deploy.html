@@ -1,0 +1,398 @@
+<!DOCTYPE HTML>
+<html lang="jp" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>GCP環境へのデプロイ方法</title>
+                
+
+        <!-- Custom HTML head -->
+        
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+                <link rel="icon" href="../favicon.svg">
+                        <link rel="shortcut icon" href="../favicon.png">
+                <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+                <link rel="stylesheet" href="../css/print.css" media="print">
+        
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+                <link rel="stylesheet" href="../fonts/fonts.css">
+        
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+            </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">はじめに</a></li><li class="chapter-item expanded affix "><li class="part-title">開発者向け</li><li class="chapter-item expanded "><a href="../develop/develop.html"><strong aria-hidden="true">1.</strong> 開発環境構築</a></li><li class="chapter-item expanded "><a href="../develop/tools.html"><strong aria-hidden="true">2.</strong> 開発用ツール</a></li><li class="chapter-item expanded "><a href="../develop/preparation.html"><strong aria-hidden="true">3.</strong> 大会準備</a></li><li class="chapter-item expanded "><a href="../develop/deploy.html" class="active"><strong aria-hidden="true">4.</strong> GCP環境へのデプロイ方法</a></li><li class="chapter-item expanded "><a href="../develop/utility.html"><strong aria-hidden="true">5.</strong> ユーティリティ</a></li><li class="chapter-item expanded "><a href="../site.html"><strong aria-hidden="true">6.</strong> サイトの構成</a></li><li class="chapter-item expanded "><a href="../admin/export.html"><strong aria-hidden="true">7.</strong> 結果出力</a></li><li class="chapter-item expanded affix "><li class="part-title">役員マニュアル</li><li class="chapter-item expanded "><a href="../admin/setup.html"><strong aria-hidden="true">8.</strong> 準備</a></li><li class="chapter-item expanded "><a href="../admin/check_players.html"><strong aria-hidden="true">9.</strong> 選手点呼係</a></li><li class="chapter-item expanded "><a href="../admin/call_players.html"><strong aria-hidden="true">10.</strong> 選手呼び出し係</a></li><li class="chapter-item expanded "><a href="../admin/record.html"><strong aria-hidden="true">11.</strong> 記録係</a></li><li class="chapter-item expanded "><a href="../admin/announce.html"><strong aria-hidden="true">12.</strong> 司会</a></li></ol>            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                                                <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                                            </div>
+
+                    <h1 class="menu-title"></h1>
+
+                    <div class="right-buttons">
+                                                <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                                                                        
+                    </div>
+                </div>
+
+                                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="gcp環境へのデプロイ方法"><a class="header" href="#gcp環境へのデプロイ方法">GCP環境へのデプロイ方法</a></h1>
+<h2 id="必要な前準備"><a class="header" href="#必要な前準備">必要な前準備</a></h2>
+<ul>
+<li>Google Cloud CLIのインストール</li>
+<li>GCPアカウントへのブラウザ上でのログイン・本人確認
+<ul>
+<li>※Googleアカウントの本人確認を複数回実施しなくて済むよう、まずブラウザでコンソールにログインし、CLIでの認証にはコンソールで発行した鍵を用いる形とする</li>
+</ul>
+</li>
+</ul>
+<h2 id="1-google-cloudプロジェクトの作成"><a class="header" href="#1-google-cloudプロジェクトの作成">1. Google Cloudプロジェクトの作成</a></h2>
+<ul>
+<li>ブラウザからGCPコンソールにログインし、新しいプロジェクトを作成
+<ul>
+<li>ここで設定したプロジェクトIDを以後<code>$PROJECT_ID</code>とする</li>
+</ul>
+</li>
+<li>作成後、gcloud CLIからプロジェクトを指定する</li>
+</ul>
+<pre><code class="language-bash">gcloud config set project PROJECT_ID
+</code></pre>
+<h2 id="2-サービスアカウントの作成と認証情報の取得"><a class="header" href="#2-サービスアカウントの作成と認証情報の取得">2. サービスアカウントの作成と認証情報の取得</a></h2>
+<h3 id="1-ブラウザでサービスアカウントを作成"><a class="header" href="#1-ブラウザでサービスアカウントを作成">(1) ブラウザでサービスアカウントを作成</a></h3>
+<ul>
+<li>GCPコンソールから、<code>IAMと管理</code>&gt;<code>サービスアカウント</code>&gt;<code>サービスアカウントを作成</code>
+<ul>
+<li>作成したアカウント名を以後<code>$SERVICE_ACCOUNT_NAME</code>とする</li>
+</ul>
+</li>
+<li>ロール：以下のみ付与
+<ul>
+<li>Cloud Build 編集者: <code>roles/cloudbuild.builds.editor</code></li>
+<li>Cloud SQL クライアント: <code>roles/cloudsql.client</code></li>
+<li>Artifact Registry 書き込み: <code>roles/artifactregistry.writer</code></li>
+<li>Secret Manager シークレット参照: <code>roles/secretmanager.secretAccessor</code></li>
+<li>Cloud Run 管理者: <code>roles/run.admin</code></li>
+<li>Service Usage 管理者: <code>roles/serviceusage.serviceUsageAdmin</code></li>
+<li>サービスアカウントユーザー: <code>roles/iam.serviceAccountUser</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="2-サービスアカウントのjson鍵を作成ダウンロード"><a class="header" href="#2-サービスアカウントのjson鍵を作成ダウンロード">(2) サービスアカウントのJSON鍵を作成・ダウンロード</a></h3>
+<ul>
+<li>
+<p>作成したアカウントの<code>キー</code>タブ → <code>キーを追加</code>→<code>新しい鍵を作成</code>→<code>JSON</code></p>
+</li>
+<li>
+<p>ダウンロードされたjsonファイルのファイル名をkey.jsonに変えて、リポジトリルートに移しておく</p>
+</li>
+</ul>
+<pre><code class="language-bash">mv /path-to-your-download-dir/your-file-name.json ./key.json
+</code></pre>
+<h3 id="3-gcloud-cliで認証"><a class="header" href="#3-gcloud-cliで認証">(3) gcloud CLIで認証</a></h3>
+<pre><code class="language-bash">gcloud auth activate-service-account --key-file=key.json
+</code></pre>
+<ul>
+<li>必要なAPIを有効化しておく</li>
+</ul>
+<pre><code class="language-bash">gcloud services enable \
+  cloudresourcemanager.googleapis.com \
+  run.googleapis.com \
+  compute.googleapis.com \
+  sqladmin.googleapis.com \
+  artifactregistry.googleapis.com \
+  cloudbuild.googleapis.com \
+  servicenetworking.googleapis.com \
+  secretmanager.googleapis.com \
+  cloudshell.googleapis.com
+</code></pre>
+<h2 id="3-artifact-registryにdockerリポジトリを作成"><a class="header" href="#3-artifact-registryにdockerリポジトリを作成">3. Artifact RegistryにDockerリポジトリを作成</a></h2>
+<p>GCPコンソールからArtifact Registryを開き、Dockerリポジトリを作成する</p>
+<ul>
+<li>名前: ar-docker-repo
+<ul>
+<li>任意に設定可能。ここで設定したリポジトリ名を以後<code>$ARTIFACT_REGISTRY_REPO_NAME</code>とする</li>
+</ul>
+</li>
+<li>形式: Docker</li>
+<li>モード: 標準</li>
+<li>ロケーションタイプ: リージョン asia-northeast1</li>
+<li>説明: 大会名が区別できるように適宜</li>
+<li>不変のイメージタグ: 無効</li>
+</ul>
+<h2 id="4-cloud-sql-インスタンスの作成"><a class="header" href="#4-cloud-sql-インスタンスの作成">4. Cloud SQL インスタンスの作成</a></h2>
+<p>GCPコンソールからCloud SQLを開き、インスタンスを作成する</p>
+<ul>
+<li>エディション: Enterprise（サンドボックス）</li>
+<li>バージョン: PostgreSQL 17</li>
+<li>インスタンスID: postgres-instance
+<ul>
+<li>任意に設定可能。ここで設定したインスタンスIDを以後<code>$CLOUDSQL_INSTANCE_ID</code>とする</li>
+</ul>
+</li>
+<li>パスワード: postgres</li>
+<li>リージョン: asia-northeast1</li>
+<li>可用性: シングルゾーン</li>
+</ul>
+<h2 id="5-cloudbuildyamlファイルの作成"><a class="header" href="#5-cloudbuildyamlファイルの作成">5. cloudbuild.yamlファイルの作成</a></h2>
+<p>CIにおいて実行する内容を定義するyamlファイルを作成する。Cloud Buildの実行時にこのファイルを参照させる。
+実行内容は基本的には毎回共通(cloudbuild-template.yamlに記述)だが、各種リソースのIDなどを埋め込む必要があるため、.envに記載した内容を元にyamlファイルを生成するスクリプトを用意している。</p>
+<ul>
+<li>./ci/.envに必要な変数を記入して、以下を実行する。</li>
+</ul>
+<pre><code>cd ci &amp;&amp; ./generate-cloudbuild.sh
+</code></pre>
+<ul>
+<li><code>cloudbuild_$PROJECT_ID.yaml</code>というファイルが生成される。</li>
+<li>作成したファイルを<a href="https://github.com/KazutoMurase/taido-competition-deploy">デプロイ用レポジトリ(※アクセス権限必要)</a>に移す。</li>
+</ul>
+<p>なお、CPUやメモリなど各種リソース設定値についてもcloudbuild-template.yamlに設定している。
+設定値の妥当性については<a href="https://github.com/KazutoMurase/taido-competition-record/issues/213">issue #213</a>を参照。</p>
+<h2 id="6-githubとのcloud-build連携"><a class="header" href="#6-githubとのcloud-build連携">6. GitHubとのCloud Build連携</a></h2>
+<p>GCPコンソールから<code>Cloud Build</code>→プロジェクトを選択 →<code>リポジトリを接続</code>→GitHub</p>
+<ul>
+<li>GitHubアカウントをOAuthで接続（リポジトリの管理者レベルの権限が必要、適宜依頼する）</li>
+<li>対象のリポジトリ(上記デプロイ用レポジトリ)を選択して登録</li>
+</ul>
+<p>(参考) <a href="https://cloud.google.com/build/docs/automating-builds/create-manage-triggers?hl=ja">ビルドトリガーの作成と管理 | Cloud Build Documentation | Google Cloud</a></p>
+<h2 id="7-cloud-buildトリガーの作成"><a class="header" href="#7-cloud-buildトリガーの作成">7. Cloud Buildトリガーの作成</a></h2>
+<p>GCPコンソールを開き、Cloud Buildから接続済みのリポジトリを選んでトリガーを作成する</p>
+<ul>
+<li>名前: 任意</li>
+<li>リージョン: global</li>
+<li>説明: 任意</li>
+<li>イベント: ブランチにpushする</li>
+<li>リポジトリサービス: Cloud Buildリポジトリ</li>
+<li>構成: Cloud Build構成ファイル（yamlまたはjson）</li>
+<li>CloudBuild構成ファイルの場所: <code>/cloudbuild_$PROJECT_ID.yaml</code>
+<ul>
+<li>手順5で作成したファイルを参照する</li>
+</ul>
+</li>
+<li>サービスアカウント: 手順2(1)で作成したアカウントを選択</li>
+</ul>
+<h2 id="8-初回イメージの手動ビルドとpush-任意"><a class="header" href="#8-初回イメージの手動ビルドとpush-任意">8. 初回イメージの手動ビルドとpush (任意)</a></h2>
+<p>Cloud Buildのトリガーの動作前に、Cloud Runへのデプロイに必要なDockerイメージをArtifact Registryに一度手動でpushする。
+($IMAGE_NAME, $CLOUD_RUN_DEPLOY_NAMEは手順5で.envファイルに設定したイメージ名)</p>
+<pre><code class="language-bash">gcloud auth configure-docker asia-northeast1-docker.pkg.dev
+docker build -t asia-northeast1-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REGISTRY_REPO_NAME/$IMAGE_NAME .
+docker push asia-northeast1-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REGISTRY_REPO_NAME/$IMAGE_NAME
+</code></pre>
+<h2 id="9-cloud-run公開アクセスの許可-任意"><a class="header" href="#9-cloud-run公開アクセスの許可-任意">9. Cloud Run公開アクセスの許可 (任意)</a></h2>
+<p>手動で一度デプロイしておく。リソース設定はCI buildで追って反映させる。</p>
+<pre><code class="language-bash"># Cloud Run サービスの初回デプロイ
+gcloud run deploy $CLOUD_RUN_DEPLOY_NAME \
+  --image=asia-northeast1-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REGISTRY_REPO_NAME/$IMAGE_NAME \
+  --region=asia-northeast1 \
+  --platform=managed \
+  --allow-unauthenticated
+  --update-env-vars PRODUCTION=1 \
+</code></pre>
+<p>成功すると以下のように表示され、サービスにアクセスするためのURLが確認できる。</p>
+<pre><code>Deploying container to Cloud Run service [$IMAGE_NAME] in project [$PROJECT_ID] region [asia-northeast1]
+...
+Service URL: https://$IMAGE_NAME-$ランダムなハッシュ値-uc.a.run.app
+</code></pre>
+<h2 id="10-cloudsqlの初期テーブル作成"><a class="header" href="#10-cloudsqlの初期テーブル作成">10. CloudSQLの初期テーブル作成</a></h2>
+<ul>
+<li>ローカルにpsqlをインストール</li>
+</ul>
+<p>例: Ubuntu22.04</p>
+<pre><code class="language-bash">sudo apt install postgresql-client-common postgresql-client-14
+</code></pre>
+<ul>
+<li>
+<p>Cloud SQL Auth Proxy(Cloud SQLインスタンスへの接続のための公式バイナリ)をダウンロードする</p>
+<ul>
+<li>参考：<a href="https://cloud.google.com/sql/docs/postgres/sql-proxy?hl=ja#install">Cloud SQL Auth Proxy をダウンロードしてインストールする</a></li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-bash">chmod +x cloud-sql-proxy
+
+# プロキシ起動
+./cloud-sql-proxy --credentials-file=key.json $PROJECT_ID:$REGION:$INSTANCE_NAME &amp;
+
+export PGPASSWORD=postgres
+cd ./data/$COMPETITION_NAME/static
+psql -h 127.0.0.1 -p 5432 -U postgres -d postgres -f generate_tables.sql
+cd ../original
+psql -h 127.0.0.1 -p 5432 -U postgres -d postgres -f generate_tables.sql
+cd ../../test/static
+psql -h 127.0.0.1 -p 5432 -U postgres -d postgres -f generate_tables.sql
+cd ../original
+psql -h 127.0.0.1 -p 5432 -U postgres -d postgres -f generate_tables.sql
+</code></pre>
+<p>(参考) <a href="https://cloud.google.com/run/docs/authenticating/public?hl=ja#gcloud">公開（未認証）アクセスを許可する | Cloud Run Documentation | Google Cloud</a></p>
+<p>データベースの変更を一括で行いたい場合に、一度全削除してから行う方法は以下。</p>
+<pre><code class="language-bash">psql -h 127.0.0.1 -p 5432 -U postgres -d postgres
+
+DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;
+</code></pre>
+<p>接続が必要なくなったら、cloud-sql-proxyのプロセスは落としておくとよい。　</p>
+<pre><code class="language-bash">ps aux | grep -v grep | grep cloud-sql-proxy | tr -s &quot; &quot; | cut -d&quot; &quot; -f2 | xargs kill $1
+</code></pre>
+<h2 id="オプショナル-memorystoreの利用必要に応じて"><a class="header" href="#オプショナル-memorystoreの利用必要に応じて">オプショナル. Memorystoreの利用（必要に応じて）</a></h2>
+<p>MemorystoreはredisをCloud側で立ててくれるサービス。Cloud Runのインスタンス数を2個以上にスケーリングする可能性がある場合は使う必要がある(<a href="https://github.com/KazutoMurase/taido-competition-record/issues/125">参考</a>)が、これまでの運用実績では必要な場面は無し。</p>
+<ul>
+<li>Cloud Runスケーリングが必要な場合に構成</li>
+<li>Cloud Runの「接続」→ Memorystoreを追加</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                                                    <a rel="prev" href="../develop/preparation.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+                                                    <a rel="next" href="../develop/utility.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                                    <a rel="prev" href="../develop/preparation.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+                                    <a rel="next" href="../develop/utility.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                            </nav>
+
+        </div>
+
+        
+        
+        
+                <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+        
+                <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+        
+    </body>
+</html>
