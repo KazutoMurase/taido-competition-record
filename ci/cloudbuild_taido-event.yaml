@@ -47,7 +47,7 @@ steps:
         '--min-instances',
         '0',
         '--add-cloudsql-instances',
-        'kids-468115:asia-northeast1:postgres-instance',
+        'taido-event:asia-northeast1:postgres-instance',
         '--update-env-vars',
         'COMPETITION_NAME=2025_adult',
         '--update-env-vars',
@@ -76,6 +76,12 @@ steps:
         'PASSWORD=saitama2508',
         '--update-env-vars',
         'SHOW_HIGHLIGHT_IN_TOURNAMENT=1',
+        '--update-env-vars',
+        'SHOW_TOTAL_IN_ADMIN=0',
+        '--update-env-vars',
+        'SHOW_TOTAL_IN_PUBLIC=0',
+        '--update-env-vars',
+        'SHOW_AWARD_IN_PUBLIC=0',
         '--update-env-vars',
         'USE_RESULT_DATA=0'
       ]
