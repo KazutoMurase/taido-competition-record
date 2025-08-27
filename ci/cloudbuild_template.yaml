@@ -12,7 +12,7 @@ steps:
         'build',
         '-t',
         'asia-northeast1-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REGISTRY_REPO_NAME/$IMAGE_NAME',
-        '.'
+        'taido-competition-record'
       ]
 
   - name: gcr.io/cloud-builders/docker
@@ -69,7 +69,21 @@ steps:
         '--update-env-vars',
         'USE_LOCAL_DB=0',
         '--update-env-vars',
-        'USE_LOCAL_REDIS=$USE_LOCAL_REDIS'
+        'USE_LOCAL_REDIS=$USE_LOCAL_REDIS',
+        '--update-env-vars',
+        'USERNAME=$USERNAME',
+        '--update-env-vars',
+        'PASSWORD=$PASSWORD',
+        '--update-env-vars',
+        'SHOW_TOTAL_IN_ADMIN=$SHOW_TOTAL',
+        '--update-env-vars',
+        'SHOW_TOTAL_IN_PUBLIC=0',
+        '--update-env-vars',
+        'SHOW_AWARD_IN_PUBLIC=0',
+        '--update-env-vars',
+        'USE_RESULT_DATA=0',
+        '--update-env-vars',
+        'SHOW_HIGHLIGHT_IN_TOURNAMENT=1'
       ]
 
 images:
