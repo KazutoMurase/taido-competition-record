@@ -88,7 +88,7 @@ cd ci && ./generate-cloudbuild.sh
 ```
 
 - `cloudbuild_$PROJECT_ID.yaml`というファイルが生成される。
-- 作成したファイルを[デプロイ用レポジトリ](https://github.com/KazutoMurase/taido-competition-deploy)に移す。
+- 作成したファイルを[デプロイ用レポジトリ(※アクセス権限必要)](https://github.com/KazutoMurase/taido-competition-deploy)に移す。
 
 なお、CPUやメモリなど各種リソース設定値についてもcloudbuild-template.yamlに設定している。
 設定値の妥当性については[issue #213](https://github.com/KazutoMurase/taido-competition-record/issues/213)を参照。
