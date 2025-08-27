@@ -88,7 +88,7 @@ cd ci && ./generate-cloudbuild.sh
 ```
 
 - `cloudbuild_$PROJECT_ID.yaml`というファイルが生成される。
-- 作成したファイルをコミットしてmainブランチに取り込んでおく。
+- 作成したファイルを[デプロイ用レポジトリ](https://github.com/KazutoMurase/taido-competition-deploy)に移す。
 
 なお、CPUやメモリなど各種リソース設定値についてもcloudbuild-template.yamlに設定している。
 設定値の妥当性については[issue #213](https://github.com/KazutoMurase/taido-competition-record/issues/213)を参照。
@@ -97,7 +97,7 @@ cd ci && ./generate-cloudbuild.sh
 
 GCPコンソールから`Cloud Build`→プロジェクトを選択 →`リポジトリを接続`→GitHub
 - GitHubアカウントをOAuthで接続（リポジトリの管理者レベルの権限が必要、適宜依頼する）
-- 対象のリポジトリを選択して登録
+- 対象のリポジトリ(上記デプロイ用レポジトリ)を選択して登録
 
 (参考) [ビルドトリガーの作成と管理 | Cloud Build Documentation | Google Cloud](https://cloud.google.com/build/docs/automating-builds/create-manage-triggers?hl=ja)
 
@@ -109,7 +109,7 @@ GCPコンソールを開き、Cloud Buildから接続済みのリポジトリを
 - イベント: ブランチにpushする
 - リポジトリサービス: Cloud Buildリポジトリ
 - 構成: Cloud Build構成ファイル（yamlまたはjson）
-- CloudBuild構成ファイルの場所: `/ci/cloudbuild_$PROJECT_ID.yaml`
+- CloudBuild構成ファイルの場所: `/cloudbuild_$PROJECT_ID.yaml`
     - 手順5で作成したファイルを参照する
 - サービスアカウント: 手順2(1)で作成したアカウントを選択
 
