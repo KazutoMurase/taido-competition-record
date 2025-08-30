@@ -1,93 +1,112 @@
 steps:
   - name: gcr.io/cloud-builders/git
+    id: 'check-submodule-hash'
+    entrypoint: 'bash'
     args:
-      - submodule
-      - update
-      - --init
-      - --recursive
-
-  - name: gcr.io/cloud-builders/docker
-    args:
-      [
-        'build',
-        '-t',
-        'asia-northeast1-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REGISTRY_REPO_NAME/$IMAGE_NAME',
-        'taido-competition-record'
-      ]
-
-  - name: gcr.io/cloud-builders/docker
-    args:
-      [
-        'push',
-        'asia-northeast1-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REGISTRY_REPO_NAME/$IMAGE_NAME'
-      ]
+      - '-c'
+      - |
+        git submodule update --init --recursive
+        cd $$IMAGE_NAME
+        SUBMODULE_HASH=$(git rev-parse HEAD)
+        echo "Submodule hash: $$SUBMODULE_HASH"
+        echo "$$SUBMODULE_HASH" > /workspace/submodule_hash.txt
+        cd ..
 
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
-    entrypoint: gcloud
+    id: 'check-tag-exists'
+    entrypoint: 'bash'
     args:
-      [
-        'run',
-        'deploy',
-        '$CLOUD_RUN_DEPLOY_NAME',
-        '--image',
-        'asia-northeast1-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REGISTRY_REPO_NAME/$IMAGE_NAME',
-        '--region',
-        'asia-northeast1',
-        '--allow-unauthenticated',
-        '--port',
-        '3000',
-        '--memory',
-        '4Gi',
-        '--cpu',
-        '4',
-        '--cpu-boost',
-        '--no-cpu-throttling',
-        '--max-instances',
-        '1',
-        '--min-instances',
-        '0',
-        '--add-cloudsql-instances',
-        '$PROJECT_ID:asia-northeast1:$CLOUDSQL_INSTANCE_ID',
-        '--update-env-vars',
-        'COMPETITION_NAME=$COMPETITION_NAME',
-        '--update-env-vars',
-        'PGSQL_DATABASE=postgres',
-        '--update-env-vars',
-        'PGSQL_HOST=/cloudsql/$PROJECT_ID:asia-northeast1:$CLOUDSQL_INSTANCE_ID',
-        '--update-env-vars',
-        'PGSQL_PASSWORD=postgres',
-        '--update-env-vars',
-        'PGSQL_USER=postgres',
-        '--update-env-vars',
-        'PRODUCTION=1',
-        '--update-env-vars',
-        'PRODUCTION_TEST=0',
-        '--update-env-vars',
-        'REDISHOST=$REDISHOST',
-        '--update-env-vars',
-        'REDISPORT=6379',
-        '--update-env-vars',
-        'USE_LOCAL_DB=0',
-        '--update-env-vars',
-        'USE_LOCAL_REDIS=$USE_LOCAL_REDIS',
-        '--update-env-vars',
-        'USERNAME=$USERNAME',
-        '--update-env-vars',
-        'PASSWORD=$PASSWORD',
-        '--update-env-vars',
-        'SHOW_TOTAL_IN_ADMIN=$SHOW_TOTAL',
-        '--update-env-vars',
-        'SHOW_TOTAL_IN_PUBLIC=0',
-        '--update-env-vars',
-        'SHOW_AWARD_IN_PUBLIC=0',
-        '--update-env-vars',
-        'USE_RESULT_DATA=0',
-        '--update-env-vars',
-        'SHOW_HIGHLIGHT_IN_TOURNAMENT=1'
-      ]
+      - '-c'
+      - |
+        SUBMODULE_HASH=$$(cat /workspace/submodule_hash.txt)
+        IMAGE_TAG="asia-northeast1-docker.pkg.dev/$$PROJECT_ID/ar-docker-repo/$$IMAGE_NAME:$$SUBMODULE_HASH"
+        echo "Checking if image exists: $$IMAGE_TAG"
+        if gcloud container images describe "$$IMAGE_TAG" --quiet >/dev/null 2>&1; then
+          echo "Image with tag $$SUBMODULE_HASH already exists, skipping build"
+          echo "false" > /workspace/build_required.txt
+          echo "$$IMAGE_TAG" > /workspace/existing_image.txt
+        else
+          echo "Image with tag $$SUBMODULE_HASH does not exist, build required"
+          echo "true" > /workspace/build_required.txt
+          echo "$$IMAGE_TAG" > /workspace/new_image.txt
+        fi
 
-images:
-  - asia-northeast1-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REGISTRY_REPO_NAME/$IMAGE_NAME
+  - name: gcr.io/cloud-builders/docker
+    id: 'build-image'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        if [ "$(cat /workspace/build_required.txt)" = "true" ]; then
+          SUBMODULE_HASH=$$(cat /workspace/submodule_hash.txt)
+          IMAGE_TAG="asia-northeast1-docker.pkg.dev/$$PROJECT_ID/ar-docker-repo/$$IMAGE_NAME:$$SUBMODULE_HASH"
+          echo "Building image with tag: $$IMAGE_TAG"
+          docker build -t "$$IMAGE_TAG" $$IMAGE_NAME
+          docker tag "$$IMAGE_TAG" asia-northeast1-docker.pkg.dev/$$PROJECT_ID/ar-docker-repo/$$IMAGE_NAME:latest
+        else
+          echo "Skipping Docker build - image already exists"
+        fi
+
+  - name: gcr.io/cloud-builders/docker
+    id: 'push-image'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        if [ "$(cat /workspace/build_required.txt)" = "true" ]; then
+          SUBMODULE_HASH=$$(cat /workspace/submodule_hash.txt)
+          IMAGE_TAG="asia-northeast1-docker.pkg.dev/$$PROJECT_ID/ar-docker-repo/$$IMAGE_NAME:$$SUBMODULE_HASH"
+          echo "Pushing image with tag: $$IMAGE_TAG"
+          docker push "$$IMAGE_TAG"
+          docker push asia-northeast1-docker.pkg.dev/$$PROJECT_ID/ar-docker-repo/$$IMAGE_NAME:latest
+        else
+          echo "Skipping Docker push - image already exists"
+        fi
+
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    id: 'deploy-service'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        if [ "$(cat /workspace/build_required.txt)" = "true" ]; then
+          SUBMODULE_HASH=$$(cat /workspace/submodule_hash.txt)
+          IMAGE_TO_DEPLOY="asia-northeast1-docker.pkg.dev/$$PROJECT_ID/ar-docker-repo/$$IMAGE_NAME:$$SUBMODULE_HASH"
+          echo "Deploying newly built image: $$IMAGE_TO_DEPLOY"
+        else
+          IMAGE_TO_DEPLOY=$$(cat /workspace/existing_image.txt)
+          echo "Deploying existing image: $$IMAGE_TO_DEPLOY"
+        fi
+        gcloud run deploy $$CLOUD_RUN_DEPLOY_NAME \
+          --image "$$IMAGE_TO_DEPLOY" \
+          --region asia-northeast1 \
+          --allow-unauthenticated \
+          --port 3000 \
+          --memory 4Gi \
+          --cpu 4 \
+          --cpu-boost \
+          --no-cpu-throttling \
+          --max-instances 1 \
+          --min-instances 0 \
+          --add-cloudsql-instances $$PROJECT_ID:asia-northeast1:$$CLOUDSQL_INSTANCE_ID \
+          --update-env-vars COMPETITION_NAME=$$COMPETITION_NAME \
+          --update-env-vars PGSQL_DATABASE=postgres \
+          --update-env-vars PGSQL_HOST=/cloudsql/$$PROJECT_ID:asia-northeast1:$$CLOUDSQL_INSTANCE_ID \
+          --update-env-vars PGSQL_PASSWORD=postgres \
+          --update-env-vars PGSQL_USER=postgres \
+          --update-env-vars PRODUCTION=1 \
+          --update-env-vars PRODUCTION_TEST=0 \
+          --update-env-vars REDISHOST=$$REDISHOST \
+          --update-env-vars REDISPORT=6379 \
+          --update-env-vars USE_LOCAL_DB=0 \
+          --update-env-vars USE_LOCAL_REDIS=$$USE_LOCAL_REDIS \
+          --update-env-vars USERNAME=$$USERNAME \
+          --update-env-vars PASSWORD=$$PASSWORD \
+          --update-env-vars SHOW_HIGHLIGHT_IN_TOURNAMENT=1 \
+          --update-env-vars SHOW_TOTAL_IN_ADMIN=$$SHOW_TOTAL \
+          --update-env-vars SHOW_TOTAL_IN_PUBLIC=0 \
+          --update-env-vars SHOW_AWARD_IN_PUBLIC=0 \
+          --update-env-vars USE_RESULT_DATA=0
 
 options:
   logging: CLOUD_LOGGING_ONLY
