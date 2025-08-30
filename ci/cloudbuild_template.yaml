@@ -19,7 +19,7 @@ steps:
       - '-c'
       - |
         SUBMODULE_HASH=$$(cat /workspace/submodule_hash.txt)
-        IMAGE_TAG="asia-northeast1-docker.pkg.dev/$$PROJECT_ID/ar-docker-repo/$$IMAGE_NAME:$$SUBMODULE_HASH"
+        IMAGE_TAG="asia-northeast1-docker.pkg.dev/$$PROJECT_ID/$$ARTIFACT_REGISTRY_REPO_NAME/$$IMAGE_NAME:$$SUBMODULE_HASH"
         echo "Checking if image exists: $$IMAGE_TAG"
         if gcloud container images describe "$$IMAGE_TAG" --quiet >/dev/null 2>&1; then
           echo "Image with tag $$SUBMODULE_HASH already exists, skipping build"
@@ -39,10 +39,10 @@ steps:
       - |
         if [ "$(cat /workspace/build_required.txt)" = "true" ]; then
           SUBMODULE_HASH=$$(cat /workspace/submodule_hash.txt)
-          IMAGE_TAG="asia-northeast1-docker.pkg.dev/$$PROJECT_ID/ar-docker-repo/$$IMAGE_NAME:$$SUBMODULE_HASH"
+          IMAGE_TAG="asia-northeast1-docker.pkg.dev/$$PROJECT_ID/$$ARTIFACT_REGISTRY_REPO_NAME/$$IMAGE_NAME:$$SUBMODULE_HASH"
           echo "Building image with tag: $$IMAGE_TAG"
           docker build -t "$$IMAGE_TAG" $$IMAGE_NAME
-          docker tag "$$IMAGE_TAG" asia-northeast1-docker.pkg.dev/$$PROJECT_ID/ar-docker-repo/$$IMAGE_NAME:latest
+          docker tag "$$IMAGE_TAG" asia-northeast1-docker.pkg.dev/$$PROJECT_ID/$$ARTIFACT_REGISTRY_REPO_NAME/$$IMAGE_NAME:latest
         else
           echo "Skipping Docker build - image already exists"
         fi
@@ -55,10 +55,10 @@ steps:
       - |
         if [ "$(cat /workspace/build_required.txt)" = "true" ]; then
           SUBMODULE_HASH=$$(cat /workspace/submodule_hash.txt)
-          IMAGE_TAG="asia-northeast1-docker.pkg.dev/$$PROJECT_ID/ar-docker-repo/$$IMAGE_NAME:$$SUBMODULE_HASH"
+          IMAGE_TAG="asia-northeast1-docker.pkg.dev/$$PROJECT_ID/$$ARTIFACT_REGISTRY_REPO_NAME/$$IMAGE_NAME:$$SUBMODULE_HASH"
           echo "Pushing image with tag: $$IMAGE_TAG"
           docker push "$$IMAGE_TAG"
-          docker push asia-northeast1-docker.pkg.dev/$$PROJECT_ID/ar-docker-repo/$$IMAGE_NAME:latest
+          docker push asia-northeast1-docker.pkg.dev/$$PROJECT_ID/$$ARTIFACT_REGISTRY_REPO_NAME/$$IMAGE_NAME:latest
         else
           echo "Skipping Docker push - image already exists"
         fi
@@ -71,7 +71,7 @@ steps:
       - |
         if [ "$(cat /workspace/build_required.txt)" = "true" ]; then
           SUBMODULE_HASH=$$(cat /workspace/submodule_hash.txt)
-          IMAGE_TO_DEPLOY="asia-northeast1-docker.pkg.dev/$$PROJECT_ID/ar-docker-repo/$$IMAGE_NAME:$$SUBMODULE_HASH"
+          IMAGE_TO_DEPLOY="asia-northeast1-docker.pkg.dev/$$PROJECT_ID/$$ARTIFACT_REGISTRY_REPO_NAME/$$IMAGE_NAME:$$SUBMODULE_HASH"
           echo "Deploying newly built image: $$IMAGE_TO_DEPLOY"
         else
           IMAGE_TO_DEPLOY=$$(cat /workspace/existing_image.txt)
