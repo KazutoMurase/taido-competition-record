@@ -84,7 +84,7 @@ CIにおいて実行する内容を定義するyamlファイルを作成する�
 
 - ./ci/.envに必要な変数を記入して、以下を実行する。
 ```
-cd ci && ./generate-cloudbuild.sh
+cd ci && ./generate-cloudbuild.py
 ```
 
 - `cloudbuild_$PROJECT_ID.yaml`というファイルが生成される。
