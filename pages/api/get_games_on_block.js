@@ -122,6 +122,9 @@ async function GetFromDB(req, res, event_name) {
   const sorted_data = result_schedule.rows.sort((a, b) => a.id - b.id);
   query =
     "SELECT early_round_type, later_round_type FROM event_type WHERE name_en = $1";
+  if (event_name.includes("test")) {
+    event_name = event_name.replace("test_", "");
+  }
   const result_round_type = await client.query(query, [event_name]);
   const early_round_type = result_round_type.rows[0]["early_round_type"];
   const later_round_type = result_round_type.rows[0]["later_round_type"];
@@ -303,6 +306,9 @@ async function GetFromDB(req, res, event_name) {
     }
     if (sorted_block_data[i]["id"] === current_id) {
       sorted_block_data[i]["current"] = true;
+    }
+    if (!("round_type" in sorted_block_data[i])) {
+      sorted_block_data[i]["round_type"] = later_round_type;
     }
   }
   return sorted_block_data;
