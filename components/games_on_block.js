@@ -249,7 +249,7 @@ function GamesOnBlock({
                     bgcolor={"current" in item ? "yellow" : "white"}
                   >
                     {event_name.includes("hokei") ? (
-                      <td>{item["round_type"].replace(/['"]+/g, "")}</td>
+                      <td>{item["round_type"]?.replace(/['"]+/g, "")}</td>
                     ) : (
                       <></>
                     )}
