@@ -76,7 +76,7 @@ const Summary: React.FC<{ params }> = ({ params }) => {
         container
         justifyContent="center"
         alignItems="center"
-        style={{ height: "320px" }}
+        style={{ height: "360px" }}
       >
         <GetAwardedPlayers hide={hide_award} is_high_school_result={false} />
       </Grid>
