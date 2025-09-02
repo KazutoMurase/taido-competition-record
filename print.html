@@ -155,13 +155,18 @@
 <h2 id="必要な環境"><a class="header" href="#必要な環境">必要な環境</a></h2>
 <ul>
 <li>Docker</li>
+<li>Git</li>
 </ul>
 <h2 id="手順"><a class="header" href="#手順">手順</a></h2>
-<p>以下のコマンドを本レポジトリのルートで実行しビルドする。</p>
-<pre><code class="language-bash">docker build -t taido-competition-record .
+<p>以下の手順は本レポジトリのルートで実行する想定で記載している。</p>
+<p>dataを取得する。</p>
+<pre><code class="language-bash">git submodule update --init --recursive
 </code></pre>
-<p>出来たイメージを使ってコンテナを立ち上げる。</p>
+<p>コンテナを立ち上げる(最初、イメージがローカルに存在しない場合はDockerレジストリから取得される)。</p>
 <pre><code class="language-bash">docker compose up
+</code></pre>
+<p>(Optional) 自前でイメージをビルドし使ってもよい。</p>
+<pre><code class="language-bash">docker build -t ghcr.io/kazutomurase/taido-competition-record .
 </code></pre>
 <p>ポート被りが無ければ、http://localhost:3000 でアクセスできる。
 ポート番号は .env の PORT で指定できる。</p>
