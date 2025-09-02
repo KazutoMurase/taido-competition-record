@@ -2,7 +2,7 @@ version: "2.4"
 
 services:
   app:
-    image: "taido-competition-record:latest"
+    image: "ghcr.io/kazutomurase/taido-competition-record:latest"
     env_file:
       - .env
     ports:
