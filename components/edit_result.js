@@ -803,6 +803,8 @@ function CreateBlock(
   currentGameIds = [],
   blinkState = true,
   fromAdmin = false,
+  selectedMatchId = null,
+  onMatchIdClick = null,
 ) {
   const router = useRouter();
 
@@ -927,10 +929,23 @@ function CreateBlock(
             x={x + width / 2 - 8}
             y={item["left_begin_y"] + 5 + y_padding}
             text={item["id"]}
-            fill={"gray"}
+            fill={selectedMatchId === item["id"] ? "red" : "gray"}
             fontSize={12}
-            onClick={(e) => onUpdate(item["id"], editable)}
-            onTap={(e) => onUpdate(item["id"], editable)}
+            listening={true}
+            onClick={(e) => {
+              if (onMatchIdClick) {
+                onMatchIdClick(item["id"], editable);
+              } else {
+                onUpdate(item["id"], editable);
+              }
+            }}
+            onTap={(e) => {
+              if (onMatchIdClick) {
+                onMatchIdClick(item["id"], editable);
+              } else {
+                onUpdate(item["id"], editable);
+              }
+            }}
           />
           <Text
             x={x + width / 2 - 8}
@@ -1093,10 +1108,23 @@ function CreateBlock(
             x={x + width / 2 - 8}
             y={item["left_begin_y"] + 5 + y_padding}
             text={item["id"]}
-            fill={"gray"}
+            fill={selectedMatchId === item["id"] ? "red" : "gray"}
             fontSize={12}
-            onClick={(e) => onUpdate(item["id"], editable)}
-            onTap={(e) => onUpdate(item["id"], editable)}
+            listening={true}
+            onClick={(e) => {
+              if (onMatchIdClick) {
+                onMatchIdClick(item["id"], editable);
+              } else {
+                onUpdate(item["id"], editable);
+              }
+            }}
+            onTap={(e) => {
+              if (onMatchIdClick) {
+                onMatchIdClick(item["id"], editable);
+              } else {
+                onUpdate(item["id"], editable);
+              }
+            }}
           />
           <Text
             x={x + width / 2 - 10}
@@ -1380,10 +1408,23 @@ function CreateBlock(
             y_padding
           }
           text={item["id"] < 10 ? " " + item["id"] : item["id"]}
-          fill={"gray"}
+          fill={selectedMatchId === item["id"] ? "red" : "gray"}
           fontSize={12}
-          onClick={(e) => onUpdate(item["id"], editable)}
-          onTap={(e) => onUpdate(item["id"], editable)}
+          listening={true}
+          onClick={(e) => {
+            if (onMatchIdClick) {
+              onMatchIdClick(item["id"], editable);
+            } else {
+              onUpdate(item["id"], editable);
+            }
+          }}
+          onTap={(e) => {
+            if (onMatchIdClick) {
+              onMatchIdClick(item["id"], editable);
+            } else {
+              onUpdate(item["id"], editable);
+            }
+          }}
         />
         <Text
           x={
@@ -1452,6 +1493,7 @@ function EditResult({
   const [showIds, setShowIds] = useState(true);
   const [groupNameStates, setGroupNameStates] = useState({});
   const [districtColors, setDistrictColors] = useState({});
+  const [selectedMatchId, setSelectedMatchId] = useState(null);
 
   const fetchCurrentBlock = useCallback(async () => {
     const blockData = {};
@@ -1689,6 +1731,32 @@ function EditResult({
     });
   };
 
+  const handleMatchIdClick = (matchId, editable) => {
+    if (selectedMatchId === null) {
+      setSelectedMatchId(matchId);
+    } else if (selectedMatchId === matchId) {
+      setSelectedMatchId(null);
+    } else {
+      const firstMatchData = data.find((item) => item.id === selectedMatchId);
+      const secondMatchData = data.find((item) => item.id === matchId);
+
+      if (firstMatchData && secondMatchData) {
+        setData((prevData) =>
+          prevData.map((item) => {
+            if (item.id === selectedMatchId) {
+              return { ...item, id: matchId };
+            } else if (item.id === matchId) {
+              return { ...item, id: selectedMatchId };
+            }
+            return item;
+          }),
+        );
+      }
+
+      setSelectedMatchId(null);
+    }
+  };
+
   useEffect(() => {
     const handleKeyPress = (event) => {
       if (event.key === "a" || event.key === "A") {
@@ -1785,6 +1853,8 @@ function EditResult({
                       ),
                       blinkState,
                       fromAdmin,
+                      selectedMatchId,
+                      handleMatchIdClick,
                     ),
                   )}
                   {sortedData.map((item, index) =>
