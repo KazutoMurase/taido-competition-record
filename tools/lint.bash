@@ -1,5 +1,5 @@
 #!/bin/bash
-DOCKER_IMAGE=taido-competition-record:latest
+DOCKER_IMAGE=ghcr.io/kazutomurase/taido-competition-record:latest
 CMD="cd /ws/ && npm run lint && npm run ts"
 
 docker run --rm --volume "./:/ws" \
