@@ -185,6 +185,7 @@ function CreateText(
   blinkState = true,
   textPositions = {},
   onTextDrag = null,
+  showIds = true,
 ) {
   const is_left = item["block_pos"] === "left";
   const is_right = item["block_pos"] === "right";
@@ -276,6 +277,15 @@ function CreateText(
               fill="black"
               visible={"left_out" in item && item["left_group_name"] !== "''"}
             />
+            <Text
+              x={is_left ? 100 : 730}
+              y={item["left_begin_y"] - 15 + y_padding}
+              text={`団体内ランク${(item["id"] % 4) + 1}位`}
+              fontSize={12}
+              fill="blue"
+              fontStyle="bold"
+              visible={showIds}
+            />
           </Group>
           <Group
             x={rightPos.x}
@@ -330,6 +340,15 @@ function CreateText(
               height={1}
               fill="black"
               visible={"right_out" in item && item["right_group_name"] !== "''"}
+            />
+            <Text
+              x={is_left ? 100 : 730}
+              y={item["right_begin_y"] - 15 + y_padding}
+              text={`団体内ランク${(item["id"] % 4) + 1}位`}
+              fontSize={12}
+              fill="red"
+              fontStyle="bold"
+              visible={showIds}
             />
           </Group>
         </>
@@ -394,6 +413,15 @@ function CreateText(
             fill="black"
             visible={"left_out" in item && item["left_group_name"] !== "''"}
           />
+          <Text
+            x={is_left ? 100 : 730}
+            y={item["left_begin_y"] - 15 + y_padding}
+            text={`前年度同大会${(item["id"] % 4) + 1}位`}
+            fontSize={12}
+            fill="green"
+            fontStyle="bold"
+            visible={showIds}
+          />
         </Group>
       );
     }
@@ -456,6 +484,15 @@ function CreateText(
             fill="black"
             visible={"right_out" in item && item["right_group_name"] !== "''"}
           />
+          <Text
+            x={is_left ? 100 : 730}
+            y={item["right_begin_y"] - 15 + y_padding}
+            text={`地区大会${(item["id"] % 4) + 1}位`}
+            fontSize={12}
+            fill="orange"
+            fontStyle="bold"
+            visible={showIds}
+          />
         </Group>
       );
     }
@@ -513,6 +550,15 @@ function CreateText(
             }
             fontSize={GetGroupNameFontSize(item["left_group_name"])}
           />
+          <Text
+            x={x - 120}
+            y={item["left_begin_y"] - 18 + y_padding}
+            text={`団体内ランク${(item["id"] % 4) + 1}位`}
+            fontSize={12}
+            fill="purple"
+            fontStyle="bold"
+            visible={showIds}
+          />
         </Group>
         <Group
           x={rightFakePos.x}
@@ -552,6 +598,15 @@ function CreateText(
                 : ""
             }
             fontSize={GetGroupNameFontSize(item["right_group_name"])}
+          />
+          <Text
+            x={x + width + 120}
+            y={item["left_begin_y"] - 18 + y_padding}
+            text={`団体内ランク${(item["id"] % 4) + 1}位`}
+            fontSize={12}
+            fill="teal"
+            fontStyle="bold"
+            visible={showIds}
           />
         </Group>
       </>
@@ -1217,6 +1272,7 @@ function EditResult({
   const [courts, setCourts] = useState([]);
   const [blinkState, setBlinkState] = useState(true);
   const [textPositions, setTextPositions] = useState({});
+  const [showIds, setShowIds] = useState(true);
 
   const fetchCurrentBlock = useCallback(async () => {
     const blockData = {};
@@ -1399,6 +1455,27 @@ function EditResult({
       [groupKey]: position,
     }));
   };
+
+  const resetTextPositions = () => {
+    setTextPositions({});
+  };
+
+  const toggleIds = () => {
+    setShowIds((prev) => !prev);
+  };
+
+  useEffect(() => {
+    const handleKeyPress = (event) => {
+      if (event.key === "a" || event.key === "A") {
+        toggleIds();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+    return () => {
+      window.removeEventListener("keydown", handleKeyPress);
+    };
+  }, []);
   return (
     <div>
       <Container maxWidth="md">
@@ -1497,6 +1574,7 @@ function EditResult({
                           blinkState,
                           textPositions,
                           handleTextDrag,
+                          showIds,
                         ),
                   )}
                 </Layer>
