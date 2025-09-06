@@ -186,6 +186,9 @@ function CreateText(
   textPositions = {},
   onTextDrag = null,
   showIds = true,
+  groupNameStates = {},
+  onGroupNameClick = null,
+  getDistrictColor = null,
 ) {
   const is_left = item["block_pos"] === "left";
   const is_right = item["block_pos"] === "right";
@@ -268,7 +271,35 @@ function CreateText(
               y={item["left_begin_y"] - 2 + y_padding}
               text={GetGroupNameWithBracket(item["left_group_name"])}
               fontSize={GetGroupNameFontSize(item["left_group_name"])}
+              fill={
+                groupNameStates[item["left_group_name"]] === 1 ? "red" : "black"
+              }
+              visible={groupNameStates[item["left_group_name"]] !== 3}
+              onClick={() =>
+                onGroupNameClick && onGroupNameClick(item["left_group_name"])
+              }
+              onTap={() =>
+                onGroupNameClick && onGroupNameClick(item["left_group_name"])
+              }
             />
+            {groupNameStates[item["left_group_name"]] === 2 && (
+              <Rect
+                x={is_left ? 120 : 750}
+                y={item["left_begin_y"] - 7 + y_padding}
+                width={item["left_group_name"].length * 10 + 20}
+                height={20}
+                fill={
+                  getDistrictColor && getDistrictColor(item["left_group_name"])
+                }
+                opacity={0.5}
+                onClick={() =>
+                  onGroupNameClick && onGroupNameClick(item["left_group_name"])
+                }
+                onTap={() =>
+                  onGroupNameClick && onGroupNameClick(item["left_group_name"])
+                }
+              />
+            )}
             <Rect
               x={is_left ? 120 : 750}
               y={item["left_begin_y"] + 5 + y_padding}
@@ -332,7 +363,37 @@ function CreateText(
               y={item["right_begin_y"] - 2 + y_padding}
               text={GetGroupNameWithBracket(item["right_group_name"])}
               fontSize={GetGroupNameFontSize(item["right_group_name"])}
+              fill={
+                groupNameStates[item["right_group_name"]] === 1
+                  ? "red"
+                  : "black"
+              }
+              visible={groupNameStates[item["right_group_name"]] !== 3}
+              onClick={() =>
+                onGroupNameClick && onGroupNameClick(item["right_group_name"])
+              }
+              onTap={() =>
+                onGroupNameClick && onGroupNameClick(item["right_group_name"])
+              }
             />
+            {groupNameStates[item["right_group_name"]] === 2 && (
+              <Rect
+                x={is_left ? 120 : 750}
+                y={item["right_begin_y"] - 7 + y_padding}
+                width={item["right_group_name"].length * 10 + 20}
+                height={20}
+                fill={
+                  getDistrictColor && getDistrictColor(item["right_group_name"])
+                }
+                opacity={0.5}
+                onClick={() =>
+                  onGroupNameClick && onGroupNameClick(item["right_group_name"])
+                }
+                onTap={() =>
+                  onGroupNameClick && onGroupNameClick(item["right_group_name"])
+                }
+              />
+            )}
             <Rect
               x={is_left ? 120 : 750}
               y={item["right_begin_y"] + 5 + y_padding}
@@ -404,7 +465,35 @@ function CreateText(
             y={item["left_begin_y"] - 2 + y_padding}
             text={GetGroupNameWithBracket(item["left_group_name"])}
             fontSize={GetGroupNameFontSize(item["left_group_name"])}
+            fill={
+              groupNameStates[item["left_group_name"]] === 1 ? "red" : "black"
+            }
+            visible={groupNameStates[item["left_group_name"]] !== 3}
+            onClick={() =>
+              onGroupNameClick && onGroupNameClick(item["left_group_name"])
+            }
+            onTap={() =>
+              onGroupNameClick && onGroupNameClick(item["left_group_name"])
+            }
           />
+          {groupNameStates[item["left_group_name"]] === 2 && (
+            <Rect
+              x={is_left ? 120 : 750}
+              y={item["left_begin_y"] - 7 + y_padding}
+              width={item["left_group_name"].length * 10 + 20}
+              height={20}
+              fill={
+                getDistrictColor && getDistrictColor(item["left_group_name"])
+              }
+              opacity={0.5}
+              onClick={() =>
+                onGroupNameClick && onGroupNameClick(item["left_group_name"])
+              }
+              onTap={() =>
+                onGroupNameClick && onGroupNameClick(item["left_group_name"])
+              }
+            />
+          )}
           <Rect
             x={is_left ? 120 : 750}
             y={item["left_begin_y"] + 5 + y_padding}
@@ -475,7 +564,35 @@ function CreateText(
             y={item["right_begin_y"] - 2 + y_padding}
             text={GetGroupNameWithBracket(item["right_group_name"])}
             fontSize={GetGroupNameFontSize(item["right_group_name"])}
+            fill={
+              groupNameStates[item["right_group_name"]] === 1 ? "red" : "black"
+            }
+            visible={groupNameStates[item["right_group_name"]] !== 3}
+            onClick={() =>
+              onGroupNameClick && onGroupNameClick(item["right_group_name"])
+            }
+            onTap={() =>
+              onGroupNameClick && onGroupNameClick(item["right_group_name"])
+            }
           />
+          {groupNameStates[item["right_group_name"]] === 2 && (
+            <Rect
+              x={is_left ? 120 : 750}
+              y={item["right_begin_y"] - 7 + y_padding}
+              width={item["right_group_name"].length * 10 + 20}
+              height={20}
+              fill={
+                getDistrictColor && getDistrictColor(item["right_group_name"])
+              }
+              opacity={0.5}
+              onClick={() =>
+                onGroupNameClick && onGroupNameClick(item["right_group_name"])
+              }
+              onTap={() =>
+                onGroupNameClick && onGroupNameClick(item["right_group_name"])
+              }
+            />
+          )}
           <Rect
             x={is_left ? 120 : 750}
             y={item["right_begin_y"] + 5 + y_padding}
@@ -549,7 +666,37 @@ function CreateText(
                 : ""
             }
             fontSize={GetGroupNameFontSize(item["left_group_name"])}
+            fill={
+              groupNameStates[item["left_group_name"]] === 1 ? "red" : "black"
+            }
+            visible={groupNameStates[item["left_group_name"]] !== 3}
+            onClick={() =>
+              onGroupNameClick && onGroupNameClick(item["left_group_name"])
+            }
+            onTap={() =>
+              onGroupNameClick && onGroupNameClick(item["left_group_name"])
+            }
           />
+          {groupNameStates[item["left_group_name"]] === 2 &&
+            item["left_group_name"] !== null &&
+            !hide && (
+              <Rect
+                x={x - 110}
+                y={item["left_begin_y"] - 10 + y_padding}
+                width={item["left_group_name"].length * 10 + 20}
+                height={20}
+                fill={
+                  getDistrictColor && getDistrictColor(item["left_group_name"])
+                }
+                opacity={0.5}
+                onClick={() =>
+                  onGroupNameClick && onGroupNameClick(item["left_group_name"])
+                }
+                onTap={() =>
+                  onGroupNameClick && onGroupNameClick(item["left_group_name"])
+                }
+              />
+            )}
           <Text
             x={x - 120}
             y={item["left_begin_y"] - 18 + y_padding}
@@ -598,7 +745,37 @@ function CreateText(
                 : ""
             }
             fontSize={GetGroupNameFontSize(item["right_group_name"])}
+            fill={
+              groupNameStates[item["right_group_name"]] === 1 ? "red" : "black"
+            }
+            visible={groupNameStates[item["right_group_name"]] !== 3}
+            onClick={() =>
+              onGroupNameClick && onGroupNameClick(item["right_group_name"])
+            }
+            onTap={() =>
+              onGroupNameClick && onGroupNameClick(item["right_group_name"])
+            }
           />
+          {groupNameStates[item["right_group_name"]] === 2 &&
+            item["right_group_name"] !== null &&
+            !hide && (
+              <Rect
+                x={x + width + 130}
+                y={item["left_begin_y"] - 10 + y_padding}
+                width={item["right_group_name"].length * 10 + 20}
+                height={20}
+                fill={
+                  getDistrictColor && getDistrictColor(item["right_group_name"])
+                }
+                opacity={0.5}
+                onClick={() =>
+                  onGroupNameClick && onGroupNameClick(item["right_group_name"])
+                }
+                onTap={() =>
+                  onGroupNameClick && onGroupNameClick(item["right_group_name"])
+                }
+              />
+            )}
           <Text
             x={x + width + 120}
             y={item["left_begin_y"] - 18 + y_padding}
@@ -1273,6 +1450,8 @@ function EditResult({
   const [blinkState, setBlinkState] = useState(true);
   const [textPositions, setTextPositions] = useState({});
   const [showIds, setShowIds] = useState(true);
+  const [groupNameStates, setGroupNameStates] = useState({});
+  const [districtColors, setDistrictColors] = useState({});
 
   const fetchCurrentBlock = useCallback(async () => {
     const blockData = {};
@@ -1464,6 +1643,52 @@ function EditResult({
     setShowIds((prev) => !prev);
   };
 
+  const getDistrictColor = (districtName) => {
+    if (!districtColors[districtName]) {
+      const colors = [
+        "#ffeb3b",
+        "#ff9800",
+        "#ff5722",
+        "#e91e63",
+        "#9c27b0",
+        "#673ab7",
+        "#3f51b5",
+        "#2196f3",
+        "#03a9f4",
+        "#00bcd4",
+        "#009688",
+        "#4caf50",
+        "#8bc34a",
+        "#cddc39",
+        "#ffc107",
+        "#ff6f00",
+      ];
+      const usedColors = Object.values(districtColors);
+      const availableColors = colors.filter(
+        (color) => !usedColors.includes(color),
+      );
+      const selectedColor =
+        availableColors.length > 0
+          ? availableColors[Math.floor(Math.random() * availableColors.length)]
+          : colors[Math.floor(Math.random() * colors.length)];
+
+      setDistrictColors((prev) => ({ ...prev, [districtName]: selectedColor }));
+      return selectedColor;
+    }
+    return districtColors[districtName];
+  };
+
+  const handleGroupNameClick = (groupName) => {
+    setGroupNameStates((prev) => {
+      const currentState = prev[groupName] || 0;
+      const nextState = (currentState + 1) % 3;
+      return {
+        ...prev,
+        [groupName]: nextState === 0 ? undefined : nextState,
+      };
+    });
+  };
+
   useEffect(() => {
     const handleKeyPress = (event) => {
       if (event.key === "a" || event.key === "A") {
@@ -1575,6 +1800,9 @@ function EditResult({
                           textPositions,
                           handleTextDrag,
                           showIds,
+                          groupNameStates,
+                          handleGroupNameClick,
+                          getDistrictColor,
                         ),
                   )}
                 </Layer>
