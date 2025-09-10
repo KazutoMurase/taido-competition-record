@@ -251,9 +251,15 @@
 <ul>
 <li><code>cloudbuild_$PROJECT_ID.yaml</code>というファイルが生成される。</li>
 <li>作成したファイルを<a href="https://github.com/KazutoMurase/taido-competition-deploy">デプロイ用レポジトリ(※アクセス権限必要)</a>に移す。</li>
+<li>6と7を実施してからファイルをコミットしプッシュするとイメージ作成とデプロイが行われる。初回に手動で試したい場合は8と9を参照。</li>
 </ul>
 <p>なお、CPUやメモリなど各種リソース設定値についてもcloudbuild-template.yamlに設定している。
 設定値の妥当性については<a href="https://github.com/KazutoMurase/taido-competition-record/issues/213">issue #213</a>を参照。</p>
+<p>デプロイ用レポジトリは別で用意してもよい(Githubで新規レポジトリを作成するなど)。その場合、レポジトリは以下のような構成にする。</p>
+<ul>
+<li><a href="https://github.com/KazutoMurase/taido-competition-record">taido-competition-record</a>をsubmoduleとしてレポジトリのルートに設定。</li>
+<li>作成したファイルをレポジトリのルートに置く。</li>
+</ul>
 <h2 id="6-githubとのcloud-build連携"><a class="header" href="#6-githubとのcloud-build連携">6. GitHubとのCloud Build連携</a></h2>
 <p>GCPコンソールから<code>Cloud Build</code>→プロジェクトを選択 →<code>リポジトリを接続</code>→GitHub</p>
 <ul>
