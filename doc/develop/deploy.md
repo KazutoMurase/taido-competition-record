@@ -89,9 +89,15 @@ cd ci && ./generate-cloudbuild.py
 
 - `cloudbuild_$PROJECT_ID.yaml`というファイルが生成される。
 - 作成したファイルを[デプロイ用レポジトリ(※アクセス権限必要)](https://github.com/KazutoMurase/taido-competition-deploy)に移す。
+- 6と7を実施してからファイルをコミットしプッシュするとイメージ作成とデプロイが行われる。初回に手動で試したい場合は8と9を参照。
 
 なお、CPUやメモリなど各種リソース設定値についてもcloudbuild-template.yamlに設定している。
 設定値の妥当性については[issue #213](https://github.com/KazutoMurase/taido-competition-record/issues/213)を参照。
+
+デプロイ用レポジトリは別で用意してもよい(Githubで新規レポジトリを作成するなど)。その場合、レポジトリは以下のような構成にする。
+
+- [taido-competition-record](https://github.com/KazutoMurase/taido-competition-record)をsubmoduleとしてレポジトリのルートに設定。
+- 作成したファイルをレポジトリのルートに置く。
 
 ## 6. GitHubとのCloud Build連携
 
