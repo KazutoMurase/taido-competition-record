@@ -10,6 +10,7 @@
 - [GCP環境へのデプロイ方法](develop/deploy.md)
 - [ユーティリティ](develop/utility.md)
 - [サイトの構成](site.md)
+- [賞状印刷](admin/certificate.md)
 - [結果出力](admin/export.md)
 
 # 役員マニュアル
