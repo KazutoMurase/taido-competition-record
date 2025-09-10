@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>記録係</title>
+        <title>賞状印刷</title>
                 
 
         <!-- Custom HTML head -->
@@ -82,7 +82,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">はじめに</a></li><li class="chapter-item expanded affix "><li class="part-title">開発者向け</li><li class="chapter-item expanded "><a href="../develop/develop.html"><strong aria-hidden="true">1.</strong> 開発環境構築</a></li><li class="chapter-item expanded "><a href="../develop/tools.html"><strong aria-hidden="true">2.</strong> 開発用ツール</a></li><li class="chapter-item expanded "><a href="../develop/preparation.html"><strong aria-hidden="true">3.</strong> 大会準備</a></li><li class="chapter-item expanded "><a href="../develop/deploy.html"><strong aria-hidden="true">4.</strong> GCP環境へのデプロイ方法</a></li><li class="chapter-item expanded "><a href="../develop/utility.html"><strong aria-hidden="true">5.</strong> ユーティリティ</a></li><li class="chapter-item expanded "><a href="../site.html"><strong aria-hidden="true">6.</strong> サイトの構成</a></li><li class="chapter-item expanded "><a href="../admin/certificate.html"><strong aria-hidden="true">7.</strong> 賞状印刷</a></li><li class="chapter-item expanded "><a href="../admin/export.html"><strong aria-hidden="true">8.</strong> 結果出力</a></li><li class="chapter-item expanded affix "><li class="part-title">役員マニュアル</li><li class="chapter-item expanded "><a href="../admin/setup.html"><strong aria-hidden="true">9.</strong> 準備</a></li><li class="chapter-item expanded "><a href="../admin/check_players.html"><strong aria-hidden="true">10.</strong> 選手点呼係</a></li><li class="chapter-item expanded "><a href="../admin/call_players.html"><strong aria-hidden="true">11.</strong> 選手呼び出し係</a></li><li class="chapter-item expanded "><a href="../admin/record.html" class="active"><strong aria-hidden="true">12.</strong> 記録係</a></li><li class="chapter-item expanded "><a href="../admin/announce.html"><strong aria-hidden="true">13.</strong> 司会</a></li></ol>            </div>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">はじめに</a></li><li class="chapter-item expanded affix "><li class="part-title">開発者向け</li><li class="chapter-item expanded "><a href="../develop/develop.html"><strong aria-hidden="true">1.</strong> 開発環境構築</a></li><li class="chapter-item expanded "><a href="../develop/tools.html"><strong aria-hidden="true">2.</strong> 開発用ツール</a></li><li class="chapter-item expanded "><a href="../develop/preparation.html"><strong aria-hidden="true">3.</strong> 大会準備</a></li><li class="chapter-item expanded "><a href="../develop/deploy.html"><strong aria-hidden="true">4.</strong> GCP環境へのデプロイ方法</a></li><li class="chapter-item expanded "><a href="../develop/utility.html"><strong aria-hidden="true">5.</strong> ユーティリティ</a></li><li class="chapter-item expanded "><a href="../site.html"><strong aria-hidden="true">6.</strong> サイトの構成</a></li><li class="chapter-item expanded "><a href="../admin/certificate.html" class="active"><strong aria-hidden="true">7.</strong> 賞状印刷</a></li><li class="chapter-item expanded "><a href="../admin/export.html"><strong aria-hidden="true">8.</strong> 結果出力</a></li><li class="chapter-item expanded affix "><li class="part-title">役員マニュアル</li><li class="chapter-item expanded "><a href="../admin/setup.html"><strong aria-hidden="true">9.</strong> 準備</a></li><li class="chapter-item expanded "><a href="../admin/check_players.html"><strong aria-hidden="true">10.</strong> 選手点呼係</a></li><li class="chapter-item expanded "><a href="../admin/call_players.html"><strong aria-hidden="true">11.</strong> 選手呼び出し係</a></li><li class="chapter-item expanded "><a href="../admin/record.html"><strong aria-hidden="true">12.</strong> 記録係</a></li><li class="chapter-item expanded "><a href="../admin/announce.html"><strong aria-hidden="true">13.</strong> 司会</a></li></ol>            </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
@@ -143,81 +143,33 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="記録係"><a class="header" href="#記録係">記録係</a></h1>
+                        <h1 id="賞状印刷"><a class="header" href="#賞状印刷">賞状印刷</a></h1>
+<p>以下3つのテンプレートWordsファイルを用意し、これらを配置したディレクトリを<code>(WORDS_DIR)</code> とする。
+<code>競技名</code>、<code>名前</code>、<code>ランク</code>という文字が最終結果によって置き換わる。</p>
 <ul>
-<li>各競技の結果を記録する。</li>
+<li>賞状_個人.docx</li>
+<li>賞状_団体.docx</li>
+<li>賞状_総合.docx</li>
 </ul>
-<h2 id="サンプル動画"><a class="header" href="#サンプル動画">サンプル動画</a></h2>
-<script src="../assets/js/toggleIframe.js"></script>
-<p>法形</p>
-<div id="record_hokei_demo_iframe_container"
-     style="width: 100px; height: auto; background-color: #fff; color: #555; cursor: pointer; text-align: center;"
-     onclick="toggleIframe('record_hokei_demo_iframe_container', 'record_hokei_demo', '-6lrw86kIw8')">
-    <div id="record_hokei_demo">動画を表示</div>
-</div>
-<p>実戦</p>
-<div id="record_zissen_demo_iframe_container"
-     style="width: 100px; height: auto; background-color: #fff; color: #555; cursor: pointer; text-align: center;"
-     onclick="toggleIframe('record_zissen_demo_iframe_container', 'record_zissen_demo', 'iYSlyVMiCsk')">
-    <div id="record_zissen_demo">動画を表示</div>
-</div>
-<p>修正 (法形/実戦, 競技中)</p>
-<div id="fix_on_game_demo_iframe_container"
-     style="width: 100px; height: auto; background-color: #fff; color: #555; cursor: pointer; text-align: center;"
-     onclick="toggleIframe('fix_on_game_demo_iframe_container', 'fix_on_game_demo', '7txQ31Aa5N8')">
-    <div id="fix_on_game_demo">動画を表示</div>
-</div>
-<p>修正 (法形/実戦, 競技後)</p>
-<div id="fix_after_game_demo_iframe_container"
-     style="width: 100px; height: auto; background-color: #fff; color: #555; cursor: pointer; text-align: center;"
-     onclick="toggleIframe('fix_after_game_demo_iframe_container', 'fix_after_game_demo', 'DHbsYWWGFhs')">
-    <div id="fix_after_game_demo">動画を表示</div>
-</div>
-<p>団体法形</p>
-<div id="record_dantai_hokei_demo_iframe_container"
-     style="width: 100px; height: auto; background-color: #fff; color: #555; cursor: pointer; text-align: center;"
-     onclick="toggleIframe('record_dantai_hokei_demo_iframe_container', 'record_dantai_hokei_demo', 'UmJZfhvQ8dw')">
-    <div id="record_dantai_hokei_demo">動画を表示</div>
-</div>
-<p>展開</p>
-<div id="record_tenkai_demo_iframe_container"
-     style="width: 100px; height: auto; background-color: #fff; color: #555; cursor: pointer; text-align: center;"
-     onclick="toggleIframe('record_tenkai_demo_iframe_container', 'record_tenkai_demo', 'N61O3MvCAng')">
-    <div id="record_tenkai_demo">動画を表示</div>
-</div>
-<h2 id="タブレット操作方法"><a class="header" href="#タブレット操作方法">タブレット操作方法</a></h2>
-<div style="color:#009900; font-size:25px">① 初期画面　コート選択</div>
-<p><img src="../images/admin_initial_page.png" width="300" /></p>
-<div style="color:#009900; font-size:25px">② 競技の「記録」選択 (点呼が完了すると選択可) </div>
-<p><img src="../images/block_view_for_record.png" width="900" /></p>
-<div style="color:#009900; font-size:25px">③ 記録画面 (法形) </div>
-<p><img src="../images/record_view_hokei.png" width="1000" /></p>
-<div style="color:#009900; font-size:25px">④ 記録画面 (実戦) </div>
-<p><img src="../images/record_view_zissen.png" width="1000" /></p>
-<div style="color:#009900; font-size:25px">⑤ 記録の修正方法 (法形・実戦) </div>
-<p><img src="../images/update_record.png" width="1000" /></p>
-<p><img src="../images/update_record_view.png" width="400" /></p>
-<p style="color: #00BB00; font-size: 20px">※競技終了後は、以下「結果修正」ボタンをクリックすると修正画面に移動できる。</p>
-<p><img src="../images/block_view_for_update_reocrd.png" width="900" /></p>
-<div style="color:#009900; font-size:25px">⑥ 記録画面 (団体法形) </div>
-<p><img src="../images/record_view_dantai_hokei.png" width="1000" /></p>
-<div style="color:#009900; font-size:25px">⑦ 記録画面 (展開) </div>
-<p><img src="../images/record_view_tenkai.png" width="1000" /></p>
-<div style="color:#009900; font-size:25px">⑧ 記録の修正方法 (団体法形・展開) </div>
-<p><img src="../images/update_table_record.png" width="1000" /></p>
-<p><img src="../images/update_table_record_view.png" width="500" /></p>
-<p style="color: #00BB00; font-size: 20px">※競技終了後は、以下「結果修正」ボタンをクリックすると修正画面に移動できる。</p>
-<p><img src="../images/block_view_for_update_table_record.png" width="1000" /></p>
+<p>WindowsのPowerShellを立ち上げ、本レポジトリルートで以下を実行するとGUIが立ち上がる。
+GUI上のボタンをクリックすることで印刷を行うことができる。</p>
+<pre><code>scripts/print_certificate.py --url (システムURL) --input-words-dir (WORDS_DIR)
+</code></pre>
+<p><code>--open-only</code>を指定すると、保存したファイルを開くだけ、指定しないと印刷まで進む。
+表示崩れなどないか、しっかり確認・編集してから印刷に進みたい場合は<code>--open-only</code>を指定するとよい。
+<code>--check-image</code>を指定すると、&quot;_画像入り.docx&quot;を代わりに利用する(レイアウト確認・修正用)</p>
+<p>初回、プリンタのプロパティや印刷設定が「文書印刷」になっているか確認するとよい。
+(なっていない場合、色の薄い文字が印刷される)</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                                                    <a rel="prev" href="../admin/call_players.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                                    <a rel="prev" href="../site.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
-                                                    <a rel="next" href="../admin/announce.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                                    <a rel="next" href="../admin/export.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -227,11 +179,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                                    <a rel="prev" href="../admin/call_players.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                    <a rel="prev" href="../site.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
-                                    <a rel="next" href="../admin/announce.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                    <a rel="next" href="../admin/export.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                             </nav>
