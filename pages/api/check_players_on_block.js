@@ -261,6 +261,21 @@ async function GetFromDB(
                 break;
               }
             }
+            let color =
+              block_pos === "left" || block_pos === "center" ? "red" : "white";
+            if (sorted_data[j].right_retire === 1) {
+              if (sorted_data[j].next_left_id !== null) {
+                color =
+                  block_pos === "left" || block_pos === "center"
+                    ? "red"
+                    : "white";
+              } else if (sorted_data[j].next_right_id !== null) {
+                color =
+                  block_pos === "left" || block_pos === "center"
+                    ? "white"
+                    : "color";
+              }
+            }
             result_array.push({
               id: left_id,
               game_id: sorted_data[j].id,
@@ -269,10 +284,7 @@ async function GetFromDB(
               name: data[i].left_name,
               name_kana: data[i].left_name_kana,
               requested: requested,
-              color:
-                block_pos === "left" || block_pos === "center"
-                  ? "red"
-                  : "white",
+              color: color,
             });
           }
         }
@@ -301,6 +313,21 @@ async function GetFromDB(
                 break;
               }
             }
+            let color =
+              block_pos === "left" || block_pos === "center" ? "white" : "red";
+            if (sorted_data[j].left_retire === 1) {
+              if (sorted_data[j].next_left_id !== null) {
+                color =
+                  block_pos === "left" || block_pos === "center"
+                    ? "red"
+                    : "white";
+              } else if (sorted_data[j].next_right_id !== null) {
+                color =
+                  block_pos === "left" || block_pos === "center"
+                    ? "white"
+                    : "color";
+              }
+            }
             result_array.push({
               id: right_id,
               game_id: sorted_data[j].id,
@@ -309,10 +336,7 @@ async function GetFromDB(
               name: data[i].right_name,
               name_kana: data[i].right_name_kana,
               requested: requested,
-              color:
-                block_pos === "left" || block_pos === "center"
-                  ? "white"
-                  : "red",
+              color: color,
             });
           }
         }
