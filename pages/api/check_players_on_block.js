@@ -273,7 +273,7 @@ async function GetFromDB(
                 color =
                   block_pos === "left" || block_pos === "center"
                     ? "white"
-                    : "color";
+                    : "red";
               }
             }
             result_array.push({
@@ -325,7 +325,7 @@ async function GetFromDB(
                 color =
                   block_pos === "left" || block_pos === "center"
                     ? "white"
-                    : "color";
+                    : "red";
               }
             }
             result_array.push({
