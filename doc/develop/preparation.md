@@ -24,3 +24,15 @@ scripts/generate_tournament_db_from_xl.py --file-path (FILE_PATH_TO_EXCEL_FILE) 
 ```bash
 scripts/edit_block_csv.py
 ```
+
+#### pyqt5でxcb関連のエラーが起きた時(edit_block_csv.py)
+`edit_block_csv.py`で以下のようなエラーが出るときは、[このページ](https://qiita.com/momomo_rimoto/items/83917d3f9f5dd35457e1)に従って`libqxcb.so`に足りない.soファイルに対応するaptパッケージをインストールすると動く
+```
+qt.qpa.plugin: Could not load the Qt platform plugin "xcb" in "" even though it was found.
+```
+
+#### pyqt5で日本語が□で表示される場合(edit_block_csv.py)
+日本語フォントをaptで入れればよい。例えば、
+```
+sudo apt install fonts-noto-cjk
+```
