@@ -2,13 +2,18 @@
 import click
 import sys
 from PyQt5.QtWidgets import (
-    QApplication, QWidget, QLabel, QPushButton,
-    QGridLayout, QHBoxLayout
+    QApplication,
+    QWidget,
+    QLabel,
+    QPushButton,
+    QGridLayout,
+    QHBoxLayout,
 )
 from functools import partial
 import importlib.util
 import os
 import requests
+import string
 import zipfile
 from lxml import etree
 import shutil
@@ -16,8 +21,56 @@ import shutil
 col_text = ["優勝", "第二位", "第三位"]
 # TODO: get from awarded_players
 awards_text = ["最優秀選手賞", "優秀選手賞1", "優秀選手賞2"]
+# tune these if necessary
+default_font_size = 52
+small_font_size_threshold = 11
+small_font_size = 36
 
 app = QApplication(sys.argv)
+
+
+def hankaku_alphabets_to_zenkaku(text):
+    has_alphabet = any(c in string.ascii_letters for c in text)
+    if not has_alphabet:
+        return text
+    hankaku_alphabet = string.ascii_letters
+    hankaku_to_zenkaku_offset = 0xFF21 - 0x0041
+    zenkaku_map = {
+        ord(char): ord(char) + hankaku_to_zenkaku_offset for char in hankaku_alphabet
+    }
+    return text.translate(zenkaku_map)
+
+
+def set_fontsize(text_element, small):
+    # must be doubled from the display in Word app
+    default_font_value = default_font_size * 2
+    small_font_value = small_font_size * 2
+    # xml tags
+    w_namespace = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
+    rpr_tag = w_namespace + "rPr"
+    sz_tag = w_namespace + "sz"
+    szcs_tag = w_namespace + "szCs"
+    val_attribute = w_namespace + "val"
+    # get <w:r>
+    run_element = text_element.getparent()
+    rpr_element = run_element.find(rpr_tag)
+    if rpr_element is None:
+        print("Error: w:rPr not found")
+        return
+    sz_element = rpr_element.find(sz_tag)
+    if sz_element is None:
+        print("Error: w:sz not found")
+        return
+    szcs_element = rpr_element.find(szcs_tag)
+    if szcs_element is None:
+        print("Error: w:szCs not found")
+        return
+    if small:
+        sz_element.set(val_attribute, str(small_font_value))
+        szcs_element.set(val_attribute, str(small_font_value))
+    else:
+        szcs_element.set(val_attribute, str(default_font_value))
+        sz_element.set(val_attribute, str(default_font_value))
 
 
 def is_module_available(module_name):
@@ -26,23 +79,21 @@ def is_module_available(module_name):
 
 def exec_print(doc_path, open_only):
     import win32com.client
+
     word = win32com.client.Dispatch("Word.Application")
     word.Visible = open_only
     doc = word.Documents.Open(doc_path)
     if not open_only:
         printer_name = "Canon PRO-1000 series XPS"
         word.ActivePrinter = printer_name
-        doc.PrintOut(
-            Background=True,
-            Copies=1,
-            PageType=0
-        )
+        doc.PrintOut(Background=True, Copies=1, PageType=0)
         doc.Close(SaveChanges=False)
         word.Quit()
 
 
-def on_button_click(row, col, url_base, row_text, event_names,
-                    input_words_dir, open_only, check_image):
+def on_button_click(
+    row, col, url_base, row_text, event_names, input_words_dir, open_only, check_image
+):
     if row < 0:
         rank = ""
         event = awards_text[col].replace("1", "").replace("2", "")
@@ -54,70 +105,88 @@ def on_button_click(row, col, url_base, row_text, event_names,
     response = requests.get(url)
     if response.status_code == 200:
         if row < 0:
-            name = response.json()[col]["name"].replace('　', ' ')
+            name = response.json()[col]["name"].replace("　", " ")
             doc_name = "賞状_総合"
-        elif ("dantai" in event_names[row] or
-              "tenkai" in event_names[row]):
-            group_name = response.json()[f"{col+1}"]["group"]
-            if (group_name[-1].isalpha() and
-                group_name[-1].isascii()):
-                if (group_name[-2] == "県" or
-                    group_name[-2] == "道" or
-                    group_name[-2] == "府"):
-                    name = group_name[:-1] + chr(ord(group_name[-1]) + 0xFEE0) + "チーム"
+        elif "dantai" in event_names[row] or "tenkai" in event_names[row]:
+            group_name = response.json()[f"{col + 1}"]["group"]
+            if group_name[-1].isalpha() and group_name[-1].isascii():
+                if (
+                    group_name[-2] == "県"
+                    or group_name[-2] == "道"
+                    or group_name[-2] == "府"
+                ):
+                    name = (
+                        group_name[:-1] + chr(ord(group_name[-1]) + 0xFEE0) + "チーム"
+                    )
                 else:
-                    name = group_name[:-1] + "地区" + chr(ord(group_name[-1]) + 0xFEE0) + "チーム"
-            elif (group_name[-1] == "県" or
-                  group_name[-1] == "道" or
-                  group_name[-1] == "府"):
+                    name = (
+                        group_name[:-1]
+                        + "地区"
+                        + chr(ord(group_name[-1]) + 0xFEE0)
+                        + "チーム"
+                    )
+            elif (
+                group_name[-1] == "県"
+                or group_name[-1] == "道"
+                or group_name[-1] == "府"
+            ):
                 name = group_name + "チーム"
             else:
                 name = group_name + "地区チーム"
             doc_name = "賞状_団体"
         elif "total" in event_names[row]:
-            group_name = response.json()[f"{col+1}"]["group"]
-            if (group_name[-1] == "県" or
-                group_name[-1] == "道" or
-                group_name[-1] == "府"):
+            group_name = response.json()[f"{col + 1}"]["group"]
+            if (
+                group_name[-1] == "県"
+                or group_name[-1] == "道"
+                or group_name[-1] == "府"
+            ):
                 name = group_name
             else:
                 name = group_name + "地区"
             event += rank
             doc_name = "賞状_総合"
         else:
-            name = response.json()[f"{col+1}"]["name"].replace('　', ' ')
+            name = response.json()[f"{col + 1}"]["name"].replace("　", " ")
             doc_name = "賞状_個人"
     if check_image:
-        docx_file = f'{input_words_dir}/{doc_name}_画像入り.docx'
+        docx_file = f"{input_words_dir}/{doc_name}_画像入り.docx"
     else:
-        docx_file = f'{input_words_dir}/{doc_name}.docx'
-    temp_dir = 'temp_unzip_dir'
+        docx_file = f"{input_words_dir}/{doc_name}.docx"
+    temp_dir = "temp_unzip_dir"
 
-    with zipfile.ZipFile(docx_file, 'r') as zip_ref:
+    with zipfile.ZipFile(docx_file, "r") as zip_ref:
         zip_ref.extractall(temp_dir)
 
-    document_path = os.path.join(temp_dir, 'word/document.xml')
+    document_path = os.path.join(temp_dir, "word/document.xml")
 
     tree = etree.parse(document_path)
     root = tree.getroot()
 
+    # convert alphabets in name to zenkaku in order not to have layed alphabet
+    name = hankaku_alphabets_to_zenkaku(name)
+
+    use_small_font_for_rank_name = len(rank) + 1 + len(name) > small_font_size_threshold
     for elem in root.getiterator():
         if not elem.text:
             continue
         if "競技名" in elem.text:
+            set_fontsize(elem, False)
             elem.text = event
         if "ランク" in elem.text:
+            set_fontsize(elem, use_small_font_for_rank_name)
             elem.text = rank
         if "名前" in elem.text:
+            set_fontsize(elem, use_small_font_for_rank_name)
             elem.text = name
 
-    tree.write(document_path, xml_declaration=True, encoding='utf-8')
+    tree.write(document_path, xml_declaration=True, encoding="utf-8")
 
     if row < 0:
-        new_docx_file = f'{event}.docx'
+        new_docx_file = f"{event}.docx"
     else:
-        new_docx_file = f'{rank}_{event}.docx'
-    with zipfile.ZipFile(new_docx_file, 'w') as zip_ref:
+        new_docx_file = f"{rank}_{event}.docx"
+    with zipfile.ZipFile(new_docx_file, "w") as zip_ref:
         for foldername, subfolders, filenames in os.walk(temp_dir):
             for filename in filenames:
                 file_path = os.path.join(foldername, filename)
@@ -126,8 +195,9 @@ def on_button_click(row, col, url_base, row_text, event_names,
 
     shutil.rmtree(temp_dir)
     if is_module_available("win32com"):
-        exec_print(f"{os.path.dirname(os.path.abspath(__file__))}/{new_docx_file}",
-                   open_only)
+        exec_print(
+            f"{os.path.dirname(os.path.abspath(__file__))}/{new_docx_file}", open_only
+        )
 
     button = app.sender()
     button.setStyleSheet("background-color: lightgreen; color: black;")
@@ -136,7 +206,7 @@ def on_button_click(row, col, url_base, row_text, event_names,
 class PrintCertificate(QWidget):
     def __init__(self, url, input_words_dir, open_only, check_image):
         super().__init__()
-        self.setWindowTitle('賞状印刷')
+        self.setWindowTitle("賞状印刷")
         self.setGeometry(100, 100, 400, 300)
 
         response = requests.get(f"{url}/api/get_events")
@@ -153,29 +223,48 @@ class PrintCertificate(QWidget):
 
         button_layout = QGridLayout()
         for row in range(len(row_text)):
-            label = QLabel(f'{row_text[row]}', self)
+            label = QLabel(f"{row_text[row]}", self)
             button_layout.addWidget(label, row, 0)
             for col in range(3):
-                button = QPushButton(f'{col_text[col]}', self)
-                button.clicked.connect(partial(on_button_click,
-                                               row, col, url,
-                                               row_text, event_names,
-                                               input_words_dir, open_only,
-                                               check_image))
-                if os.path.exists(f'{col_text[col]}_{row_text[row]}.docx'):
+                button = QPushButton(f"{col_text[col]}", self)
+                button.clicked.connect(
+                    partial(
+                        on_button_click,
+                        row,
+                        col,
+                        url,
+                        row_text,
+                        event_names,
+                        input_words_dir,
+                        open_only,
+                        check_image,
+                    )
+                )
+                if os.path.exists(f"{col_text[col]}_{row_text[row]}.docx"):
                     button.setStyleSheet("background-color: lightgreen; color: black;")
-                button_layout.addWidget(button, row, col+1)
+                button_layout.addWidget(button, row, col + 1)
 
         button_layout.addWidget(QLabel("褒章", self), len(row_text), 0)
         for col in range(len(awards_text)):
-            button = QPushButton(f'{awards_text[col]}', self)
-            button.clicked.connect(partial(on_button_click, -1, col, url,
-                                           row_text, event_names,
-                                           input_words_dir, open_only,
-                                           check_image))
-            if os.path.exists(f'{awards_text[col].replace("1", "").replace("2", "")}.docx'):
+            button = QPushButton(f"{awards_text[col]}", self)
+            button.clicked.connect(
+                partial(
+                    on_button_click,
+                    -1,
+                    col,
+                    url,
+                    row_text,
+                    event_names,
+                    input_words_dir,
+                    open_only,
+                    check_image,
+                )
+            )
+            if os.path.exists(
+                f"{awards_text[col].replace('1', '').replace('2', '')}.docx"
+            ):
                 button.setStyleSheet("background-color: lightgreen; color: black;")
-            button_layout.addWidget(button, len(row_text), col+1)
+            button_layout.addWidget(button, len(row_text), col + 1)
 
         main_layout.addLayout(button_layout)
 
@@ -193,5 +282,5 @@ def main(url, input_words_dir, open_only, check_image):
     sys.exit(app.exec_())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
