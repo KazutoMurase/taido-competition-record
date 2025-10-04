@@ -23,7 +23,7 @@ col_text = ["優勝", "第二位", "第三位"]
 awards_text = ["最優秀選手賞", "優秀選手賞1", "優秀選手賞2"]
 # tune these if necessary
 default_font_size = 52
-small_font_size_threshold = 11
+small_font_size_threshold_letter_num = 11
 small_font_size = 36
 
 app = QApplication(sys.argv)
@@ -166,7 +166,9 @@ def on_button_click(
     # convert alphabets in name to zenkaku in order not to have layed alphabet
     name = hankaku_alphabets_to_zenkaku(name)
 
-    use_small_font_for_rank_name = len(rank) + 1 + len(name) > small_font_size_threshold
+    use_small_font_for_rank_name = (
+        len(rank) + 1 + len(name) > small_font_size_threshold_letter_num
+    )
     for elem in root.getiterator():
         if not elem.text:
             continue
