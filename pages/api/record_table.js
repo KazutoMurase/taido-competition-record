@@ -79,6 +79,13 @@ const RecordTable = async (req, res) => {
         (initial_value_is_set ? "," : " ") + "penalty=" + req.body.penalty;
       initial_value_is_set = true;
     }
+    if (req.body.start_penalty !== undefined) {
+      query +=
+        (initial_value_is_set ? "," : " ") +
+        "start_penalty=" +
+        req.body.start_penalty;
+      initial_value_is_set = true;
+    }
     query += " where id = $1";
     let result = await client.query(query, [req.body.id]);
     const key = "latest_update_result_for_" + event_name + "_timestamp";
