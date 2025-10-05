@@ -106,10 +106,7 @@ function NotificationRequest({
   useEffect(() => {
     if (data.length > 0) {
       document.body.style.backgroundColor = "#fff3cd";
-    } else {
-      document.body.style.backgroundColor = "";
     }
-
     return () => {
       document.body.style.backgroundColor = "";
     };
