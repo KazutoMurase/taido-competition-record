@@ -103,6 +103,18 @@ function NotificationRequest({
     };
   }, [fetchData, update_interval]);
 
+  useEffect(() => {
+    if (data.length > 0) {
+      document.body.style.backgroundColor = "#fff3cd";
+    } else {
+      document.body.style.backgroundColor = "";
+    }
+
+    return () => {
+      document.body.style.backgroundColor = "";
+    };
+  }, [data.length]);
+
   const forceFetchData = () => {
     fetchData();
   };
