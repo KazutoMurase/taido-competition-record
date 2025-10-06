@@ -9,7 +9,7 @@ const GetGameOnTable = async (req, res) => {
     let query;
     if (event_name.includes("tenkai")) {
       query =
-        "SELECT t1.id, t2.name, t1.main_score, t1.sub1_score, t1.sub2_score, t1.sub3_score, t1.sub4_score, t1.sub5_score, t1.elapsed_time, t1.penalty, t1.retire FROM " +
+        "SELECT t1.id, t2.name, t1.main_score, t1.sub1_score, t1.sub2_score, t1.sub3_score, t1.sub4_score, t1.sub5_score, t1.elapsed_time, t1.penalty, t1.start_penalty, t1.retire FROM " +
         event_name +
         " AS t1 LEFT JOIN " +
         groups_name +
