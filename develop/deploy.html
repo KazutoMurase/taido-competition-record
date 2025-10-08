@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>GCP環境へのデプロイ方法</title>
+        <title>GCP環境へのデプロイ方法(1からセットアップする場合)</title>
                 
 
         <!-- Custom HTML head -->
@@ -82,7 +82,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">はじめに</a></li><li class="chapter-item expanded affix "><li class="part-title">開発者向け</li><li class="chapter-item expanded "><a href="../develop/develop.html"><strong aria-hidden="true">1.</strong> 開発環境構築</a></li><li class="chapter-item expanded "><a href="../develop/tools.html"><strong aria-hidden="true">2.</strong> 開発用ツール</a></li><li class="chapter-item expanded "><a href="../develop/preparation.html"><strong aria-hidden="true">3.</strong> 大会準備</a></li><li class="chapter-item expanded "><a href="../develop/deploy.html" class="active"><strong aria-hidden="true">4.</strong> GCP環境へのデプロイ方法</a></li><li class="chapter-item expanded "><a href="../develop/utility.html"><strong aria-hidden="true">5.</strong> ユーティリティ</a></li><li class="chapter-item expanded "><a href="../site.html"><strong aria-hidden="true">6.</strong> サイトの構成</a></li><li class="chapter-item expanded "><a href="../admin/certificate.html"><strong aria-hidden="true">7.</strong> 賞状印刷</a></li><li class="chapter-item expanded "><a href="../admin/export.html"><strong aria-hidden="true">8.</strong> 結果出力</a></li><li class="chapter-item expanded affix "><li class="part-title">役員マニュアル</li><li class="chapter-item expanded "><a href="../admin/setup.html"><strong aria-hidden="true">9.</strong> 準備</a></li><li class="chapter-item expanded "><a href="../admin/check_players.html"><strong aria-hidden="true">10.</strong> 選手点呼係</a></li><li class="chapter-item expanded "><a href="../admin/call_players.html"><strong aria-hidden="true">11.</strong> 選手呼び出し係</a></li><li class="chapter-item expanded "><a href="../admin/record.html"><strong aria-hidden="true">12.</strong> 記録係</a></li><li class="chapter-item expanded "><a href="../admin/announce.html"><strong aria-hidden="true">13.</strong> 司会</a></li></ol>            </div>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">はじめに</a></li><li class="chapter-item expanded affix "><li class="part-title">開発者向け</li><li class="chapter-item expanded "><a href="../develop/develop.html"><strong aria-hidden="true">1.</strong> 開発環境構築</a></li><li class="chapter-item expanded "><a href="../develop/tools.html"><strong aria-hidden="true">2.</strong> 開発用ツール</a></li><li class="chapter-item expanded "><a href="../develop/preparation.html"><strong aria-hidden="true">3.</strong> 大会準備</a></li><li class="chapter-item expanded "><a href="../develop/deploy.html" class="active"><strong aria-hidden="true">4.</strong> GCP環境へのデプロイ方法(1からセットアップする場合)</a></li><li class="chapter-item expanded "><a href="../develop/deploy_using_existing_project.html"><strong aria-hidden="true">5.</strong> GCP環境へのデプロイ方法(既存のプロジェクトを使いまわす場合)</a></li><li class="chapter-item expanded "><a href="../develop/utility.html"><strong aria-hidden="true">6.</strong> ユーティリティ</a></li><li class="chapter-item expanded "><a href="../site.html"><strong aria-hidden="true">7.</strong> サイトの構成</a></li><li class="chapter-item expanded "><a href="../admin/certificate.html"><strong aria-hidden="true">8.</strong> 賞状印刷</a></li><li class="chapter-item expanded "><a href="../admin/export.html"><strong aria-hidden="true">9.</strong> 結果出力</a></li><li class="chapter-item expanded affix "><li class="part-title">役員マニュアル</li><li class="chapter-item expanded "><a href="../admin/setup.html"><strong aria-hidden="true">10.</strong> 準備</a></li><li class="chapter-item expanded "><a href="../admin/check_players.html"><strong aria-hidden="true">11.</strong> 選手点呼係</a></li><li class="chapter-item expanded "><a href="../admin/call_players.html"><strong aria-hidden="true">12.</strong> 選手呼び出し係</a></li><li class="chapter-item expanded "><a href="../admin/record.html"><strong aria-hidden="true">13.</strong> 記録係</a></li><li class="chapter-item expanded "><a href="../admin/announce.html"><strong aria-hidden="true">14.</strong> 司会</a></li></ol>            </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
@@ -187,7 +187,7 @@
 <h3 id="2-サービスアカウントのjson鍵を作成ダウンロード"><a class="header" href="#2-サービスアカウントのjson鍵を作成ダウンロード">(2) サービスアカウントのJSON鍵を作成・ダウンロード</a></h3>
 <ul>
 <li>
-<p>作成したアカウントの<code>キー</code>タブ → <code>キーを追加</code>→<code>新しい鍵を作成</code>→<code>JSON</code></p>
+<p>作成したアカウントの<code>鍵</code>タブ → <code>キーを追加</code>→<code>新しい鍵を作成</code>→<code>JSON</code></p>
 </li>
 <li>
 <p>ダウンロードされたjsonファイルのファイル名をkey.jsonに変えて、リポジトリルートに移しておく</p>
@@ -360,7 +360,7 @@ CREATE SCHEMA public;
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
-                                                    <a rel="next" href="../develop/utility.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                                    <a rel="next" href="../develop/deploy_using_existing_project.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -374,7 +374,7 @@ CREATE SCHEMA public;
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
-                                    <a rel="next" href="../develop/utility.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                    <a rel="next" href="../develop/deploy_using_existing_project.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                             </nav>

@@ -83,7 +83,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="index.html">はじめに</a></li><li class="chapter-item expanded affix "><li class="part-title">開発者向け</li><li class="chapter-item expanded "><a href="develop/develop.html"><strong aria-hidden="true">1.</strong> 開発環境構築</a></li><li class="chapter-item expanded "><a href="develop/tools.html"><strong aria-hidden="true">2.</strong> 開発用ツール</a></li><li class="chapter-item expanded "><a href="develop/preparation.html"><strong aria-hidden="true">3.</strong> 大会準備</a></li><li class="chapter-item expanded "><a href="develop/deploy.html"><strong aria-hidden="true">4.</strong> GCP環境へのデプロイ方法</a></li><li class="chapter-item expanded "><a href="develop/utility.html"><strong aria-hidden="true">5.</strong> ユーティリティ</a></li><li class="chapter-item expanded "><a href="site.html"><strong aria-hidden="true">6.</strong> サイトの構成</a></li><li class="chapter-item expanded "><a href="admin/certificate.html"><strong aria-hidden="true">7.</strong> 賞状印刷</a></li><li class="chapter-item expanded "><a href="admin/export.html"><strong aria-hidden="true">8.</strong> 結果出力</a></li><li class="chapter-item expanded affix "><li class="part-title">役員マニュアル</li><li class="chapter-item expanded "><a href="admin/setup.html"><strong aria-hidden="true">9.</strong> 準備</a></li><li class="chapter-item expanded "><a href="admin/check_players.html"><strong aria-hidden="true">10.</strong> 選手点呼係</a></li><li class="chapter-item expanded "><a href="admin/call_players.html"><strong aria-hidden="true">11.</strong> 選手呼び出し係</a></li><li class="chapter-item expanded "><a href="admin/record.html"><strong aria-hidden="true">12.</strong> 記録係</a></li><li class="chapter-item expanded "><a href="admin/announce.html"><strong aria-hidden="true">13.</strong> 司会</a></li></ol>            </div>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="index.html">はじめに</a></li><li class="chapter-item expanded affix "><li class="part-title">開発者向け</li><li class="chapter-item expanded "><a href="develop/develop.html"><strong aria-hidden="true">1.</strong> 開発環境構築</a></li><li class="chapter-item expanded "><a href="develop/tools.html"><strong aria-hidden="true">2.</strong> 開発用ツール</a></li><li class="chapter-item expanded "><a href="develop/preparation.html"><strong aria-hidden="true">3.</strong> 大会準備</a></li><li class="chapter-item expanded "><a href="develop/deploy.html"><strong aria-hidden="true">4.</strong> GCP環境へのデプロイ方法(1からセットアップする場合)</a></li><li class="chapter-item expanded "><a href="develop/deploy_using_existing_project.html"><strong aria-hidden="true">5.</strong> GCP環境へのデプロイ方法(既存のプロジェクトを使いまわす場合)</a></li><li class="chapter-item expanded "><a href="develop/utility.html"><strong aria-hidden="true">6.</strong> ユーティリティ</a></li><li class="chapter-item expanded "><a href="site.html"><strong aria-hidden="true">7.</strong> サイトの構成</a></li><li class="chapter-item expanded "><a href="admin/certificate.html"><strong aria-hidden="true">8.</strong> 賞状印刷</a></li><li class="chapter-item expanded "><a href="admin/export.html"><strong aria-hidden="true">9.</strong> 結果出力</a></li><li class="chapter-item expanded affix "><li class="part-title">役員マニュアル</li><li class="chapter-item expanded "><a href="admin/setup.html"><strong aria-hidden="true">10.</strong> 準備</a></li><li class="chapter-item expanded "><a href="admin/check_players.html"><strong aria-hidden="true">11.</strong> 選手点呼係</a></li><li class="chapter-item expanded "><a href="admin/call_players.html"><strong aria-hidden="true">12.</strong> 選手呼び出し係</a></li><li class="chapter-item expanded "><a href="admin/record.html"><strong aria-hidden="true">13.</strong> 記録係</a></li><li class="chapter-item expanded "><a href="admin/announce.html"><strong aria-hidden="true">14.</strong> 司会</a></li></ol>            </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
@@ -194,16 +194,50 @@ result以下にcsv形式で保存される。</p>
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="大会準備"><a class="header" href="#大会準備">大会準備</a></h1>
 <p>各大会毎にデータベースを構築する必要がある。</p>
+<h2 id="環境構築"><a class="header" href="#環境構築">環境構築</a></h2>
 <p>以下実行しスクリプトを利用する為の環境を準備する。</p>
 <pre><code class="language-bash">python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 </code></pre>
 <h2 id="トーナメント用db作成"><a class="header" href="#トーナメント用db作成">トーナメント用DB作成</a></h2>
+<p>まず、taido-competition-record/data以下に大会用フォルダを用意する（例：<code>2025_student</code>）。その下にoriginalフォルダとstaticフォルダを作る。</p>
+<p>それぞれのフォルダ内のファイルの作り方はいくつかあるので、以下に列挙する。</p>
+<h4 id="generate_tournament_db_from_xlpyで生成するもの"><a class="header" href="#generate_tournament_db_from_xlpyで生成するもの">generate_tournament_db_from_xl.pyで生成するもの</a></h4>
+<ul>
+<li>original以下の個実・個法・団法などトーナメント形式の競技のcsv</li>
+</ul>
+<p>トーナメントのエクセルファイルからDB用CSVを自動生成できる。エクセルのタブ名とcsvのファイル名は<code>name_db_map</code>変数が対応している。</p>
+<h4 id="edit_block_csvpyで出力するもの"><a class="header" href="#edit_block_csvpyで出力するもの">edit_block_csv.pyで出力するもの</a></h4>
+<ul>
+<li>original以下の<code>block_*</code>や<code>current_block_*</code></li>
+</ul>
+<h4 id="エクセルファイルからのコピペ等で手動作成するもの"><a class="header" href="#エクセルファイルからのコピペ等で手動作成するもの">エクセルファイルからのコピペ等で手動作成するもの</a></h4>
+<ul>
+<li>static/players.csv</li>
+<li>static/groups.csv</li>
+</ul>
+<h4 id="エクセルファイルを元に手動で作成するもの"><a class="header" href="#エクセルファイルを元に手動で作成するもの">エクセルファイルを元に手動で作成するもの</a></h4>
+<ul>
+<li>original以下の団法・展開競技のcsv</li>
+<li>title.txt</li>
+</ul>
+<h4 id="過去の同一大会からコピーするもの"><a class="header" href="#過去の同一大会からコピーするもの">過去の同一大会からコピーするもの</a></h4>
+<ul>
+<li>original/awarded_players.csv (優秀選手などの褒章が存在しない大会の場合は不要)</li>
+<li>original/generate_tables.sql</li>
+<li>static/court_type.csv</li>
+<li>stattic/event_type.csv</li>
+<li>static/generate_tables.sql</li>
+</ul>
+<p>ただし、コート数や競技等の変更がある場合は適宜編集を加えること。</p>
+<h2 id="csvデータ作成用ツールの使い方"><a class="header" href="#csvデータ作成用ツールの使い方">csvデータ作成用ツールの使い方</a></h2>
+<h4 id="generate_tournament_db_from_xlpy"><a class="header" href="#generate_tournament_db_from_xlpy">generate_tournament_db_from_xl.py</a></h4>
 <p>大会Excelファイルと出力先ディレクトリを入力すると自動で出力してくれる。</p>
 <pre><code class="language-bash">scripts/generate_tournament_db_from_xl.py --file-path (FILE_PATH_TO_EXCEL_FILE) --output-path (OUTPUT_DIRECTORY)
 </code></pre>
-<p>時程表を作成するためのGUIを用意している。
+<h4 id="edit_block_csvpy"><a class="header" href="#edit_block_csvpy">edit_block_csv.py</a></h4>
+<p>時程表を作成するためのGUI。
 大会名(e.g. 2024_alljp)とブロック(e.g. A)を入力し、新規作成や編集を行うことができる。</p>
 <pre><code class="language-bash">scripts/edit_block_csv.py
 </code></pre>
@@ -259,7 +293,7 @@ pip install -r requirements.txt
 <h3 id="2-サービスアカウントのjson鍵を作成ダウンロード"><a class="header" href="#2-サービスアカウントのjson鍵を作成ダウンロード">(2) サービスアカウントのJSON鍵を作成・ダウンロード</a></h3>
 <ul>
 <li>
-<p>作成したアカウントの<code>キー</code>タブ → <code>キーを追加</code>→<code>新しい鍵を作成</code>→<code>JSON</code></p>
+<p>作成したアカウントの<code>鍵</code>タブ → <code>キーを追加</code>→<code>新しい鍵を作成</code>→<code>JSON</code></p>
 </li>
 <li>
 <p>ダウンロードされたjsonファイルのファイル名をkey.jsonに変えて、リポジトリルートに移しておく</p>
@@ -423,6 +457,126 @@ CREATE SCHEMA public;
 <li>Cloud Runスケーリングが必要な場合に構成</li>
 <li>Cloud Runの「接続」→ Memorystoreを追加</li>
 </ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="gcp環境へのデプロイ方法既存のプロジェクトを使いまわす場合"><a class="header" href="#gcp環境へのデプロイ方法既存のプロジェクトを使いまわす場合">GCP環境へのデプロイ方法(既存のプロジェクトを使いまわす場合)</a></h1>
+<p>&quot;Cloud SQLを利用する場合&quot;(本番直前)と&quot;ローカルのDBを利用する場合&quot;(本番より数日以上前にデプロイの確認をするとき及び大会終了後)とで若干必要な手順が異なることに注意。</p>
+<h2 id="必要な前準備-1"><a class="header" href="#必要な前準備-1">必要な前準備</a></h2>
+<ul>
+<li>Google Cloud CLIのインストール</li>
+<li>GCPアカウントへのブラウザ上でのログイン・本人確認
+<ul>
+<li>※Googleアカウントの本人確認を複数回実施しなくて済むよう、まずブラウザでコンソールにログインし、CLIでの認証にはコンソールで発行した鍵を用いる形とする</li>
+</ul>
+</li>
+</ul>
+<h2 id="1-google-cloudプロジェクトの設定"><a class="header" href="#1-google-cloudプロジェクトの設定">1. Google Cloudプロジェクトの設定</a></h2>
+<ul>
+<li>ブラウザからGCPコンソールにログインし、新しいプロジェクトを作成
+<ul>
+<li>ここでは仮にプロジェクトIDを<code>taido-event</code>とする</li>
+</ul>
+</li>
+<li>作成後、gcloud CLIからプロジェクトを指定する</li>
+</ul>
+<pre><code class="language-bash">gcloud config set project taido-event
+</code></pre>
+<h2 id="2-サービスアカウントの認証情報の取得"><a class="header" href="#2-サービスアカウントの認証情報の取得">2. サービスアカウントの認証情報の取得</a></h2>
+<h3 id="1-サービスアカウントのjson鍵をダウンロード"><a class="header" href="#1-サービスアカウントのjson鍵をダウンロード">(1) サービスアカウントのJSON鍵をダウンロード</a></h3>
+<ul>
+<li>
+<p>GCPコンソール(Webサイト)の<code>IAMと管理</code>&gt;<code>サービスアカウント</code>で使用しているアカウントの詳細から<code>鍵</code>タブ を選び、存在するキー(jsonファイル)をダウンロードする。</p>
+</li>
+<li>
+<p>ダウンロードされたjsonファイルのファイル名をkey.jsonに変えて、リポジトリルートに移しておく</p>
+</li>
+</ul>
+<pre><code class="language-bash">mv /path-to-your-download-dir/your-file-name.json ./key.json
+</code></pre>
+<h3 id="2-gcloud-cliで認証"><a class="header" href="#2-gcloud-cliで認証">(2) gcloud CLIで認証</a></h3>
+<pre><code class="language-bash">gcloud auth activate-service-account --key-file=key.json
+</code></pre>
+<h2 id="3-cloud-sql-インスタンスの作成cloud-sqlを利用する場合のみ必要"><a class="header" href="#3-cloud-sql-インスタンスの作成cloud-sqlを利用する場合のみ必要">3. Cloud SQL インスタンスの作成(Cloud SQLを利用する場合のみ必要)</a></h2>
+<p>GCPコンソールからCloud SQLを開き、インスタンスを作成する</p>
+<ul>
+<li>エディション: Enterprise（サンドボックス）</li>
+<li>バージョン: PostgreSQL 17</li>
+<li>インスタンスID: postgres-instance
+<ul>
+<li>任意に設定可能。ここで設定したインスタンスIDを以後<code>$CLOUDSQL_INSTANCE_ID</code>とする</li>
+</ul>
+</li>
+<li>パスワード: postgres</li>
+<li>リージョン: asia-northeast1</li>
+<li>可用性: シングルゾーン</li>
+</ul>
+<h2 id="4-cloudsqlの初期テーブル作成cloud-sqlを利用する場合のみ必要"><a class="header" href="#4-cloudsqlの初期テーブル作成cloud-sqlを利用する場合のみ必要">4. CloudSQLの初期テーブル作成(Cloud SQLを利用する場合のみ必要)</a></h2>
+<p>この手順に入る前に<a href="develop/./preparation.html">大会準備</a>のDB用csvファイル作成は完了していることを前提とする。</p>
+<ul>
+<li>ローカルにpsqlをインストール</li>
+</ul>
+<p>例: Ubuntu22.04</p>
+<pre><code class="language-bash">sudo apt install postgresql-client-common postgresql-client-14
+</code></pre>
+<ul>
+<li>
+<p>Cloud SQL Auth Proxy(Cloud SQLインスタンスへの接続のための公式バイナリ)をダウンロードする</p>
+<ul>
+<li>参考：<a href="https://cloud.google.com/sql/docs/postgres/sql-proxy?hl=ja#install">Cloud SQL Auth Proxy をダウンロードしてインストールする</a></li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-bash">chmod +x cloud-sql-proxy
+
+# プロキシ起動
+./cloud-sql-proxy --credentials-file=key.json $PROJECT_ID:$REGION:$INSTANCE_NAME &amp;
+
+export PGPASSWORD=postgres
+cd ./data/$COMPETITION_NAME/static
+psql -h 127.0.0.1 -p 5432 -U postgres -d postgres -f generate_tables.sql
+cd ../original
+psql -h 127.0.0.1 -p 5432 -U postgres -d postgres -f generate_tables.sql
+cd ../../test/static
+psql -h 127.0.0.1 -p 5432 -U postgres -d postgres -f generate_tables.sql
+cd ../original
+psql -h 127.0.0.1 -p 5432 -U postgres -d postgres -f generate_tables.sql
+</code></pre>
+<h2 id="5-taido-competition-recordレポジトリtaido-competition-deployレポジトリでsubmoduleの更新ローカルのdbを利用する場合のみ必要だが基本的にやっておくべき"><a class="header" href="#5-taido-competition-recordレポジトリtaido-competition-deployレポジトリでsubmoduleの更新ローカルのdbを利用する場合のみ必要だが基本的にやっておくべき">5. taido-competition-recordレポジトリ、taido-competition-deployレポジトリでsubmoduleの更新(ローカルのDBを利用する場合のみ必要だが、基本的にやっておくべき)</a></h2>
+<p>&quot;taido-competition-data&quot; &lt; &quot;taido-competition-record&quot; &lt; &quot;taido-competition-deploy&quot;というgit submoduleの入れ子構造になっているので、この後の手順でtaido-competition-deployが新たな大会データを参照するためにはそれぞれでsubmoduleを更新しておく必要がある。</p>
+<p>つまり、以下の順で更新をする。</p>
+<ul>
+<li>taido-competition-record内のtaido-competition-data submoduleを最新にしてpushする。</li>
+<li>taido-competition-deploy内のtaido-competition-record submoduleを最新にしてpushする。(この後のcloudbuild.yamlと一緒にpushするのでもよい)</li>
+</ul>
+<h2 id="6-cloudbuildyamlファイルの更新"><a class="header" href="#6-cloudbuildyamlファイルの更新">6. cloudbuild.yamlファイルの更新</a></h2>
+<p>GitHubの<a href="https://github.com/KazutoMurase/taido-competition-deploy">taido-competition-deploy</a>レポジトリにプロジェクトに対応するyamlファイルがあるはずなので、その内容を修正してコミットする。</p>
+<p>プロジェクトが<code>taido-event</code>であれば<a href="https://github.com/KazutoMurase/taido-competition-deploy/blob/main/cloudbuild_taido-event.yaml">このファイル</a>になる。</p>
+<p>変更内容は以下を参考にすること。</p>
+<ul>
+<li>ローカルのDBを利用する場合(本番より数日以上前にデプロイの確認をするとき): <a href="https://github.com/KazutoMurase/taido-competition-deploy/pull/1/files">リンク</a></li>
+<li>Cloud SQLを使う場合(本番直前): <a href="https://github.com/KazutoMurase/taido-competition-deploy/pull/2/files">リンク</a></li>
+<li>ローカルのDBを利用する場合(大会終了後): <a href="https://github.com/KazutoMurase/taido-competition-deploy/pull/3/files">リンク</a>
+<ul>
+<li>この場合はresultも同時にpushする必要があるが、その作成方法については<a href="develop/../admin/export.html">結果出力</a>を参照</li>
+</ul>
+</li>
+</ul>
+<h1 id="その他参考情報"><a class="header" href="#その他参考情報">その他参考情報</a></h1>
+<h2 id="cloudbuildyamlの主要な変数の意味"><a class="header" href="#cloudbuildyamlの主要な変数の意味">cloudbuild.yamlの主要な変数の意味</a></h2>
+<ul>
+<li>COMPETITION_NAME: data以下に作る大会用のフォルダ名と対応</li>
+<li>PGSQL_HOST: postgresqlのデータベースを設置するアドレス</li>
+<li>PRODUCTION: 0にするとデバッグ機能をつけてページをビルド、1にすると本番用にビルド</li>
+<li>PRODUCTION_TEST: 1にするとadminで入力した結果を公開ページには見せないなど、デプロイしたサイトでも結果入力のテストができる状況になる</li>
+<li>USE_LOCAL_DB: 1でローカル(手元でdocker compose upするときは手元のPC、デプロイした時はCloud Runのインスタンス)のデータベースを使う</li>
+<li>SHOW_HIGHLIGHT_IN_TOURNAMENT: 1にすると次の試合がトーナメント上で強調表示される</li>
+<li>SHOW_TOTAL_IN_ADMIN: 総合得点表をadminで表示</li>
+<li>SHOW_TOTAL_IN_PUBLIC: 総合得点表を公開ページで表示</li>
+<li>SHOW_AWARD_IN_PUBLIC: 優秀選手賞等の褒章受賞者を公開ページで表示</li>
+<li>USE_RESULT_DATA: data以下のoriginalでなくresultフォルダにあるデータを使用(USE_LOCAL_DB=1の時のみ有効)</li>
+</ul>
+<h2 id="ローカルのdbを利用してデプロイした際の挙動について"><a class="header" href="#ローカルのdbを利用してデプロイした際の挙動について">ローカルのDBを利用してデプロイした際の挙動について</a></h2>
+<p>ローカルのDBを利用したデプロイで事前に挙動を確認した際、しばらくサイトを触らないとDBの情報がリセットされて大会の進行が初期状態に戻る。</p>
+<p>cloudbuild.yamlで<code>--no-cpu-throttling</code>を指定しているのでアクセスが無い時にCloud Runのインスタンスが一度シャットダウンするために起きる。</p>
+<p>本番だと常にアクセスがあるのと、Cloud SQLでデータを保持するのでこのようなリセットは起きない。</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="ユーティリティ"><a class="header" href="#ユーティリティ">ユーティリティ</a></h1>
 <p>以下大会準備や大会中に使える便利URLやAPIについて記載する。</p>
 <h2 id="データベース初期化"><a class="header" href="#データベース初期化">データベース初期化</a></h2>

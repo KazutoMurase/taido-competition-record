@@ -82,7 +82,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">はじめに</a></li><li class="chapter-item expanded affix "><li class="part-title">開発者向け</li><li class="chapter-item expanded "><a href="../develop/develop.html"><strong aria-hidden="true">1.</strong> 開発環境構築</a></li><li class="chapter-item expanded "><a href="../develop/tools.html"><strong aria-hidden="true">2.</strong> 開発用ツール</a></li><li class="chapter-item expanded "><a href="../develop/preparation.html" class="active"><strong aria-hidden="true">3.</strong> 大会準備</a></li><li class="chapter-item expanded "><a href="../develop/deploy.html"><strong aria-hidden="true">4.</strong> GCP環境へのデプロイ方法</a></li><li class="chapter-item expanded "><a href="../develop/utility.html"><strong aria-hidden="true">5.</strong> ユーティリティ</a></li><li class="chapter-item expanded "><a href="../site.html"><strong aria-hidden="true">6.</strong> サイトの構成</a></li><li class="chapter-item expanded "><a href="../admin/certificate.html"><strong aria-hidden="true">7.</strong> 賞状印刷</a></li><li class="chapter-item expanded "><a href="../admin/export.html"><strong aria-hidden="true">8.</strong> 結果出力</a></li><li class="chapter-item expanded affix "><li class="part-title">役員マニュアル</li><li class="chapter-item expanded "><a href="../admin/setup.html"><strong aria-hidden="true">9.</strong> 準備</a></li><li class="chapter-item expanded "><a href="../admin/check_players.html"><strong aria-hidden="true">10.</strong> 選手点呼係</a></li><li class="chapter-item expanded "><a href="../admin/call_players.html"><strong aria-hidden="true">11.</strong> 選手呼び出し係</a></li><li class="chapter-item expanded "><a href="../admin/record.html"><strong aria-hidden="true">12.</strong> 記録係</a></li><li class="chapter-item expanded "><a href="../admin/announce.html"><strong aria-hidden="true">13.</strong> 司会</a></li></ol>            </div>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">はじめに</a></li><li class="chapter-item expanded affix "><li class="part-title">開発者向け</li><li class="chapter-item expanded "><a href="../develop/develop.html"><strong aria-hidden="true">1.</strong> 開発環境構築</a></li><li class="chapter-item expanded "><a href="../develop/tools.html"><strong aria-hidden="true">2.</strong> 開発用ツール</a></li><li class="chapter-item expanded "><a href="../develop/preparation.html" class="active"><strong aria-hidden="true">3.</strong> 大会準備</a></li><li class="chapter-item expanded "><a href="../develop/deploy.html"><strong aria-hidden="true">4.</strong> GCP環境へのデプロイ方法(1からセットアップする場合)</a></li><li class="chapter-item expanded "><a href="../develop/deploy_using_existing_project.html"><strong aria-hidden="true">5.</strong> GCP環境へのデプロイ方法(既存のプロジェクトを使いまわす場合)</a></li><li class="chapter-item expanded "><a href="../develop/utility.html"><strong aria-hidden="true">6.</strong> ユーティリティ</a></li><li class="chapter-item expanded "><a href="../site.html"><strong aria-hidden="true">7.</strong> サイトの構成</a></li><li class="chapter-item expanded "><a href="../admin/certificate.html"><strong aria-hidden="true">8.</strong> 賞状印刷</a></li><li class="chapter-item expanded "><a href="../admin/export.html"><strong aria-hidden="true">9.</strong> 結果出力</a></li><li class="chapter-item expanded affix "><li class="part-title">役員マニュアル</li><li class="chapter-item expanded "><a href="../admin/setup.html"><strong aria-hidden="true">10.</strong> 準備</a></li><li class="chapter-item expanded "><a href="../admin/check_players.html"><strong aria-hidden="true">11.</strong> 選手点呼係</a></li><li class="chapter-item expanded "><a href="../admin/call_players.html"><strong aria-hidden="true">12.</strong> 選手呼び出し係</a></li><li class="chapter-item expanded "><a href="../admin/record.html"><strong aria-hidden="true">13.</strong> 記録係</a></li><li class="chapter-item expanded "><a href="../admin/announce.html"><strong aria-hidden="true">14.</strong> 司会</a></li></ol>            </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
@@ -145,16 +145,50 @@
                     <main>
                         <h1 id="大会準備"><a class="header" href="#大会準備">大会準備</a></h1>
 <p>各大会毎にデータベースを構築する必要がある。</p>
+<h2 id="環境構築"><a class="header" href="#環境構築">環境構築</a></h2>
 <p>以下実行しスクリプトを利用する為の環境を準備する。</p>
 <pre><code class="language-bash">python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 </code></pre>
 <h2 id="トーナメント用db作成"><a class="header" href="#トーナメント用db作成">トーナメント用DB作成</a></h2>
+<p>まず、taido-competition-record/data以下に大会用フォルダを用意する（例：<code>2025_student</code>）。その下にoriginalフォルダとstaticフォルダを作る。</p>
+<p>それぞれのフォルダ内のファイルの作り方はいくつかあるので、以下に列挙する。</p>
+<h4 id="generate_tournament_db_from_xlpyで生成するもの"><a class="header" href="#generate_tournament_db_from_xlpyで生成するもの">generate_tournament_db_from_xl.pyで生成するもの</a></h4>
+<ul>
+<li>original以下の個実・個法・団法などトーナメント形式の競技のcsv</li>
+</ul>
+<p>トーナメントのエクセルファイルからDB用CSVを自動生成できる。エクセルのタブ名とcsvのファイル名は<code>name_db_map</code>変数が対応している。</p>
+<h4 id="edit_block_csvpyで出力するもの"><a class="header" href="#edit_block_csvpyで出力するもの">edit_block_csv.pyで出力するもの</a></h4>
+<ul>
+<li>original以下の<code>block_*</code>や<code>current_block_*</code></li>
+</ul>
+<h4 id="エクセルファイルからのコピペ等で手動作成するもの"><a class="header" href="#エクセルファイルからのコピペ等で手動作成するもの">エクセルファイルからのコピペ等で手動作成するもの</a></h4>
+<ul>
+<li>static/players.csv</li>
+<li>static/groups.csv</li>
+</ul>
+<h4 id="エクセルファイルを元に手動で作成するもの"><a class="header" href="#エクセルファイルを元に手動で作成するもの">エクセルファイルを元に手動で作成するもの</a></h4>
+<ul>
+<li>original以下の団法・展開競技のcsv</li>
+<li>title.txt</li>
+</ul>
+<h4 id="過去の同一大会からコピーするもの"><a class="header" href="#過去の同一大会からコピーするもの">過去の同一大会からコピーするもの</a></h4>
+<ul>
+<li>original/awarded_players.csv (優秀選手などの褒章が存在しない大会の場合は不要)</li>
+<li>original/generate_tables.sql</li>
+<li>static/court_type.csv</li>
+<li>stattic/event_type.csv</li>
+<li>static/generate_tables.sql</li>
+</ul>
+<p>ただし、コート数や競技等の変更がある場合は適宜編集を加えること。</p>
+<h2 id="csvデータ作成用ツールの使い方"><a class="header" href="#csvデータ作成用ツールの使い方">csvデータ作成用ツールの使い方</a></h2>
+<h4 id="generate_tournament_db_from_xlpy"><a class="header" href="#generate_tournament_db_from_xlpy">generate_tournament_db_from_xl.py</a></h4>
 <p>大会Excelファイルと出力先ディレクトリを入力すると自動で出力してくれる。</p>
 <pre><code class="language-bash">scripts/generate_tournament_db_from_xl.py --file-path (FILE_PATH_TO_EXCEL_FILE) --output-path (OUTPUT_DIRECTORY)
 </code></pre>
-<p>時程表を作成するためのGUIを用意している。
+<h4 id="edit_block_csvpy"><a class="header" href="#edit_block_csvpy">edit_block_csv.py</a></h4>
+<p>時程表を作成するためのGUI。
 大会名(e.g. 2024_alljp)とブロック(e.g. A)を入力し、新規作成や編集を行うことができる。</p>
 <pre><code class="language-bash">scripts/edit_block_csv.py
 </code></pre>
