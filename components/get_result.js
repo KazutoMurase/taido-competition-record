@@ -182,7 +182,7 @@ function CreateText(
   y_padding,
   hide = false,
   currentBlockDataArray = null,
-  blinkState = true,
+  beforeFinalData = null,
 ) {
   const is_left = item["block_pos"] === "left";
   const is_right = item["block_pos"] === "right";
@@ -191,6 +191,8 @@ function CreateText(
 
   let isLeftPlayerCurrent = false;
   let isRightPlayerCurrent = false;
+  let isLeftPlayerInBeforeFinal = false;
+  let isRightPlayerInBeforeFinal = false;
   if (currentBlockDataArray && Array.isArray(currentBlockDataArray)) {
     for (const currentBlockItem of currentBlockDataArray) {
       if (
@@ -200,6 +202,10 @@ function CreateText(
           item["left_name"] === currentBlockItem.right_name)
       ) {
         isLeftPlayerCurrent = true;
+        isLeftPlayerInBeforeFinal =
+          beforeFinalData &&
+          beforeFinalData["left_name"] &&
+          beforeFinalData["left_name"] === currentBlockItem["left_name"];
       }
       if (
         currentBlockItem &&
@@ -208,6 +214,10 @@ function CreateText(
           item["right_name"] === currentBlockItem.right_name)
       ) {
         isRightPlayerCurrent = true;
+        isRightPlayerInBeforeFinal =
+          beforeFinalData &&
+          beforeFinalData["right_name"] &&
+          beforeFinalData["right_name"] === currentBlockItem["right_name"];
       }
     }
   }
@@ -234,8 +244,20 @@ function CreateText(
             y={item["left_begin_y"] - 7 + y_padding}
             text={GetSplitName(item["left_name"])}
             fontSize={item["left_name"].length < 8 ? 18 : 14}
-            fill={isLeftPlayerCurrent ? "#ff5722" : "black"}
-            fontStyle={isLeftPlayerCurrent ? "bold" : "normal"}
+            fill={
+              isLeftPlayerCurrent &&
+              !isLeftPlayerInBeforeFinal &&
+              !isRightPlayerInBeforeFinal
+                ? "#ff5722"
+                : "black"
+            }
+            fontStyle={
+              isLeftPlayerCurrent &&
+              !isLeftPlayerInBeforeFinal &&
+              !isRightPlayerInBeforeFinal
+                ? "bold"
+                : "normal"
+            }
           />
           <Rect
             x={is_left ? 0 : 625}
@@ -278,8 +300,20 @@ function CreateText(
             y={item["right_begin_y"] - 7 + y_padding}
             text={GetSplitName(item["right_name"])}
             fontSize={item["right_name"].length < 8 ? 18 : 14}
-            fill={isRightPlayerCurrent ? "#ff5722" : "black"}
-            fontStyle={isRightPlayerCurrent ? "bold" : "normal"}
+            fill={
+              isRightPlayerCurrent &&
+              !isLeftPlayerInBeforeFinal &&
+              !isRightPlayerInBeforeFinal
+                ? "#ff5722"
+                : "black"
+            }
+            fontStyle={
+              isRightPlayerCurrent &&
+              !isLeftPlayerInBeforeFinal &&
+              !isRightPlayerInBeforeFinal
+                ? "bold"
+                : "normal"
+            }
           />
           <Rect
             x={is_left ? 0 : 625}
@@ -424,6 +458,8 @@ function CreateText(
               ? 18
               : 14
           }
+          fill={isLeftPlayerCurrent ? "#ff5722" : "black"}
+          fontStyle={isLeftPlayerCurrent ? "bold" : "normal"}
         />
         <Text
           x={x - 220}
@@ -450,6 +486,8 @@ function CreateText(
               ? 18
               : 14
           }
+          fill={isRightPlayerCurrent ? "#ff5722" : "black"}
+          fontStyle={isRightPlayerCurrent ? "bold" : "normal"}
         />
         <Text
           x={x + width + 10}
@@ -1182,7 +1220,10 @@ function GetResult({
     }
     fetchEventDescription();
     async function fetchCourts() {
-      const response = await fetch("/api/get_courts");
+      const query_text =
+        "/api/get_courts" +
+        (event_name.includes("test") ? "?is_test=true" : "");
+      const response = await fetch(query_text);
       const result = await response.json();
       setCourts(result);
     }
@@ -1523,7 +1564,7 @@ function GetResult({
                           y_padding,
                           hide,
                           Object.values(currentBlockData),
-                          blinkState,
+                          before_final_data,
                         ),
                   )}
                 </Layer>
