@@ -249,14 +249,12 @@ function CreateText(
             text={GetSplitName(item["left_name"])}
             fontSize={item["left_name"].length < 8 ? 18 : 14}
             fill={
-              isLeftPlayerCurrent &&
-              !isLeftPlayerInBeforeFinal
+              isLeftPlayerCurrent && !isLeftPlayerInBeforeFinal
                 ? "#ff5722"
                 : "black"
             }
             fontStyle={
-              isLeftPlayerCurrent &&
-              !isLeftPlayerInBeforeFinal
+              isLeftPlayerCurrent && !isLeftPlayerInBeforeFinal
                 ? "bold"
                 : "normal"
             }
@@ -303,14 +301,12 @@ function CreateText(
             text={GetSplitName(item["right_name"])}
             fontSize={item["right_name"].length < 8 ? 18 : 14}
             fill={
-              isRightPlayerCurrent &&
-              !isRightPlayerInBeforeFinal
+              isRightPlayerCurrent && !isRightPlayerInBeforeFinal
                 ? "#ff5722"
                 : "black"
             }
             fontStyle={
-              isRightPlayerCurrent &&
-              !isRightPlayerInBeforeFinal
+              isRightPlayerCurrent && !isRightPlayerInBeforeFinal
                 ? "bold"
                 : "normal"
             }
