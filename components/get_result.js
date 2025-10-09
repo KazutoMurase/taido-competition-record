@@ -206,8 +206,8 @@ function CreateText(
           beforeFinalData &&
           beforeFinalData["left_name"] &&
           beforeFinalData["right_name"] &&
-          (beforeFinalData["left_name"] === currentBlockItem["left_name"] ||
-            beforeFinalData["right_name"] === currentBlockItem["left_name"]);
+          (beforeFinalData["left_name"] === item["left_name"] ||
+            beforeFinalData["right_name"] === item["left_name"]);
       }
       if (
         currentBlockItem &&
@@ -220,8 +220,8 @@ function CreateText(
           beforeFinalData &&
           beforeFinalData["left_name"] &&
           beforeFinalData["right_name"] &&
-          (beforeFinalData["left_name"] === currentBlockItem["right_name"] ||
-            beforeFinalData["right_name"] === currentBlockItem["right_name"]);
+          (beforeFinalData["left_name"] === item["right_name"] ||
+            beforeFinalData["right_name"] === item["right_name"]);
       }
     }
   }
@@ -358,8 +358,16 @@ function CreateText(
             y={item["left_begin_y"] - 7 + y_padding}
             text={GetSplitName(item["left_name"])}
             fontSize={item["left_name"].length < 8 ? 18 : 14}
-            fill={isLeftPlayerCurrent ? "#ff5722" : "black"}
-            fontStyle={isLeftPlayerCurrent ? "bold" : "normal"}
+            fill={
+              isLeftPlayerCurrent && !isLeftPlayerInBeforeFinal
+                ? "#ff5722"
+                : "black"
+            }
+            fontStyle={
+              isLeftPlayerCurrent && !isLeftPlayerInBeforeFinal
+                ? "bold"
+                : "normal"
+            }
           />
           <Rect
             x={is_left ? 0 : 625}
@@ -408,8 +416,16 @@ function CreateText(
             y={item["right_begin_y"] - 7 + y_padding}
             text={GetSplitName(item["right_name"])}
             fontSize={item["right_name"].length < 8 ? 18 : 14}
-            fill={isRightPlayerCurrent ? "#ff5722" : "black"}
-            fontStyle={isRightPlayerCurrent ? "bold" : "normal"}
+            fill={
+              isRightPlayerCurrent && !isRightPlayerInBeforeFinal
+                ? "#ff5722"
+                : "black"
+            }
+            fontStyle={
+              isRightPlayerCurrent && !isRightPlayerInBeforeFinal
+                ? "bold"
+                : "normal"
+            }
           />
           <Rect
             x={is_left ? 0 : 625}
