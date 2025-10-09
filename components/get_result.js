@@ -205,7 +205,9 @@ function CreateText(
         isLeftPlayerInBeforeFinal =
           beforeFinalData &&
           beforeFinalData["left_name"] &&
-          beforeFinalData["left_name"] === currentBlockItem["left_name"];
+          beforeFinalData["right_name"] &&
+          (beforeFinalData["left_name"] === currentBlockItem["left_name"] ||
+            beforeFinalData["right_name"] === currentBlockItem["left_name"]);
       }
       if (
         currentBlockItem &&
@@ -216,8 +218,10 @@ function CreateText(
         isRightPlayerCurrent = true;
         isRightPlayerInBeforeFinal =
           beforeFinalData &&
+          beforeFinalData["left_name"] &&
           beforeFinalData["right_name"] &&
-          beforeFinalData["right_name"] === currentBlockItem["right_name"];
+          (beforeFinalData["left_name"] === currentBlockItem["right_name"] ||
+            beforeFinalData["right_name"] === currentBlockItem["right_name"]);
       }
     }
   }
@@ -246,15 +250,13 @@ function CreateText(
             fontSize={item["left_name"].length < 8 ? 18 : 14}
             fill={
               isLeftPlayerCurrent &&
-              !isLeftPlayerInBeforeFinal &&
-              !isRightPlayerInBeforeFinal
+              !isLeftPlayerInBeforeFinal
                 ? "#ff5722"
                 : "black"
             }
             fontStyle={
               isLeftPlayerCurrent &&
-              !isLeftPlayerInBeforeFinal &&
-              !isRightPlayerInBeforeFinal
+              !isLeftPlayerInBeforeFinal
                 ? "bold"
                 : "normal"
             }
@@ -302,14 +304,12 @@ function CreateText(
             fontSize={item["right_name"].length < 8 ? 18 : 14}
             fill={
               isRightPlayerCurrent &&
-              !isLeftPlayerInBeforeFinal &&
               !isRightPlayerInBeforeFinal
                 ? "#ff5722"
                 : "black"
             }
             fontStyle={
               isRightPlayerCurrent &&
-              !isLeftPlayerInBeforeFinal &&
               !isRightPlayerInBeforeFinal
                 ? "bold"
                 : "normal"
