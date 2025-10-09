@@ -79,7 +79,10 @@ const RecordTable = async (req, res) => {
         (initial_value_is_set ? "," : " ") + "penalty=" + req.body.penalty;
       initial_value_is_set = true;
     }
-    if (req.body.start_penalty !== undefined) {
+    if (
+      req.body.start_penalty !== undefined &&
+      req.body.start_penalty !== null
+    ) {
       query +=
         (initial_value_is_set ? "," : " ") +
         "start_penalty=" +
