@@ -103,14 +103,23 @@ function NotificationRequest({
     };
   }, [fetchData, update_interval]);
 
+  const [previousDataLength, setPreviousDataLength] = useState(0);
+
   useEffect(() => {
     if (data.length > 0) {
       document.body.style.backgroundColor = "#fff3cd";
+      if (previousDataLength === 0 && data.length > 0) {
+        const audio = new Audio("/notification-sound.wav");
+        audio.play().catch((error) => {
+          console.log("Failed to play sound:", error);
+        });
+      }
     }
+    setPreviousDataLength(data.length);
     return () => {
       document.body.style.backgroundColor = "";
     };
-  }, [data.length]);
+  }, [data.length, previousDataLength]);
 
   const forceFetchData = () => {
     fetchData();
