@@ -257,7 +257,14 @@ function CheckTable({
                 {is_mobile ? <></> : <th></th>}
               </tr>
               {data.items?.map((item, index) => (
-                <tr key={item["id"]} className={checkStyles.column}>
+                <tr
+                  key={item["id"]}
+                  className={
+                    item["retire"] === 1
+                      ? checkStyles.column_retire
+                      : checkStyles.column
+                  }
+                >
                   <td>{item["name"].replace("'", "").replace("'", "")}</td>
                   <td className={checkStyles.elem}>
                     <input

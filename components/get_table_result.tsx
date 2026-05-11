@@ -14,7 +14,7 @@ function MakeTable(event_name, resultTable, title, show_caption) {
     <table className={tableStyles.table} align="center" border={1}>
       <thead>
         <tr>
-          <td colSpan={14}>{title}</td>
+          <td colSpan={15}>{title}</td>
         </tr>
         <tr className={checkStyles.border_bottom}>
           {event_name.includes("tenkai") ? (
@@ -46,6 +46,11 @@ function MakeTable(event_name, resultTable, title, show_caption) {
               </td>
               <td style={{ width: "50px" }}>
                 場外
+                <br />
+                減点
+              </td>
+              <td style={{ width: "50px" }}>
+                開始
                 <br />
                 減点
               </td>
@@ -255,6 +260,11 @@ const GetTableResult: React.FC<{
                   </td>
                   <td>
                     {elem.penalty && visible ? elem.penalty.toFixed(1) : ""}
+                  </td>
+                  <td>
+                    {elem.start_penalty && visible
+                      ? elem.start_penalty.toFixed(1)
+                      : ""}
                   </td>
                   <td className={checkStyles.border_right}>
                     {elem.sum_score && visible ? elem.sum_score.toFixed(1) : ""}

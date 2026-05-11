@@ -84,7 +84,7 @@ async function UpdateTableEventFromCSV(client, db_name, event_name) {
     query =
       "UPDATE " +
       event_name +
-      " SET main_score=null, sub1_score=null, sub2_score=null, sub3_score=null, sub4_score=null, sub5_score=null, elapsed_time=null, penalty=null, retire=null";
+      " SET main_score=null, sub1_score=null, sub2_score=null, sub3_score=null, sub4_score=null, sub5_score=null, elapsed_time=null, penalty=null, start_penalty=null, retire=null";
   } else {
     query =
       "UPDATE " +

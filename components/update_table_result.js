@@ -110,6 +110,16 @@ function CalcSum(values, initialValues) {
   } else if (initialValues[18] !== "") {
     sum -= parseInt(initialValues[18]);
   }
+  if (values[19] !== null) {
+    sum -= (values[19] ? parseInt(values[19]) : 0) * 10;
+  } else if (initialValues[19] !== "") {
+    sum -= parseInt(initialValues[19]) * 10;
+  }
+  if (values[20] !== null) {
+    sum -= values[20] ? parseInt(values[20]) : values[20];
+  } else if (initialValues[20] !== "") {
+    sum -= parseInt(initialValues[20]);
+  }
   return (
     <Typography variant="h1" color="red">
       {sum / 10}
@@ -118,8 +128,10 @@ function CalcSum(values, initialValues) {
 }
 
 function UpdateTableResult({ event_name, id, is_mobile, return_url }) {
-  // time x4, main x3, sub1 x2, sub2 x2, sub3 x2, sub4 x2, sub5 x2, penalty x2
+  // time x4, main x3, sub1 x2, sub2 x2, sub3 x2, sub4 x2, sub5 x2, penalty x3
   const [values, setValues] = useState([
+    null,
+    null,
     null,
     null,
     null,
@@ -160,8 +172,12 @@ function UpdateTableResult({ event_name, id, is_mobile, return_url }) {
     "",
     "",
     "",
+    "",
+    "",
   ]);
   const inputRefs = [
+    useRef(null),
+    useRef(null),
     useRef(null),
     useRef(null),
     useRef(null),
@@ -191,6 +207,8 @@ function UpdateTableResult({ event_name, id, is_mobile, return_url }) {
         );
         const result = await response.json();
         let initialValues = [
+          "",
+          "",
           "",
           "",
           "",
@@ -246,6 +264,10 @@ function UpdateTableResult({ event_name, id, is_mobile, return_url }) {
           initialValues[17] = parseInt(-result.penalty);
           initialValues[18] = parseInt(-result.penalty * 10) % 10;
         }
+        if (result.start_penalty) {
+          initialValues[19] = parseInt(-result.start_penalty);
+          initialValues[20] = parseInt(-result.start_penalty * 10) % 10;
+        }
         setInitialValues(initialValues);
         setData(result);
       }
@@ -281,7 +303,7 @@ function UpdateTableResult({ event_name, id, is_mobile, return_url }) {
       id: data.id,
       event_name: event_name,
     };
-    for (let i = 0; i < 19; i++) {
+    for (let i = 0; i < 21; i++) {
       if (values[i] === null && initialValues[i] !== "") {
         values[i] = initialValues[i];
       }
@@ -331,6 +353,12 @@ function UpdateTableResult({ event_name, id, is_mobile, return_url }) {
         -(parseInt(values[17]) * 10 + parseInt(values[18])) / 10;
     } else {
       post["penalty"] = null;
+    }
+    if (values[19] !== null && values[20] !== null) {
+      post["start_penalty"] =
+        -(parseInt(values[19]) * 10 + parseInt(values[20])) / 10;
+    } else {
+      post["start_penalty"] = null;
     }
     axios
       .post("/api/record_table", post)
@@ -650,6 +678,19 @@ function UpdateTableResult({ event_name, id, is_mobile, return_url }) {
                   17,
                   17,
                   18,
+                  handleChange,
+                )}
+                <Typography variant="h4" sx={{ mx: 1, mt: 5 }}>
+                  -
+                </Typography>
+                {ScoreField(
+                  "開始減点",
+                  values,
+                  initialValues,
+                  inputRefs,
+                  19,
+                  19,
+                  20,
                   handleChange,
                 )}
               </Box>

@@ -8,6 +8,12 @@
   height: 50px;
 }
 
+.column_retire {
+  font-size: 20px;
+  height: 50px;
+  background: #999999;
+}
+
 .elem {
   text-align: center;
   vertical-align: middle;

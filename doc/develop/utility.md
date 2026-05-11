@@ -14,7 +14,7 @@
 またはブラウザでアクセスする。
 
 ```bash
-curl (URL)/api/reset_cache
+curl "(URL)/api/reset_cache"
 ```
 
 ## イベント順変更
@@ -23,7 +23,7 @@ curl (URL)/api/reset_cache
 またはブラウザでアクセスする。
 
 ```bash
-curl (URL)/api/change_event_order?block=a&target_schedule_id=10
+curl "(URL)/api/change_event_order?block=a&target_schedule_id=10"
 ```
 
 ## 現在スケジュール位置変更
@@ -32,7 +32,7 @@ curl (URL)/api/change_event_order?block=a&target_schedule_id=10
 またはブラウザでアクセスする。
 
 ```bash
-curl (URL)/api/update_current_schedule?block=a&schedule_id=5
+curl "(URL)/api/update_current_schedule?block=a&schedule_id=5"
 ```
 
 ## 褒章更新
@@ -40,10 +40,10 @@ curl (URL)/api/update_current_schedule?block=a&schedule_id=5
 褒章に関して、選手名、または選手IDを以下のように指定し、更新を行うことができる。
 
 ```bash
-# 選手名で更新
+# 選手名で更新 (ただし他大会と人物が重複していることもあるので、対象の大会データディレクトリ以下で実行するとよい)
 curl "http://localhost:3000/api/record_awards?id=1&player_id=$(git grep "選手名" | cut -d":" -f2 | cut -d"," -f1)"
 # 選手IDで更新
-curl (URL)/api/record_awards?id=1&player_id=1
+curl "(URL)/api/record_awards?id=1&player_id=1"
 ```
 
 ## データベース更新
@@ -52,5 +52,5 @@ curl (URL)/api/record_awards?id=1&player_id=1
 
 例: block_aテーブルにおけるid=1のplayers_checked要素を1に更新
 ```bash
-curl (URL)/api/update_db?id=1&table_name=block_a&key=players_checked&value=1
+curl "(URL)/api/update_db?id=1&table_name=block_a&key=players_checked&value=1"
 ```

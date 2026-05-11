@@ -47,7 +47,7 @@ function onSubmit(
     event_name: event_name,
     update_block: block_number,
   };
-  for (let i = 0; i < 19; i++) {
+  for (let i = 0; i < 21; i++) {
     if (values[i] === null && initialValues[i] !== "") {
       values[i] = initialValues[i];
     }
@@ -94,6 +94,12 @@ function onSubmit(
     post["penalty"] = -(parseInt(values[17]) * 10 + parseInt(values[18])) / 10;
   } else {
     post["penalty"] = null;
+  }
+  if (values[19] !== null && values[20] !== null) {
+    post["start_penalty"] =
+      -(parseInt(values[19]) * 10 + parseInt(values[20])) / 10;
+  } else {
+    post["start_penalty"] = null;
   }
   axios
     .post("/api/record_table", post)
@@ -219,6 +225,16 @@ function CalcSum(values, initialValues) {
   } else if (initialValues[18] !== "") {
     sum -= parseInt(initialValues[18]);
   }
+  if (values[19] !== null) {
+    sum -= (values[19] ? parseInt(values[19]) : 0) * 10;
+  } else if (initialValues[19] !== "") {
+    sum -= parseInt(initialValues[19]) * 10;
+  }
+  if (values[20] !== null) {
+    sum -= values[20] ? parseInt(values[20]) : values[20];
+  } else if (initialValues[20] !== "") {
+    sum -= parseInt(initialValues[20]);
+  }
   return (
     <Typography variant="h1" color="red">
       {sum / 10}
@@ -233,8 +249,10 @@ function RecordTableResult({
   update_interval,
   is_mobile,
 }) {
-  // time x4, main x3, sub1 x2, sub2 x2, sub3 x2, sub4 x2, sub5 x2, penalty x2
+  // time x4, main x3, sub1 x2, sub2 x2, sub3 x2, sub4 x2, sub5 x2, penalty x3
   const [values, setValues] = useState([
+    null,
+    null,
     null,
     null,
     null,
@@ -275,8 +293,12 @@ function RecordTableResult({
     "",
     "",
     "",
+    "",
+    "",
   ]);
   const inputRefs = [
+    useRef(null),
+    useRef(null),
     useRef(null),
     useRef(null),
     useRef(null),
@@ -333,6 +355,8 @@ function RecordTableResult({
       "",
       "",
       "",
+      "",
+      "",
     ];
     if (result.elapsed_time) {
       initialValues[0] = parseInt(result.elapsed_time / 10);
@@ -368,6 +392,10 @@ function RecordTableResult({
     if (result.penalty) {
       initialValues[17] = parseInt(-result.penalty);
       initialValues[18] = parseInt(-result.penalty * 10) % 10;
+    }
+    if (result.start_penalty) {
+      initialValues[19] = parseInt(-result.start_penalty);
+      initialValues[20] = parseInt(-result.start_penalty * 10) % 10;
     }
     setInitialValues(initialValues);
     setData(result);
@@ -693,6 +721,19 @@ function RecordTableResult({
                   17,
                   17,
                   18,
+                  handleChange,
+                )}
+                <Typography variant="h4" sx={{ mx: 1, mt: 5 }}>
+                  -
+                </Typography>
+                {ScoreField(
+                  "開始減点",
+                  values,
+                  initialValues,
+                  inputRefs,
+                  19,
+                  19,
+                  20,
                   handleChange,
                 )}
               </Box>

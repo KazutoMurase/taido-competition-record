@@ -9,7 +9,7 @@ const Confirm = async (req, res) => {
   const groups = event_name.includes("test") ? "test_groups" : "groups";
   if (event_name.includes("tenkai")) {
     query =
-      "SELECT t1.id, t1.group_id, t1.round, t1.main_score, t1.sub1_score, t1.sub2_score, t1.sub3_score, t1.sub4_score, t1.sub5_score, t1.elapsed_time, t1.penalty, t1.retire, t2.name FROM " +
+      "SELECT t1.id, t1.group_id, t1.round, t1.main_score, t1.sub1_score, t1.sub2_score, t1.sub3_score, t1.sub4_score, t1.sub5_score, t1.elapsed_time, t1.penalty, t1.start_penalty, t1.retire, t2.name FROM " +
       event_name +
       " AS t1 LEFT JOIN " +
       groups_name +
@@ -51,6 +51,9 @@ const Confirm = async (req, res) => {
       : null;
     if (sorted_data[i]["penalty"]) {
       sum_score += parseFloat(sorted_data[i]["penalty"]) * 10;
+    }
+    if (sorted_data[i]["start_penalty"]) {
+      sum_score += parseFloat(sorted_data[i]["start_penalty"]) * 10;
     }
     if (sorted_data[i]["elapsed_time"]) {
       const time = parseFloat(sorted_data[i]["elapsed_time"]);

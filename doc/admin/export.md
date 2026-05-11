@@ -19,7 +19,6 @@ tools/export.bash (URL)
 cloudbuild_$PROJECT_ID.yamlを編集しコミットする(Docker内DB接続に切り替わる)。
 
 - add-cloudsql-instances項目を削除
-- PGSQL\_DATABASE=taido\_recordに変更
 - PGSQL\_HOST=localhostに変更
 - USE\_LOCAL\_DB=1に変更
 - SHOW\_HIGHLIGHT\_IN\_TOURNAMENT=0に変更
