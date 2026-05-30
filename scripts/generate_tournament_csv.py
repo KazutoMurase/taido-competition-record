@@ -19,6 +19,10 @@ HEADER = [
 ]
 
 RIGHT_SMALL_BRANCH_FLIP_LIMIT = 9
+# These two keep game numbering aligned with existing student brackets.
+# They only affect adjacent outer-column game IDs, not the bracket shape.
+LEFT_OUTER_GAME_ID_SWAP_LIMIT = 39
+RIGHT_OUTER_GAME_ID_SWAP_PLAYER_COUNT = 37
 
 
 @dataclass
@@ -40,6 +44,15 @@ class Game:
             "left_retire": "",
             "right_retire": "",
         }
+
+
+@dataclass
+class Node:
+    path: str
+    player_id: str = ""
+    left: object = None
+    right: object = None
+    game_id: int = 0
 
 
 def player_column_to_event_name(player_column):
@@ -74,49 +87,82 @@ def balanced_left_count(player_count, path):
     return (player_count + 1) // 2 if left_big else player_count // 2
 
 
+def visual_order_key(path, player_count):
+    if player_count <= LEFT_OUTER_GAME_ID_SWAP_LIMIT:
+        if path == "LLLR":
+            return "0LLLL"
+        if path == "LLLL":
+            return "0LLLR"
+    if player_count == RIGHT_OUTER_GAME_ID_SWAP_PLAYER_COUNT:
+        if path == "RRRL":
+            return "1LLLL"
+        if path == "RRRR":
+            return "1LLLR"
+    if not path:
+        return ""
+    if path[0] == "L":
+        return "0" + path[1:]
+    return "1" + path[1:].translate(str.maketrans("LR", "RL"))
+
+
+def game_id_order_key(node, player_count):
+    return (-len(node.path), visual_order_key(node.path, player_count))
+
+
 def build_games(player_ids):
     final_id = len(player_ids)
     third_place_id = final_id - 1
-    next_game_id = 1
-    games = []
 
-    def build_node(node_player_ids, path="", is_root=False):
-        nonlocal next_game_id
+    def build_node(node_player_ids, path=""):
         if len(node_player_ids) == 1:
-            return ("player", node_player_ids[0])
+            return Node(path=path, player_id=node_player_ids[0])
 
         left_count = balanced_left_count(len(node_player_ids), path)
-        left = build_node(node_player_ids[:left_count], f"{path}L")
-        right = build_node(node_player_ids[left_count:], f"{path}R")
+        return Node(
+            path=path,
+            left=build_node(node_player_ids[:left_count], f"{path}L"),
+            right=build_node(node_player_ids[left_count:], f"{path}R"),
+        )
 
-        if is_root:
-            game_id = final_id
-        else:
-            game_id = next_game_id
-            next_game_id += 1
-
-        game = Game(id=game_id)
-        set_side(game, "left", left)
-        set_side(game, "right", right)
-        games.append(game)
-        return ("game", game)
+    def collect_game_nodes(node):
+        if node.player_id:
+            return []
+        nodes = collect_game_nodes(node.left)
+        nodes.extend(collect_game_nodes(node.right))
+        nodes.append(node)
+        return nodes
 
     def set_side(game, side, node):
-        node_type, value = node
-        if node_type == "player":
+        if node.player_id:
             if side == "left":
-                game.left_player_id = value
+                game.left_player_id = node.player_id
             else:
-                game.right_player_id = value
+                game.right_player_id = node.player_id
             return
 
-        previous_game = value
         if side == "left":
-            previous_game.next_left_id = str(game.id)
+            node.game.next_left_id = str(game.id)
         else:
-            previous_game.next_right_id = str(game.id)
+            node.game.next_right_id = str(game.id)
 
-    build_node(player_ids, is_root=True)
+    root = build_node(player_ids)
+    root.game_id = final_id
+
+    game_nodes = [node for node in collect_game_nodes(root) if node is not root]
+    for game_id, node in enumerate(
+        sorted(game_nodes, key=lambda node: game_id_order_key(node, len(player_ids))),
+        start=1,
+    ):
+        node.game_id = game_id
+
+    games = []
+    for node in collect_game_nodes(root):
+        node.game = Game(id=node.game_id)
+    for node in collect_game_nodes(root):
+        set_side(node.game, "left", node.left)
+        set_side(node.game, "right", node.right)
+        games.append(node.game)
+
     games.append(Game(id=third_place_id))
     return sorted(games, key=lambda game: game.id)
 
