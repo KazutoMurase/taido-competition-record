@@ -116,7 +116,7 @@ def game_order_key(node, sibling_states, game_order_first_round_counts):
     ]
     block_path = max(matching_block_paths, key=len, default="")
 
-    if block_path and game_order_first_round_counts.get(block_path) == 1:
+    if block_path in game_order_first_round_counts and game_order_first_round_counts[block_path] == 1:
         sibling_state_values = sibling_states.get(parent_path, set())
         if (
             ("P", "P") in sibling_state_values
@@ -135,43 +135,36 @@ def count_first_rounds(slot_players, start, end):
     )
 
 
+def slot_range_for_path(slot_count, path):
+    start = 0
+    end = slot_count
+    for direction in path:
+        middle = (start + end) // 2
+        if direction == "L":
+            end = middle
+        else:
+            start = middle
+    return start, end
+
+
+def game_order_block_paths(slot_count):
+    if slot_count == 16:
+        return ("",)
+    if slot_count == 32:
+        return ("L", "R")
+    if slot_count >= 64:
+        return ("LL", "RR")
+    return ()
+
+
 def count_game_order_first_rounds(slot_players):
     slot_count = len(slot_players)
-    if slot_count == 32:
-        middle = slot_count // 2
-        return {
-            "L": count_first_rounds(slot_players, 0, middle),
-            "R": count_first_rounds(slot_players, middle, slot_count),
-        }
-    if slot_count < 64:
-        return {}
-
-    block_size = slot_count // 4
     return {
-        "LL": count_first_rounds(slot_players, 0, block_size),
-        "RR": count_first_rounds(slot_players, block_size * 3, slot_count),
-    }
-
-
-def delayed_single_first_round_parent_paths(slot_players, game_nodes):
-    slot_count = len(slot_players)
-    if slot_count != 16 or count_first_rounds(slot_players, 0, slot_count) != 1:
-        return set()
-
-    max_depth = max((len(node.path) for node in game_nodes), default=0)
-    first_round_nodes = [
-        node
-        for node in game_nodes
-        if len(node.path) == max_depth and node_state(node) == ("P", "P")
-    ]
-    if len(first_round_nodes) != 1:
-        return set()
-
-    parent_path = first_round_nodes[0].path[:-1]
-    return {
-        node.path
-        for node in game_nodes
-        if node.path == parent_path
+        block_path: count_first_rounds(
+            slot_players,
+            *slot_range_for_path(slot_count, block_path),
+        )
+        for block_path in game_order_block_paths(slot_count)
     }
 
 
@@ -256,7 +249,6 @@ def build_games(player_ids):
     for node in game_nodes:
         sibling_states.setdefault(node.path[:-1], set()).add(node_state(node))
 
-    delayed_parent_paths = delayed_single_first_round_parent_paths(slot_players, game_nodes)
     visual_ranks = {}
     for depth in sorted({len(node.path) for node in game_nodes}):
         nodes_at_depth = [node for node in game_nodes if len(node.path) == depth]
@@ -277,7 +269,7 @@ def build_games(player_ids):
             game_nodes,
             key=lambda node: (
                 -len(node.path),
-                visual_ranks[node.path] + (1.5 if node.path in delayed_parent_paths else 0),
+                visual_ranks[node.path],
             ),
         ),
         start=1,
