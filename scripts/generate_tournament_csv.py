@@ -98,6 +98,52 @@ def visual_path_key(path):
     return "1" + path[1:].translate(str.maketrans("LR", "RL"))
 
 
+def node_state(node):
+    return (
+        "P" if node.left.player_id else "G",
+        "P" if node.right.player_id else "G",
+    )
+
+
+def game_order_key(node, sibling_states, block_first_round_counts):
+    path = node.path
+    base_key = visual_path_key(path)
+    parent_path = path[:-1]
+    seed_block_path = path[:2]
+
+    if seed_block_path in ("LL", "RR") and block_first_round_counts.get(seed_block_path) == 1:
+        sibling_state_values = sibling_states.get(parent_path, set())
+        if (
+            ("P", "P") in sibling_state_values
+            and (("P", "G") in sibling_state_values or ("G", "P") in sibling_state_values)
+        ):
+            return base_key[:-1] + ("0" if node_state(node) == ("P", "P") else "1")
+
+    return base_key
+
+
+def count_first_rounds_by_seed_block(slot_players):
+    slot_count = len(slot_players)
+    if slot_count < 64:
+        return {"LL": 0, "LR": 0, "RL": 0, "RR": 0}
+
+    block_size = slot_count // 4
+    block_ranges = {
+        "LL": (0, block_size),
+        "LR": (block_size, block_size * 2),
+        "RL": (block_size * 2, block_size * 3),
+        "RR": (block_size * 3, slot_count),
+    }
+    return {
+        block_path: sum(
+            1
+            for slot_index in range(start, end, 2)
+            if slot_players[slot_index] and slot_players[slot_index + 1]
+        )
+        for block_path, (start, end) in block_ranges.items()
+    }
+
+
 def build_slot_players(player_ids):
     slot_count = next_power_of_two(len(player_ids))
     seeds = seed_order(slot_count)
@@ -156,8 +202,19 @@ def build_games(player_ids):
     root.game_id = final_id
 
     game_nodes = [node for node in collect_game_nodes(root) if node is not root]
+    sibling_states = {}
+    block_first_round_counts = count_first_rounds_by_seed_block(slot_players)
+    for node in game_nodes:
+        sibling_states.setdefault(node.path[:-1], set()).add(node_state(node))
+
     for game_id, node in enumerate(
-        sorted(game_nodes, key=lambda node: (-len(node.path), visual_path_key(node.path))),
+        sorted(
+            game_nodes,
+            key=lambda node: (
+                -len(node.path),
+                game_order_key(node, sibling_states, block_first_round_counts),
+            ),
+        ),
         start=1,
     ):
         node.game_id = game_id
