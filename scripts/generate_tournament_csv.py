@@ -105,13 +105,18 @@ def node_state(node):
     )
 
 
-def game_order_key(node, sibling_states, block_first_round_counts):
+def game_order_key(node, sibling_states, game_order_first_round_counts):
     path = node.path
     base_key = visual_path_key(path)
     parent_path = path[:-1]
-    seed_block_path = path[:2]
+    matching_block_paths = [
+        block_path
+        for block_path in game_order_first_round_counts
+        if path.startswith(block_path)
+    ]
+    block_path = max(matching_block_paths, key=len, default="")
 
-    if seed_block_path in ("LL", "RR") and block_first_round_counts.get(seed_block_path) == 1:
+    if block_path and game_order_first_round_counts.get(block_path) == 1:
         sibling_state_values = sibling_states.get(parent_path, set())
         if (
             ("P", "P") in sibling_state_values
@@ -122,9 +127,57 @@ def game_order_key(node, sibling_states, block_first_round_counts):
     return base_key
 
 
+def count_first_rounds(slot_players, start, end):
+    return sum(
+        1
+        for slot_index in range(start, end, 2)
+        if slot_players[slot_index] and slot_players[slot_index + 1]
+    )
+
+
+def count_game_order_first_rounds(slot_players):
+    slot_count = len(slot_players)
+    if slot_count == 32:
+        middle = slot_count // 2
+        return {
+            "L": count_first_rounds(slot_players, 0, middle),
+            "R": count_first_rounds(slot_players, middle, slot_count),
+        }
+    if slot_count < 64:
+        return {}
+
+    block_size = slot_count // 4
+    return {
+        "LL": count_first_rounds(slot_players, 0, block_size),
+        "RR": count_first_rounds(slot_players, block_size * 3, slot_count),
+    }
+
+
+def delayed_single_first_round_parent_paths(slot_players, game_nodes):
+    slot_count = len(slot_players)
+    if slot_count != 16 or count_first_rounds(slot_players, 0, slot_count) != 1:
+        return set()
+
+    max_depth = max((len(node.path) for node in game_nodes), default=0)
+    first_round_nodes = [
+        node
+        for node in game_nodes
+        if len(node.path) == max_depth and node_state(node) == ("P", "P")
+    ]
+    if len(first_round_nodes) != 1:
+        return set()
+
+    parent_path = first_round_nodes[0].path[:-1]
+    return {
+        node.path
+        for node in game_nodes
+        if node.path == parent_path
+    }
+
+
 def count_first_rounds_by_seed_block(slot_players):
     slot_count = len(slot_players)
-    if slot_count < 64:
+    if slot_count < 8:
         return {"LL": 0, "LR": 0, "RL": 0, "RR": 0}
 
     block_size = slot_count // 4
@@ -135,11 +188,7 @@ def count_first_rounds_by_seed_block(slot_players):
         "RR": (block_size * 3, slot_count),
     }
     return {
-        block_path: sum(
-            1
-            for slot_index in range(start, end, 2)
-            if slot_players[slot_index] and slot_players[slot_index + 1]
-        )
+        block_path: count_first_rounds(slot_players, start, end)
         for block_path, (start, end) in block_ranges.items()
     }
 
@@ -203,16 +252,32 @@ def build_games(player_ids):
 
     game_nodes = [node for node in collect_game_nodes(root) if node is not root]
     sibling_states = {}
-    block_first_round_counts = count_first_rounds_by_seed_block(slot_players)
+    game_order_first_round_counts = count_game_order_first_rounds(slot_players)
     for node in game_nodes:
         sibling_states.setdefault(node.path[:-1], set()).add(node_state(node))
+
+    delayed_parent_paths = delayed_single_first_round_parent_paths(slot_players, game_nodes)
+    visual_ranks = {}
+    for depth in sorted({len(node.path) for node in game_nodes}):
+        nodes_at_depth = [node for node in game_nodes if len(node.path) == depth]
+        for rank, node in enumerate(
+            sorted(
+                nodes_at_depth,
+                key=lambda node: game_order_key(
+                    node,
+                    sibling_states,
+                    game_order_first_round_counts,
+                ),
+            )
+        ):
+            visual_ranks[node.path] = rank
 
     for game_id, node in enumerate(
         sorted(
             game_nodes,
             key=lambda node: (
                 -len(node.path),
-                game_order_key(node, sibling_states, block_first_round_counts),
+                visual_ranks[node.path] + (1.5 if node.path in delayed_parent_paths else 0),
             ),
         ),
         start=1,
