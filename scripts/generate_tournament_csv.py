@@ -18,12 +18,6 @@ HEADER = [
     "right_retire",
 ]
 
-RIGHT_SMALL_BRANCH_FLIP_LIMIT = 9
-# These two keep game numbering aligned with existing student brackets.
-# They only affect adjacent outer-column game IDs, not the bracket shape.
-LEFT_OUTER_GAME_ID_SWAP_LIMIT = 39
-RIGHT_OUTER_GAME_ID_SWAP_PLAYER_COUNT = 37
-
 
 @dataclass
 class Game:
@@ -72,32 +66,31 @@ def read_player_ids(players_csv, player_column):
     return player_ids
 
 
-def balanced_left_count(player_count, path):
-    if player_count % 2 == 0:
-        return player_count // 2
-    if player_count == 3:
-        return 2 if path.endswith("R") else 1
-    if player_count % 4 == 1:
-        left_big = True
-        if path.endswith("R") and player_count <= RIGHT_SMALL_BRANCH_FLIP_LIMIT:
-            left_big = not left_big
-        return (player_count + 1) // 2 if left_big else player_count // 2
-
-    left_big = False
-    return (player_count + 1) // 2 if left_big else player_count // 2
+def next_power_of_two(value):
+    return 1 << (value - 1).bit_length()
 
 
-def visual_order_key(path, player_count):
-    if player_count <= LEFT_OUTER_GAME_ID_SWAP_LIMIT:
-        if path == "LLLR":
-            return "0LLLL"
-        if path == "LLLL":
-            return "0LLLR"
-    if player_count == RIGHT_OUTER_GAME_ID_SWAP_PLAYER_COUNT:
-        if path == "RRRL":
-            return "1LLLL"
-        if path == "RRRR":
-            return "1LLLR"
+def visual_seed_order(slot_count):
+    if slot_count == 1:
+        return [1]
+
+    order = []
+    for index, seed in enumerate(visual_seed_order(slot_count // 2)):
+        complement = slot_count + 1 - seed
+        if index % 2 == 0:
+            order.extend([seed, complement])
+        else:
+            order.extend([complement, seed])
+    return order
+
+
+def seed_order(slot_count):
+    visual_order = visual_seed_order(slot_count)
+    middle = slot_count // 2
+    return visual_order[:middle] + list(reversed(visual_order[middle:]))
+
+
+def visual_path_key(path):
     if not path:
         return ""
     if path[0] == "L":
@@ -105,32 +98,46 @@ def visual_order_key(path, player_count):
     return "1" + path[1:].translate(str.maketrans("LR", "RL"))
 
 
-def game_id_order_key(node, player_count):
-    return (-len(node.path), visual_order_key(node.path, player_count))
+def build_slot_players(player_ids):
+    slot_count = next_power_of_two(len(player_ids))
+    seeds = seed_order(slot_count)
+    seed_to_index = {seed: index for index, seed in enumerate(seeds)}
+    occupied_slots = [True] * slot_count
+    bye_count = slot_count - len(player_ids)
+
+    for seed in range(1, bye_count + 1):
+        seed_index = seed_to_index[seed]
+        opponent_index = seed_index + 1 if seed_index % 2 == 0 else seed_index - 1
+        occupied_slots[opponent_index] = False
+
+    assigned_players = iter(player_ids)
+    return [
+        next(assigned_players) if occupied else ""
+        for occupied in occupied_slots
+    ]
 
 
 def build_games(player_ids):
     final_id = len(player_ids)
     third_place_id = final_id - 1
+    slot_players = build_slot_players(player_ids)
 
-    def build_node(node_player_ids, path=""):
-        if len(node_player_ids) == 1:
-            return Node(path=path, player_id=node_player_ids[0])
+    def build_node(start, end, path=""):
+        if end - start == 1:
+            player_id = slot_players[start]
+            return Node(path=path, player_id=player_id) if player_id else None
 
-        left_count = balanced_left_count(len(node_player_ids), path)
-        return Node(
-            path=path,
-            left=build_node(node_player_ids[:left_count], f"{path}L"),
-            right=build_node(node_player_ids[left_count:], f"{path}R"),
-        )
+        middle = (start + end) // 2
+        left = build_node(start, middle, f"{path}L")
+        right = build_node(middle, end, f"{path}R")
+        if left and right:
+            return Node(path=path, left=left, right=right)
+        return left or right
 
     def collect_game_nodes(node):
-        if node.player_id:
+        if not node or node.player_id:
             return []
-        nodes = collect_game_nodes(node.left)
-        nodes.extend(collect_game_nodes(node.right))
-        nodes.append(node)
-        return nodes
+        return collect_game_nodes(node.left) + collect_game_nodes(node.right) + [node]
 
     def set_side(game, side, node):
         if node.player_id:
@@ -145,12 +152,12 @@ def build_games(player_ids):
         else:
             node.game.next_right_id = str(game.id)
 
-    root = build_node(player_ids)
+    root = build_node(0, len(slot_players))
     root.game_id = final_id
 
     game_nodes = [node for node in collect_game_nodes(root) if node is not root]
     for game_id, node in enumerate(
-        sorted(game_nodes, key=lambda node: game_id_order_key(node, len(player_ids))),
+        sorted(game_nodes, key=lambda node: (-len(node.path), visual_path_key(node.path))),
         start=1,
     ):
         node.game_id = game_id
@@ -226,7 +233,7 @@ def generate_one(args, player_column):
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Generate an individual tournament CSV from a players.csv *_player_id column."
+        description="Generate an individual tournament CSV from seeded power-of-two slots."
     )
     parser.add_argument("competition", help="competition name under data/, e.g. 2025_kid")
     group = parser.add_mutually_exclusive_group(required=True)

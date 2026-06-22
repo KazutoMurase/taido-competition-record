@@ -339,21 +339,21 @@ class TournamentWidget(QWidget):
         x, y = self.positions[game_id]
         path = self.model.node_paths.get(game_id, "")
         is_diff = path in self.diff_paths
+        label_y = self.game_label_y_overrides.get(game_id, y)
 
         for side in ("L", "R"):
             child_id = self.model.children.get(game_id, {}).get(side)
             if child_id:
                 self._draw_node(painter, child_id)
                 cx, cy = self.positions[child_id]
-                self._draw_connector(painter, cx, cy, x, y, path + side)
+                self._draw_connector(painter, cx, cy, x, label_y, path + side)
             else:
                 player_id = game.left_player_id if side == "L" else game.right_player_id
                 if player_id:
                     leaf_y = self.input_positions.get((game_id, side), y)
                     self._draw_player(painter, x, leaf_y, player_id, path + side)
-                    self._draw_short_connector(painter, x, y, leaf_y, path + side)
+                    self._draw_short_connector(painter, x, label_y, leaf_y, path + side)
 
-        label_y = self.game_label_y_overrides.get(game_id, y)
         self._draw_game(painter, x, label_y, game.id, is_diff)
 
     def _draw_connector(self, painter, child_x, child_y, parent_x, parent_y, path):
@@ -469,25 +469,19 @@ class CompareWindow(QMainWindow):
             for path, state in generated_model.path_states.items()
             if original_model.path_states.get(path) != state
         )
-        input_path_rows = self._input_path_rows(original_model, generated_model)
         layout_depths = self._layout_depths(original_model, generated_model)
 
         root = QWidget()
         layout = QHBoxLayout()
-        layout.addWidget(self._pane(original_model, diff_paths, input_path_rows, layout_depths))
-        layout.addWidget(self._pane(generated_model, diff_paths, input_path_rows, layout_depths))
+        layout.addWidget(self._pane(original_model, diff_paths, layout_depths))
+        layout.addWidget(self._pane(generated_model, diff_paths, layout_depths))
         root.setLayout(layout)
         self.setCentralWidget(root)
 
-    def _input_path_rows(self, original_model, generated_model):
+    def _input_path_rows(self, model):
         rows = {}
         for bracket_side in ("L", "R"):
-            ordered_paths = []
-            for model in (original_model, generated_model):
-                for path in model.api_like_input_paths(bracket_side):
-                    if path not in ordered_paths:
-                        ordered_paths.append(path)
-            for index, path in enumerate(ordered_paths):
+            for index, path in enumerate(model.api_like_input_paths(bracket_side)):
                 rows[path] = index
         return rows
 
@@ -505,7 +499,7 @@ class CompareWindow(QMainWindow):
             )
         return depths
 
-    def _pane(self, model, diff_paths, input_path_rows, layout_depths):
+    def _pane(self, model, diff_paths, layout_depths):
         pane = QWidget()
         layout = QVBoxLayout()
         title = QLabel(model.title)
@@ -513,6 +507,7 @@ class CompareWindow(QMainWindow):
         layout.addWidget(title)
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
+        input_path_rows = self._input_path_rows(model)
         scroll.setWidget(TournamentWidget(model, diff_paths, input_path_rows, layout_depths))
         scroll.setMinimumWidth(800)
         layout.addWidget(scroll)
