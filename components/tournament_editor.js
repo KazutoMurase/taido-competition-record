@@ -170,8 +170,14 @@ function isEditableSide(item, side) {
   return !("has_right" in item);
 }
 
-function isTruthyValue(value) {
-  return value === true || value === 1 || value === "1" || value === "true";
+function getMvpLabel(value) {
+  if (value === 1 || value === "1") {
+    return "最優秀";
+  }
+  if (value === 2 || value === "2") {
+    return "優秀";
+  }
+  return "";
 }
 
 function getAuxiliaryLabel(item, prefix, auxiliaryMode) {
@@ -188,7 +194,7 @@ function getAuxiliaryLabel(item, prefix, auxiliaryMode) {
     return value ? `団体内${value}位` : "";
   }
   if (auxiliaryMode === "mvp") {
-    return isTruthyValue(item[`${prefix}_mvp`]) ? "MVP" : "";
+    return getMvpLabel(item[`${prefix}_mvp`]);
   }
   return "";
 }
@@ -1120,10 +1126,7 @@ export default function TournamentEditor({ competition, eventName }) {
                         {selectedPlayerDetails.national_rank || "-"}
                       </Typography>
                       <Typography variant="body2">
-                        MVP:{" "}
-                        {isTruthyValue(selectedPlayerDetails.mvp)
-                          ? "あり"
-                          : "-"}
+                        MVP: {getMvpLabel(selectedPlayerDetails.mvp) || "-"}
                       </Typography>
                     </Box>
                   ) : null}
