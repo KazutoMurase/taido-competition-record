@@ -159,6 +159,14 @@ pip install -r requirements.txt
 <li>original以下の個実・個法・団法などトーナメント形式の競技のcsv</li>
 </ul>
 <p>トーナメントのエクセルファイルからDB用CSVを自動生成できる。エクセルのタブ名とcsvのファイル名は<code>name_db_map</code>変数が対応している。</p>
+<h4 id="generate_tournament_csvpyで生成するもの"><a class="header" href="#generate_tournament_csvpyで生成するもの">generate_tournament_csv.pyで生成するもの</a></h4>
+<ul>
+<li>static/players.csv</li>
+<li>static/generate_tables.sql</li>
+<li>original以下の個実・個法など個人競技トーナメントのcsv</li>
+<li>original/generate_tables.sql</li>
+</ul>
+<p>選手一覧CSVからplayers.csvと個人競技トーナメントCSVを生成できる。団体競技は対象外。</p>
 <h4 id="edit_block_csvpyで出力するもの"><a class="header" href="#edit_block_csvpyで出力するもの">edit_block_csv.pyで出力するもの</a></h4>
 <ul>
 <li>original以下の<code>block_*</code>や<code>current_block_*</code></li>
@@ -187,6 +195,11 @@ pip install -r requirements.txt
 <p>大会Excelファイルと出力先ディレクトリを入力すると自動で出力してくれる。</p>
 <pre><code class="language-bash">scripts/generate_tournament_db_from_xl.py --file-path (FILE_PATH_TO_EXCEL_FILE) --output-path (OUTPUT_DIRECTORY)
 </code></pre>
+<h4 id="generate_tournament_csvpy"><a class="header" href="#generate_tournament_csvpy">generate_tournament_csv.py</a></h4>
+<p>選手一覧CSVを入力して、大会フォルダ配下の<code>static</code>と<code>original</code>にDB用CSVを生成する。</p>
+<pre><code class="language-bash">python scripts/generate_tournament_csv.py 2026_kid --source-csv players_children.csv players_high_school.csv --seed 1
+</code></pre>
+<p>入力CSVはUTF-8にしておく。高校生用CSVの<code>high_school_</code>プレフィックスは出力時に外され、<code>推</code>や<code>○</code>など数値でない順位情報は空欄として扱われる。</p>
 <h4 id="edit_block_csvpy"><a class="header" href="#edit_block_csvpy">edit_block_csv.py</a></h4>
 <p>時程表を作成するためのGUI。
 大会名(e.g. 2024_alljp)とブロック(e.g. A)を入力し、新規作成や編集を行うことができる。</p>
