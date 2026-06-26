@@ -20,6 +20,7 @@ HEADER = [
 
 PLAYER_BASE_FIELDS = ["id", "group_id", "name", "name_kana", "mvp"]
 RANK_SUFFIXES = ["rank_group", "rank_lastyear", "rank_total"]
+COMMENT_SUFFIXES = ["comment"]
 EVENT_PREFIXES_TO_STRIP = ("high_school_",)
 
 
@@ -347,6 +348,8 @@ def source_output_fieldnames(event_names):
         fieldnames.append(f"{event_name}_player_id")
         for suffix in RANK_SUFFIXES:
             fieldnames.append(f"{event_name}_{suffix}")
+        for suffix in COMMENT_SUFFIXES:
+            fieldnames.append(f"{event_name}_{suffix}")
     return fieldnames
 
 
@@ -376,6 +379,11 @@ def build_players_rows_from_sources(source_tables, event_names):
                     output_row[f"{event_name}_{suffix}"] = clean_integer(
                         output_row[f"{event_name}_{suffix}"]
                     )
+                for suffix in COMMENT_SUFFIXES:
+                    output_row[f"{event_name}_{suffix}"] = source_row.get(
+                        f"{source_event_name}_{suffix}",
+                        "",
+                    ).strip()
 
             output_rows.append(output_row)
     return output_rows
@@ -408,6 +416,8 @@ def players_column_sql(field):
         return "mvp integer"
     if field.endswith("_player_id"):
         return f"{field} integer unique"
+    if field.endswith("_comment"):
+        return f"{field} text"
     return f"{field} integer"
 
 

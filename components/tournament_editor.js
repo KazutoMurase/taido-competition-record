@@ -133,6 +133,7 @@ function enrichRows(rows, playerMap) {
       left_rank_group: left.rank_group || "",
       left_rank_lastyear: left.rank_lastyear || "",
       left_rank_total: left.rank_total || "",
+      left_comment: left.comment || "",
       right_name: right.name || "",
       right_name_kana: right.name_kana || "",
       right_group_id: right.group_id || "",
@@ -141,6 +142,7 @@ function enrichRows(rows, playerMap) {
       right_rank_group: right.rank_group || "",
       right_rank_lastyear: right.rank_lastyear || "",
       right_rank_total: right.rank_total || "",
+      right_comment: right.comment || "",
     };
   });
 }
@@ -730,6 +732,7 @@ function getSelectedPlayerDetails(row, side) {
     rank_group: row[`${side}_rank_group`] || "",
     rank_lastyear: row[`${side}_rank_lastyear`] || "",
     rank_total: row[`${side}_rank_total`] || "",
+    comment: row[`${side}_comment`] || "",
     mvp: row[`${side}_mvp`] || "",
   };
 }
@@ -1123,6 +1126,9 @@ export default function TournamentEditor({ competition, eventName }) {
                       </Typography>
                       <Typography variant="body2">
                         全体ランク: {selectedPlayerDetails.rank_total || "-"}
+                      </Typography>
+                      <Typography variant="body2">
+                        備考: {selectedPlayerDetails.comment || "-"}
                       </Typography>
                       <Typography variant="body2">
                         MVP: {getMvpLabel(selectedPlayerDetails.mvp) || "-"}

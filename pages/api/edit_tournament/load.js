@@ -61,6 +61,7 @@ function buildPlayerMap(playersRows, eventName, groupMap) {
       rank_group: cleanText(row[`${eventName}_rank_group`]),
       rank_lastyear: cleanText(row[`${eventName}_rank_lastyear`]),
       rank_total: cleanText(row[`${eventName}_rank_total`]),
+      comment: cleanText(row[`${eventName}_comment`]),
     };
   }
   return playerMap;
@@ -89,6 +90,7 @@ function enrichRows(rows, playerMap) {
       left_rank_group: leftPlayer.rank_group || "",
       left_rank_lastyear: leftPlayer.rank_lastyear || "",
       left_rank_total: leftPlayer.rank_total || "",
+      left_comment: leftPlayer.comment || "",
       right_name: rightPlayer.name || "",
       right_name_kana: rightPlayer.name_kana || "",
       right_group_id: rightPlayer.group_id || "",
@@ -97,6 +99,7 @@ function enrichRows(rows, playerMap) {
       right_rank_group: rightPlayer.rank_group || "",
       right_rank_lastyear: rightPlayer.rank_lastyear || "",
       right_rank_total: rightPlayer.rank_total || "",
+      right_comment: rightPlayer.comment || "",
     };
   });
 }
