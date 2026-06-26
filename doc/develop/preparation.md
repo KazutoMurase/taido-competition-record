@@ -23,6 +23,14 @@ pip install -r requirements.txt
 
 トーナメントのエクセルファイルからDB用CSVを自動生成できる。エクセルのタブ名とcsvのファイル名は`name_db_map`変数が対応している。
 
+#### generate_tournament_csv.pyで生成するもの
+- static/players.csv
+- static/generate_tables.sql
+- original以下の個実・個法など個人競技トーナメントのcsv
+- original/generate_tables.sql
+
+選手一覧CSVからplayers.csvと個人競技トーナメントCSVを生成できる。団体競技は対象外。
+
 #### edit_block_csv.pyで出力するもの
 - original以下の`block_*`や`current_block_*`
 
@@ -52,6 +60,16 @@ pip install -r requirements.txt
 ```bash
 scripts/generate_tournament_db_from_xl.py --file-path (FILE_PATH_TO_EXCEL_FILE) --output-path (OUTPUT_DIRECTORY)
 ```
+
+#### generate_tournament_csv.py
+
+選手一覧CSVを入力して、大会フォルダ配下の`static`と`original`にDB用CSVを生成する。
+
+```bash
+python scripts/generate_tournament_csv.py 2026_kid --source-csv players_children.csv players_high_school.csv --seed 1
+```
+
+入力CSVはUTF-8にしておく。高校生用CSVの`high_school_`プレフィックスは出力時に外され、`推`や`○`など数値でない順位情報は空欄として扱われる。
 
 #### edit_block_csv.py
 

@@ -130,17 +130,17 @@ function enrichRows(rows, playerMap) {
       left_group_id: left.group_id || "",
       left_group_name: left.group_name || "",
       left_mvp: left.mvp || "",
-      left_team_rank: left.team_rank || "",
-      left_prev_rank: left.prev_rank || "",
-      left_national_rank: left.national_rank || "",
+      left_rank_group: left.rank_group || "",
+      left_rank_lastyear: left.rank_lastyear || "",
+      left_rank_total: left.rank_total || "",
       right_name: right.name || "",
       right_name_kana: right.name_kana || "",
       right_group_id: right.group_id || "",
       right_group_name: right.group_name || "",
       right_mvp: right.mvp || "",
-      right_team_rank: right.team_rank || "",
-      right_prev_rank: right.prev_rank || "",
-      right_national_rank: right.national_rank || "",
+      right_rank_group: right.rank_group || "",
+      right_rank_lastyear: right.rank_lastyear || "",
+      right_rank_total: right.rank_total || "",
     };
   });
 }
@@ -181,16 +181,16 @@ function getMvpLabel(value) {
 }
 
 function getAuxiliaryLabel(item, prefix, auxiliaryMode) {
-  if (auxiliaryMode === "national") {
-    const value = item[`${prefix}_national_rank`];
-    return value ? `全国${value}位` : "";
+  if (auxiliaryMode === "total") {
+    const value = item[`${prefix}_rank_total`];
+    return value ? `全体${value}位` : "";
   }
-  if (auxiliaryMode === "prev") {
-    const value = item[`${prefix}_prev_rank`];
+  if (auxiliaryMode === "lastyear") {
+    const value = item[`${prefix}_rank_lastyear`];
     return value ? `昨年度${value}位` : "";
   }
-  if (auxiliaryMode === "team") {
-    const value = item[`${prefix}_team_rank`];
+  if (auxiliaryMode === "group") {
+    const value = item[`${prefix}_rank_group`];
     return value ? `団体内${value}位` : "";
   }
   if (auxiliaryMode === "mvp") {
@@ -200,8 +200,8 @@ function getAuxiliaryLabel(item, prefix, auxiliaryMode) {
 }
 
 function getAuxiliaryColor(item, prefix, auxiliaryMode) {
-  if (auxiliaryMode === "team") {
-    const value = item[`${prefix}_team_rank`];
+  if (auxiliaryMode === "group") {
+    const value = item[`${prefix}_rank_group`];
     const colors = {
       1: "#d32f2f",
       2: "#1976d2",
@@ -210,9 +210,9 @@ function getAuxiliaryColor(item, prefix, auxiliaryMode) {
     };
     return colors[value] || "#5f6368";
   }
-  if (auxiliaryMode === "national" || auxiliaryMode === "prev") {
+  if (auxiliaryMode === "total" || auxiliaryMode === "lastyear") {
     return item[
-      `${prefix}_${auxiliaryMode === "national" ? "national" : "prev"}_rank`
+      `${prefix}_${auxiliaryMode === "total" ? "rank_total" : "rank_lastyear"}`
     ]
       ? "#d32f2f"
       : "#5f6368";
@@ -727,9 +727,9 @@ function getSelectedPlayerDetails(row, side) {
     name: row[`${side}_name`] || "",
     name_kana: row[`${side}_name_kana`] || "",
     group_name: row[`${side}_group_name`] || "",
-    team_rank: row[`${side}_team_rank`] || "",
-    prev_rank: row[`${side}_prev_rank`] || "",
-    national_rank: row[`${side}_national_rank`] || "",
+    rank_group: row[`${side}_rank_group`] || "",
+    rank_lastyear: row[`${side}_rank_lastyear`] || "",
+    rank_total: row[`${side}_rank_total`] || "",
     mvp: row[`${side}_mvp`] || "",
   };
 }
@@ -1060,9 +1060,9 @@ export default function TournamentEditor({ competition, eventName }) {
                 size="small"
               >
                 <MenuItem value="none">なし</MenuItem>
-                <MenuItem value="national">全国</MenuItem>
-                <MenuItem value="prev">昨年度</MenuItem>
-                <MenuItem value="team">団体内</MenuItem>
+                <MenuItem value="total">全体</MenuItem>
+                <MenuItem value="lastyear">昨年度</MenuItem>
+                <MenuItem value="group">団体内</MenuItem>
                 <MenuItem value="mvp">MVP</MenuItem>
               </TextField>
               <Divider />
@@ -1115,15 +1115,14 @@ export default function TournamentEditor({ competition, eventName }) {
                         所属: {selectedPlayerDetails.group_name || "-"}
                       </Typography>
                       <Typography variant="body2">
-                        団体内ランク: {selectedPlayerDetails.team_rank || "-"}
+                        団体内ランク: {selectedPlayerDetails.rank_group || "-"}
                       </Typography>
                       <Typography variant="body2">
                         昨年度同大会ランク:{" "}
-                        {selectedPlayerDetails.prev_rank || "-"}
+                        {selectedPlayerDetails.rank_lastyear || "-"}
                       </Typography>
                       <Typography variant="body2">
-                        全国内ランク:{" "}
-                        {selectedPlayerDetails.national_rank || "-"}
+                        全体ランク: {selectedPlayerDetails.rank_total || "-"}
                       </Typography>
                       <Typography variant="body2">
                         MVP: {getMvpLabel(selectedPlayerDetails.mvp) || "-"}
