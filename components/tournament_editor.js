@@ -211,9 +211,9 @@ function getAuxiliaryColor(item, prefix, auxiliaryMode) {
     return colors[value] || "#5f6368";
   }
   if (auxiliaryMode === "total" || auxiliaryMode === "lastyear") {
-    return item[`${
-      prefix
-    }_${auxiliaryMode === "total" ? "rank_total" : "rank_lastyear"}`]
+    return item[
+      `${prefix}_${auxiliaryMode === "total" ? "rank_total" : "rank_lastyear"}`
+    ]
       ? "#d32f2f"
       : "#5f6368";
   }
@@ -1122,8 +1122,7 @@ export default function TournamentEditor({ competition, eventName }) {
                         {selectedPlayerDetails.rank_lastyear || "-"}
                       </Typography>
                       <Typography variant="body2">
-                        全体ランク:{" "}
-                        {selectedPlayerDetails.rank_total || "-"}
+                        全体ランク: {selectedPlayerDetails.rank_total || "-"}
                       </Typography>
                       <Typography variant="body2">
                         MVP: {getMvpLabel(selectedPlayerDetails.mvp) || "-"}
