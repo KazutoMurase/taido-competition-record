@@ -58,9 +58,9 @@ function buildPlayerMap(playersRows, eventName, groupMap) {
       group_id: cleanText(row.group_id),
       group_name: groupMap[String(row.group_id)] || "",
       mvp: cleanText(row.mvp),
-      team_rank: cleanText(row[`${eventName}_team_rank`]),
-      prev_rank: cleanText(row[`${eventName}_prev_rank`]),
-      national_rank: cleanText(row[`${eventName}_national_rank`]),
+      rank_group: cleanText(row[`${eventName}_rank_group`]),
+      rank_lastyear: cleanText(row[`${eventName}_rank_lastyear`]),
+      rank_total: cleanText(row[`${eventName}_rank_total`]),
     };
   }
   return playerMap;
@@ -86,17 +86,17 @@ function enrichRows(rows, playerMap) {
       left_group_id: leftPlayer.group_id || "",
       left_group_name: leftPlayer.group_name || "",
       left_mvp: leftPlayer.mvp || "",
-      left_team_rank: leftPlayer.team_rank || "",
-      left_prev_rank: leftPlayer.prev_rank || "",
-      left_national_rank: leftPlayer.national_rank || "",
+      left_rank_group: leftPlayer.rank_group || "",
+      left_rank_lastyear: leftPlayer.rank_lastyear || "",
+      left_rank_total: leftPlayer.rank_total || "",
       right_name: rightPlayer.name || "",
       right_name_kana: rightPlayer.name_kana || "",
       right_group_id: rightPlayer.group_id || "",
       right_group_name: rightPlayer.group_name || "",
       right_mvp: rightPlayer.mvp || "",
-      right_team_rank: rightPlayer.team_rank || "",
-      right_prev_rank: rightPlayer.prev_rank || "",
-      right_national_rank: rightPlayer.national_rank || "",
+      right_rank_group: rightPlayer.rank_group || "",
+      right_rank_lastyear: rightPlayer.rank_lastyear || "",
+      right_rank_total: rightPlayer.rank_total || "",
     };
   });
 }
