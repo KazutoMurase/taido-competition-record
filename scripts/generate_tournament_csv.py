@@ -10,7 +10,7 @@ if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
 from tournament_game_builder import Game, build_games, build_games_from_slots
-from tournament_player_placement import RandomPlacementStrategy
+from tournament_player_placement import RandomPlacementStrategy, SmartSeedPlacementStrategy
 
 
 HEADER = [
@@ -264,6 +264,26 @@ def player_ids_from_rows(rows, player_column):
     ]
 
 
+def placement_players_from_rows(rows, event_name):
+    player_column = f"{event_name}_player_id"
+    return [
+        {
+            "player_id": clean_player_id(row.get(player_column, "")),
+            "rank_group": clean_integer(row.get(f"{event_name}_rank_group", "")),
+            "rank_lastyear": clean_integer(row.get(f"{event_name}_rank_lastyear", "")),
+            "rank_total": clean_integer(row.get(f"{event_name}_rank_total", "")),
+        }
+        for row in rows
+        if clean_player_id(row.get(player_column, ""))
+    ]
+
+
+def create_placement_strategy(args, rng):
+    if args.placement == "random":
+        return RandomPlacementStrategy(rng)
+    return SmartSeedPlacementStrategy(rng)
+
+
 def generate_from_source_csvs(args):
     source_tables = [read_players_table(path) for path in args.source_csv]
     event_names = source_event_names(source_tables)
@@ -278,23 +298,22 @@ def generate_from_source_csvs(args):
     print(f"wrote {static_sql}")
 
     rng = random.Random(args.seed)
-    placement_strategy = RandomPlacementStrategy(rng)
+    placement_strategy = create_placement_strategy(args, rng)
     generated_event_names = []
     for event_name in event_names:
-        player_column = f"{event_name}_player_id"
-        player_ids = player_ids_from_rows(output_rows, player_column)
-        if len(player_ids) < 2:
-            print(f"skipped {event_name} ({len(player_ids)} players)", file=sys.stderr)
+        players = placement_players_from_rows(output_rows, event_name)
+        if len(players) < 2:
+            print(f"skipped {event_name} ({len(players)} players)", file=sys.stderr)
             continue
 
-        slot_players = placement_strategy.build_slot_players(player_ids)
+        slot_players = placement_strategy.build_slot_players(players)
         games = build_games_from_slots(slot_players)
         output_csv = Path("data") / args.competition / "original" / f"{event_name}.csv"
 
         output_csv.parent.mkdir(parents=True, exist_ok=True)
         with output_csv.open("w", encoding="utf-8", newline="") as f:
             write_games(games, f)
-        print(f"wrote {output_csv} ({len(player_ids)} players, {len(games)} rows)")
+        print(f"wrote {output_csv} ({len(players)} players, {len(games)} rows)")
         generated_event_names.append(event_name)
 
     original_sql = Path("data") / args.competition / "original" / "generate_tables.sql"
@@ -334,6 +353,12 @@ def parse_args():
         help="build static/players.csv and all individual tournaments from one or more source CSVs",
     )
     parser.add_argument("--players-csv", type=Path, help="override players.csv path")
+    parser.add_argument(
+        "--placement",
+        choices=("smart", "random"),
+        default="smart",
+        help="player placement strategy (default: smart)",
+    )
     parser.add_argument("--seed", type=int, help="random seed for reproducible shuffling")
     return parser.parse_args()
 
