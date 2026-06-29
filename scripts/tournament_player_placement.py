@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from dataclasses import replace
 import random
+import sys
 
 
 @dataclass
@@ -142,6 +143,12 @@ class RandomPlacementStrategy(PlacementStrategy):
 
 class SmartSeedPlacementStrategy(PlacementStrategy):
     RANK_FIELDS = ("rank_total", "rank_lastyear", "rank_group")
+    RELAX_ORDER = (
+        "same_rank_first_round",
+        "same_group_rank_1_4_quarter",
+        "same_group_quarter",
+        "same_group_first_round",
+    )
 
     def __init__(
         self,
@@ -150,28 +157,42 @@ class SmartSeedPlacementStrategy(PlacementStrategy):
         seed=None,
         max_attempts=100,
         max_search_nodes=1000,
+        progress_label="",
     ):
         self.rng = rng or random.Random()
         self.max_seed = max_seed
         self.seed = seed
         self.max_attempts = max_attempts
         self.max_search_nodes = max_search_nodes
+        self.progress_label = progress_label
         self.search_nodes = 0
+        self.relaxed_constraints = set()
 
     def build_slot_players(self, players):
         last_error = None
-        for attempt in range(self.max_attempts):
-            if self.seed is None:
-                self.rng = random.Random(self.rng.random())
-            else:
-                self.rng = random.Random(self.seed + attempt)
-            self.search_nodes = 0
-            try:
-                return self.build_slot_players_once(players)
-            except ValueError as e:
-                last_error = e
+        relax_steps = range(len(self.RELAX_ORDER) + 1)
+        attempts_per_step = max(1, self.max_attempts // len(list(relax_steps)))
+        for relax_count in relax_steps:
+            self.relaxed_constraints = set(self.RELAX_ORDER[:relax_count])
+            for attempt in range(attempts_per_step):
+                if self.progress_label:
+                    relaxed = ",".join(self.RELAX_ORDER[:relax_count]) or "none"
+                    print(
+                        f"placing {self.progress_label}: relaxed={relaxed} "
+                        f"attempt={attempt + 1}/{attempts_per_step}",
+                        file=sys.stderr,
+                    )
+                if self.seed is None:
+                    self.rng = random.Random(self.rng.random())
+                else:
+                    self.rng = random.Random(self.seed + relax_count * attempts_per_step + attempt)
+                self.search_nodes = 0
+                try:
+                    return self.build_slot_players_once(players)
+                except ValueError as e:
+                    last_error = e
         raise ValueError(
-            f"could not place players after {self.max_attempts} attempts"
+            f"could not place players after {attempts_per_step} attempts at each relax step"
         ) from last_error
 
     def build_slot_players_once(self, players):
@@ -502,12 +523,34 @@ class SmartSeedPlacementStrategy(PlacementStrategy):
                 for slot in candidate_slots
                 if slot.visual_half != opposing_half
             ]
-        candidate_slots = [
-            slot
-            for slot in candidate_slots
-            if not self.has_same_group_first_round_opponent(slots, player_by_id, player, slot)
-        ]
+        if self.is_hard("same_group_first_round"):
+            candidate_slots = [
+                slot
+                for slot in candidate_slots
+                if not self.has_same_group_first_round_opponent(slots, player_by_id, player, slot)
+            ]
+        if self.is_hard("same_group_quarter"):
+            candidate_slots = [
+                slot
+                for slot in candidate_slots
+                if not self.has_same_group_quarter_conflict(slots, player_by_id, player, slot)
+            ]
+        if self.is_hard("same_group_rank_1_4_quarter"):
+            candidate_slots = [
+                slot
+                for slot in candidate_slots
+                if not self.has_same_group_rank_quarter_conflict(slots, player_by_id, player, slot)
+            ]
+        if self.is_hard("same_rank_first_round"):
+            candidate_slots = [
+                slot
+                for slot in candidate_slots
+                if not self.has_same_rank_first_round_opponent(slots, player_by_id, player, slot)
+            ]
         return candidate_slots
+
+    def is_hard(self, constraint_name):
+        return constraint_name in self.RELAX_ORDER and constraint_name not in self.relaxed_constraints
 
     def has_same_group_first_round_opponent(self, slots, player_by_id, player, slot):
         if not player.group_id:
@@ -517,6 +560,37 @@ class SmartSeedPlacementStrategy(PlacementStrategy):
         return (
             bool(opponent_player_id)
             and player_by_id[opponent_player_id].group_id == player.group_id
+        )
+
+    def has_same_group_quarter_conflict(self, slots, player_by_id, player, slot):
+        if not player.group_id:
+            return False
+        return any(
+            placed_slot.player_id
+            and player_by_id[placed_slot.player_id].group_id == player.group_id
+            and placed_slot.visual_quarter == slot.visual_quarter
+            for placed_slot in slots
+        )
+
+    def has_same_group_rank_quarter_conflict(self, slots, player_by_id, player, slot):
+        if not player.group_id or rank_value(player.rank_group) not in (1, 2, 3, 4):
+            return False
+        return any(
+            placed_slot.player_id
+            and player_by_id[placed_slot.player_id].group_id == player.group_id
+            and rank_value(player_by_id[placed_slot.player_id].rank_group) in (1, 2, 3, 4)
+            and placed_slot.visual_quarter == slot.visual_quarter
+            for placed_slot in slots
+        )
+
+    def has_same_rank_first_round_opponent(self, slots, player_by_id, player, slot):
+        rank_group = rank_value(player.rank_group)
+        if rank_group is None:
+            return False
+        opponent_player_id = slots[slot.opponent_index].player_id
+        return (
+            bool(opponent_player_id)
+            and rank_value(player_by_id[opponent_player_id].rank_group) == rank_group
         )
 
     def lastyear_group_restriction(self, slots, player_by_id, player):
@@ -596,8 +670,16 @@ class SmartSeedPlacementStrategy(PlacementStrategy):
                 for placed_slot in same_group_slots
                 if placed_slot.visual_vertical == slot.visual_vertical
             )
+            if self.has_same_group_first_round_opponent(slots, player_by_id, player, slot):
+                group_score += 100
+            if self.has_same_group_quarter_conflict(slots, player_by_id, player, slot):
+                group_score += 40
+            if self.has_same_group_rank_quarter_conflict(slots, player_by_id, player, slot):
+                group_score += 30
 
         rank_group = rank_value(player.rank_group)
+        if self.has_same_rank_first_round_opponent(slots, player_by_id, player, slot):
+            group_score += 20
         if rank_group not in (1, 2):
             return group_score
 

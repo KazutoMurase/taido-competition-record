@@ -320,6 +320,7 @@ def generate_from_source_csvs(args):
                 seed=args.seed,
                 max_attempts=args.placement_attempts,
                 max_search_nodes=args.placement_search_nodes,
+                progress_label=event_name,
             )
         )
         try:
@@ -382,13 +383,13 @@ def parse_args():
     parser.add_argument(
         "--placement-attempts",
         type=int,
-        default=100,
+        default=20,
         help="max smart placement attempts with derived random seeds",
     )
     parser.add_argument(
         "--placement-search-nodes",
         type=int,
-        default=1000,
+        default=2000,
         help="max backtracking nodes per smart placement attempt",
     )
     return parser.parse_args()
