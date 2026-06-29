@@ -269,6 +269,7 @@ def placement_players_from_rows(rows, event_name):
     return [
         {
             "player_id": clean_player_id(row.get(player_column, "")),
+            "group_id": clean_integer(row.get("group_id", "")),
             "rank_group": clean_integer(row.get(f"{event_name}_rank_group", "")),
             "rank_lastyear": clean_integer(row.get(f"{event_name}_rank_lastyear", "")),
             "rank_total": clean_integer(row.get(f"{event_name}_rank_total", "")),
@@ -281,7 +282,12 @@ def placement_players_from_rows(rows, event_name):
 def create_placement_strategy(args, rng):
     if args.placement == "random":
         return RandomPlacementStrategy(rng)
-    return SmartSeedPlacementStrategy(rng)
+    return SmartSeedPlacementStrategy(
+        rng,
+        seed=args.seed,
+        max_attempts=args.placement_attempts,
+        max_search_nodes=args.placement_search_nodes,
+    )
 
 
 def generate_from_source_csvs(args):
@@ -298,7 +304,7 @@ def generate_from_source_csvs(args):
     print(f"wrote {static_sql}")
 
     rng = random.Random(args.seed)
-    placement_strategy = create_placement_strategy(args, rng)
+    random_placement_strategy = RandomPlacementStrategy(rng)
     generated_event_names = []
     for event_name in event_names:
         players = placement_players_from_rows(output_rows, event_name)
@@ -306,7 +312,21 @@ def generate_from_source_csvs(args):
             print(f"skipped {event_name} ({len(players)} players)", file=sys.stderr)
             continue
 
-        slot_players = placement_strategy.build_slot_players(players)
+        placement_strategy = (
+            random_placement_strategy
+            if args.placement == "random"
+            else SmartSeedPlacementStrategy(
+                random.Random(args.seed),
+                seed=args.seed,
+                max_attempts=args.placement_attempts,
+                max_search_nodes=args.placement_search_nodes,
+                progress_label=event_name,
+            )
+        )
+        try:
+            slot_players = placement_strategy.build_slot_players(players)
+        except ValueError as e:
+            raise ValueError(f"{event_name}: {e}") from e
         games = build_games_from_slots(slot_players)
         output_csv = Path("data") / args.competition / "original" / f"{event_name}.csv"
 
@@ -360,6 +380,18 @@ def parse_args():
         help="player placement strategy (default: smart)",
     )
     parser.add_argument("--seed", type=int, help="random seed for reproducible shuffling")
+    parser.add_argument(
+        "--placement-attempts",
+        type=int,
+        default=20,
+        help="max smart placement attempts with derived random seeds",
+    )
+    parser.add_argument(
+        "--placement-search-nodes",
+        type=int,
+        default=2000,
+        help="max backtracking nodes per smart placement attempt",
+    )
     return parser.parse_args()
 
 

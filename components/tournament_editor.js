@@ -13,7 +13,6 @@ import {
   Checkbox,
   Container,
   Divider,
-  FormControlLabel,
   Grid,
   MenuItem,
   Paper,
@@ -147,13 +146,8 @@ function enrichRows(rows, playerMap) {
   });
 }
 
-function getGroupColor(
-  groupName,
-  groupColorMap,
-  colorByGroup,
-  highlightedGroupName,
-) {
-  if (!colorByGroup || !groupName) {
+function getGroupColor(groupName, groupColorMap, highlightedGroupName) {
+  if (!groupName) {
     return null;
   }
   if (
@@ -234,7 +228,6 @@ function PlayerText({
   selectedSlot,
   onSelectSlot,
   groupColorMap,
-  colorByGroup,
   highlightedGroupName,
   showPlayerIds,
   auxiliaryMode,
@@ -253,12 +246,7 @@ function PlayerText({
     selectedSlot &&
     selectedSlot.original_id === item.original_id &&
     selectedSlot.side === side;
-  const fill = getGroupColor(
-    groupName,
-    groupColorMap,
-    colorByGroup,
-    highlightedGroupName,
-  );
+  const fill = getGroupColor(groupName, groupColorMap, highlightedGroupName);
   const textY = y + yPadding;
 
   return (
@@ -513,7 +501,6 @@ function GameShape({
 
 function TournamentCanvas({
   rows,
-  colorByGroup,
   highlightedGroupName,
   auxiliaryMode,
   printMode,
@@ -591,8 +578,9 @@ function TournamentCanvas({
                       selectedSlot={selectedSlot}
                       onSelectSlot={onSelectSlot}
                       groupColorMap={groupColorMap}
-                      colorByGroup={colorByGroup && !printMode}
-                      highlightedGroupName={highlightedGroupName}
+                      highlightedGroupName={
+                        printMode ? [] : highlightedGroupName
+                      }
                       showPlayerIds={!printMode}
                       auxiliaryMode={printMode ? "none" : auxiliaryMode}
                     />
@@ -607,8 +595,9 @@ function TournamentCanvas({
                       selectedSlot={selectedSlot}
                       onSelectSlot={onSelectSlot}
                       groupColorMap={groupColorMap}
-                      colorByGroup={colorByGroup && !printMode}
-                      highlightedGroupName={highlightedGroupName}
+                      highlightedGroupName={
+                        printMode ? [] : highlightedGroupName
+                      }
                       showPlayerIds={!printMode}
                       auxiliaryMode={printMode ? "none" : auxiliaryMode}
                     />
@@ -746,7 +735,6 @@ export default function TournamentEditor({ competition, eventName }) {
   });
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [selectedGameId, setSelectedGameId] = useState(null);
-  const [colorByGroup, setColorByGroup] = useState(false);
   const [highlightedGroupName, setHighlightedGroupName] = useState([]);
   const [auxiliaryMode, setAuxiliaryMode] = useState("none");
   const [printMode, setPrintMode] = useState(false);
@@ -981,7 +969,6 @@ export default function TournamentEditor({ competition, eventName }) {
             ) : (
               <TournamentCanvas
                 rows={layoutRows}
-                colorByGroup={colorByGroup}
                 highlightedGroupName={highlightedGroupName}
                 auxiliaryMode={auxiliaryMode}
                 printMode={printMode}
@@ -1002,18 +989,8 @@ export default function TournamentEditor({ competition, eventName }) {
                   選手名または試合番号をクリックして編集します。
                 </Typography>
               </Box>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={colorByGroup}
-                    onChange={(event) => setColorByGroup(event.target.checked)}
-                  />
-                }
-                label="所属色を表示"
-              />
               <TextField
                 select
-                label="所属色の対象"
                 value={highlightedGroupName}
                 onChange={(event) => {
                   const value = event.target.value;
@@ -1032,12 +1009,11 @@ export default function TournamentEditor({ competition, eventName }) {
                 }}
                 fullWidth
                 size="small"
-                disabled={!colorByGroup}
                 SelectProps={{
                   multiple: true,
                   displayEmpty: true,
                   renderValue: (selected) =>
-                    selected.length === 0 ? "なし" : selected.join(", "),
+                    selected.length === 0 ? "所属色なし" : selected.join(", "),
                 }}
               >
                 <MenuItem value={ALL_GROUPS_VALUE}>
