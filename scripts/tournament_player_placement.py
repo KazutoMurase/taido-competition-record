@@ -29,6 +29,10 @@ class PlacementStrategy:
         raise NotImplementedError
 
 
+class PlacementSearchLimitExceeded(ValueError):
+    pass
+
+
 def next_power_of_two(value):
     return 1 << (value - 1).bit_length()
 
@@ -139,11 +143,38 @@ class RandomPlacementStrategy(PlacementStrategy):
 class SmartSeedPlacementStrategy(PlacementStrategy):
     RANK_FIELDS = ("rank_total", "rank_lastyear", "rank_group")
 
-    def __init__(self, rng=None, max_seed=8):
+    def __init__(
+        self,
+        rng=None,
+        max_seed=8,
+        seed=None,
+        max_attempts=100,
+        max_search_nodes=1000,
+    ):
         self.rng = rng or random.Random()
         self.max_seed = max_seed
+        self.seed = seed
+        self.max_attempts = max_attempts
+        self.max_search_nodes = max_search_nodes
+        self.search_nodes = 0
 
     def build_slot_players(self, players):
+        last_error = None
+        for attempt in range(self.max_attempts):
+            if self.seed is None:
+                self.rng = random.Random(self.rng.random())
+            else:
+                self.rng = random.Random(self.seed + attempt)
+            self.search_nodes = 0
+            try:
+                return self.build_slot_players_once(players)
+            except ValueError as e:
+                last_error = e
+        raise ValueError(
+            f"could not place players after {self.max_attempts} attempts"
+        ) from last_error
+
+    def build_slot_players_once(self, players):
         placement_players = [placement_player_from_entry(player) for player in players]
         slots = build_slots(len(placement_players))
         apply_byes(slots, len(placement_players))
@@ -384,6 +415,12 @@ class SmartSeedPlacementStrategy(PlacementStrategy):
             slots[index].player_id = solved_slot.player_id
 
     def solve_players_backtracking(self, slots, player_by_id, remaining_players):
+        self.search_nodes += 1
+        if self.search_nodes > self.max_search_nodes:
+            raise PlacementSearchLimitExceeded(
+                f"placement search exceeded {self.max_search_nodes} nodes"
+            )
+
         if not remaining_players:
             return slots
 
@@ -465,7 +502,22 @@ class SmartSeedPlacementStrategy(PlacementStrategy):
                 for slot in candidate_slots
                 if slot.visual_half != opposing_half
             ]
+        candidate_slots = [
+            slot
+            for slot in candidate_slots
+            if not self.has_same_group_first_round_opponent(slots, player_by_id, player, slot)
+        ]
         return candidate_slots
+
+    def has_same_group_first_round_opponent(self, slots, player_by_id, player, slot):
+        if not player.group_id:
+            return False
+
+        opponent_player_id = slots[slot.opponent_index].player_id
+        return (
+            bool(opponent_player_id)
+            and player_by_id[opponent_player_id].group_id == player.group_id
+        )
 
     def lastyear_group_restriction(self, slots, player_by_id, player):
         if not player.group_id or rank_value(player.rank_lastyear) is not None:
@@ -518,9 +570,36 @@ class SmartSeedPlacementStrategy(PlacementStrategy):
         return None
 
     def balance_score(self, slots, player_by_id, player, slot):
+        group_score = 0
+        if player.group_id:
+            same_group_slots = [
+                placed_slot
+                for placed_slot in slots
+                if placed_slot.player_id
+                and player_by_id[placed_slot.player_id].group_id == player.group_id
+            ]
+            # Same-group first-round matches are filtered as a hard constraint.
+            # Beyond that, keep teammates out of the same visual quarter first,
+            # then prefer spreading them across left/right and top/bottom.
+            group_score += 8 * sum(
+                1
+                for placed_slot in same_group_slots
+                if placed_slot.visual_quarter == slot.visual_quarter
+            )
+            group_score += 2 * sum(
+                1
+                for placed_slot in same_group_slots
+                if placed_slot.visual_half == slot.visual_half
+            )
+            group_score += sum(
+                1
+                for placed_slot in same_group_slots
+                if placed_slot.visual_vertical == slot.visual_vertical
+            )
+
         rank_group = rank_value(player.rank_group)
         if rank_group not in (1, 2):
-            return 0
+            return group_score
 
         same_rank_slots = [
             placed_slot
@@ -534,7 +613,7 @@ class SmartSeedPlacementStrategy(PlacementStrategy):
         vertical_count = sum(
             1 for placed_slot in same_rank_slots if placed_slot.visual_vertical == slot.visual_vertical
         )
-        return half_count + vertical_count
+        return group_score + half_count + vertical_count
 
 
 def player_id_from_entry(player):

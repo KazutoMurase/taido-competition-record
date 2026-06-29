@@ -282,7 +282,12 @@ def placement_players_from_rows(rows, event_name):
 def create_placement_strategy(args, rng):
     if args.placement == "random":
         return RandomPlacementStrategy(rng)
-    return SmartSeedPlacementStrategy(rng)
+    return SmartSeedPlacementStrategy(
+        rng,
+        seed=args.seed,
+        max_attempts=args.placement_attempts,
+        max_search_nodes=args.placement_search_nodes,
+    )
 
 
 def generate_from_source_csvs(args):
@@ -310,7 +315,12 @@ def generate_from_source_csvs(args):
         placement_strategy = (
             random_placement_strategy
             if args.placement == "random"
-            else SmartSeedPlacementStrategy(random.Random(args.seed))
+            else SmartSeedPlacementStrategy(
+                random.Random(args.seed),
+                seed=args.seed,
+                max_attempts=args.placement_attempts,
+                max_search_nodes=args.placement_search_nodes,
+            )
         )
         try:
             slot_players = placement_strategy.build_slot_players(players)
@@ -369,6 +379,18 @@ def parse_args():
         help="player placement strategy (default: smart)",
     )
     parser.add_argument("--seed", type=int, help="random seed for reproducible shuffling")
+    parser.add_argument(
+        "--placement-attempts",
+        type=int,
+        default=100,
+        help="max smart placement attempts with derived random seeds",
+    )
+    parser.add_argument(
+        "--placement-search-nodes",
+        type=int,
+        default=1000,
+        help="max backtracking nodes per smart placement attempt",
+    )
     return parser.parse_args()
 
 
