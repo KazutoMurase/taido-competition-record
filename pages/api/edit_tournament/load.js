@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { parse } from "csv-parse/sync";
 import { applyTournamentLayout } from "../../../lib/tournament_layout";
+import GetClient from "../../../lib/db_client";
 
 function assertSafeName(value, label) {
   if (!value || !/^[A-Za-z0-9_-]+$/.test(value)) {
@@ -118,12 +119,105 @@ function findEventInfo(eventRows, eventName) {
   };
 }
 
-export default function LoadTournament(req, res) {
+async function loadFromDb(eventName) {
+  const client = await GetClient();
+  const playerColumn = `${eventName}_player_id`;
+  const rankGroupColumn = `${eventName}_rank_group`;
+  const rankLastyearColumn = `${eventName}_rank_lastyear`;
+  const rankTotalColumn = `${eventName}_rank_total`;
+  const commentColumn = `${eventName}_comment`;
+
+  const eventResult = await client.query(
+    "SELECT full_name, description FROM event_type WHERE name_en = $1",
+    [eventName],
+  );
+  const eventInfo =
+    eventResult.rows.length > 0
+      ? {
+          full_name: cleanText(eventResult.rows[0].full_name) || eventName,
+          description: cleanText(eventResult.rows[0].description)
+            .split("|")
+            .map((text) => text.trim())
+            .filter(Boolean),
+        }
+      : { full_name: eventName, description: [] };
+
+  const playersResult = await client.query(
+    `SELECT
+      p.${playerColumn} AS player_id,
+      p.name,
+      p.name_kana,
+      p.group_id,
+      g.name AS group_name,
+      p.mvp,
+      p.${rankGroupColumn} AS rank_group,
+      p.${rankLastyearColumn} AS rank_lastyear,
+      p.${rankTotalColumn} AS rank_total,
+      p.${commentColumn} AS comment
+    FROM players AS p
+    LEFT JOIN groups AS g ON p.group_id = g.id
+    WHERE p.${playerColumn} IS NOT NULL`,
+  );
+
+  const players = playersResult.rows.map((row) => ({
+    player_id: cleanText(row.player_id),
+    name: cleanText(row.name),
+    name_kana: cleanText(row.name_kana),
+    group_id: cleanText(row.group_id),
+    group_name: cleanText(row.group_name),
+    mvp: cleanText(row.mvp),
+    rank_group: cleanText(row.rank_group),
+    rank_lastyear: cleanText(row.rank_lastyear),
+    rank_total: cleanText(row.rank_total),
+    comment: cleanText(row.comment),
+  }));
+  const playerMap = {};
+  for (const player of players) {
+    playerMap[player.player_id] = player;
+  }
+
+  const rowsResult = await client.query(
+    `SELECT id, left_player_id, right_player_id, next_left_id, next_right_id,
+      left_player_flag, left_retire, right_retire
+    FROM ${eventName}
+    ORDER BY id`,
+  );
+  const rows = enrichRows(rowsResult.rows, playerMap);
+
+  const groupsResult = await client.query("SELECT id, name FROM groups");
+  const groups = {};
+  for (const row of groupsResult.rows) {
+    groups[String(row.id)] = cleanText(row.name);
+  }
+
+  return {
+    eventInfo,
+    rows,
+    players: players.sort((a, b) => Number(a.player_id) - Number(b.player_id)),
+    groups,
+  };
+}
+
+export default async function LoadTournament(req, res) {
   try {
     const competition = String(req.query.competition || "");
     const eventName = String(req.query.event_name || "");
     assertSafeName(competition, "competition");
     assertSafeName(eventName, "event_name");
+
+    if (process.env.EDIT_TOURNAMENT_LOAD_FROM_CSV !== "1") {
+      const { eventInfo, rows, players, groups } = await loadFromDb(eventName);
+      res.json({
+        competition,
+        event_name: eventName,
+        event_info: eventInfo,
+        rows,
+        layout_rows: applyTournamentLayout(rows),
+        players,
+        groups,
+      });
+      return;
+    }
 
     const baseDir = path.join(process.cwd(), "data", competition);
     const tournamentCsv = path.join(baseDir, "original", `${eventName}.csv`);
