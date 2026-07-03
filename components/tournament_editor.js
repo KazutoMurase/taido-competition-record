@@ -1167,10 +1167,6 @@ export default function TournamentEditor({
                 </Stack>
               </Box>
               <Divider />
-              <Button variant="outlined" fullWidth onClick={handleBackToList}>
-                一覧へ戻る
-              </Button>
-              <Divider />
               <Stack direction="row" spacing={1}>
                 <Button
                   variant="contained"
@@ -1194,6 +1190,10 @@ export default function TournamentEditor({
               {saveStatus ? (
                 <Alert severity={saveStatus.type}>{saveStatus.text}</Alert>
               ) : null}
+              <Divider />
+              <Button variant="outlined" fullWidth onClick={handleBackToList}>
+                一覧へ戻る
+              </Button>
             </Stack>
           </Paper>
         </Grid>
