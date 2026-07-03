@@ -6,6 +6,7 @@ import React, {
   useState,
 } from "react";
 React.useLayoutEffect = React.useEffect;
+import Head from "next/head";
 import {
   Alert,
   Box,
@@ -909,8 +910,13 @@ export default function TournamentEditor({
     }
   };
 
+  const pageTitle = eventInfo.full_name || eventName;
+
   return (
     <Container className="edit-page-root" maxWidth={false} sx={{ py: 2 }}>
+      <Head>
+        <title>{pageTitle}</title>
+      </Head>
       <style jsx global>{`
         @media print {
           .edit-controls {
