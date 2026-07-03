@@ -1,6 +1,5 @@
 import fs from "fs";
 import path from "path";
-import { parse } from "csv-parse/sync";
 import GetClient from "../../../lib/db_client";
 import { Set as RedisSet } from "../../../lib/redis_client";
 
@@ -19,15 +18,6 @@ function assertSafeName(value, label) {
   if (!value || !/^[A-Za-z0-9_-]+$/.test(value)) {
     throw new Error(`invalid ${label}`);
   }
-}
-
-function readCsv(filePath) {
-  const fileData = fs.readFileSync(filePath, "utf-8");
-  return parse(fileData, {
-    columns: true,
-    skip_empty_lines: true,
-    bom: true,
-  });
 }
 
 function cleanText(value) {
@@ -57,9 +47,12 @@ function csvEscape(value) {
   return text;
 }
 
-function assertEventExists(eventTypeCsv, eventName) {
-  const events = readCsv(eventTypeCsv);
-  if (!events.some((row) => cleanText(row.name_en) === eventName)) {
+async function assertEventExists(client, eventName) {
+  const result = await client.query(
+    "SELECT 1 FROM event_type WHERE name_en = $1",
+    [eventName],
+  );
+  if (result.rows.length === 0) {
     throw new Error(`unknown event_name: ${eventName}`);
   }
   if (eventName.includes("dantai") || eventName.includes("tenkai")) {
@@ -69,13 +62,12 @@ function assertEventExists(eventTypeCsv, eventName) {
   }
 }
 
-function buildPlayerIds(playersCsv, eventName) {
+async function buildPlayerIds(client, eventName) {
   const playerColumn = `${eventName}_player_id`;
-  return new Set(
-    readCsv(playersCsv)
-      .map((row) => cleanText(row[playerColumn]))
-      .filter(Boolean),
+  const result = await client.query(
+    `SELECT ${playerColumn} AS player_id FROM players WHERE ${playerColumn} IS NOT NULL`,
   );
+  return new Set(result.rows.map((row) => cleanText(row.player_id)));
 }
 
 function normalizeRows(rows, playerIds) {
@@ -190,6 +182,42 @@ async function replaceEventTable(client, eventName, rows) {
   }
 }
 
+function tryWriteCsv(originalDir, tournamentCsv, csv, timestamp) {
+  if (!fs.existsSync(originalDir)) {
+    return {
+      savedCsv: null,
+      backupCsv: null,
+      csvWarning: `skipped CSV write because ${originalDir} does not exist`,
+    };
+  }
+
+  const backupCsv = `${tournamentCsv}.${timestamp}.bak`;
+  const temporaryCsv = `${tournamentCsv}.${timestamp}.tmp`;
+  try {
+    if (fs.existsSync(tournamentCsv)) {
+      fs.copyFileSync(tournamentCsv, backupCsv);
+    }
+    fs.writeFileSync(temporaryCsv, csv, "utf-8");
+    fs.renameSync(temporaryCsv, tournamentCsv);
+    return {
+      savedCsv: path.relative(process.cwd(), tournamentCsv),
+      backupCsv: fs.existsSync(backupCsv)
+        ? path.relative(process.cwd(), backupCsv)
+        : null,
+      csvWarning: null,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      savedCsv: null,
+      backupCsv: null,
+      csvWarning: `DB saved, but CSV write failed: ${
+        error.message || "unknown error"
+      }`,
+    };
+  }
+}
+
 export default async function SaveTournament(req, res) {
   if (req.method !== "POST") {
     res.status(405).json({ error: "method not allowed" });
@@ -204,38 +232,27 @@ export default async function SaveTournament(req, res) {
 
     const baseDir = path.join(process.cwd(), "data", competition);
     const originalDir = path.join(baseDir, "original");
-    const staticDir = path.join(baseDir, "static");
     const tournamentCsv = path.join(originalDir, `${eventName}.csv`);
-    const playersCsv = path.join(staticDir, "players.csv");
-    const eventTypeCsv = path.join(staticDir, "event_type.csv");
 
-    assertEventExists(eventTypeCsv, eventName);
-    const playerIds = buildPlayerIds(playersCsv, eventName);
+    const client = await GetClient();
+    await assertEventExists(client, eventName);
+    const playerIds = await buildPlayerIds(client, eventName);
     const rows = normalizeRows(req.body.rows, playerIds);
     const csv = `${rowsToCsv(rows)}\n`;
 
     const timestamp = Date.now();
-    const backupCsv = `${tournamentCsv}.${timestamp}.bak`;
-    const temporaryCsv = `${tournamentCsv}.${timestamp}.tmp`;
-    if (fs.existsSync(tournamentCsv)) {
-      fs.copyFileSync(tournamentCsv, backupCsv);
-    }
-    fs.writeFileSync(temporaryCsv, csv, "utf-8");
-
-    const client = await GetClient();
     await replaceEventTable(client, eventName, rows);
-    fs.renameSync(temporaryCsv, tournamentCsv);
     await RedisSet(
       `latest_update_result_for_${eventName}_timestamp`,
       timestamp,
     );
+    const csvResult = tryWriteCsv(originalDir, tournamentCsv, csv, timestamp);
 
     res.json({
       ok: true,
-      saved_csv: path.relative(process.cwd(), tournamentCsv),
-      backup_csv: fs.existsSync(backupCsv)
-        ? path.relative(process.cwd(), backupCsv)
-        : null,
+      saved_csv: csvResult.savedCsv,
+      backup_csv: csvResult.backupCsv,
+      csv_warning: csvResult.csvWarning,
     });
   } catch (error) {
     console.log(error);
