@@ -26,6 +26,7 @@ export default function EditTournamentPage() {
     <TournamentEditor
       competition={String(competition)}
       eventName={String(event_name)}
+      onBackToList={() => router.push("/admin/edit_tournaments")}
     />
   );
 }
