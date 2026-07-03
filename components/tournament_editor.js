@@ -726,7 +726,11 @@ function getSelectedPlayerDetails(row, side) {
   };
 }
 
-export default function TournamentEditor({ competition, eventName }) {
+export default function TournamentEditor({
+  competition,
+  eventName,
+  onBackToList = null,
+}) {
   const [rows, setRows] = useState([]);
   const [players, setPlayers] = useState([]);
   const [eventInfo, setEventInfo] = useState({
@@ -897,6 +901,12 @@ export default function TournamentEditor({ competition, eventName }) {
   const handlePrint = () => {
     setPrintMode(true);
     window.setTimeout(() => window.print(), 0);
+  };
+
+  const handleBackToList = () => {
+    if (onBackToList) {
+      onBackToList();
+    }
   };
 
   return (
@@ -1180,6 +1190,10 @@ export default function TournamentEditor({ competition, eventName }) {
               {saveStatus ? (
                 <Alert severity={saveStatus.type}>{saveStatus.text}</Alert>
               ) : null}
+              <Divider />
+              <Button variant="outlined" fullWidth onClick={handleBackToList}>
+                一覧へ戻る
+              </Button>
             </Stack>
           </Paper>
         </Grid>
