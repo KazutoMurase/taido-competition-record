@@ -27,6 +27,9 @@ export default function Home({ params }) {
   const ToNotificationRequest = () => {
     router.push("/admin/notification_request");
   };
+  const ToCorrections = () => {
+    router.push("/admin/corrections");
+  };
   const ToSummary = () => {
     router.push("/summary?from_admin=true");
   };
@@ -170,6 +173,22 @@ export default function Home({ params }) {
               <SyncIcon color="primary" />
             </>
           )}
+        </Grid>
+        <br />
+        <br />
+        <Grid
+          container
+          justifyContent="center"
+          alignItems="center"
+          style={{ height: "80px" }}
+        >
+          <Button
+            variant="outlined"
+            type="submit"
+            onClick={(e) => ToCorrections()}
+          >
+            進行調整
+          </Button>
         </Grid>
       </Container>
     </div>

@@ -9,7 +9,7 @@ const Home = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [tabIndex, setTabIndex] = React.useState(0);
-  const { block_number } = router.query;
+  const { block_number, correction } = router.query;
   if (block_number === undefined) {
     return <></>;
   }
@@ -20,6 +20,8 @@ const Home = () => {
         update_interval={3000}
         is_mobile={isMobile}
         return_url="/admin"
+        correction={correction === "true"}
+        correction_return_url="/admin/corrections"
       />
     </>
   );

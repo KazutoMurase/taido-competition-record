@@ -162,7 +162,14 @@ function ShowGamesText(item, is_mobile) {
   return prefix + item["games_text"];
 }
 
-function Block({ block_number, update_interval, is_mobile, return_url }) {
+function Block({
+  block_number,
+  update_interval,
+  is_mobile,
+  return_url,
+  correction = false,
+  correction_return_url,
+}) {
   const router = useRouter();
   const ToCheck = (block_number, id, name, event_id) => {
     router.push(
@@ -231,19 +238,22 @@ function Block({ block_number, update_interval, is_mobile, return_url }) {
     );
   };
   const ToBack = () => {
-    router.push(return_url);
+    router.push(
+      correction && correction_return_url ? correction_return_url : return_url,
+    );
   };
   const [data, setData] = useState([]);
   const [current, setCurrent] = useState([]);
 
+  const fetchData = useCallback(async () => {
+    const response = await fetch(
+      "/api/get_time_schedule?block_number=" + block_number,
+    );
+    const result = await response.json();
+    setData(result);
+  }, [block_number]);
+
   useEffect(() => {
-    async function fetchData() {
-      const response = await fetch(
-        "/api/get_time_schedule?block_number=" + block_number,
-      );
-      const result = await response.json();
-      setData(result);
-    }
     const interval = setInterval(() => {
       fetchData();
     }, update_interval);
@@ -251,7 +261,7 @@ function Block({ block_number, update_interval, is_mobile, return_url }) {
     return () => {
       clearInterval(interval);
     };
-  }, [block_number, update_interval]);
+  }, [fetchData, update_interval]);
 
   const fetchCurrent = useCallback(async () => {
     const response = await fetch(
@@ -262,6 +272,58 @@ function Block({ block_number, update_interval, is_mobile, return_url }) {
   }, [block_number]);
   const forceFetchCurrent = () => {
     fetchCurrent();
+  };
+  const refreshBlock = async () => {
+    await Promise.all([fetchData(), fetchCurrent()]);
+  };
+  const updateCurrentSchedule = async (item) => {
+    if (
+      !confirm(
+        `${block_number.toUpperCase()}コートの現在位置を ${item["id"]}: ${item[
+          "name"
+        ]?.replace(/['"]+/g, "")} に変更します。よろしいですか？`,
+      )
+    ) {
+      return;
+    }
+    const response = await fetch(
+      "/api/update_current_schedule?block=" +
+        block_number +
+        "&schedule_id=" +
+        item["id"],
+    );
+    if (!response.ok) {
+      alert("現在位置の変更に失敗しました");
+      return;
+    }
+    await refreshBlock();
+  };
+  const swapEventOrder = async (item, nextItem) => {
+    if (!nextItem) {
+      return;
+    }
+    if (
+      !confirm(
+        `${block_number.toUpperCase()}コートの ${item["id"]}: ${item[
+          "name"
+        ]?.replace(/['"]+/g, "")} と ${nextItem["id"]}: ${nextItem[
+          "name"
+        ]?.replace(/['"]+/g, "")} を入れ替えます。よろしいですか？`,
+      )
+    ) {
+      return;
+    }
+    const response = await fetch(
+      "/api/change_event_order?block=" +
+        block_number +
+        "&target_schedule_id=" +
+        item["id"],
+    );
+    if (!response.ok) {
+      alert("イベント順の入れ替えに失敗しました");
+      return;
+    }
+    await refreshBlock();
   };
   const ToFinish = (id, block_number) => {
     let post = { id: id, update_block: block_number };
@@ -302,6 +364,18 @@ function Block({ block_number, update_interval, is_mobile, return_url }) {
           >
             <h1>{block_number.toUpperCase()}コート</h1>
           </Grid>
+          {correction ? (
+            <Grid
+              container
+              justifyContent="center"
+              alignItems="center"
+              style={{ height: "40px", color: "#b71c1c", fontWeight: "bold" }}
+            >
+              進行調整モード
+            </Grid>
+          ) : (
+            <></>
+          )}
           <Table border="1">
             <TableHead>
               <TableRow className={checkStyles.column}>
@@ -331,43 +405,81 @@ function Block({ block_number, update_interval, is_mobile, return_url }) {
                     {"game_count" in item ? item["game_count"] + "試合" : ""}
                   </TableCell>
                   <TableCell>
-                    {item["event_id"] > 0 ? (
-                      <Button
-                        variant="contained"
-                        type="submit"
-                        onClick={(e) =>
-                          ToCheck(
+                    {correction ? (
+                      <>
+                        <Button
+                          variant="contained"
+                          type="submit"
+                          onClick={(e) => updateCurrentSchedule(item)}
+                          disabled={!item["id"] || item["id"] === current.id}
+                          sx={{
+                            width: is_mobile ? "8rem" : "9rem",
+                            marginBottom: is_mobile ? "5px" : "0px",
+                          }}
+                        >
+                          現在競技にする
+                        </Button>
+                        {is_mobile ? <br /> : <>&nbsp;&nbsp;</>}
+                        <Button
+                          variant="outlined"
+                          type="submit"
+                          onClick={(e) => swapEventOrder(item, data[index + 1])}
+                          disabled={
+                            !item["id"] ||
+                            index >= data.length - 1 ||
+                            !data[index + 1]["id"]
+                          }
+                          sx={{
+                            width: is_mobile ? "8rem" : "7rem",
+                            marginBottom: is_mobile ? "5px" : "0px",
+                          }}
+                        >
+                          次競技と入替
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        {item["event_id"] > 0 ? (
+                          <Button
+                            variant="contained"
+                            type="submit"
+                            onClick={(e) =>
+                              ToCheck(
+                                block_number,
+                                item["id"],
+                                item["name"],
+                                item["event_id"],
+                              )
+                            }
+                            style={
+                              item["players_checked"] ? doneButtonStyle : null
+                            }
+                            sx={{
+                              width: "5rem",
+                              marginBottom: is_mobile ? "5px" : "0px",
+                            }}
+                          >
+                            {item["players_checked"] ? "点呼完了" : "点呼"}
+                          </Button>
+                        ) : (
+                          <></>
+                        )}
+                        {is_mobile ? <></> : <>&nbsp;&nbsp;</>}
+                        {item["event_id"] > 0 ? (
+                          ShowDetails(
+                            item,
                             block_number,
-                            item["id"],
-                            item["name"],
-                            item["event_id"],
+                            current,
+                            is_mobile,
+                            ToCall,
+                            ToRecord,
+                            ToUpdate,
+                            ToFinish,
                           )
-                        }
-                        style={item["players_checked"] ? doneButtonStyle : null}
-                        sx={{
-                          width: "5rem",
-                          marginBottom: is_mobile ? "5px" : "0px",
-                        }}
-                      >
-                        {item["players_checked"] ? "点呼完了" : "点呼"}
-                      </Button>
-                    ) : (
-                      <></>
-                    )}
-                    {is_mobile ? <></> : <>&nbsp;&nbsp;</>}
-                    {item["event_id"] > 0 ? (
-                      ShowDetails(
-                        item,
-                        block_number,
-                        current,
-                        is_mobile,
-                        ToCall,
-                        ToRecord,
-                        ToUpdate,
-                        ToFinish,
-                      )
-                    ) : (
-                      <></>
+                        ) : (
+                          <></>
+                        )}
+                      </>
                     )}
                   </TableCell>
                 </TableRow>
