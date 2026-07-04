@@ -25,6 +25,10 @@ export default function Corrections() {
     );
   };
 
+  const toAwards = () => {
+    router.push("/admin/awards");
+  };
+
   const toAdmin = () => {
     router.push("/admin");
   };
@@ -40,16 +44,8 @@ export default function Corrections() {
           style={{ height: "80px" }}
         >
           <h1>
-            <u>進行調整</u>
+            <u>運用管理</u>
           </h1>
-        </Grid>
-        <Grid
-          container
-          justifyContent="center"
-          alignItems="center"
-          style={{ height: "40px" }}
-        >
-          コート別の現在競技・競技順を調整します
         </Grid>
         <br />
         <br />
@@ -77,6 +73,16 @@ export default function Corrections() {
           );
         })}
         <br />
+        <Grid
+          container
+          justifyContent="center"
+          alignItems="center"
+          style={{ height: "60px" }}
+        >
+          <Button variant="contained" type="submit" onClick={(e) => toAwards()}>
+            褒章更新
+          </Button>
+        </Grid>
         <Grid
           container
           justifyContent="center"
