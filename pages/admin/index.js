@@ -187,7 +187,7 @@ export default function Home({ params }) {
             type="submit"
             onClick={(e) => ToCorrections()}
           >
-            進行調整
+            運用管理
           </Button>
         </Grid>
       </Container>
