@@ -25,6 +25,7 @@ function ShowDetails(
   ToRecord,
   ToUpdate,
   ToFinish,
+  operation_unlock,
 ) {
   if (is_mobile) {
     return (
@@ -34,7 +35,11 @@ function ShowDetails(
           variant="contained"
           type="submit"
           onClick={(e) => ToCall(block_number, item["id"], item["event_id"])}
-          disabled={item["id"] !== current.id || !item["players_checked"]}
+          disabled={
+            item["id"] < current.id ||
+            (!operation_unlock &&
+              (item["id"] !== current.id || !item["players_checked"]))
+          }
           sx={{ width: "5rem", marginBottom: "5px" }}
         >
           呼び出し
@@ -48,11 +53,29 @@ function ShowDetails(
               onClick={(e) =>
                 ToRecord(block_number, item["id"], item["event_id"])
               }
-              disabled={item["id"] !== current.id || !item["players_checked"]}
+              disabled={
+                item["id"] !== current.id ||
+                (!operation_unlock && !item["players_checked"])
+              }
               sx={{ width: "5rem", marginBottom: "5px" }}
             >
               記録　
             </Button>
+            {operation_unlock ? (
+              <>
+                <br />
+                <Button
+                  variant="contained"
+                  type="submit"
+                  onClick={(e) =>
+                    ToUpdate(block_number, item["id"], item["event_id"])
+                  }
+                  sx={{ width: "5rem", marginBottom: "5px" }}
+                >
+                  結果修正
+                </Button>
+              </>
+            ) : null}
           </>
         ) : (
           <>
@@ -62,7 +85,10 @@ function ShowDetails(
               onClick={(e) =>
                 ToUpdate(block_number, item["id"], item["event_id"])
               }
-              disabled={item["id"] > current.id || !item["players_checked"]}
+              disabled={
+                !operation_unlock &&
+                (item["id"] > current.id || !item["players_checked"])
+              }
               sx={{ width: "5rem", marginBottom: "5px" }}
             >
               結果修正
@@ -78,7 +104,11 @@ function ShowDetails(
         variant="contained"
         type="submit"
         onClick={(e) => ToCall(block_number, item["id"], item["event_id"])}
-        disabled={item["id"] !== current.id || !item["players_checked"]}
+        disabled={
+          item["id"] < current.id ||
+          (!operation_unlock &&
+            (item["id"] !== current.id || !item["players_checked"]))
+        }
       >
         呼び出し
       </Button>
@@ -87,7 +117,10 @@ function ShowDetails(
         variant="contained"
         type="submit"
         onClick={(e) => ToRecord(block_number, item["id"], item["event_id"])}
-        disabled={item["id"] !== current.id || !item["players_checked"]}
+        disabled={
+          item["id"] !== current.id ||
+          (!operation_unlock && !item["players_checked"])
+        }
       >
         記録
       </Button>
@@ -96,7 +129,10 @@ function ShowDetails(
         variant="contained"
         type="submit"
         onClick={(e) => ToUpdate(block_number, item["id"], item["event_id"])}
-        disabled={item["id"] > current.id || !item["players_checked"]}
+        disabled={
+          !operation_unlock &&
+          (item["id"] > current.id || !item["players_checked"])
+        }
       >
         結果修正
       </Button>
@@ -169,6 +205,7 @@ function Block({
   return_url,
   correction = false,
   correction_return_url,
+  show_operation_unlock = false,
 }) {
   const router = useRouter();
   const ToCheck = (block_number, id, name, event_id) => {
@@ -244,6 +281,7 @@ function Block({
   };
   const [data, setData] = useState([]);
   const [current, setCurrent] = useState([]);
+  const [operationUnlock, setOperationUnlock] = useState(false);
 
   const fetchData = useCallback(async () => {
     const response = await fetch(
@@ -270,6 +308,29 @@ function Block({
     const result = await response.json();
     setCurrent(result);
   }, [block_number]);
+  const fetchOperationUnlock = useCallback(async () => {
+    if (!show_operation_unlock) {
+      return;
+    }
+    const response = await fetch("/api/operation_unlock?block=" + block_number);
+    const result = await response.json();
+    setOperationUnlock(result.enabled === true);
+  }, [block_number, show_operation_unlock]);
+  const updateOperationUnlock = async (enabled) => {
+    const response = await fetch("/api/operation_unlock", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ block: block_number, enabled }),
+    });
+    if (!response.ok) {
+      alert("操作制限解除の更新に失敗しました");
+      return;
+    }
+    const result = await response.json();
+    setOperationUnlock(result.enabled === true);
+  };
   const forceFetchCurrent = () => {
     fetchCurrent();
   };
@@ -345,6 +406,9 @@ function Block({
       clearInterval(interval);
     };
   }, [fetchCurrent, update_interval]);
+  useEffect(() => {
+    fetchOperationUnlock();
+  }, [fetchOperationUnlock]);
   const doneButtonStyle = {
     backgroundColor: "purple",
   };
@@ -372,6 +436,18 @@ function Block({
               style={{ height: "40px", color: "#b71c1c", fontWeight: "bold" }}
             >
               進行調整モード
+            </Grid>
+          ) : (
+            <></>
+          )}
+          {operationUnlock ? (
+            <Grid
+              container
+              justifyContent="center"
+              alignItems="center"
+              style={{ height: "40px", color: "#b71c1c", fontWeight: "bold" }}
+            >
+              操作制限解除中
             </Grid>
           ) : (
             <></>
@@ -475,6 +551,7 @@ function Block({
                             ToRecord,
                             ToUpdate,
                             ToFinish,
+                            operationUnlock,
                           )
                         ) : (
                           <></>
@@ -496,6 +573,22 @@ function Block({
               戻る
             </Button>
           </Grid>
+          {show_operation_unlock ? (
+            <Grid container justifyContent="center" alignItems="center">
+              <Box sx={{ textAlign: "center" }}>
+                <Button
+                  variant={operationUnlock ? "contained" : "outlined"}
+                  color={operationUnlock ? "error" : "primary"}
+                  type="submit"
+                  onClick={(e) => updateOperationUnlock(!operationUnlock)}
+                >
+                  操作制限解除 {operationUnlock ? "ON" : "OFF"}
+                </Button>
+              </Box>
+            </Grid>
+          ) : (
+            <></>
+          )}
         </Box>
       </Container>
     </div>
