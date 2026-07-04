@@ -124,13 +124,22 @@ class BlockCSVEditor(QWidget):
         try:
             with open(self.event_type_file, 'r', encoding='utf-8') as f:
                 reader = csv.DictReader(f)
-                for row in reader:
-                    # 全てのイベントを読み込み（existence関係なく）
-                    self.event_types[int(row['id'])] = row['name']
+                rows = list(reader)
+                for row in rows:
+                    event_id = int(row['id'])
+                    event_name = row['name']
+                    self.event_types[event_id] = event_name
             # コンボボックスに追加
             self.event_combo.clear()
-            for event_id, event_name in sorted(self.event_types.items()):
-                self.event_combo.addItem(f"{event_id}: {event_name}", event_id)
+            for row in sorted(rows, key=lambda r: int(r['id'])):
+                event_id = int(row['id'])
+                event_name = row['name']
+                is_finished = (
+                    row['name'].strip().strip("'") == '全日程終了'
+                    or row.get('name_en') == 'finished'
+                )
+                if row['existence'] == '1' or is_finished:
+                    self.event_combo.addItem(f"{event_id}: {event_name}", event_id)
         except FileNotFoundError:
             QMessageBox.warning(self, "Warning", f"Event type file not found: {self.event_type_file}")
         except Exception as e:
