@@ -42,20 +42,25 @@ async function GetFromDB(req, res, event_name) {
     block_name +
     " AS t1 ON t0.id = t1.id";
   let result = await client.query(query);
-  if (
-    req.query.schedule_id !== undefined &&
-    parseInt(req.query.schedule_id) !== result.rows[0].id
-  ) {
+  const current_schedule_id = result.rows[0].id;
+  const current_order_id = result.rows[0].game_id;
+  let schedule_id =
+    req.query.schedule_id !== undefined
+      ? parseInt(req.query.schedule_id)
+      : current_schedule_id;
+  if (schedule_id < current_schedule_id) {
     return [];
   }
-  let schedule_id = result.rows[0].id;
-  query =
-    "SELECT game_id from " +
-    block_name +
-    "_games where order_id = $1 and schedule_id = $2";
-  let values = [result.rows[0].game_id, result.rows[0].id];
-  result = await client.query(query, values);
-  const current_id = result.rows.length === 0 ? -1 : result.rows[0].game_id;
+  let current_id = -1;
+  if (schedule_id === current_schedule_id) {
+    query =
+      "SELECT game_id from " +
+      block_name +
+      "_games where order_id = $1 and schedule_id = $2";
+    let values = [current_order_id, current_schedule_id];
+    result = await client.query(query, values);
+    current_id = result.rows.length === 0 ? -1 : result.rows[0].game_id;
+  }
   let result_block;
   if (event_name.includes("dantai")) {
     const groups_name = event_name + "_groups";
@@ -319,11 +324,16 @@ const GetGamesOnBlock = async (req, res) => {
     const block_name = "block_" + req.query.block_number;
     const current_block_name = "current_" + block_name;
     const event_name = req.query.event_name;
-    const cacheKey = "get_games_on_" + block_name;
+    const cacheKey =
+      "get_games_on_" +
+      block_name +
+      "_" +
+      event_name +
+      "_" +
+      (req.query.schedule_id || "current");
     const cachedData = await Get(cacheKey);
 
-    // 'update_id_for_' +current_block_name can be checked,
-    // but only game id should be enough in the current logic
+    const latestIdUpdateKey = "update_id_for_" + current_block_name;
     const latestGameIdUpdateKey = "update_game_id_for_" + current_block_name;
     const latestChangeOrderKey = "change_order_for_" + block_name;
     const latestUpdateResultKey =
@@ -331,6 +341,7 @@ const GetGamesOnBlock = async (req, res) => {
     const latestCompletePlayersKey =
       "update_complete_players_for_" + block_name;
 
+    const latestIdUpdateTimestamp = (await Get(latestIdUpdateKey)) || 0;
     const latestGameIdUpdateTimestamp = (await Get(latestGameIdUpdateKey)) || 0;
     const latestChangeOrderTimestamp = (await Get(latestChangeOrderKey)) || 0;
     const latestUpdateResultTimestamp = (await Get(latestUpdateResultKey)) || 0;
@@ -338,6 +349,7 @@ const GetGamesOnBlock = async (req, res) => {
       (await Get(latestCompletePlayersKey)) || 0;
     if (
       cachedData &&
+      latestIdUpdateTimestamp < cachedData.timestamp &&
       latestGameIdUpdateTimestamp < cachedData.timestamp &&
       latestChangeOrderTimestamp < cachedData.timestamp &&
       latestUpdateResultTimestamp < cachedData.timestamp &&

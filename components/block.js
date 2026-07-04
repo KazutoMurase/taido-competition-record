@@ -36,8 +36,9 @@ function ShowDetails(
           type="submit"
           onClick={(e) => ToCall(block_number, item["id"], item["event_id"])}
           disabled={
-            item["id"] !== current.id ||
-            (!operation_unlock && !item["players_checked"])
+            item["id"] < current.id ||
+            (!operation_unlock &&
+              (item["id"] !== current.id || !item["players_checked"]))
           }
           sx={{ width: "5rem", marginBottom: "5px" }}
         >
@@ -104,8 +105,9 @@ function ShowDetails(
         type="submit"
         onClick={(e) => ToCall(block_number, item["id"], item["event_id"])}
         disabled={
-          item["id"] !== current.id ||
-          (!operation_unlock && !item["players_checked"])
+          item["id"] < current.id ||
+          (!operation_unlock &&
+            (item["id"] !== current.id || !item["players_checked"]))
         }
       >
         呼び出し
