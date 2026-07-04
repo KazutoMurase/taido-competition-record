@@ -198,6 +198,24 @@ function UpdateResult({ event_name, id, is_mobile, return_url }) {
         console.log(e);
       });
   };
+  const onReset = (data, event_name) => {
+    if (!window.confirm("この試合の結果をリセットしますか？")) {
+      return;
+    }
+    axios
+      .post("/api/reset_result", {
+        id: data.id,
+        event_name: event_name,
+      })
+      .then((response) => {
+        console.log(response);
+        router.push("/" + return_url);
+      })
+      .catch((e) => {
+        console.log(e);
+        alert("結果リセットに失敗しました");
+      });
+  };
 
   let no_game_red_winner;
   let no_game_white_winner;
@@ -408,6 +426,17 @@ function UpdateResult({ event_name, id, is_mobile, return_url }) {
             &nbsp;&nbsp;
             <Button variant="contained" type="submit" onClick={onBack}>
               戻る
+            </Button>
+          </Grid>
+          <Grid container justifyContent="center" alignItems="center">
+            <Button
+              variant="outlined"
+              color="error"
+              type="submit"
+              onClick={(e) => onReset(data, event_name)}
+              disabled={!data.id}
+            >
+              結果リセット
             </Button>
           </Grid>
         </Box>
