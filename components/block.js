@@ -244,18 +244,13 @@ function Block({
   };
   const [data, setData] = useState([]);
   const [current, setCurrent] = useState([]);
-  const [games, setGames] = useState([]);
-  const [selectedGameIds, setSelectedGameIds] = useState({});
 
   const fetchData = useCallback(async () => {
-    const [scheduleResponse, gamesResponse] = await Promise.all([
-      fetch("/api/get_time_schedule?block_number=" + block_number),
-      fetch("/api/get_game_ids_on_block?block_number=" + block_number),
-    ]);
-    const scheduleResult = await scheduleResponse.json();
-    const gamesResult = await gamesResponse.json();
-    setData(scheduleResult);
-    setGames(gamesResult);
+    const response = await fetch(
+      "/api/get_time_schedule?block_number=" + block_number,
+    );
+    const result = await response.json();
+    setData(result);
   }, [block_number]);
 
   useEffect(() => {
@@ -281,17 +276,6 @@ function Block({
   const refreshBlock = async () => {
     await Promise.all([fetchData(), fetchCurrent()]);
   };
-  const getScheduleGames = (scheduleId) => {
-    return games
-      .filter((game) => game.schedule_id === scheduleId)
-      .sort((a, b) => a.order_id - b.order_id);
-  };
-  const getCurrentGame = () => {
-    return games.find(
-      (game) =>
-        game.schedule_id === current.id && game.order_id === current.game_id,
-    );
-  };
   const updateCurrentSchedule = async (item) => {
     if (
       !confirm(
@@ -310,32 +294,6 @@ function Block({
     );
     if (!response.ok) {
       alert("現在位置の変更に失敗しました");
-      return;
-    }
-    await refreshBlock();
-  };
-  const updateCurrentGame = async (item, gameId) => {
-    if (!gameId) {
-      alert("変更する試合番号を選択してください");
-      return;
-    }
-    if (
-      !confirm(
-        `${block_number.toUpperCase()}コートの次の試合を ${gameId} 番に変更します。よろしいですか？`,
-      )
-    ) {
-      return;
-    }
-    const response = await fetch(
-      "/api/update_current_game_id?block=" +
-        block_number +
-        "&schedule_id=" +
-        item["id"] +
-        "&game_id=" +
-        gameId,
-    );
-    if (!response.ok) {
-      alert("次の試合番号の変更に失敗しました");
       return;
     }
     await refreshBlock();
@@ -425,7 +383,6 @@ function Block({
                 <TableCell>時間</TableCell>
                 <TableCell>試合{is_mobile && <br />}番号</TableCell>
                 <TableCell>試合数</TableCell>
-                {correction ? <TableCell></TableCell> : <></>}
                 <TableCell></TableCell>
               </TableRow>
             </TableHead>
@@ -447,70 +404,6 @@ function Block({
                   <TableCell>
                     {"game_count" in item ? item["game_count"] + "試合" : ""}
                   </TableCell>
-                  {correction ? (
-                    <TableCell>
-                      {item["id"] === current.id ? (
-                        <Box
-                          sx={{
-                            display: "flex",
-                            gap: "8px",
-                            alignItems: "flex-start",
-                            flexDirection: "column",
-                          }}
-                        >
-                          <div>
-                            現在試合: <b>{getCurrentGame()?.game_id || "-"}</b>
-                          </div>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              gap: "8px",
-                              alignItems: "center",
-                              flexWrap: "wrap",
-                            }}
-                          >
-                            変更先:
-                            <select
-                              value={
-                                selectedGameIds[item["id"]] ||
-                                getCurrentGame()?.game_id ||
-                                ""
-                              }
-                              onChange={(e) =>
-                                setSelectedGameIds({
-                                  ...selectedGameIds,
-                                  [item["id"]]: e.target.value,
-                                })
-                              }
-                            >
-                              {getScheduleGames(item["id"]).map((game) => (
-                                <option key={game.id} value={game.game_id}>
-                                  {game.game_id}
-                                </option>
-                              ))}
-                            </select>
-                            <Button
-                              variant="contained"
-                              type="submit"
-                              onClick={(e) =>
-                                updateCurrentGame(
-                                  item,
-                                  selectedGameIds[item["id"]] ||
-                                    getCurrentGame()?.game_id,
-                                )
-                              }
-                            >
-                              変更
-                            </Button>
-                          </Box>
-                        </Box>
-                      ) : (
-                        "-"
-                      )}
-                    </TableCell>
-                  ) : (
-                    <></>
-                  )}
                   <TableCell>
                     {correction ? (
                       <>

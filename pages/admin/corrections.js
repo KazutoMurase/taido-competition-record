@@ -49,7 +49,7 @@ export default function Corrections() {
           alignItems="center"
           style={{ height: "40px" }}
         >
-          コート別の現在競技・現在試合・競技順を調整します
+          コート別の現在競技・競技順を調整します
         </Grid>
         <br />
         <br />
