@@ -22,6 +22,7 @@ const Home = () => {
         return_url="/admin"
         correction={correction === "true"}
         correction_return_url="/admin/corrections"
+        show_operation_unlock={true}
       />
     </>
   );
