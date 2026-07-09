@@ -14,6 +14,17 @@ const CSV_HEADER = [
   "right_retire",
 ];
 
+const DANTAI_CSV_HEADER = [
+  "id",
+  "left_group_id",
+  "right_group_id",
+  "next_left_id",
+  "next_right_id",
+  "left_group_flag",
+  "left_retire",
+  "right_retire",
+];
+
 function assertSafeName(value, label) {
   if (!value || !/^[A-Za-z0-9_-]+$/.test(value)) {
     throw new Error(`invalid ${label}`);
@@ -55,7 +66,10 @@ async function assertEventExists(client, eventName) {
   if (result.rows.length === 0) {
     throw new Error(`unknown event_name: ${eventName}`);
   }
-  if (eventName.includes("dantai") || eventName.includes("tenkai")) {
+  if (
+    (eventName.includes("dantai") && !eventName.includes("dantai_zissen")) ||
+    eventName.includes("tenkai")
+  ) {
     throw new Error(
       `unsupported event_name for tournament editor: ${eventName}`,
     );
@@ -63,6 +77,13 @@ async function assertEventExists(client, eventName) {
 }
 
 async function buildPlayerIds(client, eventName) {
+  if (eventName.includes("dantai_zissen")) {
+    const result = await client.query(
+      `SELECT id AS player_id FROM ${eventName}_groups`,
+    );
+    return new Set(result.rows.map((row) => cleanText(row.player_id)));
+  }
+
   const playerColumn = `${eventName}_player_id`;
   const result = await client.query(
     `SELECT ${playerColumn} AS player_id FROM players WHERE ${playerColumn} IS NOT NULL`,
@@ -165,14 +186,40 @@ function rowsToCsv(rows) {
   ].join("\n");
 }
 
+function dantaiRows(rows) {
+  return rows.map((row) => ({
+    id: row.id,
+    left_group_id: row.left_player_id,
+    right_group_id: row.right_player_id,
+    next_left_id: row.next_left_id,
+    next_right_id: row.next_right_id,
+    left_group_flag: row.left_player_flag,
+    left_retire: row.left_retire,
+    right_retire: row.right_retire,
+  }));
+}
+
+function rowsToDantaiCsv(rows) {
+  const convertedRows = dantaiRows(rows);
+  return [
+    DANTAI_CSV_HEADER.join(","),
+    ...convertedRows.map((row) =>
+      DANTAI_CSV_HEADER.map((header) => csvEscape(row[header])).join(","),
+    ),
+  ].join("\n");
+}
+
 async function replaceEventTable(client, eventName, rows) {
+  const isDantaiZissen = eventName.includes("dantai_zissen");
+  const header = isDantaiZissen ? DANTAI_CSV_HEADER : CSV_HEADER;
+  const insertRows = isDantaiZissen ? dantaiRows(rows) : rows;
   await client.query("BEGIN");
   try {
     await client.query(`DELETE FROM ${eventName}`);
-    for (const row of rows) {
+    for (const row of insertRows) {
       await client.query({
-        text: `INSERT INTO ${eventName} (${CSV_HEADER.join(", ")}) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-        values: CSV_HEADER.map((header) => row[header]),
+        text: `INSERT INTO ${eventName} (${header.join(", ")}) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        values: header.map((column) => row[column]),
       });
     }
     await client.query("COMMIT");
@@ -238,7 +285,11 @@ export default async function SaveTournament(req, res) {
     await assertEventExists(client, eventName);
     const playerIds = await buildPlayerIds(client, eventName);
     const rows = normalizeRows(req.body.rows, playerIds);
-    const csv = `${rowsToCsv(rows)}\n`;
+    const csv = `${
+      eventName.includes("dantai_zissen")
+        ? rowsToDantaiCsv(rows)
+        : rowsToCsv(rows)
+    }\n`;
 
     const timestamp = Date.now();
     await replaceEventTable(client, eventName, rows);

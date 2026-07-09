@@ -68,6 +68,42 @@ function buildPlayerMap(playersRows, eventName, groupMap) {
   return playerMap;
 }
 
+function buildDantaiPlayerMap(groupRows, groupMap) {
+  const playerMap = {};
+  for (const row of groupRows) {
+    const playerId = cleanText(row.id);
+    if (!playerId) {
+      continue;
+    }
+    playerMap[playerId] = {
+      player_id: playerId,
+      name: cleanText(row.name),
+      name_kana: "",
+      group_id: cleanText(row.group_id),
+      group_name: groupMap[String(row.group_id)] || "",
+      mvp: "",
+      rank_group: "",
+      rank_lastyear: "",
+      rank_total: "",
+      comment: "",
+    };
+  }
+  return playerMap;
+}
+
+function normalizeDantaiRows(rows) {
+  return rows.map((row) => ({
+    id: row.id,
+    left_player_id: row.left_group_id,
+    right_player_id: row.right_group_id,
+    next_left_id: row.next_left_id,
+    next_right_id: row.next_right_id,
+    left_player_flag: row.left_group_flag,
+    left_retire: row.left_retire,
+    right_retire: row.right_retire,
+  }));
+}
+
 function enrichRows(rows, playerMap) {
   return rows.map((row) => {
     const leftPlayer = playerMap[cleanText(row.left_player_id)] || {};
@@ -121,6 +157,50 @@ function findEventInfo(eventRows, eventName) {
 
 async function loadFromDb(eventName) {
   const client = await GetClient();
+  if (eventName.includes("dantai_zissen")) {
+    const eventResult = await client.query(
+      "SELECT full_name, description FROM event_type WHERE name_en = $1",
+      [eventName],
+    );
+    const eventInfo =
+      eventResult.rows.length > 0
+        ? {
+            full_name: cleanText(eventResult.rows[0].full_name) || eventName,
+            description: cleanText(eventResult.rows[0].description)
+              .split("|")
+              .map((text) => text.trim())
+              .filter(Boolean),
+          }
+        : { full_name: eventName, description: [] };
+
+    const groupsResult = await client.query("SELECT id, name FROM groups");
+    const groups = {};
+    for (const row of groupsResult.rows) {
+      groups[String(row.id)] = cleanText(row.name);
+    }
+
+    const dantaiGroupsResult = await client.query(
+      `SELECT id, group_id, name FROM ${eventName}_groups ORDER BY id`,
+    );
+    const playerMap = buildDantaiPlayerMap(dantaiGroupsResult.rows, groups);
+    const rowsResult = await client.query(
+      `SELECT id, left_group_id, right_group_id, next_left_id, next_right_id,
+        left_group_flag, left_retire, right_retire
+      FROM ${eventName}
+      ORDER BY id`,
+    );
+    const rows = enrichRows(normalizeDantaiRows(rowsResult.rows), playerMap);
+
+    return {
+      eventInfo,
+      rows,
+      players: Object.values(playerMap).sort(
+        (a, b) => Number(a.player_id) - Number(b.player_id),
+      ),
+      groups,
+    };
+  }
+
   const playerColumn = `${eventName}_player_id`;
   const rankGroupColumn = `${eventName}_rank_group`;
   const rankLastyearColumn = `${eventName}_rank_lastyear`;
@@ -226,15 +306,22 @@ export default async function LoadTournament(req, res) {
     const eventTypeCsv = path.join(baseDir, "static", "event_type.csv");
 
     const rows = readCsv(tournamentCsv);
-    const playersRows = readCsv(playersCsv);
     const groupMap = fs.existsSync(groupsCsv)
       ? buildGroupMap(readCsv(groupsCsv))
       : {};
-    const playerMap = buildPlayerMap(playersRows, eventName, groupMap);
+    const playerMap = eventName.includes("dantai_zissen")
+      ? buildDantaiPlayerMap(
+          readCsv(path.join(baseDir, "original", `${eventName}_groups.csv`)),
+          groupMap,
+        )
+      : buildPlayerMap(readCsv(playersCsv), eventName, groupMap);
     const eventInfo = fs.existsSync(eventTypeCsv)
       ? findEventInfo(readCsv(eventTypeCsv), eventName)
       : { full_name: eventName, description: [] };
-    const enrichedRows = enrichRows(rows, playerMap);
+    const enrichedRows = enrichRows(
+      eventName.includes("dantai_zissen") ? normalizeDantaiRows(rows) : rows,
+      playerMap,
+    );
 
     res.json({
       competition,
