@@ -1237,7 +1237,7 @@ export default function TournamentEditor({
               ) : null}
               <Divider />
               <Button variant="outlined" fullWidth onClick={handleBackToList}>
-                一覧へ戻る
+                競技一覧へ戻る
               </Button>
             </Stack>
           </Paper>
