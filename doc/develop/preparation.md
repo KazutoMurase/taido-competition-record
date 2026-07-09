@@ -27,9 +27,10 @@ pip install -r requirements.txt
 - static/players.csv
 - static/generate_tables.sql
 - original以下の個実・個法など個人競技トーナメントのcsv
+- original以下の団体実戦トーナメント、団体法形、展開競技のcsv
 - original/generate_tables.sql
 
-選手一覧CSVからplayers.csvと個人競技トーナメントCSVを生成できる。団体競技は対象外。
+選手一覧CSVからplayers.csv、個人競技トーナメントCSV、団体実戦トーナメントCSV、団体法形・展開の採点順CSVを生成できる。
 
 #### edit_block_csv.pyで出力するもの
 - original以下の`block_*`や`current_block_*`
@@ -39,7 +40,6 @@ pip install -r requirements.txt
 - static/groups.csv
 
 #### エクセルファイルを元に手動で作成するもの
-- original以下の団法・展開競技のcsv
 - title.txt
 
 #### 過去の同一大会からコピーするもの

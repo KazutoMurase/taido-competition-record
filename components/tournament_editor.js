@@ -35,6 +35,17 @@ const CSV_HEADER = [
   "right_retire",
 ];
 
+const DANTAI_CSV_HEADER = [
+  "id",
+  "left_group_id",
+  "right_group_id",
+  "next_left_id",
+  "next_right_id",
+  "left_group_flag",
+  "left_retire",
+  "right_retire",
+];
+
 const GROUP_COLORS = [
   "#fff59d",
   "#ffcc80",
@@ -710,6 +721,31 @@ function rowsToCsv(rows) {
   ].join("\n");
 }
 
+function rowsToDantaiCsv(rows) {
+  const idMap = {};
+  for (const row of rows) {
+    idMap[row.original_id] = cleanNumber(row.draft_id);
+  }
+  const outputRows = rows
+    .map((row) => ({
+      id: idMap[row.original_id],
+      left_group_id: row.left_player_id || "",
+      right_group_id: row.right_player_id || "",
+      next_left_id: row.next_left_id ? idMap[row.next_left_id] || "" : "",
+      next_right_id: row.next_right_id ? idMap[row.next_right_id] || "" : "",
+      left_group_flag: row.left_player_flag ?? "",
+      left_retire: row.left_retire ?? "",
+      right_retire: row.right_retire ?? "",
+    }))
+    .sort((a, b) => Number(a.id) - Number(b.id));
+  return [
+    DANTAI_CSV_HEADER.join(","),
+    ...outputRows.map((row) =>
+      DANTAI_CSV_HEADER.map((header) => csvEscape(row[header])).join(","),
+    ),
+  ].join("\n");
+}
+
 function getSelectedPlayerDetails(row, side) {
   if (!row || !side) {
     return null;
@@ -853,7 +889,10 @@ export default function TournamentEditor({
     if (hasFatalWarnings) {
       return;
     }
-    downloadText(`${eventName}.csv`, `${rowsToCsv(rows)}\n`);
+    const csv = eventName.includes("dantai_zissen")
+      ? rowsToDantaiCsv(rows)
+      : rowsToCsv(rows);
+    downloadText(`${eventName}.csv`, `${csv}\n`);
   };
 
   const handleSave = async () => {

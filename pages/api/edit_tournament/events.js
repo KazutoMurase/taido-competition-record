@@ -18,7 +18,7 @@ function cleanText(value) {
 function isUnsupportedEvent(eventName) {
   return (
     eventName === "finished" ||
-    eventName.includes("dantai") ||
+    (eventName.includes("dantai") && !eventName.includes("dantai_zissen")) ||
     eventName.includes("tenkai")
   );
 }
