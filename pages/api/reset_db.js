@@ -114,6 +114,16 @@ async function UpdateBlockFromCSV(client, db_name, block_name) {
   await client.query(query);
 }
 
+async function ResetAwardedPlayers(client) {
+  const existsResult = await client.query(
+    "SELECT to_regclass('public.awarded_players') AS table_name",
+  );
+  if (!existsResult.rows[0].table_name) {
+    return;
+  }
+  await client.query("UPDATE awarded_players SET player_id=null");
+}
+
 const ResetDb = async (req, res) => {
   try {
     const client = await GetClient();
@@ -134,8 +144,10 @@ const ResetDb = async (req, res) => {
       console.log("reset " + req.body.block_names[i]);
       await UpdateBlockFromCSV(client, db_name, req.body.block_names[i]);
     }
-    let query = "UPDATE awarded_players SET player_id=null";
-    await client.query(query);
+    if (!is_test) {
+      await ResetAwardedPlayers(client);
+    }
+    let query;
     query = "DELETE FROM " + (is_test ? "test_" : "") + "notification_request";
     await client.query(query);
     // update timestamp to current
