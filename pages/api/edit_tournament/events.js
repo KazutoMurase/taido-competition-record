@@ -16,11 +16,14 @@ function cleanText(value) {
 }
 
 function isUnsupportedEvent(eventName) {
-  return (
-    eventName === "finished" ||
-    (eventName.includes("dantai") && !eventName.includes("dantai_zissen")) ||
-    eventName.includes("tenkai")
-  );
+  return eventName === "finished" || eventName === "dantai_zissen";
+}
+
+function editorType(eventName) {
+  if (eventName.includes("dantai_hokei") || eventName.includes("tenkai")) {
+    return "table_order";
+  }
+  return "tournament";
 }
 
 export default async function ListEditableTournamentEvents(req, res) {
@@ -43,6 +46,7 @@ export default async function ListEditableTournamentEvents(req, res) {
           name_en: eventName,
           existence: Boolean(event.existence),
           editable: Boolean(event.existence) && !isUnsupportedEvent(eventName),
+          editor_type: editorType(eventName),
         };
       });
 

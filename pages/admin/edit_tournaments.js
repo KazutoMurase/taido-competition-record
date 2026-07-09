@@ -51,9 +51,13 @@ export default function EditTournamentsPage({ params }) {
       .finally(() => setLoading(false));
   }, [competition]);
 
-  const openEditor = (eventName) => {
+  const openEditor = (event) => {
+    const path =
+      event.editor_type === "table_order"
+        ? "/admin/edit_table_order"
+        : "/admin/edit";
     router.push(
-      `/admin/edit?competition=${competition}&event_name=${eventName}`,
+      `${path}?competition=${competition}&event_name=${event.name_en}`,
     );
   };
 
@@ -62,7 +66,7 @@ export default function EditTournamentsPage({ params }) {
       <Stack spacing={3}>
         <Box sx={{ textAlign: "center" }}>
           <h1>
-            <u>トーナメント編集</u>
+            <u>競技編集</u>
           </h1>
         </Box>
 
@@ -82,7 +86,7 @@ export default function EditTournamentsPage({ params }) {
                   <Button
                     variant="contained"
                     fullWidth
-                    onClick={() => openEditor(event.name_en)}
+                    onClick={() => openEditor(event)}
                     sx={{ minHeight: 48 }}
                   >
                     {event.name || event.full_name || event.name_en}
