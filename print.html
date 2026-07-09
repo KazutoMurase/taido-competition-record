@@ -221,6 +221,8 @@ pip install -r requirements.txt
 <ul>
 <li>original以下の<code>block_*</code>や<code>current_block_*</code></li>
 </ul>
+<p>現在は、基本的には管理画面のブロック編集ページで時程CSVを編集・保存する。
+<code>edit_block_csv.py</code> は従来のローカルGUIとして残っている。</p>
 <h4 id="エクセルファイルからのコピペ等で手動作成するもの"><a class="header" href="#エクセルファイルからのコピペ等で手動作成するもの">エクセルファイルからのコピペ等で手動作成するもの</a></h4>
 <ul>
 <li>static/players.csv</li>
@@ -230,15 +232,16 @@ pip install -r requirements.txt
 <ul>
 <li>title.txt</li>
 </ul>
-<h4 id="過去の同一大会からコピーするもの"><a class="header" href="#過去の同一大会からコピーするもの">過去の同一大会からコピーするもの</a></h4>
+<h4 id="昨年度の同一大会を参考に用意するもの"><a class="header" href="#昨年度の同一大会を参考に用意するもの">昨年度の同一大会を参考に用意するもの</a></h4>
 <ul>
 <li>original/awarded_players.csv (優秀選手などの褒章が存在しない大会の場合は不要)</li>
 <li>original/generate_tables.sql</li>
 <li>static/court_type.csv</li>
-<li>stattic/event_type.csv</li>
+<li>static/event_type.csv</li>
 <li>static/generate_tables.sql</li>
 </ul>
-<p>ただし、コート数や競技等の変更がある場合は適宜編集を加えること。</p>
+<p>変化がなければ昨年度の同一大会のファイルをコピーする。
+コート数、競技、賞の有無などが変わる場合は、昨年度の同一大会のファイルを参考に適宜編集する。</p>
 <h2 id="csvデータ作成用ツールの使い方"><a class="header" href="#csvデータ作成用ツールの使い方">csvデータ作成用ツールの使い方</a></h2>
 <h4 id="generate_tournament_db_from_xlpy"><a class="header" href="#generate_tournament_db_from_xlpy">generate_tournament_db_from_xl.py</a></h4>
 <p>大会Excelファイルと出力先ディレクトリを入力すると自動で出力してくれる。</p>
@@ -254,6 +257,33 @@ pip install -r requirements.txt
 大会名(e.g. 2024_alljp)とブロック(e.g. A)を入力し、新規作成や編集を行うことができる。</p>
 <pre><code class="language-bash">scripts/edit_block_csv.py
 </code></pre>
+<h4 id="ブロック編集ページ"><a class="header" href="#ブロック編集ページ">ブロック編集ページ</a></h4>
+<p>管理画面の競技編集ページから、各コートのブロック編集ページを開ける。</p>
+<pre><code class="language-text">/admin/edit_tournaments
+</code></pre>
+<p>ブロック編集ページでは、<code>block_a.csv</code> と <code>block_a_games.csv</code> のような時程CSVを編集できる。
+<code>CSV出力</code> ボタンを押すと、DBには保存せずに現在の画面内容から以下の2ファイルをダウンロードする。</p>
+<pre><code class="language-text">block_&lt;block&gt;.csv
+block_&lt;block&gt;_games.csv
+</code></pre>
+<p><code>保存</code> ボタンを押すと、DBを更新し、<code>data/&lt;competition&gt;/original/</code> 以下のCSVも更新する。
+既存CSVがある場合は、同じディレクトリに <code>.bak</code> ファイルを作ってから上書きする。</p>
+<h4 id="update_block_tables_sqlpy"><a class="header" href="#update_block_tables_sqlpy">update_block_tables_sql.py</a></h4>
+<p><code>static/court_type.csv</code> を見て、<code>original/generate_tables.sql</code> にブロック用テーブル定義を追加する。
+新しい大会で <code>block_a</code>, <code>block_a_games</code>, <code>current_block_a</code> などのテーブル定義がまだない場合に使う。</p>
+<pre><code class="language-bash">python3 scripts/update_block_tables_sql.py 2026_kid
+</code></pre>
+<p><code>competition</code> には <code>2026_kid</code> のような大会名だけを渡す。
+<code>data/2026_kid</code> のように <code>data/</code> 付きで渡さない。</p>
+<p>このスクリプトは、<code>data/&lt;competition&gt;/static/court_type.csv</code> のコート名からブロック名を決める。
+たとえば <code>Aコート</code>, <code>Bコート</code> があれば、<code>block_a</code>, <code>block_b</code> 関連のテーブルを生成する。</p>
+<p>生成箇所は以下のコメントで囲まれる。</p>
+<pre><code class="language-sql">-- BEGIN generated block tables
+...
+-- END generated block tables
+</code></pre>
+<p>このコメントがすでにある場合は、その範囲を置き換える。
+コメントなしで既存の <code>block_*</code> テーブル定義がある場合は、意図しない重複生成を避けるためエラーにする。</p>
 <h4 id="pyqt5でxcb関連のエラーが起きた時edit_block_csvpy"><a class="header" href="#pyqt5でxcb関連のエラーが起きた時edit_block_csvpy">pyqt5でxcb関連のエラーが起きた時(edit_block_csv.py)</a></h4>
 <p><code>edit_block_csv.py</code>で以下のようなエラーが出るときは、<a href="https://qiita.com/momomo_rimoto/items/83917d3f9f5dd35457e1">このページ</a>に従って<code>libqxcb.so</code>に足りない.soファイルに対応するaptパッケージをインストールすると動く</p>
 <pre><code>qt.qpa.plugin: Could not load the Qt platform plugin &quot;xcb&quot; in &quot;&quot; even though it was found.
