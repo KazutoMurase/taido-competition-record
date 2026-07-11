@@ -226,6 +226,11 @@ export default async function SaveBlock(req, res) {
 
     await replaceBlockTables(client, block, rows, gamesRows);
     await RedisSet(`latest_update_block_${block}_timestamp`, timestamp);
+    await RedisSet(`change_event_order_for_block_${block}`, timestamp);
+    await RedisSet(`change_order_for_block_${block}`, timestamp);
+    await RedisSet(`update_complete_players_for_block_${block}`, timestamp);
+    await RedisSet(`update_id_for_current_block_${block}`, timestamp);
+    await RedisSet(`update_game_id_for_current_block_${block}`, timestamp);
 
     const originalDir = path.join(
       process.cwd(),
