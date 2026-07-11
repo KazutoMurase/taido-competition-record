@@ -137,6 +137,15 @@ function normalizeRowsForCourtCount(rows, courtCount) {
   });
 }
 
+function blankFinalRow(eventName, round) {
+  const row = {};
+  for (const field of headerForEvent(eventName)) {
+    row[field] = "";
+  }
+  row.round = round;
+  return row;
+}
+
 function sortRowsForSave(rows) {
   return rows
     .map((row, index) => ({ row, index }))
@@ -244,6 +253,7 @@ export default function TableOrderEditor({
     () => breakPositionsFromRows(entryRows, courtCount),
     [courtCount, entryRows],
   );
+  const finalSlotCount = fixedRows.length;
 
   const setEntryRows = (nextEntryRows) => {
     setRows(sortRowsForSave([...nextEntryRows, ...fixedRows]));
@@ -279,6 +289,30 @@ export default function TableOrderEditor({
           nextCourtCount,
         ),
         ...normalizedFixedRows,
+      ]);
+    });
+    setSaveStatus(null);
+  };
+
+  const handleFinalSlotCountChange = (event) => {
+    const nextFinalSlotCount = Number(event.target.value);
+    const finalRound = courtCount + 1;
+    setRows((currentRows) => {
+      const currentEntryRows = currentRows.filter(isEntryRow);
+      const currentFixedRows = currentRows.filter((row) => !isEntryRow(row));
+      const nextFixedRows =
+        nextFinalSlotCount <= currentFixedRows.length
+          ? currentFixedRows.slice(0, nextFinalSlotCount)
+          : [
+              ...currentFixedRows,
+              ...Array.from(
+                { length: nextFinalSlotCount - currentFixedRows.length },
+                () => blankFinalRow(eventName, finalRound),
+              ),
+            ];
+      return sortRowsForSave([
+        ...currentEntryRows,
+        ...nextFixedRows.map((row) => ({ ...row, round: finalRound })),
       ]);
     });
     setSaveStatus(null);
@@ -419,6 +453,27 @@ export default function TableOrderEditor({
                     {count}コート
                   </MenuItem>
                 ))}
+              </Select>
+            </FormControl>
+            <FormControl size="small" sx={{ minWidth: 240 }}>
+              <InputLabel id="final-slot-count-label">勝ち上がり枠</InputLabel>
+              <Select
+                labelId="final-slot-count-label"
+                label="勝ち上がり枠"
+                value={finalSlotCount}
+                onChange={handleFinalSlotCountChange}
+              >
+                {Array.from({ length: 13 }, (_, count) => count).map(
+                  (count) => (
+                    <MenuItem
+                      key={count}
+                      value={count}
+                      disabled={count > entryRows.length}
+                    >
+                      {count}枠
+                    </MenuItem>
+                  ),
+                )}
               </Select>
             </FormControl>
           </Stack>

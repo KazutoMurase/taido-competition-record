@@ -97,6 +97,10 @@ function rowsToCsv(rows, eventName) {
   ].join("\n");
 }
 
+function valueForDb(value) {
+  return value === "" || value == null ? null : value;
+}
+
 async function assertEventExists(client, eventName) {
   const result = await client.query(
     "SELECT 1 FROM event_type WHERE name_en = $1",
@@ -127,7 +131,7 @@ async function replaceEventTable(client, eventName, rows) {
         text: `INSERT INTO ${eventName} (${header.join(", ")}) VALUES (${header
           .map((_, index) => `$${index + 1}`)
           .join(", ")})`,
-        values: header.map((column) => row[column] ?? null),
+        values: header.map((column) => valueForDb(row[column])),
       });
     }
     await client.query("COMMIT");
