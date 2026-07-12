@@ -219,6 +219,15 @@ block_&lt;block&gt;_games.csv
 </code></pre>
 <p><code>保存</code> ボタンを押すと、DBを更新し、<code>data/&lt;competition&gt;/original/</code> 以下のCSVも更新する。
 既存CSVがある場合は、同じディレクトリに <code>.bak</code> ファイルを作ってから上書きする。</p>
+<h4 id="check_competition_csv_coveragepy"><a class="header" href="#check_competition_csv_coveragepy">check_competition_csv_coverage.py</a></h4>
+<p>競技CSVとブロック時程CSVを作成した後、全試合が時程に入っているか確認する。</p>
+<pre><code class="language-bash">python scripts/check_competition_csv_coverage.py 2026_kid
+</code></pre>
+<p>問題がある場合は、未割り当ての<code>game_id</code>や重複している<code>game_id</code>が表示される。
+詳細を見たい場合は<code>--verbose</code>を付けると、種目ごとにどのブロック・時程にどの<code>game_id</code>が入っているか確認できる。</p>
+<pre><code class="language-bash">python scripts/check_competition_csv_coverage.py 2026_kid --verbose
+</code></pre>
+<p><code>WARN</code>は、全試合の時程割り当て自体は成立しているが、<code>*_groups.csv</code>に実際の競技CSVへ出ていない団体が残っている場合や、<code>block_*_games.csv</code>の行<code>id</code>に欠番がある場合などに表示される。</p>
 <h4 id="update_block_tables_sqlpy"><a class="header" href="#update_block_tables_sqlpy">update_block_tables_sql.py</a></h4>
 <p><code>static/court_type.csv</code> を見て、<code>original/generate_tables.sql</code> にブロック用テーブル定義を追加する。
 新しい大会で <code>block_a</code>, <code>block_a_games</code>, <code>current_block_a</code> などのテーブル定義がまだない場合に使う。</p>
