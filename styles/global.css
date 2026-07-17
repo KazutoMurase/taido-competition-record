@@ -161,6 +161,11 @@ table.default td:last-child {
   button {
     display: none !important;
   }
+
+  table.default td {
+    background: #fff;
+    box-shadow: none;
+  }
 }
 
 h2.competition-title {

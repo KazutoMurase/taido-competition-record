@@ -20,32 +20,36 @@ function GetEvents() {
   useEffect(() => {
     fetchData();
   }, []);
-  const events = data.map((item, index) => {
+  const events = data.filter((item) => {
     const event_name = GetEventName(item["id"]);
-    if (event_name === "dantai" || !item["existence"]) {
-      return <></>;
-    }
-    return (
-      <Grid
-        key={index}
-        container
-        justifyContent="center"
-        alignItems="center"
-        style={{ height: "60px" }}
-      >
-        <Button
-          variant="contained"
-          style={{ minWidth: "140px" }}
-          type="submit"
-          onClick={(e) => ToResult(event_name)}
-        >
-          {item["name"].replace("'", "").replace("'", "")}
-        </Button>
-      </Grid>
-    );
+    return event_name !== "dantai" && item["existence"];
   });
 
-  return events;
+  return (
+    <Grid container spacing={2}>
+      {events.map((item) => {
+        const event_name = GetEventName(item["id"]);
+        return (
+          <Grid
+            key={item["id"]}
+            item
+            xs={6}
+            display="flex"
+            justifyContent="center"
+          >
+            <Button
+              variant="contained"
+              fullWidth
+              sx={{ maxWidth: "280px" }}
+              onClick={() => ToResult(event_name)}
+            >
+              {item["name"].replace("'", "").replace("'", "")}
+            </Button>
+          </Grid>
+        );
+      })}
+    </Grid>
+  );
 }
 
 export default GetEvents;
