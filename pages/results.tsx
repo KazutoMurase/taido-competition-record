@@ -15,21 +15,21 @@ const Results: React.FC = () => {
       <Container maxWidth="md">
         <Grid
           container
-          justifyContent="center"
+          direction="column"
           alignItems="center"
-          style={{ height: "100px" }}
+          spacing={3}
+          sx={{ py: 3 }}
         >
-          <h1>
-            <u>競技結果一覧</u>
-          </h1>
-          <GetEvents />
-          <Grid
-            container
-            justifyContent="center"
-            alignItems="center"
-            style={{ height: "100px" }}
-          >
-            <Button variant="contained" type="submit" onClick={(e) => onBack()}>
+          <Grid item>
+            <h1>
+              <u>競技結果一覧</u>
+            </h1>
+          </Grid>
+          <Grid item width="100%">
+            <GetEvents />
+          </Grid>
+          <Grid item>
+            <Button variant="contained" onClick={onBack}>
               戻る
             </Button>
           </Grid>
