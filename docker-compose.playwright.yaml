@@ -1,0 +1,37 @@
+services:
+  playwright:
+    build:
+      context: ./e2e
+    user: ${PLAYWRIGHT_UID:-1000}:${PLAYWRIGHT_GID:-1000}
+    init: true
+    shm_size: "1gb"
+    env_file:
+      - .env
+    environment:
+      HOME: /tmp/playwright-home
+      XDG_CACHE_HOME: /tmp/playwright-cache
+      BASE_URL: http://host.docker.internal:${PORT}
+      COURT: ${COURT:-}
+      CONFIRM_ADVANCE: ${CONFIRM_ADVANCE:-}
+      EXPECTED_SCHEDULE_ID: ${EXPECTED_SCHEDULE_ID:-}
+      SEED: ${SEED:-}
+      MAX_GAMES: ${MAX_GAMES:-200}
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - ./e2e/tests:/work/tests:ro
+      - ./e2e/playwright.config.ts:/work/playwright.config.ts:ro
+      - ./e2e/artifacts/${ARTIFACT_SUBDIR:-latest}:/artifacts
+    command:
+      - npx
+      - playwright
+      - test
+      - tests/advance-current.spec.ts
+      - --workers=1

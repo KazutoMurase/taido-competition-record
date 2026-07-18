@@ -17,3 +17,6 @@ cloud-sql-proxy
 
 # venv for generate db script
 venv/
+
+# Playwright output
+e2e/artifacts/
