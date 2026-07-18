@@ -65,6 +65,7 @@ const PRINT_STAGE_WIDTH = 850;
 const EDIT_STAGE_WIDTH = 930;
 const EDIT_STAGE_OFFSET_X = 40;
 const ALL_GROUPS_VALUE = "__all_groups__";
+const LAST_YEAR_RANK_COLOR = "#8e24aa";
 
 function cleanNumber(value) {
   const parsed = Number(value);
@@ -188,47 +189,38 @@ function getMvpLabel(value) {
   return "";
 }
 
-function getAuxiliaryLabel(item, prefix, auxiliaryMode) {
-  if (auxiliaryMode === "total") {
-    const value = item[`${prefix}_rank_total`];
-    return value ? `全体${value}位` : "";
-  }
-  if (auxiliaryMode === "lastyear") {
-    const value = item[`${prefix}_rank_lastyear`];
-    return value ? `昨年度${value}位` : "";
-  }
-  if (auxiliaryMode === "group") {
-    const value = item[`${prefix}_rank_group`];
-    return value ? `団体内${value}位` : "";
-  }
-  if (auxiliaryMode === "mvp") {
-    return getMvpLabel(item[`${prefix}_mvp`]);
-  }
-  return "";
+function getGroupRankColor(value) {
+  const colors = {
+    1: "#d32f2f",
+    2: "#1976d2",
+    3: "#f57c00",
+    4: "#388e3c",
+  };
+  return colors[value] || "#5f6368";
 }
 
-function getAuxiliaryColor(item, prefix, auxiliaryMode) {
-  if (auxiliaryMode === "group") {
-    const value = item[`${prefix}_rank_group`];
-    const colors = {
-      1: "#d32f2f",
-      2: "#1976d2",
-      3: "#f57c00",
-      4: "#388e3c",
-    };
-    return colors[value] || "#5f6368";
+function getAuxiliaryLabels(item, prefix, auxiliaryMode) {
+  if (auxiliaryMode === "total") {
+    const value = item[`${prefix}_rank_total`];
+    return value ? [{ text: `全体${value}`, color: "#d32f2f" }] : [];
   }
-  if (auxiliaryMode === "total" || auxiliaryMode === "lastyear") {
-    return item[
-      `${prefix}_${auxiliaryMode === "total" ? "rank_total" : "rank_lastyear"}`
-    ]
-      ? "#d32f2f"
-      : "#5f6368";
+  if (auxiliaryMode === "group-lastyear") {
+    const groupRank = item[`${prefix}_rank_group`];
+    const lastYearRank = item[`${prefix}_rank_lastyear`];
+    return [
+      lastYearRank
+        ? { text: `昨年${lastYearRank}`, color: LAST_YEAR_RANK_COLOR }
+        : null,
+      groupRank
+        ? { text: `団体${groupRank}`, color: getGroupRankColor(groupRank) }
+        : null,
+    ].filter(Boolean);
   }
   if (auxiliaryMode === "mvp") {
-    return "#d32f2f";
+    const label = getMvpLabel(item[`${prefix}_mvp`]);
+    return label ? [{ text: label, color: "#d32f2f" }] : [];
   }
-  return "#5f6368";
+  return [];
 }
 
 function PlayerText({
@@ -252,8 +244,7 @@ function PlayerText({
   const x = isLeftBlock ? 0 : 630;
   const groupX = isLeftBlock ? 120 : 750;
   const playerIdX = isLeftBlock ? x - 32 : 850;
-  const auxiliaryLabel = getAuxiliaryLabel(item, prefix, auxiliaryMode);
-  const auxiliaryColor = getAuxiliaryColor(item, prefix, auxiliaryMode);
+  const auxiliaryLabels = getAuxiliaryLabels(item, prefix, auxiliaryMode);
   const selected =
     selectedSlot &&
     selectedSlot.original_id === item.original_id &&
@@ -333,17 +324,20 @@ function PlayerText({
         onClick={() => onSelectSlot(item.original_id, side)}
         onTap={() => onSelectSlot(item.original_id, side)}
       />
-      <Text
-        x={groupX}
-        y={textY - 18}
-        text={auxiliaryLabel}
-        fontSize={11}
-        fill={auxiliaryColor}
-        fontStyle="bold"
-        listening={Boolean(auxiliaryLabel)}
-        onClick={() => onSelectSlot(item.original_id, side)}
-        onTap={() => onSelectSlot(item.original_id, side)}
-      />
+      {auxiliaryLabels.map((label, index) => (
+        <Text
+          key={label.text}
+          x={groupX + index * 36}
+          y={textY - 18}
+          text={label.text}
+          fontSize={11}
+          fill={label.color}
+          fontStyle="bold"
+          listening={true}
+          onClick={() => onSelectSlot(item.original_id, side)}
+          onTap={() => onSelectSlot(item.original_id, side)}
+        />
+      ))}
       <Text
         x={groupX}
         y={textY - 2}
@@ -777,7 +771,7 @@ export default function TournamentEditor({
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [selectedGameId, setSelectedGameId] = useState(null);
   const [highlightedGroupName, setHighlightedGroupName] = useState([]);
-  const [auxiliaryMode, setAuxiliaryMode] = useState("none");
+  const [auxiliaryMode, setAuxiliaryMode] = useState("group-lastyear");
   const [printMode, setPrintMode] = useState(false);
   const [error, setError] = useState("");
   const [saveStatus, setSaveStatus] = useState(null);
@@ -1095,8 +1089,7 @@ export default function TournamentEditor({
               >
                 <MenuItem value="none">なし</MenuItem>
                 <MenuItem value="total">全体</MenuItem>
-                <MenuItem value="lastyear">昨年度</MenuItem>
-                <MenuItem value="group">団体内</MenuItem>
+                <MenuItem value="group-lastyear">昨年度・団体内</MenuItem>
                 <MenuItem value="mvp">MVP</MenuItem>
               </TextField>
               <Divider />
