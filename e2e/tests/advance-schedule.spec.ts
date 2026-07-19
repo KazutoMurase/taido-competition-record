@@ -78,6 +78,12 @@ async function waitForApp(page: Page) {
     .toBe(200);
 }
 
+async function waitForRecordData(page: Page) {
+  await expect(
+    page.getByRole("heading", { name: /^第[1-9]\d*試合$/ }),
+  ).toBeVisible({ timeout: 15_000 });
+}
+
 async function markEveryonePresent(page: Page) {
   const radios = page.locator('input[type="radio"]');
   await expect
@@ -481,6 +487,7 @@ test("指定コートの現在競技を完了し、次競技へ進める", async
     }
     visitedPositions.add(position);
 
+    await waitForRecordData(page);
     const result = page.url().includes("record_table_result")
       ? await fillTableScores(page)
       : await recordTournamentGame(page);
