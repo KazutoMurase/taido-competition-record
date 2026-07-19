@@ -468,6 +468,8 @@ function Block({
                   key={item["id"]}
                   className={"admin"}
                   bgcolor={item["id"] === current.id ? "#ffd54f" : "white"}
+                  data-schedule-id={item["id"]}
+                  data-current={item["id"] === current.id ? "true" : "false"}
                 >
                   <TableCell>{item["name"]?.replace(/['"]+/g, "")}</TableCell>
                   <TableCell>

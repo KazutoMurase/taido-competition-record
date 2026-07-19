@@ -6,6 +6,7 @@
 
 - [開発環境構築](develop/develop.md)
 - [開発用ツール](develop/tools.md)
+- [現在競技の自動進行](develop/playwright.md)
 - [大会準備](develop/preparation.md)
 - [GCP環境へのデプロイ方法(1からセットアップする場合)](develop/deploy.md)
 - [GCP環境へのデプロイ方法(既存のプロジェクトを使いまわす場合)](develop/deploy_using_existing_project.md)
