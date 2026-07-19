@@ -226,7 +226,7 @@ export default async function SaveBlock(req, res) {
 
     await replaceBlockTables(client, block, rows, gamesRows);
     await Promise.all([
-      TouchCacheVersion(`latest_update_block_${block}_timestamp`),
+      TouchCacheVersion(`latest_update_block_${block}_version`),
       TouchCacheVersion(`change_event_order_for_block_${block}`),
       TouchCacheVersion(`change_order_for_block_${block}`),
       TouchCacheVersion(`update_complete_players_for_block_${block}`),
