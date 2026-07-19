@@ -78,6 +78,31 @@ async function waitForApp(page: Page) {
     .toBe(200);
 }
 
+async function authorizeRemoteNavigation(page: Page) {
+  if (process.env.ALLOW_REMOTE_BASE_URL !== "1") {
+    return;
+  }
+
+  const baseURL = process.env.BASE_URL;
+  const username = process.env.USERNAME;
+  const password = process.env.PASSWORD;
+  if (!baseURL || !username || !password) {
+    throw new Error(
+      "BASE_URL, USERNAME, and PASSWORD are required for remote execution.",
+    );
+  }
+
+  const origin = new URL(baseURL).origin;
+  const authorization = `Basic ${Buffer.from(
+    `${username}:${password}`,
+  ).toString("base64")}`;
+  await page.route(`${origin}/**`, (route) =>
+    route.continue({
+      headers: { ...route.request().headers(), authorization },
+    }),
+  );
+}
+
 async function waitForRecordData(page: Page) {
   await expect(
     page.getByRole("heading", { name: /^第[1-9]\d*試合$/ }),
@@ -387,6 +412,7 @@ test("指定コートの現在競技を完了し、次競技へ進める", async
   }
   console.log(`[advance-schedule] court=${court.toUpperCase()}`);
 
+  await authorizeRemoteNavigation(page);
   await waitForApp(page);
   await page.goto("/admin");
   await page
