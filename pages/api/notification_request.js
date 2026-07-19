@@ -43,7 +43,6 @@ async function GetFromDB(req, res, notification_request_name) {
 const NotificationRequest = async (req, res) => {
   try {
     const is_test = req.query.is_test === "true";
-    console.log(is_test);
     const notification_request_name = is_test
       ? "test_notification_request"
       : "notification_request";

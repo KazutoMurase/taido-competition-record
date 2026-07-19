@@ -116,7 +116,6 @@ const RecordTable = async (req, res) => {
       " and schedule_id = " +
       schedule_id;
     result = await client.query(query);
-    console.log(result.rows);
     const update_game_id_key = "update_game_id_for_" + current_block_name;
     await TouchCacheVersion(update_game_id_key);
     if (result.rows.length === 0) {

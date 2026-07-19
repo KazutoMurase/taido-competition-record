@@ -5,12 +5,10 @@ const CreateNotificationRequest = async (req, res) => {
   try {
     const client = await GetClient();
     let query, values, result;
-    console.log(req.body.is_test);
     const notification_request_name =
       req.body.is_test === true
         ? "test_notification_request"
         : "notification_request";
-    console.log(notification_request_name);
     if ("player_id" in req.body) {
       query =
         "INSERT INTO " +

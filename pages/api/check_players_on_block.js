@@ -343,7 +343,6 @@ async function GetFromDB(
       }
     }
   }
-  console.log(result_array);
   // check if all requested
   let all_requested_array = [];
   for (let i = 0; i < requested_data.length; i++) {
@@ -375,12 +374,10 @@ async function GetDantaiFromDB(
     "_games WHERE schedule_id = " +
     schedule_id;
   let result_dantai = await client.query(query);
-  console.log(result_dantai.rows);
   const sorted_dantai = result_dantai.rows.sort(
     (a, b) => a.game_id - b.game_id,
   );
   const game_id = sorted_dantai[0].game_id;
-  console.log(game_id);
   query =
     "SELECT t1.name, t0.group_id AS id, t0.event_id FROM " +
     event_name +

@@ -190,7 +190,6 @@ const GetGame = async (req, res) => {
           sorted_data[i].block_pos == "center"
             ? "red"
             : "white";
-        console.log(sorted_data[i]);
         res.json(sorted_data[i]);
         return;
       }
