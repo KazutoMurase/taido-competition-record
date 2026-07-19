@@ -83,7 +83,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="index.html">はじめに</a></li><li class="chapter-item expanded affix "><li class="part-title">開発者向け</li><li class="chapter-item expanded "><a href="develop/develop.html"><strong aria-hidden="true">1.</strong> 開発環境構築</a></li><li class="chapter-item expanded "><a href="develop/tools.html"><strong aria-hidden="true">2.</strong> 開発用ツール</a></li><li class="chapter-item expanded "><a href="develop/preparation.html"><strong aria-hidden="true">3.</strong> 大会準備</a></li><li class="chapter-item expanded "><a href="develop/deploy.html"><strong aria-hidden="true">4.</strong> GCP環境へのデプロイ方法(1からセットアップする場合)</a></li><li class="chapter-item expanded "><a href="develop/deploy_using_existing_project.html"><strong aria-hidden="true">5.</strong> GCP環境へのデプロイ方法(既存のプロジェクトを使いまわす場合)</a></li><li class="chapter-item expanded "><a href="develop/utility.html"><strong aria-hidden="true">6.</strong> ユーティリティ</a></li><li class="chapter-item expanded "><a href="site.html"><strong aria-hidden="true">7.</strong> サイトの構成</a></li><li class="chapter-item expanded "><a href="admin/certificate.html"><strong aria-hidden="true">8.</strong> 賞状印刷</a></li><li class="chapter-item expanded "><a href="admin/export.html"><strong aria-hidden="true">9.</strong> 結果出力</a></li><li class="chapter-item expanded affix "><li class="part-title">役員マニュアル</li><li class="chapter-item expanded "><a href="admin/setup.html"><strong aria-hidden="true">10.</strong> 準備</a></li><li class="chapter-item expanded "><a href="admin/check_players.html"><strong aria-hidden="true">11.</strong> 選手点呼係</a></li><li class="chapter-item expanded "><a href="admin/call_players.html"><strong aria-hidden="true">12.</strong> 選手呼び出し係</a></li><li class="chapter-item expanded "><a href="admin/record.html"><strong aria-hidden="true">13.</strong> 記録係</a></li><li class="chapter-item expanded "><a href="admin/announce.html"><strong aria-hidden="true">14.</strong> 司会</a></li></ol>            </div>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="index.html">はじめに</a></li><li class="chapter-item expanded affix "><li class="part-title">開発者向け</li><li class="chapter-item expanded "><a href="develop/develop.html"><strong aria-hidden="true">1.</strong> 開発環境構築</a></li><li class="chapter-item expanded "><a href="develop/tools.html"><strong aria-hidden="true">2.</strong> 開発用ツール</a></li><li class="chapter-item expanded "><a href="develop/playwright.html"><strong aria-hidden="true">3.</strong> 現在競技の自動進行</a></li><li class="chapter-item expanded "><a href="develop/preparation.html"><strong aria-hidden="true">4.</strong> 大会準備</a></li><li class="chapter-item expanded "><a href="develop/deploy.html"><strong aria-hidden="true">5.</strong> GCP環境へのデプロイ方法(1からセットアップする場合)</a></li><li class="chapter-item expanded "><a href="develop/deploy_using_existing_project.html"><strong aria-hidden="true">6.</strong> GCP環境へのデプロイ方法(既存のプロジェクトを使いまわす場合)</a></li><li class="chapter-item expanded "><a href="develop/utility.html"><strong aria-hidden="true">7.</strong> ユーティリティ</a></li><li class="chapter-item expanded "><a href="site.html"><strong aria-hidden="true">8.</strong> サイトの構成</a></li><li class="chapter-item expanded "><a href="admin/certificate.html"><strong aria-hidden="true">9.</strong> 賞状印刷</a></li><li class="chapter-item expanded "><a href="admin/export.html"><strong aria-hidden="true">10.</strong> 結果出力</a></li><li class="chapter-item expanded affix "><li class="part-title">役員マニュアル</li><li class="chapter-item expanded "><a href="admin/setup.html"><strong aria-hidden="true">11.</strong> 準備</a></li><li class="chapter-item expanded "><a href="admin/check_players.html"><strong aria-hidden="true">12.</strong> 選手点呼係</a></li><li class="chapter-item expanded "><a href="admin/call_players.html"><strong aria-hidden="true">13.</strong> 選手呼び出し係</a></li><li class="chapter-item expanded "><a href="admin/record.html"><strong aria-hidden="true">14.</strong> 記録係</a></li><li class="chapter-item expanded "><a href="admin/announce.html"><strong aria-hidden="true">15.</strong> 司会</a></li></ol>            </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
@@ -192,6 +192,87 @@ result以下にcsv形式で保存される。</p>
 <p>本レポジトリのルートで以下を実行する。</p>
 <pre><code class="language-bash">tools/lint.bash
 </code></pre>
+<h2 id="現在競技の自動進行"><a class="header" href="#現在競技の自動進行">現在競技の自動進行</a></h2>
+<p>起動中のローカル環境に対して、指定コートの現在競技を点呼から記録まで自動で進められる。
+実行方法と注意事項は<a href="develop/./playwright.html">現在競技の自動進行</a>を参照する。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="大会スケジュールの自動進行"><a class="header" href="#大会スケジュールの自動進行">大会スケジュールの自動進行</a></h1>
+<p>指定したコートの現在競技を、点呼から全試合の記録まで自動で進める。
+現在競技が終了し、次の競技へ移動したことを確認すると停止する。</p>
+<p>このツールはローカル環境の大会データを実際に更新する。
+実行前に、<code>.env</code>の<code>COMPETITION_NAME</code>と対象コートが正しいことを必ず確認する。
+本番環境に対しては使用しないこと。</p>
+<p>PlaywrightはDockerコンテナ内で実行されるため、ホストへのPlaywrightやChromiumのインストールは不要である。</p>
+<h2 id="基本的な使い方"><a class="header" href="#基本的な使い方">基本的な使い方</a></h2>
+<p>最初にアプリを起動する。</p>
+<pre><code class="language-bash">docker compose up
+</code></pre>
+<p>別のターミナルで、リポジトリルートから進めたいコートを指定する。
+以下はAコートの現在競技を進める例である。</p>
+<pre><code class="language-bash">tools/advance-schedule.bash A
+</code></pre>
+<p>実行中は、対象競技、試合番号、登録した結果が表示される。</p>
+<pre><code class="language-text">[advance-schedule] court=A
+[advance-schedule] current schedule=1, game=1, competition=男子法形
+[advance-schedule] attendance completed
+[advance-schedule] recorded game=1, result=赤旗2本
+[advance-schedule] recorded game=2, result=赤旗1本
+[advance-schedule] completed 男子法形; next schedule=2
+</code></pre>
+<p>点呼や一部の試合がすでに完了している場合は、残りの処理から続行する。</p>
+<h2 id="複数の競技を順番に進める"><a class="header" href="#複数の競技を順番に進める">複数の競技を順番に進める</a></h2>
+<p>複数のコートを指定すると、指定した順番に各コートの現在競技を1つずつ進める。</p>
+<pre><code class="language-bash">tools/advance-schedule.bash A B A C B
+</code></pre>
+<p>この例では、A、B、A、C、Bの順に処理する。
+途中で失敗した場合は、その場で停止する。</p>
+<h2 id="計画ファイルを使う"><a class="header" href="#計画ファイルを使う">計画ファイルを使う</a></h2>
+<p>実行順が長い場合は、計画ファイルを使用する。</p>
+<pre><code class="language-bash">tools/advance-schedule.bash --file e2e/advance-plan.txt
+</code></pre>
+<p>計画ファイルには、1行につきコートと現在競技IDを記述する。</p>
+<pre><code class="language-text"># court schedule_id
+A 1
+B 1
+A 2
+C 1
+B 2
+</code></pre>
+<p>空行と<code>#</code>以降は無視される。
+サンプルは<code>e2e/advance-plan.example.txt</code>にある。</p>
+<p>現在競技IDは省略できる。</p>
+<pre><code class="language-text">A
+B
+A
+</code></pre>
+<p>長い計画では現在競技IDを指定することを推奨する。
+途中で失敗して同じファイルを再実行した場合に、完了済みの処理を安全にスキップできるためである。</p>
+<table><thead><tr><th>コートの現在競技ID</th><th>動作</th></tr></thead><tbody>
+<tr><td>計画と同じ</td><td>現在競技を実行する</td></tr>
+<tr><td>計画より先</td><td>完了済みとしてスキップする</td></tr>
+<tr><td>計画より前</td><td>計画と状態が一致しないため停止する</td></tr>
+</tbody></table>
+<h2 id="自動で入力される内容"><a class="header" href="#自動で入力される内容">自動で入力される内容</a></h2>
+<p>点呼が未完了の場合は、全選手または全団体を出席として登録する。
+その後、競技が終了するまでランダムな試合結果を入力する。</p>
+<table><thead><tr><th>競技種別</th><th>入力内容</th></tr></thead><tbody>
+<tr><td>個人・団体法形のトーナメント</td><td>赤旗0〜3本</td></tr>
+<tr><td>個人・団体実戦</td><td>赤勝利または白勝利</td></tr>
+<tr><td>団体法形</td><td>主審・副審得点と減点</td></tr>
+<tr><td>展開</td><td>時間、主審・副審得点、減点</td></tr>
+</tbody></table>
+<p>入力後は保存された結果を確認し、正しく保存されていない場合は停止する。
+団体法形・展開の予選では、全試合の終了後に結果を確定して決勝進出団体を反映する。</p>
+<h2 id="失敗した場合"><a class="header" href="#失敗した場合">失敗した場合</a></h2>
+<p>計画ファイルに現在競技IDを記載している場合は、問題を解消して同じコマンドを再実行する。
+完了済みの競技はスキップされ、未完了の競技から続行する。
+エラーの内容はコンソールに表示される。</p>
+<h2 id="注意事項"><a class="header" href="#注意事項">注意事項</a></h2>
+<ul>
+<li>複数のターミナルから同じコートを同時に実行しない。</li>
+<li>実行中は対象コートを手動で操作しない。</li>
+<li>処理済みの試合結果は、ツールを再実行しても元に戻らない。</li>
+<li>このツールはローカル環境専用であり、本番環境やCloud Runには使用しない。</li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="大会準備"><a class="header" href="#大会準備">大会準備</a></h1>
 <p>各大会毎にデータベースを構築する必要がある。</p>
 <h2 id="環境構築"><a class="header" href="#環境構築">環境構築</a></h2>
