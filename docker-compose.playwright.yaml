@@ -26,7 +26,6 @@ services:
     volumes:
       - ./e2e/tests:/work/tests:ro
       - ./e2e/playwright.config.ts:/work/playwright.config.ts:ro
-      - ./e2e/artifacts/${ARTIFACT_SUBDIR:-latest}:/artifacts
     command:
       - npx
       - playwright

@@ -238,6 +238,7 @@ async function verifyTableRecord(page: Page, payload: TableRecordPayload) {
 }
 
 async function recordTournamentGame(page: Page) {
+  await expect(page.locator("#choice0")).toBeVisible({ timeout: 15_000 });
   const isHokei = await page.getByText("赤の旗", { exact: true }).isVisible();
   const choice = isHokei ? integer(0, 3) : integer(0, 1);
   const label = isHokei
@@ -437,6 +438,26 @@ test("指定コートの現在競技を完了し、次競技へ進める", async
     console.log("[advance-schedule] attendance was already completed");
   }
 
+  console.log(
+    `[advance-schedule] opening record screen for schedule=${initial.id}, game=${initial.game_id}`,
+  );
+  await page.goto(`/admin/block?block_number=${court}`, {
+    waitUntil: "domcontentloaded",
+  });
+  const row = page.locator(
+    `tr[data-schedule-id="${initial.id}"][data-current="true"]`,
+  );
+  const recordButton = row.getByRole("button", { name: "記録", exact: true });
+  await expect(row).toBeVisible({ timeout: 15_000 });
+  await expect(recordButton).toBeEnabled({ timeout: 15_000 });
+  await Promise.all([
+    page.waitForURL(/\/admin\/record_(?:table_)?result/, {
+      timeout: 15_000,
+    }),
+    recordButton.click(),
+  ]);
+  console.log("[advance-schedule] record screen opened");
+
   const visitedPositions = new Set<string>();
   for (let recordedGames = 0; ; recordedGames += 1) {
     console.log(
@@ -459,26 +480,6 @@ test("指定コートの現在競技を完了し、次競技へ進める", async
       );
     }
     visitedPositions.add(position);
-
-    console.log(
-      `[advance-schedule] opening record screen for schedule=${before.id}, game=${before.game_id}`,
-    );
-    await page.goto(`/admin/block?block_number=${court}`, {
-      waitUntil: "domcontentloaded",
-    });
-    const row = page.locator(
-      `tr[data-schedule-id="${initial.id}"][data-current="true"]`,
-    );
-    const recordButton = row.getByRole("button", { name: "記録", exact: true });
-    await expect(row).toBeVisible({ timeout: 15_000 });
-    await expect(recordButton).toBeEnabled({ timeout: 15_000 });
-    await Promise.all([
-      page.waitForURL(/\/admin\/record_(?:table_)?result/, {
-        timeout: 15_000,
-      }),
-      recordButton.click(),
-    ]);
-    console.log("[advance-schedule] record screen opened");
 
     const result = page.url().includes("record_table_result")
       ? await fillTableScores(page)

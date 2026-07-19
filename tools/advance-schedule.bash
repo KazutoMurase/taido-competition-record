@@ -90,20 +90,12 @@ PLAYWRIGHT_UID="$(id -u)" \
 PLAYWRIGHT_GID="$(id -g)" \
 "${COMPOSE[@]}" build playwright
 
-RUN_ID=${RUN_ID:-"$(date +%Y%m%d-%H%M%S)-$$"}
-if [[ ! "${RUN_ID}" =~ ^[A-Za-z0-9._-]+$ ]]; then
-    echo "RUN_ID may only contain letters, numbers, dot, underscore, and hyphen." >&2
-    exit 1
-fi
 TOTAL_STEPS=${#COURTS[@]}
 
 for ((index = 0; index < TOTAL_STEPS; index += 1)); do
     COURT=${COURTS[index]}
     EXPECTED_SCHEDULE_ID=${EXPECTED_SCHEDULE_IDS[index]}
     STEP_NUMBER=$((index + 1))
-    STEP_LABEL=$(printf "%03d-%s" "${STEP_NUMBER}" "${COURT}")
-    ARTIFACT_SUBDIR="${RUN_ID}/${STEP_LABEL}"
-    mkdir -p "e2e/artifacts/${ARTIFACT_SUBDIR}"
     if [[ -n "${EXPECTED_SCHEDULE_ID}" ]]; then
         echo "[advance-plan] [${STEP_NUMBER}/${TOTAL_STEPS}] court=${COURT} expected_schedule=${EXPECTED_SCHEDULE_ID}"
     else
@@ -115,7 +107,6 @@ for ((index = 0; index < TOTAL_STEPS; index += 1)); do
     EXPECTED_SCHEDULE_ID="${EXPECTED_SCHEDULE_ID}" \
     PLAYWRIGHT_UID="$(id -u)" \
     PLAYWRIGHT_GID="$(id -g)" \
-    ARTIFACT_SUBDIR="${ARTIFACT_SUBDIR}" \
     "${COMPOSE[@]}" run \
         --rm \
         --no-deps \
@@ -123,4 +114,3 @@ for ((index = 0; index < TOTAL_STEPS; index += 1)); do
 done
 
 echo "[advance-plan] completed ${TOTAL_STEPS} step(s)"
-echo "[advance-plan] artifacts: e2e/artifacts/${RUN_ID}"

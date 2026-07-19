@@ -18,5 +18,5 @@ cloud-sql-proxy
 # venv for generate db script
 venv/
 
-# Playwright output
-e2e/artifacts/
+# Local Playwright plan
+e2e/advance-plan.txt

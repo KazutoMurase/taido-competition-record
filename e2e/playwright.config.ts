@@ -20,11 +20,8 @@ export default defineConfig({
   forbidOnly: true,
   retries: 0,
   workers: 1,
-  outputDir: "/artifacts/test-results",
-  reporter: [
-    ["line"],
-    ["html", { outputFolder: "/artifacts/report", open: "never" }],
-  ],
+  outputDir: "/tmp/test-results",
+  reporter: "line",
   use: {
     baseURL,
     actionTimeout: 15_000,
@@ -34,8 +31,8 @@ export default defineConfig({
       password: process.env.PASSWORD,
     },
     headless: true,
-    screenshot: "only-on-failure",
-    trace: "retain-on-failure",
-    video: "retain-on-failure",
+    screenshot: "off",
+    trace: "off",
+    video: "off",
   },
 });
