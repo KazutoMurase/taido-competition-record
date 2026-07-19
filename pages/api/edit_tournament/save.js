@@ -209,12 +209,13 @@ function rowsToDantaiCsv(rows) {
   ].join("\n");
 }
 
-async function replaceEventTable(client, eventName, rows) {
+async function replaceEventTable(pool, eventName, rows) {
   const isDantaiZissen = eventName.includes("dantai_zissen");
   const header = isDantaiZissen ? DANTAI_CSV_HEADER : CSV_HEADER;
   const insertRows = isDantaiZissen ? dantaiRows(rows) : rows;
-  await client.query("BEGIN");
+  const client = await pool.connect();
   try {
+    await client.query("BEGIN");
     await client.query(`DELETE FROM ${eventName}`);
     for (const row of insertRows) {
       await client.query({
@@ -226,6 +227,8 @@ async function replaceEventTable(client, eventName, rows) {
   } catch (error) {
     await client.query("ROLLBACK");
     throw error;
+  } finally {
+    client.release();
   }
 }
 
@@ -281,9 +284,9 @@ export default async function SaveTournament(req, res) {
     const originalDir = path.join(baseDir, "original");
     const tournamentCsv = path.join(originalDir, `${eventName}.csv`);
 
-    const client = await GetClient();
-    await assertEventExists(client, eventName);
-    const playerIds = await buildPlayerIds(client, eventName);
+    const pool = GetClient();
+    await assertEventExists(pool, eventName);
+    const playerIds = await buildPlayerIds(pool, eventName);
     const rows = normalizeRows(req.body.rows, playerIds);
     const csv = `${
       eventName.includes("dantai_zissen")
@@ -292,7 +295,7 @@ export default async function SaveTournament(req, res) {
     }\n`;
 
     const timestamp = Date.now();
-    await replaceEventTable(client, eventName, rows);
+    await replaceEventTable(pool, eventName, rows);
     await MarkResultUpdated(eventName);
     const csvResult = tryWriteCsv(originalDir, tournamentCsv, csv, timestamp);
 

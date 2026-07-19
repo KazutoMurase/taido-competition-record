@@ -121,10 +121,11 @@ async function buildTeamIds(client, eventName) {
   return new Set(result.rows.map((row) => cleanText(row.id)));
 }
 
-async function replaceEventTable(client, eventName, rows) {
+async function replaceEventTable(pool, eventName, rows) {
   const header = headerForEvent(eventName);
-  await client.query("BEGIN");
+  const client = await pool.connect();
   try {
+    await client.query("BEGIN");
     await client.query(`DELETE FROM ${eventName}`);
     for (const row of rows) {
       await client.query({
@@ -138,6 +139,8 @@ async function replaceEventTable(client, eventName, rows) {
   } catch (error) {
     await client.query("ROLLBACK");
     throw error;
+  } finally {
+    client.release();
   }
 }
 
@@ -189,16 +192,16 @@ export default async function SaveTableOrder(req, res) {
     assertSafeName(competition, "competition");
     assertSafeName(eventName, "event_name");
 
-    const client = await GetClient();
-    await assertEventExists(client, eventName);
+    const pool = GetClient();
+    await assertEventExists(pool, eventName);
     const rows = normalizeRows(
       req.body.rows,
-      await buildTeamIds(client, eventName),
+      await buildTeamIds(pool, eventName),
     );
     const csv = `${rowsToCsv(rows, eventName)}\n`;
     const timestamp = Date.now();
 
-    await replaceEventTable(client, eventName, rows);
+    await replaceEventTable(pool, eventName, rows);
     await MarkResultUpdated(eventName);
 
     const originalDir = path.join(
