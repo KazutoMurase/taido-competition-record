@@ -9,6 +9,7 @@ usage() {
     echo "Usage:"
     echo "  tools/advance-schedule.bash [--parallel] A [B ...]"
     echo "  tools/advance-schedule.bash [--parallel] --file PATH"
+    echo "  tools/advance-schedule.bash [--parallel] --all"
 }
 
 append_step() {
@@ -32,6 +33,7 @@ declare -a COURTS=()
 declare -a EXPECTED_SCHEDULE_IDS=()
 declare -a COURT_ARGUMENTS=()
 PARALLEL=false
+ALL_COURTS=false
 PLAN_FILE=""
 
 while [[ $# -gt 0 ]]; do
@@ -42,6 +44,14 @@ while [[ $# -gt 0 ]]; do
                 exit 1
             fi
             PARALLEL=true
+            shift
+            ;;
+        --all)
+            if [[ "${ALL_COURTS}" == true ]]; then
+                echo "--all may only be specified once." >&2
+                exit 1
+            fi
+            ALL_COURTS=true
             shift
             ;;
         --file)
@@ -67,6 +77,11 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+if [[ "${ALL_COURTS}" == true && ( -n "${PLAN_FILE}" || ${#COURT_ARGUMENTS[@]} -gt 0 ) ]]; then
+    echo "--all cannot be combined with court arguments or --file." >&2
+    exit 1
+fi
 
 if [[ -n "${PLAN_FILE}" ]]; then
     if [[ ${#COURT_ARGUMENTS[@]} -gt 0 ]]; then
@@ -98,7 +113,7 @@ else
     done
 fi
 
-if [[ ${#COURTS[@]} -eq 0 ]]; then
+if [[ "${ALL_COURTS}" == false && ${#COURTS[@]} -eq 0 ]]; then
     echo "No steps were found." >&2
     exit 1
 fi
@@ -120,6 +135,48 @@ PLAYWRIGHT_UID="$(id -u)" \
 PLAYWRIGHT_GID="$(id -g)" \
 "${COMPOSE[@]}" build playwright
 
+if [[ "${ALL_COURTS}" == true ]]; then
+    if ! COURT_OUTPUT=$(
+        PLAYWRIGHT_UID="$(id -u)" \
+        PLAYWRIGHT_GID="$(id -g)" \
+        "${COMPOSE[@]}" run \
+            --rm \
+            --no-deps \
+            -T \
+            playwright \
+            node -e '
+const response = await fetch(`${process.env.BASE_URL}/api/get_courts`);
+if (!response.ok) {
+  throw new Error(`/api/get_courts returned ${response.status}: ${await response.text()}`);
+}
+const courts = await response.json();
+for (const court of courts) {
+  const name = String(court.name).replace(/[\x22\x27]/g, "");
+  const match = name.match(/^([A-Za-z])コート$/);
+  if (!match) {
+    throw new Error(`Unexpected court name: ${court.name}`);
+  }
+  console.log(match[1].toUpperCase());
+}
+'
+    ); then
+        echo "Failed to get courts from the app." >&2
+        exit 1
+    fi
+
+    while IFS= read -r court; do
+        if [[ -n "${court}" ]]; then
+            append_step "${court}"
+        fi
+    done <<< "${COURT_OUTPUT}"
+
+    if [[ ${#COURTS[@]} -eq 0 ]]; then
+        echo "No courts were returned by the app." >&2
+        exit 1
+    fi
+    echo "[advance-plan] all courts: ${COURTS[*]}"
+fi
+
 TOTAL_STEPS=${#COURTS[@]}
 
 run_step() {
@@ -138,6 +195,7 @@ run_step() {
         COURT="${court}" \
         CONFIRM_ADVANCE="${court}" \
         EXPECTED_SCHEDULE_ID="${expected_schedule_id}" \
+        ADVANCE_ALL_SCHEDULES="$([[ "${ALL_COURTS}" == true ]] && echo 1 || echo 0)" \
         PLAYWRIGHT_UID="$(id -u)" \
         PLAYWRIGHT_GID="$(id -g)" \
         "${COMPOSE[@]}" run \
@@ -149,6 +207,7 @@ run_step() {
         COURT="${court}" \
         CONFIRM_ADVANCE="${court}" \
         EXPECTED_SCHEDULE_ID="${expected_schedule_id}" \
+        ADVANCE_ALL_SCHEDULES="$([[ "${ALL_COURTS}" == true ]] && echo 1 || echo 0)" \
         PLAYWRIGHT_UID="$(id -u)" \
         PLAYWRIGHT_GID="$(id -g)" \
         "${COMPOSE[@]}" run \
