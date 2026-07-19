@@ -69,7 +69,7 @@ const CheckTableGroupsOnBlock = async (req, res) => {
       "update_complete_players_for_" + block_name;
     const event_name = (is_test ? "test_" : "") + GetEventName(event_id);
     const latestResultUpdateKey =
-      "latest_update_result_for_" + event_name + "_timestamp";
+      "latest_update_result_for_" + event_name + "_version";
     const data = await GetVersionedCache(
       cacheKey,
       [

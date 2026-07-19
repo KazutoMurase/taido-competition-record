@@ -64,7 +64,7 @@ const CurrentGameOnTable = async (req, res) => {
     const latestGameIdUpdateKey = "update_game_id_for_" + current_block_name;
     const latestChangeOrderKey = "change_order_for_" + block_name;
     const latestUpdateResultKey =
-      "latest_update_result_for_" + event_name + "_timestamp";
+      "latest_update_result_for_" + event_name + "_version";
     const latestCompletePlayersKey =
       "update_complete_players_for_" + block_name;
 

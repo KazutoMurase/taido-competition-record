@@ -457,7 +457,7 @@ const CheckPlayersOnBlock = async (req, res) => {
     const event_name = (is_test ? "test_" : "") + GetEventName(event_id);
     const players_name = is_test ? "test_players" : "players";
     const latestResultUpdateKey =
-      "latest_update_result_for_" + event_name + "_timestamp";
+      "latest_update_result_for_" + event_name + "_version";
     const data = await GetVersionedCache(
       cacheKey,
       [
