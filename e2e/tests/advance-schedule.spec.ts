@@ -264,11 +264,16 @@ async function recordTournamentGame(page: Page) {
     page.waitForResponse(
       (response) =>
         response.url().includes("/api/record") &&
-        response.request().method() === "POST" &&
-        response.ok(),
+        response.request().method() === "POST",
     ),
     page.getByRole("button", { name: "決定", exact: true }).first().click(),
   ]);
+
+  if (!recordResponse.ok()) {
+    throw new Error(
+      `/api/record returned ${recordResponse.status()}: ${await recordResponse.text()}`,
+    );
+  }
 
   const payload = recordResponse.request().postDataJSON() as RecordPayload;
   await verifyTournamentRecord(page, payload);
@@ -338,11 +343,16 @@ async function fillTableScores(page: Page) {
     page.waitForResponse(
       (response) =>
         response.url().includes("/api/record_table") &&
-        response.request().method() === "POST" &&
-        response.ok(),
+        response.request().method() === "POST",
     ),
     page.getByRole("button", { name: "決定", exact: true }).first().click(),
   ]);
+
+  if (!recordResponse.ok()) {
+    throw new Error(
+      `/api/record_table returned ${recordResponse.status()}: ${await recordResponse.text()}`,
+    );
+  }
 
   const payload = recordResponse.request().postDataJSON() as TableRecordPayload;
   await verifyTableRecord(page, payload);
