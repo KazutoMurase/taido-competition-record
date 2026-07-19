@@ -167,6 +167,15 @@
 [advance-schedule] completed 男子法形; next schedule=2
 </code></pre>
 <p>点呼や一部の試合がすでに完了している場合は、残りの処理から続行する。</p>
+<h2 id="全コートを最後まで進める"><a class="header" href="#全コートを最後まで進める">全コートを最後まで進める</a></h2>
+<p><code>--all</code>を指定すると、管理画面と同じコート一覧を取得し、全コートの残りの競技を最後まで進める。</p>
+<pre><code class="language-bash">tools/advance-schedule.bash --all
+</code></pre>
+<p>コートごとに並列実行する場合は<code>--parallel</code>を追加する。</p>
+<pre><code class="language-bash">tools/advance-schedule.bash --parallel --all
+</code></pre>
+<p>各コート内の競技は順番に処理される。
+<code>--all</code>はコート名や<code>--file</code>とは同時に指定できない。</p>
 <h2 id="複数の競技を順番に進める"><a class="header" href="#複数の競技を順番に進める">複数の競技を順番に進める</a></h2>
 <p>複数のコートを指定すると、指定した順番に各コートの現在競技を1つずつ進める。</p>
 <pre><code class="language-bash">tools/advance-schedule.bash A B A C B
