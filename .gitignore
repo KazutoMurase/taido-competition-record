@@ -17,6 +17,3 @@ cloud-sql-proxy
 
 # venv for generate db script
 venv/
-
-# Local Playwright plan
-e2e/advance-plan.txt
