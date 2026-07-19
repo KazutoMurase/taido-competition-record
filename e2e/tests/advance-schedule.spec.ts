@@ -369,6 +369,12 @@ test("指定コートの現在競技を完了し、次競技へ進める", async
   const expectedScheduleId = expectedScheduleText
     ? Number.parseInt(expectedScheduleText, 10)
     : null;
+  const advanceAllSchedules = process.env.ADVANCE_ALL_SCHEDULES === "1";
+  if (advanceAllSchedules && expectedScheduleId !== null) {
+    throw new Error(
+      "ADVANCE_ALL_SCHEDULES cannot be combined with EXPECTED_SCHEDULE_ID.",
+    );
+  }
   console.log(`[advance-schedule] court=${court.toUpperCase()}`);
 
   await waitForApp(page);
@@ -380,130 +386,150 @@ test("指定コートの現在競技を完了し、次競技へ進める", async
     new RegExp(`/admin/block\\?block_number=${court}$`),
   );
 
-  const initial = await currentSchedule(page, court);
-  const schedules = await scheduleList(page, court);
-  if (expectedScheduleId !== null && initial.id > expectedScheduleId) {
-    const completedSchedule = schedules.find(
-      (schedule) => schedule.id === expectedScheduleId,
-    );
-    if (completedSchedule) {
-      await confirmPreliminaryTableResult(page, court, completedSchedule);
-    }
-    console.log(
-      `[advance-schedule] skip: expected schedule=${expectedScheduleId} is already completed; current schedule=${initial.id}`,
-    );
-    return;
-  }
-  if (expectedScheduleId !== null && initial.id < expectedScheduleId) {
-    throw new Error(
-      `Court ${court.toUpperCase()} is behind the plan: expected schedule=${expectedScheduleId}, current schedule=${initial.id}.`,
-    );
-  }
-
-  const target = schedules.find((schedule) => schedule.id === initial.id);
-  if (!target || target.event_id <= 0) {
-    throw new Error(
-      `No playable current competition for court ${court.toUpperCase()}.`,
-    );
-  }
-
-  const competitionName =
-    target.name?.replace(/["']/g, "") || `event ${target.event_id}`;
-  console.log(
-    `[advance-schedule] current schedule=${initial.id}, game=${initial.game_id}, competition=${competitionName}`,
-  );
-
-  const currentRow = page.locator(
-    `tr[data-schedule-id="${initial.id}"][data-current="true"]`,
-  );
-  await expect(currentRow).toBeVisible();
-
-  if (!target.players_checked) {
-    await currentRow.getByRole("button", { name: "点呼", exact: true }).click();
-    await expect(page).toHaveURL(/\/admin\/check_players_on_block/);
-    await markEveryonePresent(page);
-    console.log("[advance-schedule] attendance completed");
-
-    console.log(
-      "[advance-schedule] waiting for attendance status to be visible",
-    );
-    await expect
-      .poll(
-        async () => {
-          const updatedSchedules = await scheduleList(page, court);
-          return Boolean(
-            updatedSchedules.find((schedule) => schedule.id === initial.id)
-              ?.players_checked,
-          );
-        },
-        { timeout: 15_000, intervals: [250, 500, 1_000] },
-      )
-      .toBe(true);
-    console.log("[advance-schedule] attendance status confirmed");
-  } else {
-    console.log("[advance-schedule] attendance was already completed");
-  }
-
-  console.log(
-    `[advance-schedule] opening record screen for schedule=${initial.id}, game=${initial.game_id}`,
-  );
-  await page.goto(`/admin/block?block_number=${court}`, {
-    waitUntil: "domcontentloaded",
-  });
-  const row = page.locator(
-    `tr[data-schedule-id="${initial.id}"][data-current="true"]`,
-  );
-  const recordButton = row.getByRole("button", { name: "記録", exact: true });
-  await expect(row).toBeVisible({ timeout: 15_000 });
-  await expect(recordButton).toBeEnabled({ timeout: 15_000 });
-  await Promise.all([
-    page.waitForURL(/\/admin\/record_(?:table_)?result/, {
-      timeout: 15_000,
-    }),
-    recordButton.click(),
-  ]);
-  console.log("[advance-schedule] record screen opened");
-
-  const visitedPositions = new Set<string>();
-  for (let recordedGames = 0; ; recordedGames += 1) {
-    console.log(
-      `[advance-schedule] checking current position before game ${recordedGames + 1}`,
-    );
-    const before = await currentSchedule(page, court);
-    if (before.id !== initial.id) {
-      await confirmPreliminaryTableResult(page, court, target);
-      console.log(
-        `[advance-schedule] completed ${competitionName}; next schedule=${before.id}`,
+  for (;;) {
+    const initial = await currentSchedule(page, court);
+    const schedules = await scheduleList(page, court);
+    if (expectedScheduleId !== null && initial.id > expectedScheduleId) {
+      const completedSchedule = schedules.find(
+        (schedule) => schedule.id === expectedScheduleId,
       );
-      expect(before.id).toBe(initial.id + 1);
+      if (completedSchedule) {
+        await confirmPreliminaryTableResult(page, court, completedSchedule);
+      }
+      console.log(
+        `[advance-schedule] skip: expected schedule=${expectedScheduleId} is already completed; current schedule=${initial.id}`,
+      );
       return;
     }
-
-    const position = `${before.id}:${before.game_id}`;
-    if (visitedPositions.has(position)) {
+    if (expectedScheduleId !== null && initial.id < expectedScheduleId) {
       throw new Error(
-        `Schedule ${initial.id} returned to an already processed position: ${position}.`,
+        `Court ${court.toUpperCase()} is behind the plan: expected schedule=${expectedScheduleId}, current schedule=${initial.id}.`,
       );
     }
-    visitedPositions.add(position);
 
-    await waitForRecordData(page);
-    const result = page.url().includes("record_table_result")
-      ? await fillTableScores(page)
-      : await recordTournamentGame(page);
+    const target = schedules.find((schedule) => schedule.id === initial.id);
+    if (!target || target.event_id <= 0) {
+      if (advanceAllSchedules) {
+        console.log(
+          `[advance-schedule] completed all competitions for court=${court.toUpperCase()}`,
+        );
+        return;
+      }
+      throw new Error(
+        `No playable current competition for court ${court.toUpperCase()}.`,
+      );
+    }
 
-    await expect
-      .poll(
-        async () => {
-          const current = await currentSchedule(page, court);
-          return `${current.id}:${current.game_id}`;
-        },
-        { timeout: 15_000, intervals: [250, 500, 1_000] },
-      )
-      .not.toBe(`${before.id}:${before.game_id}`);
+    const competitionName =
+      target.name?.replace(/["']/g, "") || `event ${target.event_id}`;
+    console.log(
+      `[advance-schedule] current schedule=${initial.id}, game=${initial.game_id}, competition=${competitionName}`,
+    );
+
+    const currentRow = page.locator(
+      `tr[data-schedule-id="${initial.id}"][data-current="true"]`,
+    );
+    await expect(currentRow).toBeVisible();
+
+    if (!target.players_checked) {
+      await currentRow
+        .getByRole("button", { name: "点呼", exact: true })
+        .click();
+      await expect(page).toHaveURL(/\/admin\/check_players_on_block/);
+      await markEveryonePresent(page);
+      console.log("[advance-schedule] attendance completed");
+
+      console.log(
+        "[advance-schedule] waiting for attendance status to be visible",
+      );
+      await expect
+        .poll(
+          async () => {
+            const updatedSchedules = await scheduleList(page, court);
+            return Boolean(
+              updatedSchedules.find((schedule) => schedule.id === initial.id)
+                ?.players_checked,
+            );
+          },
+          { timeout: 15_000, intervals: [250, 500, 1_000] },
+        )
+        .toBe(true);
+      console.log("[advance-schedule] attendance status confirmed");
+    } else {
+      console.log("[advance-schedule] attendance was already completed");
+    }
 
     console.log(
-      `[advance-schedule] recorded game=${before.game_id}, result=${result}`,
+      `[advance-schedule] opening record screen for schedule=${initial.id}, game=${initial.game_id}`,
     );
+    await page.goto(`/admin/block?block_number=${court}`, {
+      waitUntil: "domcontentloaded",
+    });
+    const row = page.locator(
+      `tr[data-schedule-id="${initial.id}"][data-current="true"]`,
+    );
+    const recordButton = row.getByRole("button", {
+      name: "記録",
+      exact: true,
+    });
+    await expect(row).toBeVisible({ timeout: 15_000 });
+    await expect(recordButton).toBeEnabled({ timeout: 15_000 });
+    await Promise.all([
+      page.waitForURL(/\/admin\/record_(?:table_)?result/, {
+        timeout: 15_000,
+      }),
+      recordButton.click(),
+    ]);
+    console.log("[advance-schedule] record screen opened");
+
+    const visitedPositions = new Set<string>();
+    for (let recordedGames = 0; ; recordedGames += 1) {
+      console.log(
+        `[advance-schedule] checking current position before game ${recordedGames + 1}`,
+      );
+      const before = await currentSchedule(page, court);
+      if (before.id !== initial.id) {
+        await confirmPreliminaryTableResult(page, court, target);
+        console.log(
+          `[advance-schedule] completed ${competitionName}; next schedule=${before.id}`,
+        );
+        expect(before.id).toBe(initial.id + 1);
+        break;
+      }
+
+      const position = `${before.id}:${before.game_id}`;
+      if (visitedPositions.has(position)) {
+        throw new Error(
+          `Schedule ${initial.id} returned to an already processed position: ${position}.`,
+        );
+      }
+      visitedPositions.add(position);
+
+      await waitForRecordData(page);
+      const result = page.url().includes("record_table_result")
+        ? await fillTableScores(page)
+        : await recordTournamentGame(page);
+
+      await expect
+        .poll(
+          async () => {
+            const current = await currentSchedule(page, court);
+            return `${current.id}:${current.game_id}`;
+          },
+          { timeout: 15_000, intervals: [250, 500, 1_000] },
+        )
+        .not.toBe(`${before.id}:${before.game_id}`);
+
+      console.log(
+        `[advance-schedule] recorded game=${before.game_id}, result=${result}`,
+      );
+    }
+
+    if (!advanceAllSchedules) {
+      return;
+    }
+    await page.goto(`/admin/block?block_number=${court}`, {
+      waitUntil: "domcontentloaded",
+    });
   }
 });

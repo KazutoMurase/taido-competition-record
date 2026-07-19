@@ -14,6 +14,7 @@ services:
       COURT: ${COURT:-}
       CONFIRM_ADVANCE: ${CONFIRM_ADVANCE:-}
       EXPECTED_SCHEDULE_ID: ${EXPECTED_SCHEDULE_ID:-}
+      ADVANCE_ALL_SCHEDULES: ${ADVANCE_ALL_SCHEDULES:-0}
     extra_hosts:
       - host.docker.internal:host-gateway
     read_only: true
