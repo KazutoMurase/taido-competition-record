@@ -7,9 +7,9 @@ REPOSITORY_ROOT=$(cd "${SCRIPT_DIR}/.." && pwd)
 
 usage() {
     echo "Usage:"
-    echo "  tools/advance-schedule.bash [--parallel] A [B ...]"
-    echo "  tools/advance-schedule.bash [--parallel] --file PATH"
-    echo "  tools/advance-schedule.bash [--parallel] --all"
+    echo "  tools/advance-schedule.bash [--base-url URL] [--parallel] A [B ...]"
+    echo "  tools/advance-schedule.bash [--base-url URL] [--parallel] --file PATH"
+    echo "  tools/advance-schedule.bash [--base-url URL] [--parallel] --all"
 }
 
 append_step() {
@@ -35,6 +35,7 @@ declare -a COURT_ARGUMENTS=()
 PARALLEL=false
 ALL_COURTS=false
 PLAN_FILE=""
+BASE_URL=""
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -64,6 +65,18 @@ while [[ $# -gt 0 ]]; do
                 exit 1
             fi
             PLAN_FILE=$2
+            shift 2
+            ;;
+        --base-url)
+            if [[ -n "${BASE_URL}" ]]; then
+                echo "--base-url may only be specified once." >&2
+                exit 1
+            fi
+            if [[ $# -lt 2 ]]; then
+                usage
+                exit 1
+            fi
+            BASE_URL=${2%/}
             shift 2
             ;;
         --*)
@@ -120,9 +133,22 @@ fi
 
 cd "${REPOSITORY_ROOT}"
 
-if [[ -z "$(docker compose -f docker-compose.yaml ps --status running -q app)" ]]; then
-    echo "The app service is not running. Start it first with: docker compose up" >&2
-    exit 1
+declare -a REMOTE_RUN_OPTIONS=()
+if [[ -n "${BASE_URL}" ]]; then
+    if [[ ! "${BASE_URL}" =~ ^https://[A-Za-z0-9.-]+(:[1-9][0-9]{0,4})?$ ]]; then
+        echo "--base-url must be an HTTPS origin such as https://example.com." >&2
+        exit 1
+    fi
+    REMOTE_RUN_OPTIONS+=(
+        --env "BASE_URL=${BASE_URL}"
+        --env ALLOW_REMOTE_BASE_URL=1
+    )
+    echo "[advance-plan] remote target: ${BASE_URL}"
+else
+    if [[ -z "$(docker compose -f docker-compose.yaml ps --status running -q app)" ]]; then
+        echo "The app service is not running. Start it first with: docker compose up" >&2
+        exit 1
+    fi
 fi
 
 COMPOSE=(
@@ -143,6 +169,7 @@ if [[ "${ALL_COURTS}" == true ]]; then
             --rm \
             --no-deps \
             -T \
+            "${REMOTE_RUN_OPTIONS[@]}" \
             playwright \
             node -e '
 const response = await fetch(`${process.env.BASE_URL}/api/get_courts`);
@@ -202,6 +229,7 @@ run_step() {
             --rm \
             --no-deps \
             -T \
+            "${REMOTE_RUN_OPTIONS[@]}" \
             playwright 2>&1 | sed -u "s/^/[court ${court}] /"
     else
         COURT="${court}" \
@@ -214,6 +242,7 @@ run_step() {
             --rm \
             --no-deps \
             -T \
+            "${REMOTE_RUN_OPTIONS[@]}" \
             playwright
     fi
 }

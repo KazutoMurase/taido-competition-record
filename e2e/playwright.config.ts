@@ -2,11 +2,18 @@ import { defineConfig } from "@playwright/test";
 
 const baseURL = process.env.BASE_URL ?? "http://host.docker.internal:3000";
 const target = new URL(baseURL);
+const allowRemoteBaseURL = process.env.ALLOW_REMOTE_BASE_URL === "1";
 
-if (target.hostname !== "host.docker.internal") {
+if (target.hostname !== "host.docker.internal" && !allowRemoteBaseURL) {
   throw new Error(
     `Refusing to run against ${target.hostname}. The advance-schedule scenario only accepts the local Docker host.`,
   );
+}
+if (allowRemoteBaseURL && target.protocol !== "https:") {
+  throw new Error("A remote BASE_URL must use HTTPS.");
+}
+if (target.username || target.password) {
+  throw new Error("BASE_URL must not contain credentials.");
 }
 
 if (!process.env.USERNAME || !process.env.PASSWORD) {
