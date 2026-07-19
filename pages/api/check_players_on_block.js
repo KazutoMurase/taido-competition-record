@@ -1,6 +1,6 @@
 import GetClient from "../../lib/db_client";
-import { Get, Set } from "../../lib/redis_client";
 import { GetEventName } from "../../lib/get_event_name";
+import { GetVersionedCache } from "../../lib/versioned_cache";
 
 function update(sorted_data, item, block_indices, value, round) {
   if ("prev_left_id" in item) {
@@ -432,62 +432,49 @@ const CheckPlayersOnBlock = async (req, res) => {
     const block_name = "block_" + req.query.block_number;
     const cacheKey =
       "check_players_on_" + block_name + "_for_" + req.query.schedule_id;
-    const cachedData = await Get(cacheKey);
     const notification_request_name = is_test
       ? "test_notification_request"
       : "notification_request";
     const latestNotificationUpdateKey =
       "latest_update_for_" + notification_request_name;
-    const latestNotificationUpdateTimestamp =
-      (await Get(latestNotificationUpdateKey)) || 0;
     const latestCompletePlayersKey =
       "update_complete_players_for_" + block_name;
-    const latestCompletePlayersTimestamp =
-      (await Get(latestCompletePlayersKey)) || 0;
     if (GetEventName(event_id) === "dantai") {
-      if (
-        cachedData &&
-        latestNotificationUpdateTimestamp < cachedData.timestamp &&
-        latestCompletePlayersTimestamp < cachedData.timestamp
-      ) {
-        console.log("using cache");
-        return res.json(cachedData.data);
-      }
-      console.log("get new data");
-      const data = await GetDantaiFromDB(
-        req,
-        res,
-        event_id,
-        is_test,
-        notification_request_name,
+      const data = await GetVersionedCache(
+        cacheKey,
+        [latestNotificationUpdateKey, latestCompletePlayersKey],
+        () =>
+          GetDantaiFromDB(
+            req,
+            res,
+            event_id,
+            is_test,
+            notification_request_name,
+          ),
       );
-      await Set(cacheKey, { data: data, timestamp: Date.now() });
       return res.json(data);
     }
     const event_name = (is_test ? "test_" : "") + GetEventName(event_id);
     const players_name = is_test ? "test_players" : "players";
     const latestResultUpdateKey =
       "latest_update_result_for_" + event_name + "_timestamp";
-    const latestResultUpdateTimestamp = (await Get(latestResultUpdateKey)) || 0;
-    if (
-      cachedData &&
-      latestResultUpdateTimestamp < cachedData.timestamp &&
-      latestNotificationUpdateTimestamp < cachedData.timestamp &&
-      latestCompletePlayersTimestamp < cachedData.timestamp
-    ) {
-      console.log("using cache");
-      return res.json(cachedData.data);
-    }
-    console.log("get new data");
-    const data = await GetFromDB(
-      req,
-      res,
-      event_id,
-      event_name,
-      players_name,
-      notification_request_name,
+    const data = await GetVersionedCache(
+      cacheKey,
+      [
+        latestResultUpdateKey,
+        latestNotificationUpdateKey,
+        latestCompletePlayersKey,
+      ],
+      () =>
+        GetFromDB(
+          req,
+          res,
+          event_id,
+          event_name,
+          players_name,
+          notification_request_name,
+        ),
     );
-    await Set(cacheKey, { data: data, timestamp: Date.now() });
     return res.json(data);
   } catch (error) {
     console.log(error);

@@ -1,5 +1,5 @@
 import GetClient from "../../lib/db_client";
-import { Set } from "../../lib/redis_client";
+import { TouchCacheVersion } from "../../lib/versioned_cache";
 
 const ChangeEventOrder = async (req, res) => {
   try {
@@ -23,8 +23,7 @@ const ChangeEventOrder = async (req, res) => {
     values = [target_schedule_id, target_schedule_id + 1];
     result = await client.query(query, values);
     const key = "change_event_order_for_" + block_name;
-    const timestamp = Date.now();
-    await Set(key, timestamp);
+    await TouchCacheVersion(key);
     res.json({});
   } catch (error) {
     console.log(error);

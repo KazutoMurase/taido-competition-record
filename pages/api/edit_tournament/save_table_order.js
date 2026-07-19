@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import GetClient from "../../../lib/db_client";
-import { Set as RedisSet } from "../../../lib/redis_client";
+import { MarkResultUpdated } from "../../../lib/result_cache";
 
 const DANTAI_HOKEI_HEADER = [
   "id",
@@ -199,10 +199,7 @@ export default async function SaveTableOrder(req, res) {
     const timestamp = Date.now();
 
     await replaceEventTable(client, eventName, rows);
-    await RedisSet(
-      `latest_update_result_for_${eventName}_timestamp`,
-      timestamp,
-    );
+    await MarkResultUpdated(eventName);
 
     const originalDir = path.join(
       process.cwd(),

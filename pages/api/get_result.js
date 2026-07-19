@@ -1,6 +1,7 @@
 import GetClient from "../../lib/db_client";
 import { Get, Set } from "../../lib/redis_client";
 import { applyTournamentLayout } from "../../lib/tournament_layout";
+import { GetResultWithCache } from "../../lib/result_cache";
 
 async function GetFromDB(req, res) {
   const client = await GetClient();
@@ -63,23 +64,13 @@ const GetResult = async (req, res) => {
         return res.json(freezedData.data);
       } else {
         const data = await GetFromDB(req, res);
-        await Set(freezedKey, { data: data, timestamp: Date.now() });
+        await Set(freezedKey, { data });
         return res.json(data);
       }
     }
-    const latestUpdateKey =
-      "latest_update_result_for_" + event_name + "_timestamp";
-    const cacheKey = "get_result_for_" + event_name + "_cache_data";
-    const cachedData = await Get(cacheKey);
-    const latestUpdateTimestamp = (await Get(latestUpdateKey)) || 0;
-    if (cachedData && latestUpdateTimestamp < cachedData.timestamp) {
-      console.log("using cache");
-      return res.json(cachedData.data);
-    }
-    console.log("get new data");
-    const data = await GetFromDB(req, res);
-    console.log(data);
-    await Set(cacheKey, { data: data, timestamp: Date.now() });
+    const data = await GetResultWithCache(event_name, () =>
+      GetFromDB(req, res),
+    );
     res.json(data);
   } catch (error) {
     console.log(error);

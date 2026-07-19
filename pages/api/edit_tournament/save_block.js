@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import GetClient from "../../../lib/db_client";
-import { Set as RedisSet } from "../../../lib/redis_client";
+import { TouchCacheVersion } from "../../../lib/versioned_cache";
 
 const BLOCK_HEADER = [
   "id",
@@ -225,12 +225,14 @@ export default async function SaveBlock(req, res) {
     const timestamp = Date.now();
 
     await replaceBlockTables(client, block, rows, gamesRows);
-    await RedisSet(`latest_update_block_${block}_timestamp`, timestamp);
-    await RedisSet(`change_event_order_for_block_${block}`, timestamp);
-    await RedisSet(`change_order_for_block_${block}`, timestamp);
-    await RedisSet(`update_complete_players_for_block_${block}`, timestamp);
-    await RedisSet(`update_id_for_current_block_${block}`, timestamp);
-    await RedisSet(`update_game_id_for_current_block_${block}`, timestamp);
+    await Promise.all([
+      TouchCacheVersion(`latest_update_block_${block}_timestamp`),
+      TouchCacheVersion(`change_event_order_for_block_${block}`),
+      TouchCacheVersion(`change_order_for_block_${block}`),
+      TouchCacheVersion(`update_complete_players_for_block_${block}`),
+      TouchCacheVersion(`update_id_for_current_block_${block}`),
+      TouchCacheVersion(`update_game_id_for_current_block_${block}`),
+    ]);
 
     const originalDir = path.join(
       process.cwd(),

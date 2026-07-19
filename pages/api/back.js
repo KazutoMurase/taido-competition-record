@@ -1,5 +1,5 @@
 import GetClient from "../../lib/db_client";
-import { Set } from "../../lib/redis_client";
+import { TouchCacheVersion } from "../../lib/versioned_cache";
 
 const Back = async (req, res) => {
   try {
@@ -11,8 +11,7 @@ const Back = async (req, res) => {
       query = "update " + current_block_name + " set game_id = game_id - 1";
       result = await client.query(query);
       const key = "update_game_id_for_" + current_block_name;
-      const timestamp = Date.now();
-      await Set(key, timestamp);
+      await TouchCacheVersion(key);
     }
     res.json({});
   } catch (error) {

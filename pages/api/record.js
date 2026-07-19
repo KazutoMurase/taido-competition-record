@@ -1,15 +1,21 @@
 import GetClient from "../../lib/db_client";
-import { Set } from "../../lib/redis_client";
+import { MarkResultUpdated } from "../../lib/result_cache";
+import { TouchCacheVersion } from "../../lib/versioned_cache";
 
 const Record = async (req, res) => {
   try {
     const client = await GetClient();
     const event_name = req.body.event_name;
+    const game_id = Number(req.body.id);
+    if (!Number.isInteger(game_id) || game_id < 1) {
+      res.status(400).json({ error: "Invalid game ID" });
+      return;
+    }
     const type = event_name.includes("dantai") ? "group" : "player";
     let query =
       "update " + event_name + " set left_" + type + "_flag = $2 where id = $1";
     let values = [
-      req.body.id,
+      game_id,
       type === "group" ? req.body.left_group_flag : req.body.left_player_flag,
     ];
     let result = await client.query(query, values);
@@ -45,9 +51,7 @@ const Record = async (req, res) => {
         result = await client.query(query, values);
       }
     }
-    const key = "latest_update_result_for_" + event_name + "_timestamp";
-    const timestamp = Date.now();
-    await Set(key, timestamp);
+    await MarkResultUpdated(event_name);
     if (req.body.update_block === undefined || req.body.update_block === null) {
       res.json({});
       return;
@@ -67,12 +71,12 @@ const Record = async (req, res) => {
     result = await client.query(query);
     console.log(result.rows);
     const update_game_id_key = "update_game_id_for_" + current_block_name;
-    await Set(update_game_id_key, timestamp);
+    await TouchCacheVersion(update_game_id_key);
     if (result.rows.length === 0) {
       query = "update " + current_block_name + " set id = id + 1, game_id = 1";
       result = await client.query(query);
       const update_id_key = "update_id_for_" + current_block_name;
-      await Set(update_id_key, timestamp);
+      await TouchCacheVersion(update_id_key);
     } else {
       query = "update " + current_block_name + " set game_id = " + next_game_id;
       result = await client.query(query);

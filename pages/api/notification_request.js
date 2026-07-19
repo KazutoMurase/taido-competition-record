@@ -1,5 +1,5 @@
 import GetClient from "../../lib/db_client";
-import { Get, Set } from "../../lib/redis_client";
+import { GetVersionedCache } from "../../lib/versioned_cache";
 
 async function GetFromDB(req, res, notification_request_name) {
   const client = await GetClient();
@@ -48,21 +48,13 @@ const NotificationRequest = async (req, res) => {
       ? "test_notification_request"
       : "notification_request";
     const cacheKey = "get_" + notification_request_name;
-    const cachedData = await Get(cacheKey);
     const latestNotificationUpdateKey =
       "latest_update_for_" + notification_request_name;
-    const latestNotificationUpdateTimestamp =
-      (await Get(latestNotificationUpdateKey)) || 0;
-    if (
-      cachedData &&
-      latestNotificationUpdateTimestamp < cachedData.timestamp
-    ) {
-      console.log("using cache");
-      return res.json(cachedData.data);
-    }
-    console.log("get new data");
-    const data = await GetFromDB(req, res, notification_request_name);
-    await Set(cacheKey, { data: data, timestamp: Date.now() });
+    const data = await GetVersionedCache(
+      cacheKey,
+      [latestNotificationUpdateKey],
+      () => GetFromDB(req, res, notification_request_name),
+    );
     res.json(data);
   } catch (error) {
     console.log(error);

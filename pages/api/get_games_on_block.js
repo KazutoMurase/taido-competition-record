@@ -1,5 +1,5 @@
 import GetClient from "../../lib/db_client";
-import { Get, Set } from "../../lib/redis_client";
+import { GetVersionedCache } from "../../lib/versioned_cache";
 
 function update(sorted_data, item, block_indices, value, round) {
   if ("prev_left_id" in item) {
@@ -331,8 +331,6 @@ const GetGamesOnBlock = async (req, res) => {
       event_name +
       "_" +
       (req.query.schedule_id || "current");
-    const cachedData = await Get(cacheKey);
-
     const latestIdUpdateKey = "update_id_for_" + current_block_name;
     const latestGameIdUpdateKey = "update_game_id_for_" + current_block_name;
     const latestChangeOrderKey = "change_order_for_" + block_name;
@@ -341,28 +339,18 @@ const GetGamesOnBlock = async (req, res) => {
     const latestCompletePlayersKey =
       "update_complete_players_for_" + block_name;
 
-    const latestIdUpdateTimestamp = (await Get(latestIdUpdateKey)) || 0;
-    const latestGameIdUpdateTimestamp = (await Get(latestGameIdUpdateKey)) || 0;
-    const latestChangeOrderTimestamp = (await Get(latestChangeOrderKey)) || 0;
-    const latestUpdateResultTimestamp = (await Get(latestUpdateResultKey)) || 0;
-    const latestCompletePlayersTimestamp =
-      (await Get(latestCompletePlayersKey)) || 0;
-    if (
-      cachedData &&
-      latestIdUpdateTimestamp < cachedData.timestamp &&
-      latestGameIdUpdateTimestamp < cachedData.timestamp &&
-      latestChangeOrderTimestamp < cachedData.timestamp &&
-      latestUpdateResultTimestamp < cachedData.timestamp &&
-      latestCompletePlayersTimestamp < cachedData.timestamp
-    ) {
-      console.log("using cache");
-      return res.json(cachedData.data);
-    }
-    console.log("get new data");
-    const data = await GetFromDB(req, res, event_name);
-    if (data.length !== 0) {
-      await Set(cacheKey, { data: data, timestamp: Date.now() });
-    }
+    const data = await GetVersionedCache(
+      cacheKey,
+      [
+        latestIdUpdateKey,
+        latestGameIdUpdateKey,
+        latestChangeOrderKey,
+        latestUpdateResultKey,
+        latestCompletePlayersKey,
+      ],
+      () => GetFromDB(req, res, event_name),
+      (loaded) => loaded.length !== 0,
+    );
     res.json(data);
   } catch (error) {
     console.log(error);

@@ -1,6 +1,6 @@
 import GetClient from "../../lib/db_client";
-import { Get, Set } from "../../lib/redis_client";
 import { GetEventName } from "../../lib/get_event_name";
+import { GetVersionedCache } from "../../lib/versioned_cache";
 
 async function GetFromDB(
   req,
@@ -60,40 +60,26 @@ const CheckTableGroupsOnBlock = async (req, res) => {
     const block_name = "block_" + req.query.block_number;
     const cacheKey =
       "check_table_groups_on_" + block_name + "_for_" + req.query.schedule_id;
-    const cachedData = await Get(cacheKey);
     const notification_request_name = is_test
       ? "test_notification_request"
       : "notification_request";
     const latestNotificationUpdateKey =
       "latest_update_for_" + notification_request_name;
-    const latestNotificationUpdateTimestamp =
-      (await Get(latestNotificationUpdateKey)) || 0;
     const latestCompleteTableGroupsKey =
       "update_complete_players_for_" + block_name;
-    const latestCompleteTableGroupsTimestamp =
-      (await Get(latestCompleteTableGroupsKey)) || 0;
     const event_name = (is_test ? "test_" : "") + GetEventName(event_id);
     const latestResultUpdateKey =
       "latest_update_result_for_" + event_name + "_timestamp";
-    const latestResultUpdateTimestamp = (await Get(latestResultUpdateKey)) || 0;
-    if (
-      cachedData &&
-      latestResultUpdateTimestamp < cachedData.timestamp &&
-      latestNotificationUpdateTimestamp < cachedData.timestamp &&
-      latestCompleteTableGroupsTimestamp < cachedData.timestamp
-    ) {
-      console.log("using cache");
-      return res.json(cachedData.data);
-    }
-    console.log("get new data");
-    const data = await GetFromDB(
-      req,
-      res,
-      event_id,
-      event_name,
-      notification_request_name,
+    const data = await GetVersionedCache(
+      cacheKey,
+      [
+        latestResultUpdateKey,
+        latestNotificationUpdateKey,
+        latestCompleteTableGroupsKey,
+      ],
+      () =>
+        GetFromDB(req, res, event_id, event_name, notification_request_name),
     );
-    await Set(cacheKey, { data: data, timestamp: Date.now() });
     return res.json(data);
   } catch (error) {
     console.log(error);

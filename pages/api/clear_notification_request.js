@@ -1,5 +1,5 @@
 import GetClient from "../../lib/db_client";
-import { Set } from "../../lib/redis_client";
+import { TouchCacheVersion } from "../../lib/versioned_cache";
 
 const ClearNotificationRequest = async (req, res) => {
   try {
@@ -36,7 +36,7 @@ const ClearNotificationRequest = async (req, res) => {
       console.log(result);
     }
     const key = "latest_update_for_" + notification_request_name;
-    Set(key, Date.now());
+    await TouchCacheVersion(key);
     res.json({});
   } catch (error) {
     console.log(error);

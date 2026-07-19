@@ -1,5 +1,5 @@
 import GetClient from "../../lib/db_client";
-import { Get, Set } from "../../lib/redis_client";
+import { GetVersionedCache } from "../../lib/versioned_cache";
 
 async function GetFromDB(req, res) {
   const client = await GetClient();
@@ -69,22 +69,11 @@ const GetTimeSchedule = async (req, res) => {
     const latest_change_event_order_key =
       "change_event_order_for_" + block_name;
     const cache_key = "time_schedule_for_" + block_name;
-    const latest_update_timestamp = (await Get(latest_update_key)) || 0;
-    const latest_change_event_order_timestamp =
-      (await Get(latest_change_event_order_key)) || 0;
-    const cached_data = await Get(cache_key);
-    if (
-      cached_data &&
-      latest_update_timestamp < cached_data.timestamp &&
-      latest_change_event_order_timestamp < cached_data.timestamp
-    ) {
-      console.log(`using cache for ${cache_key}`);
-      return res.json(cached_data.data);
-    }
-    console.log(`get new data for ${cache_key}`);
-    const data = await GetFromDB(req, res);
-    console.log(data);
-    await Set(cache_key, { data: data, timestamp: Date.now() });
+    const data = await GetVersionedCache(
+      cache_key,
+      [latest_update_key, latest_change_event_order_key],
+      () => GetFromDB(req, res),
+    );
     res.json(data);
   } catch (error) {
     console.log(error);
