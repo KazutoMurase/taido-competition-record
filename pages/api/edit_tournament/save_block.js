@@ -128,12 +128,13 @@ async function eventIdsFromDb(client) {
   return new Set(result.rows.map((row) => Number(row.id)));
 }
 
-async function replaceBlockTables(client, block, rows, gamesRows) {
+async function replaceBlockTables(pool, block, rows, gamesRows) {
   const blockTable = `block_${block}`;
   const gamesTable = `block_${block}_games`;
   const currentTable = `current_block_${block}`;
-  await client.query("BEGIN");
+  const client = await pool.connect();
   try {
+    await client.query("BEGIN");
     await client.query(`DELETE FROM ${gamesTable}`);
     await client.query(`DELETE FROM ${currentTable}`);
     await client.query(`DELETE FROM ${blockTable}`);
@@ -159,6 +160,8 @@ async function replaceBlockTables(client, block, rows, gamesRows) {
   } catch (error) {
     await client.query("ROLLBACK");
     throw error;
+  } finally {
+    client.release();
   }
 }
 
@@ -217,14 +220,14 @@ export default async function SaveBlock(req, res) {
     assertSafeName(competition, "competition");
     assertBlockName(block);
 
-    const client = await GetClient();
-    const rows = normalizeRows(req.body.rows, await eventIdsFromDb(client));
+    const pool = GetClient();
+    const rows = normalizeRows(req.body.rows, await eventIdsFromDb(pool));
     const gamesRows = buildGamesRows(rows);
     const blockCsv = blockRowsToCsv(rows);
     const gamesCsv = gamesRowsToCsv(gamesRows);
     const timestamp = Date.now();
 
-    await replaceBlockTables(client, block, rows, gamesRows);
+    await replaceBlockTables(pool, block, rows, gamesRows);
     await Promise.all([
       TouchCacheVersion(`change_event_order_for_block_${block}`),
       TouchCacheVersion(`change_order_for_block_${block}`),

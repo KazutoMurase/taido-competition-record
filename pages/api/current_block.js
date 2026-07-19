@@ -252,8 +252,7 @@ const CurrentBlock = async (req, res) => {
     const event_name = req.query.event_name;
     const cacheKey =
       "current_" + block_name + (event_name ? "_for_" + event_name : "");
-    // 'update_id_for_' +current_block_name can be checked,
-    // but only game id should be enough in the current logic
+    const latestScheduleIdUpdateKey = "update_id_for_" + current_block_name;
     const latestGameIdUpdateKey = "update_game_id_for_" + current_block_name;
     const latestChangeOrderKey = "change_order_for_" + block_name;
     const latestUpdateResultKey =
@@ -264,6 +263,7 @@ const CurrentBlock = async (req, res) => {
     const data = await GetVersionedCache(
       cacheKey,
       [
+        latestScheduleIdUpdateKey,
         latestGameIdUpdateKey,
         latestChangeOrderKey,
         latestUpdateResultKey,

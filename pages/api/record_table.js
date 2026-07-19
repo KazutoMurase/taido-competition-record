@@ -1,16 +1,39 @@
 import GetClient from "../../lib/db_client";
+import {
+  AdvanceCurrentPosition,
+  CurrentGameConflictError,
+  LockCurrentPosition,
+} from "../../lib/current_position";
 import { MarkResultUpdated } from "../../lib/result_cache";
 import { TouchCacheVersion } from "../../lib/versioned_cache";
 
 const RecordTable = async (req, res) => {
+  let client;
+  let transactionOpen = false;
   try {
-    const client = await GetClient();
     const event_name = req.body.event_name;
     const game_id = Number(req.body.id);
-    if (!Number.isInteger(game_id) || game_id < 1) {
-      res.status(400).json({ error: "Invalid game ID" });
+    const block = req.body.update_block;
+    if (
+      !Number.isInteger(game_id) ||
+      game_id < 1 ||
+      typeof event_name !== "string" ||
+      !/^[a-z0-9_]+$/.test(event_name) ||
+      (block != null && (typeof block !== "string" || !/^[a-z]$/.test(block)))
+    ) {
+      res.status(400).json({ error: "Invalid request" });
       return;
     }
+
+    const pool = GetClient();
+    client = await pool.connect();
+    await client.query("BEGIN");
+    transactionOpen = true;
+
+    const position =
+      block == null
+        ? null
+        : await LockCurrentPosition(client, block, event_name, game_id);
     let query = "update " + event_name + " set ";
     let initial_value_is_set = false;
     if (req.body.main_score || req.body.retire) {
@@ -96,41 +119,42 @@ const RecordTable = async (req, res) => {
       initial_value_is_set = true;
     }
     query += " where id = $1";
-    let result = await client.query(query, [game_id]);
-    await MarkResultUpdated(event_name);
-    // update current block if necessary
-    if (req.body.update_block === undefined || req.body.update_block === null) {
-      res.json({});
-      return;
+    await client.query(query, [game_id]);
+
+    const scheduleChanged = position
+      ? await AdvanceCurrentPosition(client, block, position)
+      : false;
+    await client.query("COMMIT");
+    transactionOpen = false;
+
+    const cacheUpdates = [MarkResultUpdated(event_name)];
+    if (position) {
+      const currentBlockName = `current_block_${block}`;
+      cacheUpdates.push(
+        TouchCacheVersion(`update_game_id_for_${currentBlockName}`),
+      );
+      if (scheduleChanged) {
+        cacheUpdates.push(
+          TouchCacheVersion(`update_id_for_${currentBlockName}`),
+        );
+      }
     }
-    const current_block_name = "current_block_" + req.body.update_block;
-    query = "select id, game_id from " + current_block_name;
-    result = await client.query(query);
-    const next_game_id = result.rows[0].game_id + 1;
-    const schedule_id = result.rows[0].id;
-    query =
-      "select id from block_" +
-      req.body.update_block +
-      "_games where order_id = " +
-      next_game_id +
-      " and schedule_id = " +
-      schedule_id;
-    result = await client.query(query);
-    const update_game_id_key = "update_game_id_for_" + current_block_name;
-    await TouchCacheVersion(update_game_id_key);
-    if (result.rows.length === 0) {
-      query = "update " + current_block_name + " set id = id + 1, game_id = 1";
-      result = await client.query(query);
-      const update_id_key = "update_id_for_" + current_block_name;
-      await TouchCacheVersion(update_id_key);
-    } else {
-      query = "update " + current_block_name + " set game_id = " + next_game_id;
-      result = await client.query(query);
-    }
+    await Promise.all(cacheUpdates);
     res.json({});
   } catch (error) {
+    if (transactionOpen && client) {
+      await client.query("ROLLBACK");
+    }
+    if (error instanceof CurrentGameConflictError) {
+      res.status(409).json({ error: error.message });
+      return;
+    }
     console.log(error);
     res.status(500).json({ error: "Error fetching data" });
+  } finally {
+    if (client) {
+      client.release();
+    }
   }
 };
 

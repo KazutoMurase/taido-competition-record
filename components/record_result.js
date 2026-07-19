@@ -7,6 +7,15 @@ import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import FlagCircleRoundedIcon from "@mui/icons-material/FlagCircleRounded";
 
+function handleRecordError(error) {
+  if (axios.isAxiosError(error) && error.response?.status === 409) {
+    window.alert("別の画面で試合が進行しました。最新の試合を表示し直します。");
+    window.location.reload();
+    return;
+  }
+  console.error(error);
+}
+
 function onSubmit(data, flag, block_number, event_name, function_after_post) {
   let left_flag;
   if (flag === -2) {
@@ -61,15 +70,12 @@ function onSubmit(data, flag, block_number, event_name, function_after_post) {
     post["next_id"] = data.next_right_id;
     post["next_type"] = "right";
   }
-  console.log(post);
   axios
     .post("/api/record", post)
     .then((response) => {
       window.location.reload();
     })
-    .catch((e) => {
-      console.log(e);
-    });
+    .catch(handleRecordError);
 }
 
 function onBack(data, block_number, function_after_post) {
