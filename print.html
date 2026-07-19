@@ -225,9 +225,21 @@ result以下にcsv形式で保存される。</p>
 </code></pre>
 <p>この例では、A、B、A、C、Bの順に処理する。
 途中で失敗した場合は、その場で停止する。</p>
+<h3 id="コートごとに並列実行する"><a class="header" href="#コートごとに並列実行する">コートごとに並列実行する</a></h3>
+<p><code>--parallel</code>を指定すると、異なるコートを並列に処理する。
+同じコートの競技は、指定した順番どおりに処理される。</p>
+<pre><code class="language-bash">tools/advance-schedule.bash --parallel A B A C B
+</code></pre>
+<p>この例ではA、B、Cコートを並列に処理し、各コート内では指定順を維持する。
+ログの先頭には<code>[court A]</code>のようにコート名が表示される。</p>
+<p>いずれかのコートで失敗しても、実行中のほかのコートは処理を続ける。
+すべてのコートが終了した後、1つでも失敗していればコマンド全体がエラーで終了する。</p>
 <h2 id="計画ファイルを使う"><a class="header" href="#計画ファイルを使う">計画ファイルを使う</a></h2>
 <p>実行順が長い場合は、計画ファイルを使用する。</p>
 <pre><code class="language-bash">tools/advance-schedule.bash --file e2e/advance-plan.txt
+</code></pre>
+<p>コートごとに並列実行する場合は<code>--parallel</code>を追加する。</p>
+<pre><code class="language-bash">tools/advance-schedule.bash --parallel --file e2e/advance-plan.txt
 </code></pre>
 <p>計画ファイルには、1行につきコートと現在競技IDを記述する。</p>
 <pre><code class="language-text"># court schedule_id
