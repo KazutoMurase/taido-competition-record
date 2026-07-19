@@ -104,7 +104,6 @@ const Confirm = async (req, res) => {
             (i - 1);
           query = "update " + event_name + " set group_id = $1 where id = $2";
           let values = [item.group_id, target_id];
-          console.log(values);
           let result = await client.query(query, values);
         }
       }
