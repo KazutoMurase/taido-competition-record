@@ -34,28 +34,8 @@ type TableRecordPayload = {
   start_penalty?: number | null;
 };
 
-function hashSeed(value: string): number {
-  let hash = 2166136261;
-  for (const character of value) {
-    hash ^= character.charCodeAt(0);
-    hash = Math.imul(hash, 16777619);
-  }
-  return hash >>> 0;
-}
-
-function createRandom(seed: string): () => number {
-  let state = hashSeed(seed);
-  return () => {
-    state += 0x6d2b79f5;
-    let value = state;
-    value = Math.imul(value ^ (value >>> 15), value | 1);
-    value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
-    return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-function integer(random: () => number, min: number, max: number): number {
-  return Math.floor(random() * (max - min + 1)) + min;
+function integer(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 async function getJson<T>(page: Page, path: string): Promise<T> {
@@ -155,7 +135,7 @@ async function confirmPreliminaryTableResult(
   }
 
   console.log(
-    `[advance-current] confirming preliminary result: event=${eventName}, schedule=${schedule.id}`,
+    `[advance-schedule] confirming preliminary result: event=${eventName}, schedule=${schedule.id}`,
   );
   await page.goto(
     `/admin/check_table_result?block_number=${court}&schedule_id=${schedule.id}&event_id=${schedule.event_id}`,
@@ -180,7 +160,7 @@ async function confirmPreliminaryTableResult(
     confirmButton.click(),
   ]);
   console.log(
-    `[advance-current] preliminary result confirmed: event=${eventName}, schedule=${schedule.id}`,
+    `[advance-schedule] preliminary result confirmed: event=${eventName}, schedule=${schedule.id}`,
   );
 }
 
@@ -257,9 +237,9 @@ async function verifyTableRecord(page: Page, payload: TableRecordPayload) {
     .toBe(true);
 }
 
-async function recordTournamentGame(page: Page, random: () => number) {
+async function recordTournamentGame(page: Page) {
   const isHokei = await page.getByText("赤の旗", { exact: true }).isVisible();
-  const choice = isHokei ? integer(random, 0, 3) : integer(random, 0, 1);
+  const choice = isHokei ? integer(0, 3) : integer(0, 1);
   const label = isHokei
     ? `赤旗${choice}本`
     : choice === 0
@@ -286,13 +266,13 @@ async function recordTournamentGame(page: Page, random: () => number) {
   const payload = recordResponse.request().postDataJSON() as RecordPayload;
   await verifyTournamentRecord(page, payload);
   console.log(
-    `[advance-current] verified saved result: event=${payload.event_name}, id=${payload.id}`,
+    `[advance-schedule] verified saved result: event=${payload.event_name}, id=${payload.id}`,
   );
 
   return label;
 }
 
-async function fillTableScores(page: Page, random: () => number) {
+async function fillTableScores(page: Page) {
   const inputs = page.locator('input[inputmode="numeric"]');
   await expect
     .poll(() => inputs.count(), { timeout: 15_000 })
@@ -303,22 +283,22 @@ async function fillTableScores(page: Page, random: () => number) {
   if (count === 21) {
     values = [
       2,
-      integer(random, 5, 9),
-      integer(random, 0, 9),
-      integer(random, 0, 9),
+      integer(5, 9),
+      integer(0, 9),
+      integer(0, 9),
       0,
-      integer(random, 7, 9),
-      integer(random, 0, 9),
-      integer(random, 7, 9),
-      integer(random, 0, 9),
-      integer(random, 7, 9),
-      integer(random, 0, 9),
-      integer(random, 7, 9),
-      integer(random, 0, 9),
-      integer(random, 7, 9),
-      integer(random, 0, 9),
-      integer(random, 7, 9),
-      integer(random, 0, 9),
+      integer(7, 9),
+      integer(0, 9),
+      integer(7, 9),
+      integer(0, 9),
+      integer(7, 9),
+      integer(0, 9),
+      integer(7, 9),
+      integer(0, 9),
+      integer(7, 9),
+      integer(0, 9),
+      integer(7, 9),
+      integer(0, 9),
       0,
       0,
       0,
@@ -326,12 +306,12 @@ async function fillTableScores(page: Page, random: () => number) {
     ];
   } else if (count === 8) {
     values = [
-      integer(random, 7, 9),
-      integer(random, 0, 9),
-      integer(random, 7, 9),
-      integer(random, 0, 9),
-      integer(random, 7, 9),
-      integer(random, 0, 9),
+      integer(7, 9),
+      integer(0, 9),
+      integer(7, 9),
+      integer(0, 9),
+      integer(7, 9),
+      integer(0, 9),
       0,
       0,
     ];
@@ -360,7 +340,7 @@ async function fillTableScores(page: Page, random: () => number) {
   const payload = recordResponse.request().postDataJSON() as TableRecordPayload;
   await verifyTableRecord(page, payload);
   console.log(
-    `[advance-current] verified saved result: event=${payload.event_name}, id=${payload.id}`,
+    `[advance-schedule] verified saved result: event=${payload.event_name}, id=${payload.id}`,
   );
 
   return values.join("");
@@ -375,11 +355,6 @@ test("指定コートの現在競技を完了し、次競技へ進める", async
     throw new Error(`CONFIRM_ADVANCE=${court.toUpperCase()} is required.`);
   }
 
-  const maxGames = Number.parseInt(process.env.MAX_GAMES ?? "200", 10);
-  if (!Number.isInteger(maxGames) || maxGames < 1) {
-    throw new Error("MAX_GAMES must be a positive integer.");
-  }
-
   const expectedScheduleText = (process.env.EXPECTED_SCHEDULE_ID ?? "").trim();
   if (expectedScheduleText && !/^[1-9][0-9]*$/.test(expectedScheduleText)) {
     throw new Error("EXPECTED_SCHEDULE_ID must be a positive integer.");
@@ -387,9 +362,7 @@ test("指定コートの現在競技を完了し、次競技へ進める", async
   const expectedScheduleId = expectedScheduleText
     ? Number.parseInt(expectedScheduleText, 10)
     : null;
-  const seed = process.env.SEED || `${Date.now()}`;
-  const random = createRandom(seed);
-  console.log(`[advance-current] court=${court.toUpperCase()} seed=${seed}`);
+  console.log(`[advance-schedule] court=${court.toUpperCase()}`);
 
   await waitForApp(page);
   await page.goto("/admin");
@@ -410,7 +383,7 @@ test("指定コートの現在競技を完了し、次競技へ進める", async
       await confirmPreliminaryTableResult(page, court, completedSchedule);
     }
     console.log(
-      `[advance-current] skip: expected schedule=${expectedScheduleId} is already completed; current schedule=${initial.id}`,
+      `[advance-schedule] skip: expected schedule=${expectedScheduleId} is already completed; current schedule=${initial.id}`,
     );
     return;
   }
@@ -430,7 +403,7 @@ test("指定コートの現在競技を完了し、次競技へ進める", async
   const competitionName =
     target.name?.replace(/["']/g, "") || `event ${target.event_id}`;
   console.log(
-    `[advance-current] current schedule=${initial.id}, game=${initial.game_id}, competition=${competitionName}`,
+    `[advance-schedule] current schedule=${initial.id}, game=${initial.game_id}, competition=${competitionName}`,
   );
 
   const currentRow = page.locator(
@@ -442,10 +415,10 @@ test("指定コートの現在競技を完了し、次競技へ進める", async
     await currentRow.getByRole("button", { name: "点呼", exact: true }).click();
     await expect(page).toHaveURL(/\/admin\/check_players_on_block/);
     await markEveryonePresent(page);
-    console.log("[advance-current] attendance completed");
+    console.log("[advance-schedule] attendance completed");
 
     console.log(
-      "[advance-current] waiting for attendance status to be visible",
+      "[advance-schedule] waiting for attendance status to be visible",
     );
     await expect
       .poll(
@@ -459,27 +432,36 @@ test("指定コートの現在競技を完了し、次競技へ進める", async
         { timeout: 15_000, intervals: [250, 500, 1_000] },
       )
       .toBe(true);
-    console.log("[advance-current] attendance status confirmed");
+    console.log("[advance-schedule] attendance status confirmed");
   } else {
-    console.log("[advance-current] attendance was already completed");
+    console.log("[advance-schedule] attendance was already completed");
   }
 
-  for (let recordedGames = 0; recordedGames < maxGames; recordedGames += 1) {
+  const visitedPositions = new Set<string>();
+  for (let recordedGames = 0; ; recordedGames += 1) {
     console.log(
-      `[advance-current] checking current position before game ${recordedGames + 1}`,
+      `[advance-schedule] checking current position before game ${recordedGames + 1}`,
     );
     const before = await currentSchedule(page, court);
     if (before.id !== initial.id) {
       await confirmPreliminaryTableResult(page, court, target);
       console.log(
-        `[advance-current] completed ${competitionName}; next schedule=${before.id}`,
+        `[advance-schedule] completed ${competitionName}; next schedule=${before.id}`,
       );
       expect(before.id).toBe(initial.id + 1);
       return;
     }
 
+    const position = `${before.id}:${before.game_id}`;
+    if (visitedPositions.has(position)) {
+      throw new Error(
+        `Schedule ${initial.id} returned to an already processed position: ${position}.`,
+      );
+    }
+    visitedPositions.add(position);
+
     console.log(
-      `[advance-current] opening record screen for schedule=${before.id}, game=${before.game_id}`,
+      `[advance-schedule] opening record screen for schedule=${before.id}, game=${before.game_id}`,
     );
     await page.goto(`/admin/block?block_number=${court}`, {
       waitUntil: "domcontentloaded",
@@ -496,11 +478,11 @@ test("指定コートの現在競技を完了し、次競技へ進める", async
       }),
       recordButton.click(),
     ]);
-    console.log("[advance-current] record screen opened");
+    console.log("[advance-schedule] record screen opened");
 
     const result = page.url().includes("record_table_result")
-      ? await fillTableScores(page, random)
-      : await recordTournamentGame(page, random);
+      ? await fillTableScores(page)
+      : await recordTournamentGame(page);
 
     await expect
       .poll(
@@ -513,11 +495,7 @@ test("指定コートの現在競技を完了し、次競技へ進める", async
       .not.toBe(`${before.id}:${before.game_id}`);
 
     console.log(
-      `[advance-current] recorded game=${before.game_id}, result=${result}`,
+      `[advance-schedule] recorded game=${before.game_id}, result=${result}`,
     );
   }
-
-  throw new Error(
-    `Stopped after MAX_GAMES=${maxGames} before schedule ${initial.id} completed.`,
-  );
 });

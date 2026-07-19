@@ -14,8 +14,6 @@ services:
       COURT: ${COURT:-}
       CONFIRM_ADVANCE: ${CONFIRM_ADVANCE:-}
       EXPECTED_SCHEDULE_ID: ${EXPECTED_SCHEDULE_ID:-}
-      SEED: ${SEED:-}
-      MAX_GAMES: ${MAX_GAMES:-200}
     extra_hosts:
       - host.docker.internal:host-gateway
     read_only: true
@@ -33,5 +31,5 @@ services:
       - npx
       - playwright
       - test
-      - tests/advance-current.spec.ts
+      - tests/advance-schedule.spec.ts
       - --workers=1

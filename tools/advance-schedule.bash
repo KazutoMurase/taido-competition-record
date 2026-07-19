@@ -7,8 +7,8 @@ REPOSITORY_ROOT=$(cd "${SCRIPT_DIR}/.." && pwd)
 
 usage() {
     echo "Usage:"
-    echo "  tools/advance-current.bash A [B ...]"
-    echo "  tools/advance-current.bash --file PATH"
+    echo "  tools/advance-schedule.bash A [B ...]"
+    echo "  tools/advance-schedule.bash --file PATH"
 }
 
 append_step() {
@@ -103,8 +103,6 @@ for ((index = 0; index < TOTAL_STEPS; index += 1)); do
     STEP_NUMBER=$((index + 1))
     STEP_LABEL=$(printf "%03d-%s" "${STEP_NUMBER}" "${COURT}")
     ARTIFACT_SUBDIR="${RUN_ID}/${STEP_LABEL}"
-    STEP_SEED=${SEED:+${SEED}-${STEP_NUMBER}-${COURT}}
-
     mkdir -p "e2e/artifacts/${ARTIFACT_SUBDIR}"
     if [[ -n "${EXPECTED_SCHEDULE_ID}" ]]; then
         echo "[advance-plan] [${STEP_NUMBER}/${TOTAL_STEPS}] court=${COURT} expected_schedule=${EXPECTED_SCHEDULE_ID}"
@@ -118,7 +116,6 @@ for ((index = 0; index < TOTAL_STEPS; index += 1)); do
     PLAYWRIGHT_UID="$(id -u)" \
     PLAYWRIGHT_GID="$(id -g)" \
     ARTIFACT_SUBDIR="${ARTIFACT_SUBDIR}" \
-    SEED="${STEP_SEED}" \
     "${COMPOSE[@]}" run \
         --rm \
         --no-deps \

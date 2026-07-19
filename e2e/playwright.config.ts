@@ -5,7 +5,7 @@ const target = new URL(baseURL);
 
 if (target.hostname !== "host.docker.internal") {
   throw new Error(
-    `Refusing to run against ${target.hostname}. The advance-current scenario only accepts the local Docker host.`,
+    `Refusing to run against ${target.hostname}. The advance-schedule scenario only accepts the local Docker host.`,
   );
 }
 

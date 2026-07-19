@@ -37,18 +37,18 @@ docker compose up
 以下はAコートを進める例である。
 
 ```bash
-tools/advance-current.bash A
+tools/advance-schedule.bash A
 ```
 
 コマンドを実行するとすぐに自動進行を開始する。実行中は、対象競技、試合番号、登録した結果がログへ表示される。
 
 ```text
-[advance-current] court=A seed=1721300000000
-[advance-current] current schedule=1, game=1, competition=男子法形
-[advance-current] attendance completed
-[advance-current] recorded game=1, result=赤旗2本
-[advance-current] recorded game=2, result=赤旗1本
-[advance-current] completed 男子法形; next schedule=2
+[advance-schedule] court=A
+[advance-schedule] current schedule=1, game=1, competition=男子法形
+[advance-schedule] attendance completed
+[advance-schedule] recorded game=1, result=赤旗2本
+[advance-schedule] recorded game=2, result=赤旗1本
+[advance-schedule] completed 男子法形; next schedule=2
 ```
 
 ## 複数コートを順番に進める
@@ -56,7 +56,7 @@ tools/advance-current.bash A
 コートを複数指定すると、引数に書いた順番で現在競技を1つずつ進める。
 
 ```bash
-tools/advance-current.bash A B A C B
+tools/advance-schedule.bash A B A C B
 ```
 
 上の例では、Aコート、Bコート、もう一度Aコート、Cコート、もう一度Bコートの順に実行する。
@@ -69,7 +69,7 @@ Playwright専用イメージのビルドはコマンドの開始時に1回だけ
 長い実行順はテキストファイルへ記述できる。
 
 ```bash
-tools/advance-current.bash --file e2e/advance-plan.txt
+tools/advance-schedule.bash --file e2e/advance-plan.txt
 ```
 
 計画ファイルには、1行につきコートと期待する現在競技IDを記述する。
@@ -132,29 +132,6 @@ A
 
 点呼済み、または競技の途中まで記録済みの場合は、その状態から残りの試合だけを処理する。
 
-## 同じ乱数で再実行する
-
-実行時に使用したseedはログへ表示される。同じseedを指定すると、同じ順序の乱数を生成できる。
-
-```bash
-SEED=1721300000000 tools/advance-current.bash A B A
-```
-
-複数ステップの場合は、指定したseed、ステップ番号、コート名を組み合わせたseedを各ステップで使用する。
-
-ただし、既に記録された試合は元に戻らない。同じ初期データから再現する場合は、先にデータベースを初期状態へ戻す必要がある。
-
-## 最大試合数
-
-無限ループを防ぐため、1回の実行で処理する試合数はデフォルトで最大200試合である。
-変更する場合は`MAX_GAMES`を指定する。
-
-```bash
-MAX_GAMES=300 tools/advance-current.bash A
-```
-
-上限へ到達した場合は、現在競技を進めきらずエラーで終了する。
-
 ## 実行結果と障害調査
 
 失敗時のスクリーンショット、trace、video、HTMLレポートは`e2e/artifacts/`以下へ出力される。
@@ -176,7 +153,7 @@ HTMLレポートは各ステップの`report/index.html`をブラウザで開い
 
 ## 手動でComposeコマンドを実行する
 
-通常は`tools/advance-current.bash`を使用する。ツールを介さず実行する場合は、対象コートと確認値の両方を指定する。
+通常は`tools/advance-schedule.bash`を使用する。ツールを介さず実行する場合は、対象コートと確認値の両方を指定する。
 
 ```bash
 mkdir -p e2e/artifacts/manual-A
