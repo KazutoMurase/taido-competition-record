@@ -32,6 +32,7 @@ const ResetResult = async (req, res) => {
       [id],
     );
     if (result.rows.length === 0) {
+      await client.query("ROLLBACK");
       res.status(404).json({ error: "game not found" });
       return;
     }
