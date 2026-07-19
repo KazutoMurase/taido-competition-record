@@ -48,12 +48,33 @@ tools/advance-schedule.bash A B A C B
 この例では、A、B、A、C、Bの順に処理する。
 途中で失敗した場合は、その場で停止する。
 
+### コートごとに並列実行する
+
+`--parallel`を指定すると、異なるコートを並列に処理する。
+同じコートの競技は、指定した順番どおりに処理される。
+
+```bash
+tools/advance-schedule.bash --parallel A B A C B
+```
+
+この例ではA、B、Cコートを並列に処理し、各コート内では指定順を維持する。
+ログの先頭には`[court A]`のようにコート名が表示される。
+
+いずれかのコートで失敗しても、実行中のほかのコートは処理を続ける。
+すべてのコートが終了した後、1つでも失敗していればコマンド全体がエラーで終了する。
+
 ## 計画ファイルを使う
 
 実行順が長い場合は、計画ファイルを使用する。
 
 ```bash
 tools/advance-schedule.bash --file e2e/advance-plan.txt
+```
+
+コートごとに並列実行する場合は`--parallel`を追加する。
+
+```bash
+tools/advance-schedule.bash --parallel --file e2e/advance-plan.txt
 ```
 
 計画ファイルには、1行につきコートと現在競技IDを記述する。
