@@ -1,5 +1,6 @@
 import GetClient from "../../lib/db_client";
-import { Get, Set } from "../../lib/redis_client";
+import { MarkResultUpdated } from "../../lib/result_cache";
+import { TouchCacheVersion } from "../../lib/versioned_cache";
 import fs from "fs";
 //import { parse } from 'csv-parse';
 import path from "path";
@@ -150,24 +151,20 @@ const ResetDb = async (req, res) => {
     let query;
     query = "DELETE FROM " + (is_test ? "test_" : "") + "notification_request";
     await client.query(query);
-    // update timestamp to current
-    const timestamp = Date.now();
     for (let i = 0; i < req.body.event_names.length; i++) {
       const event_name = req.body.event_names[i];
-      await Set(
-        "latest_update_result_for_" + event_name + "_timestamp",
-        timestamp,
-      );
+      await MarkResultUpdated(event_name);
     }
     for (let i = 0; i < req.body.block_names.length; i++) {
       const block_name = req.body.block_names[i];
-      await Set("update_id_for_current_" + block_name, timestamp);
-      await Set("update_game_id_for_current_" + block_name, timestamp);
-      await Set("update_complete_players_for_" + block_name, timestamp);
+      await Promise.all([
+        TouchCacheVersion("update_id_for_current_" + block_name),
+        TouchCacheVersion("update_game_id_for_current_" + block_name),
+        TouchCacheVersion("update_complete_players_for_" + block_name),
+      ]);
     }
-    await Set(
+    await TouchCacheVersion(
       "latest_update_for_" + (is_test ? "test_" : "") + "notification_request",
-      timestamp,
     );
     res.json([]);
   } catch (error) {

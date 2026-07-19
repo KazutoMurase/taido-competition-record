@@ -1,6 +1,7 @@
 import GetClient from "../../lib/db_client";
-import { Get, Set } from "../../lib/redis_client";
 import { GetEventName } from "../../lib/get_event_name";
+import { MarkResultUpdated } from "../../lib/result_cache";
+import { TouchCacheVersion } from "../../lib/versioned_cache";
 
 const CompletePlayersCheck = async (req, res) => {
   try {
@@ -61,11 +62,9 @@ const CompletePlayersCheck = async (req, res) => {
       result = await client.query(query);
     }
     const key = "update_complete_players_for_block_" + req.body.block_number;
-    const timestamp = Date.now();
-    await Set(key, timestamp);
+    await TouchCacheVersion(key);
     // for retire state updates in admin
-    const result_key = "latest_update_result_for_" + event_name + "_timestamp";
-    await Set(result_key, timestamp);
+    await MarkResultUpdated(event_name);
     res.json({});
   } catch (error) {
     console.log(error);

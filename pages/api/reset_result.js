@@ -1,5 +1,5 @@
 import GetClient from "../../lib/db_client";
-import { Set } from "../../lib/redis_client";
+import { MarkResultUpdated } from "../../lib/result_cache";
 
 const ResetResult = async (req, res) => {
   let client;
@@ -73,9 +73,8 @@ const ResetResult = async (req, res) => {
       }
     }
 
-    const key = "latest_update_result_for_" + eventName + "_timestamp";
-    await Set(key, Date.now());
     await client.query("COMMIT");
+    await MarkResultUpdated(eventName);
     res.json({});
   } catch (error) {
     if (client) {

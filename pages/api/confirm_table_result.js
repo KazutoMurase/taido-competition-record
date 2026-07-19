@@ -1,5 +1,5 @@
 import GetClient from "../../lib/db_client";
-import { Set } from "../../lib/redis_client";
+import { MarkResultUpdated } from "../../lib/result_cache";
 
 const Confirm = async (req, res) => {
   const client = await GetClient();
@@ -109,9 +109,7 @@ const Confirm = async (req, res) => {
         }
       }
     }
-    const key = "latest_update_result_for_" + event_name + "_timestamp";
-    const timestamp = Date.now();
-    await Set(key, timestamp);
+    await MarkResultUpdated(event_name);
   }
   res.json({});
 };

@@ -1,10 +1,16 @@
 import GetClient from "../../lib/db_client";
-import { Set } from "../../lib/redis_client";
+import { MarkResultUpdated } from "../../lib/result_cache";
+import { TouchCacheVersion } from "../../lib/versioned_cache";
 
 const RecordTable = async (req, res) => {
   try {
     const client = await GetClient();
     const event_name = req.body.event_name;
+    const game_id = Number(req.body.id);
+    if (!Number.isInteger(game_id) || game_id < 1) {
+      res.status(400).json({ error: "Invalid game ID" });
+      return;
+    }
     let query = "update " + event_name + " set ";
     let initial_value_is_set = false;
     if (req.body.main_score || req.body.retire) {
@@ -90,10 +96,8 @@ const RecordTable = async (req, res) => {
       initial_value_is_set = true;
     }
     query += " where id = $1";
-    let result = await client.query(query, [req.body.id]);
-    const key = "latest_update_result_for_" + event_name + "_timestamp";
-    const timestamp = Date.now();
-    await Set(key, timestamp);
+    let result = await client.query(query, [game_id]);
+    await MarkResultUpdated(event_name);
     // update current block if necessary
     if (req.body.update_block === undefined || req.body.update_block === null) {
       res.json({});
@@ -114,12 +118,12 @@ const RecordTable = async (req, res) => {
     result = await client.query(query);
     console.log(result.rows);
     const update_game_id_key = "update_game_id_for_" + current_block_name;
-    await Set(update_game_id_key, timestamp);
+    await TouchCacheVersion(update_game_id_key);
     if (result.rows.length === 0) {
       query = "update " + current_block_name + " set id = id + 1, game_id = 1";
       result = await client.query(query);
       const update_id_key = "update_id_for_" + current_block_name;
-      await Set(update_id_key, timestamp);
+      await TouchCacheVersion(update_id_key);
     } else {
       query = "update " + current_block_name + " set game_id = " + next_game_id;
       result = await client.query(query);
