@@ -30,6 +30,44 @@ function GenerateItemsForKids(events, event_ids, header1, header2, spans) {
     const event_name = GetEventName(id);
     if (event_name.includes("dantai") || event_name.includes("tenkai")) {
       spans[1] += 1;
+      if (same_human_type_length >= 1) {
+        header1.push(
+          <td
+            style={{ width: "50px", padding: 2 }}
+            colSpan={same_human_type_length}
+            rowSpan={row_span}
+          >
+            {human_type + competition_type}
+          </td>,
+        );
+        same_human_type_length = 0;
+      }
+      header1.push(
+        <td style={{ width: "50px", padding: 2 }} rowSpan={2}>
+          {event_name === "dantai_zissen_man" ? (
+            <>
+              男子
+              <br />
+              団実
+            </>
+          ) : event_name === "dantai_zissen_woman" ? (
+            <>
+              女子
+              <br />
+              団実
+            </>
+          ) : event_name.includes("tenkai") ? (
+            "展開"
+          ) : (
+            <>
+              団体
+              <br />
+              法形
+            </>
+          )}
+        </td>,
+      );
+      continue;
     } else {
       spans[0] += 1;
     }
@@ -82,30 +120,6 @@ function GenerateItemsForKids(events, event_ids, header1, header2, spans) {
       header2.push(<td style={{ width: "50px", padding: 2 }}>小高</td>);
     } else if (event_name.includes("lower_grades")) {
       header2.push(<td style={{ width: "50px", padding: 2 }}>小低</td>);
-    } else {
-      header1.push(
-        <td
-          style={{ width: "50px", padding: 2 }}
-          colSpan={same_human_type_length}
-          rowSpan={2}
-        >
-          {event_name.includes("dantai_zissen") ? (
-            <>
-              団体
-              <br />
-              実戦
-            </>
-          ) : event_name.includes("tenkai") ? (
-            "展開"
-          ) : (
-            <>
-              団体
-              <br />
-              法形
-            </>
-          )}
-        </td>,
-      );
     }
   }
 }
@@ -252,7 +266,7 @@ const Total: React.FC<{ params }> = ({ params }) => {
   const use_different_personal_scores = params.title.includes("全国学生");
   const is_kids_competition = params.title.includes("少年少女");
   const event_ids = is_kids_competition
-    ? [33, 29, 35, 31, 34, 30, 27, 36, 32, 28, 7, 18, 19]
+    ? [33, 29, 35, 31, 34, 30, 27, 36, 32, 28, 7, 6, 18, 19]
     : [1, 2, 3, 4, 5, 7, 8, 10, 6, 9, 11, 26];
   // personal, dantai
   let spans = [0, 0];
