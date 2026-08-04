@@ -26,7 +26,15 @@ cloudbuild_$PROJECT_ID.yamlを編集しコミットする(Docker内DB接続に�
 - SHOW\_AWARD\_IN\_PUBLIC=1に変更
 - 総合得点のある競技会の場合は SHOW\_TOTAL\_IN\_PUBLIC=1に変更
 
-Cloud SQLを削除する(一日で700円台消費されるので早めに)。
+大会終了後はアクセス頻度が低くなるため、Cloud Runのリソースと課金設定も変更する。
+
+- `--cpu 4`を`--cpu 1`に変更
+- `--memory 4Gi`を`--memory 1Gi`に変更
+- `--no-cpu-throttling`を`--cpu-throttling`に変更
+
+`--cpu-throttling`では、主にリクエストの処理中とインスタンスの起動・終了中がCPU・メモリの課金対象になる。アクセスがない場合は`--min-instances 0`によってスケールゼロになるため、大会終了後の低頻度アクセスに適している。
+
+Cloud SQLを削除する。
 
 1. 編集 -> インスタンスの削除を防止する　のチェックを外して保存
 2. 削除
