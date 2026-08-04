@@ -89,7 +89,7 @@ scripts/edit_block_csv.py
 管理画面の競技編集ページから、各コートのブロック編集ページを開ける。
 
 ```text
-/admin/edit_tournaments
+/admin/edit
 ```
 
 ブロック編集ページでは、`block_a.csv` と `block_a_games.csv` のような時程CSVを編集できる。

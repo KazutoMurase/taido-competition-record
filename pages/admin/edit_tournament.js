@@ -1,9 +1,9 @@
 import React from "react";
 import { useRouter } from "next/router";
 import { Alert, Box } from "@mui/material";
-import TableOrderEditor from "../../components/table_order_editor";
+import TournamentEditor from "../../components/tournament_editor";
 
-export default function EditTableOrderPage() {
+export default function EditTournamentPage() {
   const router = useRouter();
   const { competition, event_name } = router.query;
 
@@ -16,14 +16,14 @@ export default function EditTableOrderPage() {
       <Box sx={{ p: 2 }}>
         <Alert severity="info">
           competition と event_name を指定してください。例:
-          /admin/edit_table_order?competition=2025_kid&event_name=dantai_hokei
+          /admin/edit_tournament?competition=2025_kid&event_name=hokei_man
         </Alert>
       </Box>
     );
   }
 
   return (
-    <TableOrderEditor
+    <TournamentEditor
       competition={String(competition)}
       eventName={String(event_name)}
       onBackToList={() => router.push("/admin/edit")}
