@@ -2,23 +2,21 @@ FROM --platform=amd64 ubuntu:22.04
 
 SHELL ["/usr/bin/bash", "-l", "-c"]
 
-RUN apt update && apt upgrade -y
+ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y \
     ca-certificates \
     curl \
     gnupg \
     gnupg2 \
-    iputils-ping \
     lsb-release \
-    net-tools \
-    nodejs \
-    npm \
+    locales \
     sudo \
     systemctl \
     redis-server \
-    vim \
-    wget
+    wget \
+    && locale-gen ja_JP.UTF-8 en_US.UTF-8 \
+    && rm -rf /var/lib/apt/lists/*
 
 # Setup postrgresql
 ENV TZ=Asia/Tokyo
@@ -26,8 +24,6 @@ ENV LANG=ja_JP.UTF-8
 ENV LANGUAGE=ja_JP:ja
 ENV LC_ALL=ja_JP.UTF-8
 
-ARG DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y locales-all
 RUN curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | tee /etc/apt/trusted.gpg.d/apt.postgresql.org.gpg >/dev/null
 RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
 RUN apt-get update && apt-get install -y postgresql-16
