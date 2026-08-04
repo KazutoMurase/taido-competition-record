@@ -162,7 +162,14 @@
 <li>SHOW_AWARD_IN_PUBLIC=1に変更</li>
 <li>総合得点のある競技会の場合は SHOW_TOTAL_IN_PUBLIC=1に変更</li>
 </ul>
-<p>Cloud SQLを削除する(一日で700円台消費されるので早めに)。</p>
+<p>大会終了後はアクセス頻度が低くなるため、Cloud Runのリソースと課金設定も変更する。</p>
+<ul>
+<li><code>--cpu 4</code>を<code>--cpu 1</code>に変更</li>
+<li><code>--memory 4Gi</code>を<code>--memory 1Gi</code>に変更</li>
+<li><code>--no-cpu-throttling</code>を<code>--cpu-throttling</code>に変更</li>
+</ul>
+<p><code>--cpu-throttling</code>では、主にリクエストの処理中とインスタンスの起動・終了中がCPU・メモリの課金対象になる。アクセスがない場合は<code>--min-instances 0</code>によってスケールゼロになるため、大会終了後の低頻度アクセスに適している。</p>
+<p>Cloud SQLを削除する。</p>
 <ol>
 <li>編集 -&gt; インスタンスの削除を防止する　のチェックを外して保存</li>
 <li>削除</li>
