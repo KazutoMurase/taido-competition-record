@@ -37,7 +37,7 @@ export default function EditBlockPage({ params }) {
     <BlockScheduleEditor
       competition={String(effectiveCompetition)}
       block={String(block).toLowerCase()}
-      onBackToList={() => router.push("/admin/edit_tournaments")}
+      onBackToList={() => router.push("/admin/edit")}
     />
   );
 }
