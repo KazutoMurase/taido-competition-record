@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 import argparse
 import csv
+import io
+import os
 import random
 import sys
+from concurrent.futures import ProcessPoolExecutor
+from contextlib import redirect_stderr
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -623,6 +627,81 @@ def create_placement_strategy(args, rng):
     )
 
 
+def build_individual_event(task):
+    (
+        event_name,
+        players,
+        placement,
+        seed,
+        placement_attempts,
+        placement_search_nodes,
+    ) = task
+    progress = io.StringIO()
+    error = None
+    games = None
+    with redirect_stderr(progress):
+        try:
+            if placement == "random":
+                placement_strategy = RandomPlacementStrategy(random.Random(seed))
+            else:
+                placement_strategy = SmartSeedPlacementStrategy(
+                    random.Random(seed),
+                    seed=seed,
+                    max_attempts=placement_attempts,
+                    max_search_nodes=placement_search_nodes,
+                    progress_label=event_name,
+                )
+            slot_players = placement_strategy.build_slot_players(players)
+            games = build_games_from_slots(slot_players)
+        except ValueError as e:
+            error = str(e)
+    return event_name, len(players), games, progress.getvalue(), error
+
+
+def write_individual_event(competition, event_name, player_count, games):
+    output_csv = Path("data") / competition / "original" / f"{event_name}.csv"
+    output_csv.parent.mkdir(parents=True, exist_ok=True)
+    with output_csv.open("w", encoding="utf-8", newline="") as f:
+        write_games(games, f)
+    print(f"wrote {output_csv} ({player_count} players, {len(games)} rows)")
+
+
+def generate_individual_events(args, event_players):
+    if not event_players:
+        return
+
+    tasks = [
+        (
+            event_name,
+            players,
+            args.placement,
+            args.seed,
+            args.placement_attempts,
+            args.placement_search_nodes,
+        )
+        for event_name, players in event_players
+    ]
+    worker_count = args.jobs or (os.cpu_count() or 1)
+    worker_count = min(worker_count, len(tasks))
+
+    if worker_count == 1:
+        results = map(build_individual_event, tasks)
+    else:
+        executor = ProcessPoolExecutor(max_workers=worker_count)
+        results = executor.map(build_individual_event, tasks)
+
+    try:
+        for event_name, player_count, games, progress, error in results:
+            if progress:
+                print(progress, end="", file=sys.stderr)
+            if error is not None:
+                raise ValueError(f"{event_name}: {error}")
+            write_individual_event(args.competition, event_name, player_count, games)
+    finally:
+        if worker_count > 1:
+            executor.shutdown()
+
+
 def generate_from_source_csvs(args):
     source_tables = [read_players_table(path) for path in args.source_csv]
     event_names = source_event_names(source_tables)
@@ -636,38 +715,17 @@ def generate_from_source_csvs(args):
     write_static_generate_tables_sql(output_fieldnames, static_sql)
     print(f"wrote {static_sql}")
 
-    rng = random.Random(args.seed)
-    random_placement_strategy = RandomPlacementStrategy(rng)
     generated_event_names = []
+    event_players = []
     for event_name in event_names:
         players = placement_players_from_rows(output_rows, event_name)
         if len(players) < 2:
             print(f"skipped {event_name} ({len(players)} players)", file=sys.stderr)
             continue
-
-        placement_strategy = (
-            random_placement_strategy
-            if args.placement == "random"
-            else SmartSeedPlacementStrategy(
-                random.Random(args.seed),
-                seed=args.seed,
-                max_attempts=args.placement_attempts,
-                max_search_nodes=args.placement_search_nodes,
-                progress_label=event_name,
-            )
-        )
-        try:
-            slot_players = placement_strategy.build_slot_players(players)
-        except ValueError as e:
-            raise ValueError(f"{event_name}: {e}") from e
-        games = build_games_from_slots(slot_players)
-        output_csv = Path("data") / args.competition / "original" / f"{event_name}.csv"
-
-        output_csv.parent.mkdir(parents=True, exist_ok=True)
-        with output_csv.open("w", encoding="utf-8", newline="") as f:
-            write_games(games, f)
-        print(f"wrote {output_csv} ({len(players)} players, {len(games)} rows)")
+        event_players.append((event_name, players))
         generated_event_names.append(event_name)
+
+    generate_individual_events(args, event_players)
 
     group_names = read_group_names(players_csv.parent / "groups.csv")
     group_event_names = source_group_event_names(source_tables)
@@ -759,7 +817,16 @@ def parse_args():
         default=20000,
         help="max backtracking nodes per smart placement attempt",
     )
-    return parser.parse_args()
+    parser.add_argument(
+        "--jobs",
+        type=int,
+        default=0,
+        help="parallel placement workers; 0 uses the CPU count (default: 0)",
+    )
+    args = parser.parse_args()
+    if args.jobs < 0:
+        parser.error("--jobs must be 0 or greater")
+    return args
 
 
 def main():
