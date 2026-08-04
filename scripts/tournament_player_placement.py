@@ -443,7 +443,7 @@ class SmartSeedPlacementStrategy(PlacementStrategy):
             )
 
         if not remaining_players:
-            return slots
+            return slots if self.is_complete_placement_valid(slots, player_by_id) else None
 
         player = min(
             remaining_players,
@@ -481,6 +481,9 @@ class SmartSeedPlacementStrategy(PlacementStrategy):
             if solved_slots:
                 return solved_slots
         return None
+
+    def is_complete_placement_valid(self, slots, player_by_id):
+        return True
 
     def future_constraint_score(self, slots, player_by_id, remaining_players, player, slot):
         trial_slots = [replace(candidate) for candidate in slots]
@@ -696,6 +699,113 @@ class SmartSeedPlacementStrategy(PlacementStrategy):
             1 for placed_slot in same_rank_slots if placed_slot.visual_vertical == slot.visual_vertical
         )
         return group_score + half_count + vertical_count
+
+
+class BalancedGroupPlacementStrategy(SmartSeedPlacementStrategy):
+    RANK_FIELDS = ("rank_lastyear",)
+    RELAX_ORDER = (
+        "same_group_balance",
+        "same_group_first_round",
+    )
+
+    def hard_constraint_slots(self, slots, player_by_id, player):
+        candidate_slots = [
+            slot
+            for slot in slots
+            if slot.occupied and not slot.player_id
+        ]
+        if self.is_hard("same_group_balance"):
+            candidate_slots = [
+                slot
+                for slot in candidate_slots
+                if self.within_group_balance_limits(slots, player_by_id, player, slot)
+            ]
+        if self.is_hard("same_group_first_round"):
+            candidate_slots = [
+                slot
+                for slot in candidate_slots
+                if not self.has_same_group_first_round_opponent(slots, player_by_id, player, slot)
+            ]
+        return candidate_slots
+
+    def within_group_balance_limits(self, slots, player_by_id, player, slot):
+        if not player.group_id:
+            return True
+
+        group_size = sum(
+            candidate.group_id == player.group_id
+            for candidate in player_by_id.values()
+        )
+        for block_count in self.balance_block_counts(group_size, len(slots)):
+            limit = (group_size + block_count - 1) // block_count
+            block_index = self.block_index(slot, block_count, len(slots))
+            placed_count = sum(
+                bool(placed_slot.player_id)
+                and player_by_id[placed_slot.player_id].group_id == player.group_id
+                and self.block_index(placed_slot, block_count, len(slots)) == block_index
+                for placed_slot in slots
+            )
+            if placed_count >= limit:
+                return False
+        return True
+
+    def balance_block_counts(self, group_size, slot_count):
+        max_block_count = min(next_power_of_two(group_size), slot_count)
+        block_counts = []
+        block_count = 2
+        while block_count <= max_block_count:
+            block_counts.append(block_count)
+            block_count *= 2
+        return block_counts
+
+    def block_index(self, slot, block_count, slot_count):
+        return slot.index * block_count // slot_count
+
+    def is_complete_placement_valid(self, slots, player_by_id):
+        if not self.is_hard("same_group_balance"):
+            return True
+
+        group_ids = {
+            player.group_id
+            for player in player_by_id.values()
+            if player.group_id
+        }
+        for group_id in group_ids:
+            group_size = sum(
+                player.group_id == group_id
+                for player in player_by_id.values()
+            )
+            for block_count in self.balance_block_counts(group_size, len(slots)):
+                counts = [
+                    sum(
+                        bool(slot.player_id)
+                        and player_by_id[slot.player_id].group_id == group_id
+                        and self.block_index(slot, block_count, len(slots)) == block_index
+                        for slot in slots
+                    )
+                    for block_index in range(block_count)
+                ]
+                if max(counts) - min(counts) > 1:
+                    return False
+        return True
+
+    def balance_score(self, slots, player_by_id, player, slot):
+        if not player.group_id:
+            return ()
+        group_size = sum(
+            candidate.group_id == player.group_id
+            for candidate in player_by_id.values()
+        )
+        return tuple(
+            sum(
+                bool(placed_slot.player_id)
+                and player_by_id[placed_slot.player_id].group_id == player.group_id
+                and self.block_index(placed_slot, block_count, len(slots))
+                == self.block_index(slot, block_count, len(slots))
+                for placed_slot in slots
+            )
+            for block_count in self.balance_block_counts(group_size, len(slots))
+        )
 
 
 def player_id_from_entry(player):

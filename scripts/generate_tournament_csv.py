@@ -14,7 +14,11 @@ if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
 from tournament_game_builder import Game, build_games, build_games_from_slots
-from tournament_player_placement import RandomPlacementStrategy, SmartSeedPlacementStrategy
+from tournament_player_placement import (
+    BalancedGroupPlacementStrategy,
+    RandomPlacementStrategy,
+    SmartSeedPlacementStrategy,
+)
 
 
 HEADER = [
@@ -619,7 +623,12 @@ def placement_players_from_rows(rows, event_name):
 def create_placement_strategy(args, rng):
     if args.placement == "random":
         return RandomPlacementStrategy(rng)
-    return SmartSeedPlacementStrategy(
+    strategy_class = (
+        BalancedGroupPlacementStrategy
+        if args.placement == "balanced"
+        else SmartSeedPlacementStrategy
+    )
+    return strategy_class(
         rng,
         seed=args.seed,
         max_attempts=args.placement_attempts,
@@ -644,7 +653,12 @@ def build_individual_event(task):
             if placement == "random":
                 placement_strategy = RandomPlacementStrategy(random.Random(seed))
             else:
-                placement_strategy = SmartSeedPlacementStrategy(
+                strategy_class = (
+                    BalancedGroupPlacementStrategy
+                    if placement == "balanced"
+                    else SmartSeedPlacementStrategy
+                )
+                placement_strategy = strategy_class(
                     random.Random(seed),
                     seed=seed,
                     max_attempts=placement_attempts,
@@ -800,7 +814,7 @@ def parse_args():
     parser.add_argument("--players-csv", type=Path, help="override players.csv path")
     parser.add_argument(
         "--placement",
-        choices=("smart", "random"),
+        choices=("smart", "balanced", "random"),
         default="smart",
         help="player placement strategy (default: smart)",
     )
@@ -809,13 +823,13 @@ def parse_args():
         "--placement-attempts",
         type=int,
         default=100,
-        help="max smart placement attempts with derived random seeds",
+        help="max smart/balanced placement attempts with derived random seeds",
     )
     parser.add_argument(
         "--placement-search-nodes",
         type=int,
         default=20000,
-        help="max backtracking nodes per smart placement attempt",
+        help="max backtracking nodes per smart/balanced placement attempt",
     )
     parser.add_argument(
         "--jobs",
