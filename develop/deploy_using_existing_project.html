@@ -190,9 +190,48 @@
 <li>任意に設定可能。ここで設定したインスタンスIDを以後<code>$CLOUDSQL_INSTANCE_ID</code>とする</li>
 </ul>
 </li>
-<li>パスワード: postgres</li>
+<li>パスワード: postgres
+<ul>
+<li>パスワードポリシーを有効にする のチェックを外す必要がある</li>
+</ul>
+</li>
 <li>リージョン: asia-northeast1</li>
 <li>可用性: シングルゾーン</li>
+</ul>
+<p>トーナメント編集用など、継続利用したいものの値段を抑えたい場合は以下</p>
+<ul>
+<li>エディション: Enterprise（サンドボックス）</li>
+<li>バージョン: PostgresSQL 15</li>
+<li>インスタンスID: postgres-instance
+<ul>
+<li>任意に設定可能。ここで設定したインスタンスIDを以後<code>$CLOUDSQL_INSTANCE_ID</code>とする</li>
+</ul>
+</li>
+<li>パスワード: postgres
+<ul>
+<li>パスワードポリシーを有効にする のチェックを外す必要がある</li>
+</ul>
+</li>
+<li>リージョン: us-central1 (アイオワ)</li>
+<li>可用性: シングルゾーン</li>
+<li>マシンの構成:
+<ul>
+<li>汎用-共有コア</li>
+<li>1vCPU、0.614GB (db-f1-micro)</li>
+</ul>
+</li>
+<li>ストレージ
+<ul>
+<li>種類: HDD</li>
+<li>ストレージ容量: 10GB</li>
+</ul>
+</li>
+<li>フラグとパラメータ
+<ul>
+<li>shared_buffers: 13107</li>
+<li>max_connections: 20</li>
+</ul>
+</li>
 </ul>
 <h2 id="4-cloudsqlの初期テーブル作成cloud-sqlを利用する場合のみ必要"><a class="header" href="#4-cloudsqlの初期テーブル作成cloud-sqlを利用する場合のみ必要">4. CloudSQLの初期テーブル作成(Cloud SQLを利用する場合のみ必要)</a></h2>
 <p>この手順に入る前に<a href="./preparation.html">大会準備</a>のDB用csvファイル作成は完了していることを前提とする。</p>
