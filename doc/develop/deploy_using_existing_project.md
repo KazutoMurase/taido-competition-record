@@ -39,8 +39,29 @@ GCPコンソールからCloud SQLを開き、インスタンスを作成する
 - インスタンスID: postgres-instance
     - 任意に設定可能。ここで設定したインスタンスIDを以後`$CLOUDSQL_INSTANCE_ID`とする
 - パスワード: postgres
+    - パスワードポリシーを有効にする のチェックを外す必要がある
 - リージョン: asia-northeast1
 - 可用性: シングルゾーン
+
+
+トーナメント編集用など、継続利用したいものの値段を抑えたい場合は以下
+- エディション: Enterprise（サンドボックス）
+- バージョン: PostgresSQL 15
+- インスタンスID: postgres-instance
+    - 任意に設定可能。ここで設定したインスタンスIDを以後`$CLOUDSQL_INSTANCE_ID`とする
+- パスワード: postgres
+    - パスワードポリシーを有効にする のチェックを外す必要がある
+- リージョン: us-central1 (アイオワ)
+- 可用性: シングルゾーン
+- マシンの構成:
+    - 汎用-共有コア
+    - 1vCPU、0.614GB (db-f1-micro)
+- ストレージ
+    - 種類: HDD
+    - ストレージ容量: 10GB
+- フラグとパラメータ
+    - shared_buffers: 13107
+    - max_connections: 20
 
 ## 4. CloudSQLの初期テーブル作成(Cloud SQLを利用する場合のみ必要)
 この手順に入る前に[大会準備](./preparation.md)のDB用csvファイル作成は完了していることを前提とする。
