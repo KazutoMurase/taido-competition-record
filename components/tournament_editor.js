@@ -285,7 +285,7 @@ function PlayerText({
         onClick={() => onSelectSlot(item.original_id, side)}
         onTap={() => onSelectSlot(item.original_id, side)}
       />
-      {showPlayerIds && playerId ? (
+      {showPlayerIds ? (
         <>
           <Rect
             x={playerIdX - 2}
@@ -303,7 +303,7 @@ function PlayerText({
           <Text
             x={playerIdX}
             y={textY - 9}
-            text={playerId}
+            text={playerId || ""}
             width={24}
             align="center"
             fill="#4b5b68"
