@@ -4,7 +4,9 @@ import csv
 import io
 import os
 import random
+import re
 import sys
+import unicodedata
 from concurrent.futures import ProcessPoolExecutor
 from contextlib import redirect_stderr
 from pathlib import Path
@@ -76,6 +78,7 @@ PLAYER_BASE_FIELDS = ["id", "group_id", "name", "name_kana", "mvp"]
 RANK_SUFFIXES = ["rank_group", "rank_lastyear", "rank_total"]
 COMMENT_SUFFIXES = ["comment"]
 EVENT_PREFIXES_TO_STRIP = ("high_school_",)
+GROUP_TEAM_MARKER_PATTERN = re.compile(r"[A-Z]")
 
 
 def player_column_to_event_name(player_column):
@@ -273,11 +276,9 @@ def read_group_names(path):
 
 
 def group_team_marker(rank_group):
-    if "A" in rank_group:
-        return "A"
-    if "B" in rank_group:
-        return "B"
-    return ""
+    normalized_rank_group = unicodedata.normalize("NFKC", rank_group).upper()
+    match = GROUP_TEAM_MARKER_PATTERN.search(normalized_rank_group)
+    return match.group(0) if match else ""
 
 
 def is_group_nonparticipant(rank_group):
@@ -285,10 +286,9 @@ def is_group_nonparticipant(rank_group):
 
 
 def group_team_sort_key(team):
-    marker_order = {"": 0, "A": 1, "B": 2}
     return (
         int(team["base_group_id"]) if team["base_group_id"].isdigit() else 10**9,
-        marker_order.get(team["marker"], 99),
+        0 if not team["marker"] else 1,
         team["marker"],
     )
 
