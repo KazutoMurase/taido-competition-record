@@ -66,6 +66,7 @@ const EDIT_STAGE_WIDTH = 930;
 const EDIT_STAGE_OFFSET_X = 40;
 const ALL_GROUPS_VALUE = "__all_groups__";
 const LAST_YEAR_RANK_COLOR = "#8e24aa";
+const MAX_EDIT_HISTORY = 100;
 
 function cleanNumber(value) {
   const parsed = Number(value);
@@ -776,8 +777,13 @@ export default function TournamentEditor({
   const [error, setError] = useState("");
   const [saveStatus, setSaveStatus] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [, setHistoryVersion] = useState(0);
   const playerInputRef = useRef(null);
   const gameInputRef = useRef(null);
+  const rowsRef = useRef([]);
+  const undoStackRef = useRef([]);
+  const redoStackRef = useRef([]);
+  const pendingTextEditRef = useRef(null);
 
   const playerMap = useMemo(() => buildPlayerMap(players), [players]);
   const layoutRows = useMemo(
@@ -811,6 +817,49 @@ export default function TournamentEditor({
       ? getSelectedPlayerDetails(selectedLayoutRow, selectedSlot.side)
       : null;
   const hasFatalWarnings = warnings.some((warning) => warning.type === "error");
+  const pendingTextEditChanged = pendingTextEditRef.current?.changed === true;
+  const canUndo = undoStackRef.current.length > 0 || pendingTextEditChanged;
+  const canRedo = redoStackRef.current.length > 0 && !pendingTextEditChanged;
+
+  const notifyHistoryChanged = useCallback(() => {
+    setHistoryVersion((version) => version + 1);
+  }, []);
+
+  const clearHistory = useCallback(() => {
+    undoStackRef.current = [];
+    redoStackRef.current = [];
+    pendingTextEditRef.current = null;
+    notifyHistoryChanged();
+  }, [notifyHistoryChanged]);
+
+  const pushUndo = useCallback(
+    (snapshot) => {
+      undoStackRef.current = [
+        ...undoStackRef.current.slice(-(MAX_EDIT_HISTORY - 1)),
+        snapshot,
+      ];
+      redoStackRef.current = [];
+      notifyHistoryChanged();
+    },
+    [notifyHistoryChanged],
+  );
+
+  const commitPendingTextEdit = useCallback(() => {
+    const pendingEdit = pendingTextEditRef.current;
+    pendingTextEditRef.current = null;
+    if (pendingEdit?.changed) {
+      pushUndo(pendingEdit.rows);
+    }
+  }, [pushUndo]);
+
+  const beginTextEdit = () => {
+    if (!pendingTextEditRef.current) {
+      pendingTextEditRef.current = {
+        rows: rowsRef.current,
+        changed: false,
+      };
+    }
+  };
 
   const loadTournament = useCallback(async () => {
     setError("");
@@ -821,10 +870,12 @@ export default function TournamentEditor({
     if (!response.ok) {
       throw new Error(result.error || "failed to load tournament");
     }
+    rowsRef.current = result.rows;
     setRows(result.rows);
     setPlayers(result.players);
     setEventInfo(result.event_info);
-  }, [competition, eventName]);
+    clearHistory();
+  }, [clearHistory, competition, eventName]);
 
   useEffect(() => {
     if (!competition || !eventName) {
@@ -844,13 +895,78 @@ export default function TournamentEditor({
     };
   }, []);
 
-  const updateRow = (originalId, patch) => {
-    setRows((prevRows) =>
-      prevRows.map((row) =>
-        row.original_id === originalId ? { ...row, ...patch } : row,
-      ),
+  const updateRow = (originalId, patch, recordHistory = true) => {
+    const previousRows = rowsRef.current;
+    const row = previousRows.find((item) => item.original_id === originalId);
+    if (
+      !row ||
+      Object.entries(patch).every(([key, value]) => row[key] === value)
+    ) {
+      return;
+    }
+    if (recordHistory) {
+      commitPendingTextEdit();
+      pushUndo(previousRows);
+    } else if (pendingTextEditRef.current) {
+      pendingTextEditRef.current.changed = true;
+      notifyHistoryChanged();
+    }
+    const nextRows = previousRows.map((item) =>
+      item.original_id === originalId ? { ...item, ...patch } : item,
     );
+    rowsRef.current = nextRows;
+    setRows(nextRows);
   };
+
+  const handleUndo = useCallback(() => {
+    commitPendingTextEdit();
+    const previousRows = undoStackRef.current.pop();
+    if (!previousRows) {
+      notifyHistoryChanged();
+      return;
+    }
+    redoStackRef.current.push(rowsRef.current);
+    rowsRef.current = previousRows;
+    setRows(previousRows);
+    notifyHistoryChanged();
+  }, [commitPendingTextEdit, notifyHistoryChanged]);
+
+  const handleRedo = useCallback(() => {
+    commitPendingTextEdit();
+    const nextRows = redoStackRef.current.pop();
+    if (!nextRows) {
+      notifyHistoryChanged();
+      return;
+    }
+    undoStackRef.current.push(rowsRef.current);
+    rowsRef.current = nextRows;
+    setRows(nextRows);
+    notifyHistoryChanged();
+  }, [commitPendingTextEdit, notifyHistoryChanged]);
+
+  useEffect(() => {
+    const handleHistoryShortcut = (event) => {
+      if (!(event.ctrlKey || event.metaKey) || event.altKey) {
+        return;
+      }
+      const key = event.key.toLowerCase();
+      if (key === "z") {
+        event.preventDefault();
+        document.activeElement?.blur();
+        if (event.shiftKey) {
+          handleRedo();
+        } else {
+          handleUndo();
+        }
+      } else if (key === "y") {
+        event.preventDefault();
+        document.activeElement?.blur();
+        handleRedo();
+      }
+    };
+    window.addEventListener("keydown", handleHistoryShortcut);
+    return () => window.removeEventListener("keydown", handleHistoryShortcut);
+  }, [handleRedo, handleUndo]);
 
   const handleSelectSlot = (originalId, side) => {
     setSelectedSlot({ original_id: originalId, side });
@@ -870,13 +986,17 @@ export default function TournamentEditor({
     }, 0);
   };
 
-  const handlePlayerChange = (value) => {
+  const handlePlayerChange = (value, recordHistory = true) => {
     if (!selectedSlot) {
       return;
     }
-    updateRow(selectedSlot.original_id, {
-      [`${selectedSlot.side}_player_id`]: value.trim(),
-    });
+    updateRow(
+      selectedSlot.original_id,
+      {
+        [`${selectedSlot.side}_player_id`]: value.trim(),
+      },
+      recordHistory,
+    );
   };
 
   const handleExportCsv = () => {
@@ -1106,7 +1226,11 @@ export default function TournamentEditor({
                     inputRef={playerInputRef}
                     label="選手ID"
                     value={selectedRow[`${selectedSlot.side}_player_id`] || ""}
-                    onChange={(event) => handlePlayerChange(event.target.value)}
+                    onFocus={beginTextEdit}
+                    onBlur={commitPendingTextEdit}
+                    onChange={(event) =>
+                      handlePlayerChange(event.target.value, false)
+                    }
                     fullWidth
                     margin="normal"
                     size="small"
@@ -1172,10 +1296,14 @@ export default function TournamentEditor({
                     inputRef={gameInputRef}
                     label="表示/出力する試合番号"
                     value={selectedGame.draft_id}
+                    onFocus={beginTextEdit}
+                    onBlur={commitPendingTextEdit}
                     onChange={(event) =>
-                      updateRow(selectedGame.original_id, {
-                        draft_id: event.target.value,
-                      })
+                      updateRow(
+                        selectedGame.original_id,
+                        { draft_id: event.target.value },
+                        false,
+                      )
                     }
                     fullWidth
                     margin="normal"
@@ -1187,6 +1315,25 @@ export default function TournamentEditor({
                   トーナメント上の選手または試合番号を選択してください。
                 </Alert>
               )}
+              <Divider />
+              <Stack direction="row" spacing={1}>
+                <Button
+                  variant="outlined"
+                  onClick={handleUndo}
+                  disabled={!canUndo}
+                  fullWidth
+                >
+                  元に戻す
+                </Button>
+                <Button
+                  variant="outlined"
+                  onClick={handleRedo}
+                  disabled={!canRedo}
+                  fullWidth
+                >
+                  やり直す
+                </Button>
+              </Stack>
               <Divider />
               <Box>
                 <Typography variant="subtitle1" sx={{ mb: 1 }}>
