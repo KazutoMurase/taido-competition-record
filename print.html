@@ -829,6 +829,16 @@ https://大会サイト/overlay/b
 </code></pre>
 <p>団体法形・展開では、選手名部分に現在演技中の団体名を表示します。
 一時的に通信できなくなった場合は、最後に取得できた表示を維持します。</p>
+<h2 id="ライブ配信ページ"><a class="header" href="#ライブ配信ページ">ライブ配信ページ</a></h2>
+<p>Cloud Build用の <code>.env</code> にYouTubeの動画IDを設定すると、公開ページにライブ配信への導線が表示されます。</p>
+<pre><code class="language-text">YOUTUBE_VIDEO_ID_A=xxxxxxxxxxx
+YOUTUBE_VIDEO_ID_B=yyyyyyyyyyy
+YOUTUBE_VIDEO_ID_C=zzzzzzzzzzz
+YOUTUBE_VIDEO_ID_D=aaaaaaaaaaa
+YOUTUBE_VIDEO_ID_E=bbbbbbbbbbb
+YOUTUBE_VIDEO_ID_F=ccccccccccc
+</code></pre>
+<p>未設定のコートは配信一覧に表示されません。すべて未設定の場合は、トップページ、時程表、競技結果にライブ配信へのリンクを表示しません。競技結果のリンクは印刷時にも表示されません。</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="賞状印刷"><a class="header" href="#賞状印刷">賞状印刷</a></h1>
 <p>以下3つのテンプレートWordsファイルを用意し、これらを配置したディレクトリを<code>(WORDS_DIR)</code> とする。
 <code>競技名</code>、<code>名前</code>、<code>ランク</code>という文字が最終結果によって置き換わる。</p>
