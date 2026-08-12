@@ -9,7 +9,7 @@ type CurrentMatch = {
   display_text: string;
 };
 
-const UPDATE_INTERVAL_MS = 3000;
+const UPDATE_INTERVAL_MS = 10000;
 
 export default function CourtOverlay() {
   const router = useRouter();
