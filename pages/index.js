@@ -15,24 +15,43 @@ import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import FlagIcon from "@mui/icons-material/Flag";
 import MilitaryTechIcon from "@mui/icons-material/MilitaryTech";
 import Image from "next/image";
+import LiveTvIcon from "@mui/icons-material/LiveTv";
+import { GetLiveStreams } from "../lib/live_streams";
 
 export const getServerSideProps = async () => {
   const competitionTitle = process.env.COMPETITION_TITLE;
   const show_total = process.env.SHOW_TOTAL_IN_PUBLIC === "1";
   const topImagePath = process.env.TOP_IMAGE_PATH || "";
+  const hasLiveStreams = GetLiveStreams().length > 0;
   return {
     props: {
       competitionTitle,
       show_total,
       topImagePath,
+      hasLiveStreams,
     },
   };
 };
 
-export default function Home({ competitionTitle, show_total, topImagePath }) {
+export default function Home({
+  competitionTitle,
+  show_total,
+  topImagePath,
+  hasLiveStreams,
+}) {
   const router = useRouter();
 
   const cardList = [
+    ...(hasLiveStreams
+      ? [
+          {
+            label: "ライブ配信",
+            icon: <LiveTvIcon sx={{ mr: 1, color: "#f44336" }} />,
+            path: "/live",
+            color: "#f44336",
+          },
+        ]
+      : []),
     {
       label: "時程表",
       icon: <ScheduleIcon sx={{ mr: 1, color: "primary.main" }} />,

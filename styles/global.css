@@ -158,6 +158,10 @@ table.default td:last-child {
 }
 
 @media print {
+  .screen-only {
+    display: none !important;
+  }
+
   button {
     display: none !important;
   }

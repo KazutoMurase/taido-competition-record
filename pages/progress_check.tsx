@@ -14,9 +14,13 @@ import {
 import { useTheme } from "@mui/material/styles";
 
 import ProgressOnBlock from "../components/progress_on_block";
+import { GetLiveStreams } from "../lib/live_streams";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const params = { production_test: process.env.PRODUCTION_TEST };
+  const params = {
+    production_test: process.env.PRODUCTION_TEST,
+    live_courts: GetLiveStreams().map((stream) => stream.court),
+  };
   return {
     props: { params },
   };
@@ -84,6 +88,7 @@ const ProgressCheck: React.FC = ({
               update_interval={10000}
               return_url="/"
               hide={hide}
+              has_live_stream={params.live_courts.includes(courts[tabIndex])}
             />
           </Box>
         </Box>
@@ -96,6 +101,7 @@ const ProgressCheck: React.FC = ({
               update_interval={10000}
               return_url="/"
               hide={hide}
+              has_live_stream={params.live_courts.includes(court)}
             />
           ))}
         </Box>

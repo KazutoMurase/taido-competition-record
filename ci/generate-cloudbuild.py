@@ -3,6 +3,15 @@ import os
 import re
 from pathlib import Path
 
+OPTIONAL_ENV_VARS = {
+    "YOUTUBE_VIDEO_ID_A": "",
+    "YOUTUBE_VIDEO_ID_B": "",
+    "YOUTUBE_VIDEO_ID_C": "",
+    "YOUTUBE_VIDEO_ID_D": "",
+    "YOUTUBE_VIDEO_ID_E": "",
+    "YOUTUBE_VIDEO_ID_F": "",
+}
+
 def load_env_vars(env_file):
     """Load environment variables from .env file"""
     env_vars = {}
@@ -30,7 +39,7 @@ def main():
     env_file = '.env'
     
     # Load environment variables
-    env_vars = load_env_vars(env_file)
+    env_vars = {**OPTIONAL_ENV_VARS, **load_env_vars(env_file)}
     output_file = f"cloudbuild_{env_vars.get('PROJECT_ID', 'unknown')}.yaml"
     
     # Read template

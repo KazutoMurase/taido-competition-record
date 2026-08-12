@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import checkStyles from "../styles/checks.module.css";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import {
@@ -57,7 +58,8 @@ const ProgressOnBlock: React.FC<{
   update_interval: number;
   return_url: string;
   hide: boolean;
-}> = ({ block_number, update_interval, hide }) => {
+  has_live_stream?: boolean;
+}> = ({ block_number, update_interval, hide, has_live_stream = false }) => {
   const [currentScheduleData, setCurrentScheduleData] =
     useState<CurrentScheduleData>();
   const [timeSchedules, setTimeSchedules] = useState<TimeScheduleData[]>([]);
@@ -173,7 +175,34 @@ const ProgressOnBlock: React.FC<{
             style={{ height: isMobile ? "5px" : "80px" }}
           >
             {!isMobile && <h1>{block_number.toUpperCase() + "コート"}</h1>}
+            {!isMobile && has_live_stream ? (
+              <Button
+                className="screen-only"
+                variant="contained"
+                color="error"
+                href={`/live/${block_number}`}
+                sx={{ ml: 2 }}
+              >
+                配信を見る
+              </Button>
+            ) : null}
           </Grid>
+          {isMobile && has_live_stream ? (
+            <Grid
+              className="screen-only"
+              container
+              justifyContent="center"
+              sx={{ mb: 1 }}
+            >
+              <Button
+                variant="contained"
+                color="error"
+                href={`/live/${block_number}`}
+              >
+                配信を見る
+              </Button>
+            </Grid>
+          ) : null}
           <TableContainer>
             <Table aria-label="schedule table">
               <TableHead>
