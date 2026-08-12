@@ -20,3 +20,18 @@ https://大会サイト/overlay/b
 
 団体法形・展開では、選手名部分に現在演技中の団体名を表示します。
 一時的に通信できなくなった場合は、最後に取得できた表示を維持します。
+
+## ライブ配信ページ
+
+Cloud Build用の `.env` にYouTubeの動画IDを設定すると、公開ページにライブ配信への導線が表示されます。
+
+```text
+YOUTUBE_VIDEO_ID_A=xxxxxxxxxxx
+YOUTUBE_VIDEO_ID_B=yyyyyyyyyyy
+YOUTUBE_VIDEO_ID_C=zzzzzzzzzzz
+YOUTUBE_VIDEO_ID_D=aaaaaaaaaaa
+YOUTUBE_VIDEO_ID_E=bbbbbbbbbbb
+YOUTUBE_VIDEO_ID_F=ccccccccccc
+```
+
+未設定のコートは配信一覧に表示されません。すべて未設定の場合は、トップページ、時程表、競技結果にライブ配信へのリンクを表示しません。競技結果のリンクは印刷時にも表示されません。

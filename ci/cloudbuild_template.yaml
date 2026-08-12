@@ -1,9 +1,9 @@
 steps:
   - name: gcr.io/cloud-builders/git
-    id: 'check-submodule-hash'
-    entrypoint: 'bash'
+    id: "check-submodule-hash"
+    entrypoint: "bash"
     args:
-      - '-c'
+      - "-c"
       - |
         git submodule update --init --recursive
         cd $$IMAGE_NAME
@@ -13,10 +13,10 @@ steps:
         cd ..
 
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
-    id: 'check-tag-exists'
-    entrypoint: 'bash'
+    id: "check-tag-exists"
+    entrypoint: "bash"
     args:
-      - '-c'
+      - "-c"
       - |
         SUBMODULE_HASH=$$(cat /workspace/submodule_hash.txt)
         IMAGE_TAG="asia-northeast1-docker.pkg.dev/$$PROJECT_ID/$$ARTIFACT_REGISTRY_REPO_NAME/$$IMAGE_NAME:$$SUBMODULE_HASH"
@@ -32,10 +32,10 @@ steps:
         fi
 
   - name: gcr.io/cloud-builders/docker
-    id: 'build-image'
-    entrypoint: 'bash'
+    id: "build-image"
+    entrypoint: "bash"
     args:
-      - '-c'
+      - "-c"
       - |
         if [ "$(cat /workspace/build_required.txt)" = "true" ]; then
           SUBMODULE_HASH=$$(cat /workspace/submodule_hash.txt)
@@ -48,10 +48,10 @@ steps:
         fi
 
   - name: gcr.io/cloud-builders/docker
-    id: 'push-image'
-    entrypoint: 'bash'
+    id: "push-image"
+    entrypoint: "bash"
     args:
-      - '-c'
+      - "-c"
       - |
         if [ "$(cat /workspace/build_required.txt)" = "true" ]; then
           SUBMODULE_HASH=$$(cat /workspace/submodule_hash.txt)
@@ -64,10 +64,10 @@ steps:
         fi
 
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
-    id: 'deploy-service'
-    entrypoint: 'bash'
+    id: "deploy-service"
+    entrypoint: "bash"
     args:
-      - '-c'
+      - "-c"
       - |
         if [ "$(cat /workspace/build_required.txt)" = "true" ]; then
           SUBMODULE_HASH=$$(cat /workspace/submodule_hash.txt)
@@ -106,6 +106,12 @@ steps:
           --update-env-vars SHOW_TOTAL_IN_ADMIN=$$SHOW_TOTAL \
           --update-env-vars SHOW_TOTAL_IN_PUBLIC=0 \
           --update-env-vars SHOW_AWARD_IN_PUBLIC=0 \
+          --update-env-vars YOUTUBE_VIDEO_ID_A=$$YOUTUBE_VIDEO_ID_A \
+          --update-env-vars YOUTUBE_VIDEO_ID_B=$$YOUTUBE_VIDEO_ID_B \
+          --update-env-vars YOUTUBE_VIDEO_ID_C=$$YOUTUBE_VIDEO_ID_C \
+          --update-env-vars YOUTUBE_VIDEO_ID_D=$$YOUTUBE_VIDEO_ID_D \
+          --update-env-vars YOUTUBE_VIDEO_ID_E=$$YOUTUBE_VIDEO_ID_E \
+          --update-env-vars YOUTUBE_VIDEO_ID_F=$$YOUTUBE_VIDEO_ID_F \
           --update-env-vars USE_RESULT_DATA=0
 
 options:

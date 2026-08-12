@@ -2,6 +2,7 @@ import Head from "next/head";
 import GetResult from "../../components/get_result";
 import GetTableResult from "../../components/get_table_result";
 import GetClient from "../../lib/db_client";
+import { GetLiveStreams } from "../../lib/live_streams";
 
 const EVENT_NAME_PATTERN = /^[a-z][a-z0-9_]*$/;
 
@@ -27,11 +28,18 @@ export const getServerSideProps = async (context) => {
       title: String(event.name || "").replace(/['"]+/g, ""),
       hide: process.env.PRODUCTION_TEST === "1",
       showHighlight: process.env.SHOW_HIGHLIGHT_IN_TOURNAMENT === "1",
+      hasLiveStreams: GetLiveStreams().length > 0,
     },
   };
 };
 
-export default function ResultPage({ eventName, title, hide, showHighlight }) {
+export default function ResultPage({
+  eventName,
+  title,
+  hide,
+  showHighlight,
+  hasLiveStreams,
+}) {
   const isTableEvent =
     eventName.includes("dantai_hokei") || eventName.includes("tenkai");
 
@@ -42,12 +50,17 @@ export default function ResultPage({ eventName, title, hide, showHighlight }) {
       </Head>
       <main>
         {isTableEvent ? (
-          <GetTableResult event_name={eventName} hide={hide} />
+          <GetTableResult
+            event_name={eventName}
+            hide={hide}
+            show_live_stream_link={hasLiveStreams}
+          />
         ) : (
           <GetResult
             event_name={eventName}
             hide={hide}
             show_highlight={showHighlight}
+            show_live_stream_link={hasLiveStreams}
           />
         )}
       </main>

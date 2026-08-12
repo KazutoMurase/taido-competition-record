@@ -111,6 +111,7 @@ const GetTableResult: React.FC<{
   is_mobile: boolean;
   back_url: string;
   return_url: string;
+  show_live_stream_link?: boolean;
 }> = ({
   update_interval = 10000,
   event_name = null,
@@ -119,6 +120,7 @@ const GetTableResult: React.FC<{
   is_mobile = false,
   back_url = null,
   return_url = null,
+  show_live_stream_link = false,
 }) => {
   const router = useRouter();
   if (return_url === null) {
@@ -470,6 +472,17 @@ const GetTableResult: React.FC<{
               alignItems="center"
               style={{ height: "80px" }}
             >
+              {show_live_stream_link ? (
+                <Button
+                  className="screen-only"
+                  variant="contained"
+                  color="error"
+                  href="/live"
+                  sx={{ mr: 2 }}
+                >
+                  ライブ配信を見る
+                </Button>
+              ) : null}
               <Button
                 variant="contained"
                 type="submit"
