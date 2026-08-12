@@ -12,6 +12,7 @@
 - [GCP環境へのデプロイ方法(既存のプロジェクトを使いまわす場合)](develop/deploy_using_existing_project.md)
 - [ユーティリティ](develop/utility.md)
 - [サイトの構成](site.md)
+- [配信用の現在試合表示](overlay.md)
 - [賞状印刷](admin/certificate.md)
 - [結果出力](admin/export.md)
 
