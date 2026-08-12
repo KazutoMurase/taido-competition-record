@@ -20,12 +20,14 @@ import { GetLiveStreams } from "../lib/live_streams";
 
 export const getServerSideProps = async () => {
   const competitionTitle = process.env.COMPETITION_TITLE;
+  const onEdit = process.env.ON_EDIT === "1";
   const show_total = process.env.SHOW_TOTAL_IN_PUBLIC === "1";
   const topImagePath = process.env.TOP_IMAGE_PATH || "";
   const hasLiveStreams = GetLiveStreams().length > 0;
   return {
     props: {
       competitionTitle,
+      onEdit,
       show_total,
       topImagePath,
       hasLiveStreams,
@@ -35,6 +37,7 @@ export const getServerSideProps = async () => {
 
 export default function Home({
   competitionTitle,
+  onEdit,
   show_total,
   topImagePath,
   hasLiveStreams,
@@ -105,7 +108,12 @@ export default function Home({
             <u>{competitionTitle}</u>
           </h2>
         </Grid>
-        {topImagePath !== "" ? (
+        {onEdit && (
+          <Typography align="center" color="text.secondary" variant="h6">
+            大会情報は現在準備中です。
+          </Typography>
+        )}
+        {!onEdit && topImagePath !== "" ? (
           <Grid
             container
             justifyContent="center"
@@ -117,43 +125,44 @@ export default function Home({
         ) : (
           <></>
         )}
-        {cardList.map((card, index) => (
-          <Grid
-            key={`grid-${index}`}
-            container
-            justifyContent="center"
-            alignItems="center"
-            style={{ height: "100px" }}
-          >
-            <Card
-              sx={{
-                width: { xs: "100%", md: "80%" },
-                height: "75%",
-                display: "flex",
-                borderLeft: 20,
-                borderColor: card.color,
-                minWidth: 140,
-              }}
-              key={index}
-              elevation={2}
+        {!onEdit &&
+          cardList.map((card, index) => (
+            <Grid
+              key={`grid-${index}`}
+              container
+              justifyContent="center"
+              alignItems="center"
+              style={{ height: "100px" }}
             >
-              <CardActionArea
-                onClick={() => {
-                  router.push(card.path);
+              <Card
+                sx={{
+                  width: { xs: "100%", md: "80%" },
+                  height: "75%",
+                  display: "flex",
+                  borderLeft: 20,
+                  borderColor: card.color,
+                  minWidth: 140,
                 }}
-                sx={{ display: "flex", alignItems: "center", p: 1 }}
+                key={index}
+                elevation={2}
               >
-                {card.icon}
-                <CardContent sx={{ p: 0 }}>
-                  <Typography variant="h6">{card.label}</Typography>
-                </CardContent>
-                <Box sx={{ pr: 2, display: "flex", alignItems: "center" }}>
-                  <ChevronRightIcon sx={{ color: card.color }} />
-                </Box>
-              </CardActionArea>
-            </Card>
-          </Grid>
-        ))}
+                <CardActionArea
+                  onClick={() => {
+                    router.push(card.path);
+                  }}
+                  sx={{ display: "flex", alignItems: "center", p: 1 }}
+                >
+                  {card.icon}
+                  <CardContent sx={{ p: 0 }}>
+                    <Typography variant="h6">{card.label}</Typography>
+                  </CardContent>
+                  <Box sx={{ pr: 2, display: "flex", alignItems: "center" }}>
+                    <ChevronRightIcon sx={{ color: card.color }} />
+                  </Box>
+                </CardActionArea>
+              </Card>
+            </Grid>
+          ))}
       </Container>
     </div>
   );

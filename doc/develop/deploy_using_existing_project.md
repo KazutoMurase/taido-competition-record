@@ -115,6 +115,7 @@ GitHubの[taido-competition-deploy](https://github.com/KazutoMurase/taido-compet
 # その他参考情報
 ## cloudbuild.yamlの主要な変数の意味
 - COMPETITION_NAME: data以下に作る大会用のフォルダ名と対応
+- ON_EDIT: 1にすると一般トップには大会名だけを表示
 - PGSQL_HOST: postgresqlのデータベースを設置するアドレス
 - PRODUCTION: 0にするとデバッグ機能をつけてページをビルド、1にすると本番用にビルド
 - PRODUCTION_TEST: 1にするとadminで入力した結果を公開ページには見せないなど、デプロイしたサイトでも結果入力のテストができる状況になる

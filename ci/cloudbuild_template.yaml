@@ -90,6 +90,7 @@ steps:
           --min-instances 0 \
           --set-cloudsql-instances $$PROJECT_ID:asia-northeast1:$$CLOUDSQL_INSTANCE_ID \
           --update-env-vars COMPETITION_NAME=$$COMPETITION_NAME \
+          --update-env-vars ON_EDIT=$$ON_EDIT \
           --update-env-vars PGSQL_DATABASE=postgres \
           --update-env-vars PGSQL_HOST=/cloudsql/$$PROJECT_ID:asia-northeast1:$$CLOUDSQL_INSTANCE_ID \
           --update-env-vars PGSQL_PASSWORD=postgres \

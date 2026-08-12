@@ -4,6 +4,7 @@ import re
 from pathlib import Path
 
 OPTIONAL_ENV_VARS = {
+    "ON_EDIT": "0",
     "YOUTUBE_VIDEO_ID_A": "",
     "YOUTUBE_VIDEO_ID_B": "",
     "YOUTUBE_VIDEO_ID_C": "",
