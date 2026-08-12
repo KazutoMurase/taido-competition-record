@@ -108,6 +108,11 @@ export default function Home({
             <u>{competitionTitle}</u>
           </h2>
         </Grid>
+        {onEdit && (
+          <Typography align="center" color="text.secondary" variant="h6">
+            大会情報は現在準備中です。
+          </Typography>
+        )}
         {!onEdit && topImagePath !== "" ? (
           <Grid
             container
