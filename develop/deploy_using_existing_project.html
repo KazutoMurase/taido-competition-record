@@ -288,6 +288,7 @@ psql -h 127.0.0.1 -p 5432 -U postgres -d postgres -f generate_tables.sql
 <h2 id="cloudbuildyamlの主要な変数の意味"><a class="header" href="#cloudbuildyamlの主要な変数の意味">cloudbuild.yamlの主要な変数の意味</a></h2>
 <ul>
 <li>COMPETITION_NAME: data以下に作る大会用のフォルダ名と対応</li>
+<li>ON_EDIT: 1にすると一般トップには大会名だけを表示</li>
 <li>PGSQL_HOST: postgresqlのデータベースを設置するアドレス</li>
 <li>PRODUCTION: 0にするとデバッグ機能をつけてページをビルド、1にすると本番用にビルド</li>
 <li>PRODUCTION_TEST: 1にするとadminで入力した結果を公開ページには見せないなど、デプロイしたサイトでも結果入力のテストができる状況になる</li>
