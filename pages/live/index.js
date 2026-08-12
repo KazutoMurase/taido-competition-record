@@ -1,7 +1,10 @@
 import Head from "next/head";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardActionArea from "@mui/material/CardActionArea";
 import CardContent from "@mui/material/CardContent";
@@ -17,6 +20,8 @@ export const getServerSideProps = async () => {
 };
 
 export default function LiveStreams({ streams }) {
+  const router = useRouter();
+
   return (
     <>
       <Head>
@@ -41,6 +46,11 @@ export default function LiveStreams({ streams }) {
             </Grid>
           ))}
         </Grid>
+        <Box sx={{ mt: 4, textAlign: "center" }}>
+          <Button variant="contained" onClick={() => router.back()}>
+            戻る
+          </Button>
+        </Box>
       </Container>
     </>
   );

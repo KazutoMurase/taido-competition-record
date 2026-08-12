@@ -1157,6 +1157,7 @@ function GetResult({
   show_highlight = true,
   is_mobile = false,
   fromAdmin = false,
+  show_live_stream_link = false,
 }) {
   const router = useRouter();
   if (returnUrl === null) {
@@ -1599,6 +1600,17 @@ function GetResult({
               alignItems="center"
               style={{ height: "80px" }}
             >
+              {show_live_stream_link ? (
+                <Button
+                  className="screen-only"
+                  variant="contained"
+                  color="error"
+                  href="/live"
+                  sx={{ mr: 2 }}
+                >
+                  ライブ配信を見る
+                </Button>
+              ) : null}
               <Button
                 variant="contained"
                 type="submit"

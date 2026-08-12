@@ -1,4 +1,5 @@
 import Head from "next/head";
+import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
@@ -14,6 +15,7 @@ export const getServerSideProps = async (context) => {
 };
 
 export default function CourtLive({ stream }) {
+  const router = useRouter();
   const [currentMatch, setCurrentMatch] = useState("");
 
   const updateCurrentMatch = useCallback(async () => {
@@ -84,6 +86,11 @@ export default function CourtLive({ stream }) {
             rel="noopener noreferrer"
           >
             YouTubeで開く
+          </Button>
+        </Box>
+        <Box sx={{ mt: 2, textAlign: "center" }}>
+          <Button variant="contained" onClick={() => router.back()}>
+            戻る
           </Button>
         </Box>
       </Container>
