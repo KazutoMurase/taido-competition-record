@@ -1,6 +1,7 @@
 // あるブロックの、試合のリストを返す
 import { NextApiRequest, NextApiResponse } from "next";
 import GetClient from "../../lib/db_client";
+import { SingleFlight } from "../../lib/single_flight";
 import { GetVersionedCache } from "../../lib/versioned_cache";
 
 export interface GameIdsData {
@@ -35,11 +36,13 @@ const GetGameIdsOnBlock = async (
     const block_name = "block_" + req.query.block_number;
     const cache_key = "get_game_ids_on_" + block_name;
     const change_event_order_cache_key = "change_event_order_for_" + block_name;
-    const data = await GetVersionedCache(
-      cache_key,
-      [change_event_order_cache_key],
-      () => GetFromDB(req),
-      Boolean,
+    const data = await SingleFlight(cache_key, () =>
+      GetVersionedCache(
+        cache_key,
+        [change_event_order_cache_key],
+        () => GetFromDB(req),
+        Boolean,
+      ),
     );
     res.json(data);
   } catch (error) {

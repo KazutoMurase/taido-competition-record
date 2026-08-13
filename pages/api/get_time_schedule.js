@@ -1,4 +1,5 @@
 import GetClient from "../../lib/db_client";
+import { SingleFlight } from "../../lib/single_flight";
 import { GetVersionedCache } from "../../lib/versioned_cache";
 
 async function GetFromDB(req, res) {
@@ -69,10 +70,12 @@ const GetTimeSchedule = async (req, res) => {
     const latest_change_event_order_key =
       "change_event_order_for_" + block_name;
     const cache_key = "time_schedule_for_" + block_name;
-    const data = await GetVersionedCache(
-      cache_key,
-      [latest_update_key, latest_change_event_order_key],
-      () => GetFromDB(req, res),
+    const data = await SingleFlight(cache_key, () =>
+      GetVersionedCache(
+        cache_key,
+        [latest_update_key, latest_change_event_order_key],
+        () => GetFromDB(req, res),
+      ),
     );
     res.json(data);
   } catch (error) {
