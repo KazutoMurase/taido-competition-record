@@ -26,11 +26,7 @@ cloudbuild_$PROJECT_ID.yamlを編集しコミットする(Docker内DB接続に�
 - SHOW\_AWARD\_IN\_PUBLIC=1に変更
 - 総合得点のある競技会の場合は SHOW\_TOTAL\_IN\_PUBLIC=1に変更
 
-大会終了後はアクセス頻度が低くなるため、Cloud Runのリソースと課金設定も変更する。
-
-- `--cpu 4`を`--cpu 1`に変更
-- `--memory 4Gi`を`--memory 1Gi`に変更
-- `--no-cpu-throttling`を`--cpu-throttling`に変更
+Cloud Runのリソースは大会当日から`--cpu 1`、`--memory 1Gi`で運用する。大会終了後はアクセス頻度が低くなるため、課金設定を`--no-cpu-throttling`から`--cpu-throttling`に変更する。`--cpu-boost`はコールドスタートを短縮するため、引き続き有効にしておく。
 
 `--cpu-throttling`では、主にリクエストの処理中とインスタンスの起動・終了中がCPU・メモリの課金対象になる。アクセスがない場合は`--min-instances 0`によってスケールゼロになるため、大会終了後の低頻度アクセスに適している。
 
