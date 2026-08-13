@@ -16,6 +16,7 @@ import {
 import { useTheme } from "@mui/material/styles";
 
 import { GetEventName } from "../lib/get_event_name";
+import { FetchJson } from "../lib/fetch_json";
 import { GameIdsData } from "../pages/api/get_game_ids_on_block";
 
 interface CurrentScheduleData {
@@ -69,22 +70,42 @@ const ProgressOnBlock: React.FC<{
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const fetchData = useCallback(async () => {
-    fetch("/api/get_time_schedule?block_number=" + block_number)
-      .then((response) => response.json())
-      .then((data) => {
-        setTimeSchedules(data);
-      });
-    fetch("/api/get_game_ids_on_block?block_number=" + block_number)
-      .then((response) => response.json())
-      .then((data) => setGames(data));
+    try {
+      const data = await FetchJson(
+        "/api/get_time_schedule?block_number=" + block_number,
+      );
+      if (!Array.isArray(data)) {
+        throw new Error("Invalid time schedule response");
+      }
+      setTimeSchedules(data);
+    } catch (error) {
+      console.error("Failed to update time schedule", error);
+    }
+    try {
+      const data = await FetchJson(
+        "/api/get_game_ids_on_block?block_number=" + block_number,
+      );
+      if (!Array.isArray(data)) {
+        throw new Error("Invalid game IDs response");
+      }
+      setGames(data);
+    } catch (error) {
+      console.error("Failed to update game IDs", error);
+    }
   }, [block_number]);
 
   const fetchCurentSchedule = useCallback(async () => {
-    fetch("/api/current_schedule?block_number=" + block_number)
-      .then((response) => response.json())
-      .then((data) => {
-        setCurrentScheduleData(data);
-      });
+    try {
+      const data = await FetchJson(
+        "/api/current_schedule?block_number=" + block_number,
+      );
+      if (!data || typeof data !== "object" || Array.isArray(data)) {
+        throw new Error("Invalid current schedule response");
+      }
+      setCurrentScheduleData(data);
+    } catch (error) {
+      console.error("Failed to update current schedule", error);
+    }
   }, [block_number]);
 
   useEffect(() => {

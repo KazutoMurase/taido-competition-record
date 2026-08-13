@@ -6,6 +6,7 @@ import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import checkStyles from "../styles/checks.module.css";
+import { FetchJson } from "../lib/fetch_json";
 
 function onMoveDown(order_id, block_number, schedule_id, function_after_post) {
   let post = {
@@ -34,19 +35,25 @@ function TableProgressOnBlock({
 
   const [data, setData] = useState([]);
   const fetchData = useCallback(async () => {
-    const response = await fetch(
-      "/api/get_table_progress_on_block?block_number=" +
-        block_number +
-        "&schedule_id=" +
-        schedule_id +
-        "&event_name=" +
-        event_name,
-    );
-    const result = await response.json();
-    if (result.length === 0) {
-      router.push("block?block_number=" + block_number);
+    try {
+      const result = await FetchJson(
+        "/api/get_table_progress_on_block?block_number=" +
+          block_number +
+          "&schedule_id=" +
+          schedule_id +
+          "&event_name=" +
+          event_name,
+      );
+      if (!Array.isArray(result)) {
+        throw new Error("Invalid table progress response");
+      }
+      if (result.length === 0) {
+        router.push("block?block_number=" + block_number);
+      }
+      setData(result);
+    } catch (error) {
+      console.error("Failed to update table progress", error);
     }
-    setData(result);
   }, [block_number, schedule_id, event_name, router]);
   useEffect(() => {
     const interval = setInterval(() => {

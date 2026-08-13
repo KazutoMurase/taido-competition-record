@@ -7,6 +7,7 @@ import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
+import { FetchJson } from "../lib/fetch_json";
 
 function handleRecordError(error) {
   if (axios.isAxiosError(error) && error.response?.status === 409) {
@@ -328,82 +329,91 @@ function RecordTableResult({
 
   const [data, setData] = useState([]);
   const fetchData = useCallback(async () => {
-    const response = await fetch(
-      "/api/current_game_on_table?block_number=" +
-        block_number +
-        "&schedule_id=" +
-        schedule_id +
-        "&event_name=" +
-        event_name,
-    );
-    const result = await response.json();
-    if (result.length === 0) {
-      router.push("block?block_number=" + block_number);
+    try {
+      const result = await FetchJson(
+        "/api/current_game_on_table?block_number=" +
+          block_number +
+          "&schedule_id=" +
+          schedule_id +
+          "&event_name=" +
+          event_name,
+      );
+      if (Array.isArray(result)) {
+        if (result.length === 0) {
+          router.push("block?block_number=" + block_number);
+        }
+        return;
+      }
+      if (!result || typeof result !== "object") {
+        throw new Error("Invalid current table game response");
+      }
+      let initialValues = [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+      ];
+      if (result.elapsed_time) {
+        initialValues[0] = parseInt(result.elapsed_time / 10);
+        initialValues[1] = parseInt(result.elapsed_time % 10);
+        initialValues[2] = parseInt(result.elapsed_time * 10) % 10;
+        initialValues[3] = parseInt(result.elapsed_time * 100) % 10;
+      }
+      if (result.main_score) {
+        initialValues[4] = parseInt(result.main_score / 10);
+        initialValues[5] = parseInt(result.main_score % 10);
+        initialValues[6] = parseInt(result.main_score * 10) % 10;
+      }
+      if (result.sub1_score) {
+        initialValues[7] = parseInt(result.sub1_score);
+        initialValues[8] = parseInt(result.sub1_score * 10) % 10;
+      }
+      if (result.sub2_score) {
+        initialValues[9] = parseInt(result.sub2_score);
+        initialValues[10] = parseInt(result.sub2_score * 10) % 10;
+      }
+      if (result.sub3_score) {
+        initialValues[11] = parseInt(result.sub3_score);
+        initialValues[12] = parseInt(result.sub3_score * 10) % 10;
+      }
+      if (result.sub4_score) {
+        initialValues[13] = parseInt(result.sub4_score);
+        initialValues[14] = parseInt(result.sub4_score * 10) % 10;
+      }
+      if (result.sub5_score) {
+        initialValues[15] = parseInt(result.sub5_score);
+        initialValues[16] = parseInt(result.sub5_score * 10) % 10;
+      }
+      if (result.penalty) {
+        initialValues[17] = parseInt(-result.penalty);
+        initialValues[18] = parseInt(-result.penalty * 10) % 10;
+      }
+      if (result.start_penalty) {
+        initialValues[19] = parseInt(-result.start_penalty);
+        initialValues[20] = parseInt(-result.start_penalty * 10) % 10;
+      }
+      setInitialValues(initialValues);
+      setData(result);
+    } catch (error) {
+      console.error("Failed to update current table game", error);
     }
-    let initialValues = [
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-    ];
-    if (result.elapsed_time) {
-      initialValues[0] = parseInt(result.elapsed_time / 10);
-      initialValues[1] = parseInt(result.elapsed_time % 10);
-      initialValues[2] = parseInt(result.elapsed_time * 10) % 10;
-      initialValues[3] = parseInt(result.elapsed_time * 100) % 10;
-    }
-    if (result.main_score) {
-      initialValues[4] = parseInt(result.main_score / 10);
-      initialValues[5] = parseInt(result.main_score % 10);
-      initialValues[6] = parseInt(result.main_score * 10) % 10;
-    }
-    if (result.sub1_score) {
-      initialValues[7] = parseInt(result.sub1_score);
-      initialValues[8] = parseInt(result.sub1_score * 10) % 10;
-    }
-    if (result.sub2_score) {
-      initialValues[9] = parseInt(result.sub2_score);
-      initialValues[10] = parseInt(result.sub2_score * 10) % 10;
-    }
-    if (result.sub3_score) {
-      initialValues[11] = parseInt(result.sub3_score);
-      initialValues[12] = parseInt(result.sub3_score * 10) % 10;
-    }
-    if (result.sub4_score) {
-      initialValues[13] = parseInt(result.sub4_score);
-      initialValues[14] = parseInt(result.sub4_score * 10) % 10;
-    }
-    if (result.sub5_score) {
-      initialValues[15] = parseInt(result.sub5_score);
-      initialValues[16] = parseInt(result.sub5_score * 10) % 10;
-    }
-    if (result.penalty) {
-      initialValues[17] = parseInt(-result.penalty);
-      initialValues[18] = parseInt(-result.penalty * 10) % 10;
-    }
-    if (result.start_penalty) {
-      initialValues[19] = parseInt(-result.start_penalty);
-      initialValues[20] = parseInt(-result.start_penalty * 10) % 10;
-    }
-    setInitialValues(initialValues);
-    setData(result);
   }, [block_number, schedule_id, event_name, router]);
   useEffect(() => {
     const interval = setInterval(() => {

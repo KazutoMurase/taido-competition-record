@@ -9,6 +9,7 @@ import SquareTwoToneIcon from "@mui/icons-material/SquareTwoTone";
 import checkStyles from "../styles/checks.module.css";
 import { useRouter } from "next/router";
 import { GetCourtId } from "../lib/get_court_id";
+import { FetchJson } from "../lib/fetch_json";
 
 function onSubmit(id, block_number, event_id, is_test, function_after_post) {
   const court_id = GetCourtId(block_number);
@@ -154,18 +155,24 @@ function CheckPlayers({
   let title;
 
   const fetchData = useCallback(async () => {
-    const response = await fetch(
-      "/api/check_players_on_block?block_number=" +
-        block_number +
-        "&schedule_id=" +
-        schedule_id +
-        "&event_id=" +
-        event_id +
-        "&is_test=" +
-        is_test,
-    );
-    const result = await response.json();
-    setData(result);
+    try {
+      const result = await FetchJson(
+        "/api/check_players_on_block?block_number=" +
+          block_number +
+          "&schedule_id=" +
+          schedule_id +
+          "&event_id=" +
+          event_id +
+          "&is_test=" +
+          is_test,
+      );
+      if (!result || !Array.isArray(result.items)) {
+        throw new Error("Invalid players response");
+      }
+      setData(result);
+    } catch (error) {
+      console.error("Failed to update players", error);
+    }
   }, [block_number, schedule_id, event_id, is_test]);
   const [data, setData] = useState([]);
   useEffect(() => {

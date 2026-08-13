@@ -6,6 +6,7 @@ import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import FlagCircleRoundedIcon from "@mui/icons-material/FlagCircleRounded";
+import { FetchJson } from "../lib/fetch_json";
 
 function handleRecordError(error) {
   if (axios.isAxiosError(error) && error.response?.status === 409) {
@@ -220,36 +221,43 @@ function RecordResult({
 
   const [data, setData] = useState([]);
   const fetchData = useCallback(async () => {
-    const response = await fetch(
-      "/api/current_block?block_number=" +
-        block_number +
-        "&schedule_id=" +
-        schedule_id +
-        "&event_name=" +
-        event_name,
-    );
-    const result = await response.json();
-    if (result.length === 0) {
-      router.push("block?block_number=" + block_number);
-    }
-    setData(result);
-    const left_flag = event_name.includes("dantai")
-      ? result.left_group_flag
-      : result.left_player_flag;
-    if (left_flag !== null && left_flag !== undefined) {
-      if (result.left_color === "red") {
-        if (event_name.includes("hokei")) {
-          setInitialRadioButton(left_flag);
-        } else if (event_name.includes("zissen")) {
-          setInitialRadioButton(1 - left_flag);
+    try {
+      const result = await FetchJson(
+        "/api/current_block?block_number=" +
+          block_number +
+          "&schedule_id=" +
+          schedule_id +
+          "&event_name=" +
+          event_name,
+      );
+      if (Array.isArray(result)) {
+        if (result.length === 0) {
+          router.push("block?block_number=" + block_number);
         }
-      } else {
-        if (event_name.includes("hokei")) {
+        return;
+      }
+      if (!result || typeof result !== "object") {
+        throw new Error("Invalid current game response");
+      }
+      setData(result);
+      const left_flag = event_name.includes("dantai")
+        ? result.left_group_flag
+        : result.left_player_flag;
+      if (left_flag !== null && left_flag !== undefined) {
+        if (result.left_color === "red") {
+          if (event_name.includes("hokei")) {
+            setInitialRadioButton(left_flag);
+          } else if (event_name.includes("zissen")) {
+            setInitialRadioButton(1 - left_flag);
+          }
+        } else if (event_name.includes("hokei")) {
           setInitialRadioButton(3 - left_flag);
         } else if (event_name.includes("zissen")) {
           setInitialRadioButton(left_flag);
         }
       }
+    } catch (error) {
+      console.error("Failed to update current game", error);
     }
   }, [block_number, schedule_id, event_name, router]);
   useEffect(() => {

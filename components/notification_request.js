@@ -8,6 +8,7 @@ import Grid from "@mui/material/Grid";
 import FlagCircleRoundedIcon from "@mui/icons-material/FlagCircleRounded";
 import SquareTwoToneIcon from "@mui/icons-material/SquareTwoTone";
 import checkStyles from "../styles/checks.module.css";
+import { FetchJson } from "../lib/fetch_json";
 import {
   Table,
   TableHead,
@@ -86,11 +87,17 @@ function NotificationRequest({
   };
 
   const fetchData = useCallback(async () => {
-    const response = await fetch(
-      "/api/notification_request?is_test=" + is_test,
-    );
-    const result = await response.json();
-    setData(result);
+    try {
+      const result = await FetchJson(
+        "/api/notification_request?is_test=" + is_test,
+      );
+      if (!Array.isArray(result)) {
+        throw new Error("Invalid notification response");
+      }
+      setData(result);
+    } catch (error) {
+      console.error("Failed to update notification requests", error);
+    }
   }, [is_test]);
   const [data, setData] = useState([]);
   useEffect(() => {

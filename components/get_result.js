@@ -9,6 +9,7 @@ import Box from "@mui/material/Box";
 import { Layer, Stage, Rect, Text } from "react-konva";
 import Grid from "@mui/material/Grid";
 import Summary from "./show_summary";
+import { FetchJson } from "../lib/fetch_json";
 
 function CreateDantaiText(item, lineWidth, y_padding, hide = false) {
   const is_left = item["block_pos"] === "left";
@@ -1185,50 +1186,64 @@ function GetResult({
     const blockData = {};
     for (const court of courts) {
       const blockNumber = court.name.replace(/['"コート]/g, "").toLowerCase();
-      const response = await fetch(
-        `/api/current_block?block_number=${blockNumber}&event_name=${event_name}`,
-      );
-      const result = await response.json();
-      if (result) {
+      try {
+        const result = await FetchJson(
+          `/api/current_block?block_number=${blockNumber}&event_name=${event_name}`,
+        );
         blockData[blockNumber] = result;
+      } catch (error) {
+        console.error(`Failed to update current block ${blockNumber}`, error);
       }
     }
-    setCurrentBlockData({ ...blockData });
+    setCurrentBlockData((previous) => ({ ...previous, ...blockData }));
   }, [courts, event_name]);
 
   useEffect(() => {
     async function fetchData() {
-      const response = await fetch("/api/get_result?event_name=" + event_name);
-      const result = await response.json();
-      setData(result);
-      if (result.length > 0) {
-        const roundNum = Math.max(
-          ...result.map((d) => Number(d.round)).filter((n) => !isNaN(n)),
+      try {
+        const result = await FetchJson(
+          "/api/get_result?event_name=" + event_name,
         );
-        setLineWidth(roundNum > 6 ? 25 : 50);
+        if (!Array.isArray(result)) {
+          throw new Error("Invalid result response");
+        }
+        setData(result);
+        if (result.length > 0) {
+          const roundNum = Math.max(
+            ...result.map((d) => Number(d.round)).filter((n) => !isNaN(n)),
+          );
+          setLineWidth(roundNum > 6 ? 25 : 50);
+        }
+      } catch (error) {
+        console.error("Failed to update result", error);
       }
     }
     fetchData();
     async function fetchEventDescription() {
-      const response = await fetch(
-        "/api/get_event_info?event_name=" +
-          (event_name.includes("test")
-            ? event_name.replace("test_", "")
-            : event_name),
-      );
-      const result = await response.json();
-      if (
-        result.length > 0 &&
-        result[0]["full_name"] &&
-        result[0]["description"]
-      ) {
-        // use "|" as a separator
-        setEventInfo({
-          full_name: result[0]["full_name"].replace(/['"]+/g, ""),
-          description: result[0]["description"]
-            .replace(/['"]+/g, "")
-            .split("|"),
-        });
+      try {
+        const result = await FetchJson(
+          "/api/get_event_info?event_name=" +
+            (event_name.includes("test")
+              ? event_name.replace("test_", "")
+              : event_name),
+        );
+        if (!Array.isArray(result)) {
+          throw new Error("Invalid event information response");
+        }
+        if (
+          result.length > 0 &&
+          result[0]["full_name"] &&
+          result[0]["description"]
+        ) {
+          setEventInfo({
+            full_name: result[0]["full_name"].replace(/['"]+/g, ""),
+            description: result[0]["description"]
+              .replace(/['"]+/g, "")
+              .split("|"),
+          });
+        }
+      } catch (error) {
+        console.error("Failed to update event information", error);
       }
     }
     fetchEventDescription();
@@ -1236,9 +1251,15 @@ function GetResult({
       const query_text =
         "/api/get_courts" +
         (event_name.includes("test") ? "?is_test=true" : "");
-      const response = await fetch(query_text);
-      const result = await response.json();
-      setCourts(result);
+      try {
+        const result = await FetchJson(query_text);
+        if (!Array.isArray(result)) {
+          throw new Error("Invalid courts response");
+        }
+        setCourts(result);
+      } catch (error) {
+        console.error("Failed to update courts", error);
+      }
     }
     if (!hide && show_highlight) {
       fetchCourts();

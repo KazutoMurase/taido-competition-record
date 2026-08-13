@@ -8,6 +8,7 @@ import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import checkStyles from "../styles/checks.module.css";
 import { GetEventName } from "../lib/get_event_name";
+import { FetchJson } from "../lib/fetch_json";
 import {
   Table,
   TableHead,
@@ -284,11 +285,17 @@ function Block({
   const [operationUnlock, setOperationUnlock] = useState(false);
 
   const fetchData = useCallback(async () => {
-    const response = await fetch(
-      "/api/get_time_schedule?block_number=" + block_number,
-    );
-    const result = await response.json();
-    setData(result);
+    try {
+      const result = await FetchJson(
+        "/api/get_time_schedule?block_number=" + block_number,
+      );
+      if (!Array.isArray(result)) {
+        throw new Error("Invalid time schedule response");
+      }
+      setData(result);
+    } catch (error) {
+      console.error("Failed to update time schedule", error);
+    }
   }, [block_number]);
 
   useEffect(() => {
@@ -302,19 +309,30 @@ function Block({
   }, [fetchData, update_interval]);
 
   const fetchCurrent = useCallback(async () => {
-    const response = await fetch(
-      "/api/current_schedule?block_number=" + block_number,
-    );
-    const result = await response.json();
-    setCurrent(result);
+    try {
+      const result = await FetchJson(
+        "/api/current_schedule?block_number=" + block_number,
+      );
+      if (!result || typeof result !== "object" || Array.isArray(result)) {
+        throw new Error("Invalid current schedule response");
+      }
+      setCurrent(result);
+    } catch (error) {
+      console.error("Failed to update current schedule", error);
+    }
   }, [block_number]);
   const fetchOperationUnlock = useCallback(async () => {
     if (!show_operation_unlock) {
       return;
     }
-    const response = await fetch("/api/operation_unlock?block=" + block_number);
-    const result = await response.json();
-    setOperationUnlock(result.enabled === true);
+    try {
+      const result = await FetchJson(
+        "/api/operation_unlock?block=" + block_number,
+      );
+      setOperationUnlock(result.enabled === true);
+    } catch (error) {
+      console.error("Failed to update operation unlock state", error);
+    }
   }, [block_number, show_operation_unlock]);
   const updateOperationUnlock = async (enabled) => {
     const response = await fetch("/api/operation_unlock", {

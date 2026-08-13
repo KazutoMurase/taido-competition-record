@@ -10,6 +10,7 @@ import checkStyles from "../styles/checks.module.css";
 import { useRouter } from "next/router";
 import { GetEventName } from "../lib/get_event_name";
 import { GetCourtId } from "../lib/get_court_id";
+import { FetchJson } from "../lib/fetch_json";
 
 function onSubmit(
   block_number,
@@ -163,18 +164,24 @@ function CheckDantai({
   let title;
 
   const fetchData = useCallback(async () => {
-    const response = await fetch(
-      "/api/check_players_on_block?block_number=" +
-        block_number +
-        "&schedule_id=" +
-        schedule_id +
-        "&event_id=" +
-        event_id +
-        "&is_test=" +
-        is_test,
-    );
-    const result = await response.json();
-    setData(result);
+    try {
+      const result = await FetchJson(
+        "/api/check_players_on_block?block_number=" +
+          block_number +
+          "&schedule_id=" +
+          schedule_id +
+          "&event_id=" +
+          event_id +
+          "&is_test=" +
+          is_test,
+      );
+      if (!result || !Array.isArray(result.items)) {
+        throw new Error("Invalid teams response");
+      }
+      setData(result);
+    } catch (error) {
+      console.error("Failed to update teams", error);
+    }
   }, [block_number, schedule_id, event_id, is_test]);
 
   const [data, setData] = useState([]);
