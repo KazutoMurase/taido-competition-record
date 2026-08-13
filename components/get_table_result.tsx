@@ -365,42 +365,45 @@ const GetTableResult: React.FC<{
   );
 
   const fetchCurrentGames = useCallback(async () => {
-    const entries = await Promise.all(
-      courts.map(async (court) => {
-        const blockNumber = String(court.name || "")
+    const blockNumbers = courts
+      .map((court) =>
+        String(court.name || "")
           .replace(/['"コート]/g, "")
-          .toLowerCase();
-        if (!blockNumber) {
-          return null;
+          .toLowerCase(),
+      )
+      .filter(Boolean);
+    try {
+      const games = await FetchJson(
+        "/api/current_games_for_courts?type=table&event_name=" +
+          encodeURIComponent(event_name) +
+          "&block_numbers=" +
+          encodeURIComponent(blockNumbers.join(",")),
+      );
+      if (!games || typeof games !== "object" || Array.isArray(games)) {
+        throw new Error("Invalid current table games response");
+      }
+      const currentGames = { ...currentGamesRef.current };
+      blockNumbers.forEach((blockNumber) => {
+        if (!(blockNumber in games)) {
+          return;
         }
-        try {
-          const response = await fetch(
-            "/api/current_game_on_table?block_number=" +
-              encodeURIComponent(blockNumber) +
-              "&event_name=" +
-              encodeURIComponent(event_name),
-          );
-          if (!response.ok) {
-            return null;
-          }
-          const game = await response.json();
-          return game?.id ? [blockNumber, game] : null;
-        } catch (error) {
-          console.error("Failed to fetch current table game", error);
-          return null;
+        if (games[blockNumber]?.id) {
+          currentGames[blockNumber] = games[blockNumber];
+        } else {
+          delete currentGames[blockNumber];
         }
-      }),
-    );
-    const currentGames = Object.fromEntries(entries.filter(Boolean));
-    currentGamesRef.current = currentGames;
-    await fetchData(currentGames);
+      });
+      currentGamesRef.current = currentGames;
+      await fetchData(currentGames);
+    } catch (error) {
+      console.error("Failed to fetch current table games", error);
+    }
   }, [courts, event_name, fetchData]);
 
   useEffect(() => {
     currentGamesRef.current = {};
     setCourts([]);
     if (hide || !show_highlight) {
-      fetchData({});
       return;
     }
     const query = event_name.includes("test") ? "?is_test=true" : "";
@@ -426,16 +429,19 @@ const GetTableResult: React.FC<{
   }, [courts.length, fetchCurrentGames, hide, show_highlight, update_interval]);
 
   useEffect(() => {
+    // Once courts are available, fetchCurrentGames also refreshes the result.
+    // Keep this fallback for pages without highlighting and while courts load.
+    if (!hide && show_highlight && courts.length > 0) {
+      return;
+    }
     fetchData();
     if (update_interval > 0) {
-      const interval = setInterval(() => {
-        fetchData();
-      }, update_interval);
+      const interval = setInterval(fetchData, update_interval);
       return () => {
         clearInterval(interval);
       };
     }
-  }, [fetchData, update_interval]);
+  }, [courts.length, fetchData, hide, show_highlight, update_interval]);
 
   const fetchEventInfo = useCallback(async () => {
     try {
