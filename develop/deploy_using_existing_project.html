@@ -197,6 +197,18 @@
 </li>
 <li>リージョン: asia-northeast1</li>
 <li>可用性: シングルゾーン</li>
+<li>マシンの構成:
+<ul>
+<li>汎用-専用コア</li>
+<li>1vCPU、6.5GiB</li>
+</ul>
+</li>
+<li>ストレージ:
+<ul>
+<li>種類: SSD</li>
+<li>ストレージ容量: 10GB</li>
+</ul>
+</li>
 </ul>
 <p>トーナメント編集用など、継続利用したいものの値段を抑えたい場合は以下</p>
 <ul>
@@ -301,7 +313,7 @@ psql -h 127.0.0.1 -p 5432 -U postgres -d postgres -f generate_tables.sql
 </ul>
 <h2 id="ローカルのdbを利用してデプロイした際の挙動について"><a class="header" href="#ローカルのdbを利用してデプロイした際の挙動について">ローカルのDBを利用してデプロイした際の挙動について</a></h2>
 <p>ローカルのDBを利用したデプロイで事前に挙動を確認した際、しばらくサイトを触らないとDBの情報がリセットされて大会の進行が初期状態に戻る。</p>
-<p>cloudbuild.yamlで<code>--no-cpu-throttling</code>を指定しているのでアクセスが無い時にCloud Runのインスタンスが一度シャットダウンするために起きる。</p>
+<p>cloudbuild.yamlで<code>--min-instances 0</code>を指定しているため、アクセスが無い時にCloud Runのインスタンスがスケールゼロになり、再起動時にローカルDBが初期化されるために起きる。</p>
 <p>本番だと常にアクセスがあるのと、Cloud SQLでデータを保持するのでこのようなリセットは起きない。</p>
 
                     </main>

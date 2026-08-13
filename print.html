@@ -505,6 +505,18 @@ block_&lt;block&gt;_games.csv
 <li>パスワード: postgres</li>
 <li>リージョン: asia-northeast1</li>
 <li>可用性: シングルゾーン</li>
+<li>マシンの構成:
+<ul>
+<li>汎用-専用コア</li>
+<li>1vCPU、6.5GiB</li>
+</ul>
+</li>
+<li>ストレージ:
+<ul>
+<li>種類: SSD</li>
+<li>ストレージ容量: 10GB</li>
+</ul>
+</li>
 </ul>
 <h2 id="5-cloudbuildyamlファイルの作成"><a class="header" href="#5-cloudbuildyamlファイルの作成">5. cloudbuild.yamlファイルの作成</a></h2>
 <p>CIにおいて実行する内容を定義するyamlファイルを作成する。Cloud Buildの実行時にこのファイルを参照させる。
@@ -671,6 +683,18 @@ CREATE SCHEMA public;
 </li>
 <li>リージョン: asia-northeast1</li>
 <li>可用性: シングルゾーン</li>
+<li>マシンの構成:
+<ul>
+<li>汎用-専用コア</li>
+<li>1vCPU、6.5GiB</li>
+</ul>
+</li>
+<li>ストレージ:
+<ul>
+<li>種類: SSD</li>
+<li>ストレージ容量: 10GB</li>
+</ul>
+</li>
 </ul>
 <p>トーナメント編集用など、継続利用したいものの値段を抑えたい場合は以下</p>
 <ul>
@@ -775,7 +799,7 @@ psql -h 127.0.0.1 -p 5432 -U postgres -d postgres -f generate_tables.sql
 </ul>
 <h2 id="ローカルのdbを利用してデプロイした際の挙動について"><a class="header" href="#ローカルのdbを利用してデプロイした際の挙動について">ローカルのDBを利用してデプロイした際の挙動について</a></h2>
 <p>ローカルのDBを利用したデプロイで事前に挙動を確認した際、しばらくサイトを触らないとDBの情報がリセットされて大会の進行が初期状態に戻る。</p>
-<p>cloudbuild.yamlで<code>--no-cpu-throttling</code>を指定しているのでアクセスが無い時にCloud Runのインスタンスが一度シャットダウンするために起きる。</p>
+<p>cloudbuild.yamlで<code>--min-instances 0</code>を指定しているため、アクセスが無い時にCloud Runのインスタンスがスケールゼロになり、再起動時にローカルDBが初期化されるために起きる。</p>
 <p>本番だと常にアクセスがあるのと、Cloud SQLでデータを保持するのでこのようなリセットは起きない。</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="ユーティリティ"><a class="header" href="#ユーティリティ">ユーティリティ</a></h1>
 <p>以下大会準備や大会中に使える便利URLやAPIについて記載する。</p>
@@ -876,12 +900,7 @@ GUI上のボタンをクリックすることで印刷を行うことができ�
 <li>SHOW_AWARD_IN_PUBLIC=1に変更</li>
 <li>総合得点のある競技会の場合は SHOW_TOTAL_IN_PUBLIC=1に変更</li>
 </ul>
-<p>大会終了後はアクセス頻度が低くなるため、Cloud Runのリソースと課金設定も変更する。</p>
-<ul>
-<li><code>--cpu 4</code>を<code>--cpu 1</code>に変更</li>
-<li><code>--memory 4Gi</code>を<code>--memory 1Gi</code>に変更</li>
-<li><code>--no-cpu-throttling</code>を<code>--cpu-throttling</code>に変更</li>
-</ul>
+<p>Cloud Runのリソースは大会当日から<code>--cpu 1</code>、<code>--memory 1Gi</code>で運用する。大会終了後はアクセス頻度が低くなるため、課金設定を<code>--no-cpu-throttling</code>から<code>--cpu-throttling</code>に変更する。<code>--cpu-boost</code>はコールドスタートを短縮するため、引き続き有効にしておく。</p>
 <p><code>--cpu-throttling</code>では、主にリクエストの処理中とインスタンスの起動・終了中がCPU・メモリの課金対象になる。アクセスがない場合は<code>--min-instances 0</code>によってスケールゼロになるため、大会終了後の低頻度アクセスに適している。</p>
 <p>Cloud SQLを削除する。</p>
 <ol>
