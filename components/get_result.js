@@ -1183,19 +1183,30 @@ function GetResult({
   const [blinkState, setBlinkState] = useState(true);
 
   const fetchCurrentBlock = useCallback(async () => {
-    const blockData = {};
-    for (const court of courts) {
-      const blockNumber = court.name.replace(/['"コート]/g, "").toLowerCase();
-      try {
-        const result = await FetchJson(
-          `/api/current_block?block_number=${blockNumber}&event_name=${event_name}`,
-        );
-        blockData[blockNumber] = result;
-      } catch (error) {
-        console.error(`Failed to update current block ${blockNumber}`, error);
-      }
+    const blockNumbers = courts.map((court) =>
+      court.name.replace(/['"コート]/g, "").toLowerCase(),
+    );
+    if (blockNumbers.length === 0) {
+      return;
     }
-    setCurrentBlockData((previous) => ({ ...previous, ...blockData }));
+    try {
+      const blockData = await FetchJson(
+        "/api/current_games_for_courts?type=tournament&event_name=" +
+          encodeURIComponent(event_name) +
+          "&block_numbers=" +
+          encodeURIComponent(blockNumbers.join(",")),
+      );
+      if (
+        !blockData ||
+        typeof blockData !== "object" ||
+        Array.isArray(blockData)
+      ) {
+        throw new Error("Invalid current blocks response");
+      }
+      setCurrentBlockData((previous) => ({ ...previous, ...blockData }));
+    } catch (error) {
+      console.error("Failed to update current blocks", error);
+    }
   }, [courts, event_name]);
 
   useEffect(() => {
@@ -1262,7 +1273,9 @@ function GetResult({
       }
     }
     if (!hide && show_highlight) {
-      fetchCourts();
+      if (courts.length === 0) {
+        fetchCourts();
+      }
       fetchCurrentBlock();
     }
     if (updateInterval > 0) {
@@ -1277,12 +1290,6 @@ function GetResult({
       };
     }
   }, [event_name, updateInterval, block_number, courts.length]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    if (courts.length > 0) {
-      fetchCurrentBlock();
-    }
-  }, [courts.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (Object.keys(currentBlockData).length > 0) {

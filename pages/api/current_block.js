@@ -1,5 +1,4 @@
 import GetClient from "../../lib/db_client";
-import { GetEventName } from "../../lib/get_event_name";
 import { GetVersionedCache } from "../../lib/versioned_cache";
 
 function update(sorted_data, item, block_indices, value, round) {
@@ -32,7 +31,7 @@ function update(sorted_data, item, block_indices, value, round) {
   item["block_pos"] = value;
 }
 
-async function GetFromDB(req, res) {
+async function GetFromDB(req) {
   const client = await GetClient();
   const block_name = "block_" + req.query.block_number;
   const current_block_name = "current_" + block_name;
@@ -245,33 +244,36 @@ async function GetFromDB(req, res) {
   return [];
 }
 
+export async function GetCurrentBlockData(query) {
+  const block_name = "block_" + query.block_number;
+  const current_block_name = "current_" + block_name;
+  const event_name = query.event_name;
+  const cacheKey =
+    "current_" + block_name + (event_name ? "_for_" + event_name : "");
+  const latestScheduleIdUpdateKey = "update_id_for_" + current_block_name;
+  const latestGameIdUpdateKey = "update_game_id_for_" + current_block_name;
+  const latestChangeOrderKey = "change_order_for_" + block_name;
+  const latestUpdateResultKey =
+    "latest_update_result_for_" + event_name + "_version";
+  const latestCompletePlayersKey = "update_complete_players_for_" + block_name;
+
+  return GetVersionedCache(
+    cacheKey,
+    [
+      latestScheduleIdUpdateKey,
+      latestGameIdUpdateKey,
+      latestChangeOrderKey,
+      latestUpdateResultKey,
+      latestCompletePlayersKey,
+    ],
+    () => GetFromDB({ query }),
+    (loaded) => query.schedule_id === undefined || loaded.length !== 0,
+  );
+}
+
 const CurrentBlock = async (req, res) => {
   try {
-    const block_name = "block_" + req.query.block_number;
-    const current_block_name = "current_" + block_name;
-    const event_name = req.query.event_name;
-    const cacheKey =
-      "current_" + block_name + (event_name ? "_for_" + event_name : "");
-    const latestScheduleIdUpdateKey = "update_id_for_" + current_block_name;
-    const latestGameIdUpdateKey = "update_game_id_for_" + current_block_name;
-    const latestChangeOrderKey = "change_order_for_" + block_name;
-    const latestUpdateResultKey =
-      "latest_update_result_for_" + event_name + "_version";
-    const latestCompletePlayersKey =
-      "update_complete_players_for_" + block_name;
-
-    const data = await GetVersionedCache(
-      cacheKey,
-      [
-        latestScheduleIdUpdateKey,
-        latestGameIdUpdateKey,
-        latestChangeOrderKey,
-        latestUpdateResultKey,
-        latestCompletePlayersKey,
-      ],
-      () => GetFromDB(req, res),
-      (loaded) => req.query.schedule_id === undefined || loaded.length !== 0,
-    );
+    const data = await GetCurrentBlockData(req.query);
     res.json(data);
   } catch (error) {
     console.log(error);
