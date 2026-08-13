@@ -19,7 +19,7 @@ import { GetEventName } from "../lib/get_event_name";
 import { FetchJson } from "../lib/fetch_json";
 import { GameIdsData } from "../pages/api/get_game_ids_on_block";
 
-interface CurrentScheduleData {
+export interface CurrentScheduleData {
   // corresponds to schedule_id in block_<block_number>_games table and id in block_<block_number> table
   id: number;
   // corresponds to "order_id" (not "game_id") in block_<block_number>_games table
@@ -60,8 +60,17 @@ const ProgressOnBlock: React.FC<{
   return_url: string;
   hide: boolean;
   has_live_stream?: boolean;
-}> = ({ block_number, update_interval, hide, has_live_stream = false }) => {
-  const [currentScheduleData, setCurrentScheduleData] =
+  current_schedule?: CurrentScheduleData;
+  poll_current_schedule?: boolean;
+}> = ({
+  block_number,
+  update_interval,
+  hide,
+  has_live_stream = false,
+  current_schedule,
+  poll_current_schedule = true,
+}) => {
+  const [fetchedCurrentScheduleData, setFetchedCurrentScheduleData] =
     useState<CurrentScheduleData>();
   const [timeSchedules, setTimeSchedules] = useState<TimeScheduleData[]>([]);
   const [games, setGames] = useState<GameIdsData[]>([]);
@@ -102,7 +111,7 @@ const ProgressOnBlock: React.FC<{
       if (!data || typeof data !== "object" || Array.isArray(data)) {
         throw new Error("Invalid current schedule response");
       }
-      setCurrentScheduleData(data);
+      setFetchedCurrentScheduleData(data);
     } catch (error) {
       console.error("Failed to update current schedule", error);
     }
@@ -113,6 +122,9 @@ const ProgressOnBlock: React.FC<{
   }, [fetchData]);
 
   useEffect(() => {
+    if (!poll_current_schedule) {
+      return;
+    }
     fetchCurentSchedule();
     if (update_interval > 0) {
       const interval = setInterval(() => {
@@ -122,7 +134,11 @@ const ProgressOnBlock: React.FC<{
         clearInterval(interval);
       };
     }
-  }, [fetchCurentSchedule, update_interval]);
+  }, [fetchCurentSchedule, poll_current_schedule, update_interval]);
+
+  const currentScheduleData = poll_current_schedule
+    ? fetchedCurrentScheduleData
+    : current_schedule;
 
   useEffect(() => {
     if (

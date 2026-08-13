@@ -14,8 +14,11 @@ import {
 import { useTheme } from "@mui/material/styles";
 
 import ProgressOnBlock from "../components/progress_on_block";
+import type { CurrentScheduleData } from "../components/progress_on_block";
 import { GetLiveStreams } from "../lib/live_streams";
 import { FetchJson } from "../lib/fetch_json";
+
+const UPDATE_INTERVAL_MS = 10000;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const params = {
@@ -42,6 +45,9 @@ const ProgressCheck: React.FC = ({
   };
   const hide = params.production_test === "1";
   const [courts, setCourts] = useState([]);
+  const [currentSchedules, setCurrentSchedules] = useState<
+    Partial<Record<string, CurrentScheduleData>>
+  >({});
 
   const fetchCourts = useCallback(async () => {
     try {
@@ -72,6 +78,35 @@ const ProgressCheck: React.FC = ({
       window.clearTimeout(retryTimer);
     };
   }, [fetchCourts]);
+
+  const fetchCurrentSchedules = useCallback(async () => {
+    const blockNumbers = isMobile ? [courts[tabIndex]].filter(Boolean) : courts;
+    if (blockNumbers.length === 0) {
+      return;
+    }
+    try {
+      const result = await FetchJson(
+        "/api/current_schedules_for_courts?block_numbers=" +
+          encodeURIComponent(blockNumbers.join(",")),
+      );
+      if (!result || typeof result !== "object" || Array.isArray(result)) {
+        throw new Error("Invalid current schedules response");
+      }
+      setCurrentSchedules((previous) => ({ ...previous, ...result }));
+    } catch (error) {
+      console.error("Failed to update current schedules", error);
+    }
+  }, [courts, isMobile, tabIndex]);
+
+  useEffect(() => {
+    fetchCurrentSchedules();
+    const interval = window.setInterval(
+      fetchCurrentSchedules,
+      UPDATE_INTERVAL_MS,
+    );
+    return () => window.clearInterval(interval);
+  }, [fetchCurrentSchedules]);
+
   if (courts.length === 0) {
     return <></>;
   }
@@ -102,11 +137,14 @@ const ProgressCheck: React.FC = ({
           </Tabs>
           <Box>
             <ProgressOnBlock
+              key={courts[tabIndex]}
               block_number={courts[tabIndex]}
-              update_interval={10000}
+              update_interval={UPDATE_INTERVAL_MS}
               return_url="/"
               hide={hide}
               has_live_stream={params.live_courts.includes(courts[tabIndex])}
+              current_schedule={currentSchedules[courts[tabIndex]]}
+              poll_current_schedule={false}
             />
           </Box>
         </Box>
@@ -116,10 +154,12 @@ const ProgressCheck: React.FC = ({
             <ProgressOnBlock
               key={court}
               block_number={court}
-              update_interval={10000}
+              update_interval={UPDATE_INTERVAL_MS}
               return_url="/"
               hide={hide}
               has_live_stream={params.live_courts.includes(court)}
+              current_schedule={currentSchedules[court]}
+              poll_current_schedule={false}
             />
           ))}
         </Box>

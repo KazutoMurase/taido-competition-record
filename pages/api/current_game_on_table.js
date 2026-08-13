@@ -1,4 +1,5 @@
 import GetClient from "../../lib/db_client";
+import { SingleFlight } from "../../lib/single_flight";
 import { GetVersionedCache } from "../../lib/versioned_cache";
 
 async function GetFromDB(req) {
@@ -76,18 +77,25 @@ export async function GetCurrentGameOnTableData(query) {
     "latest_update_result_for_" + event_name + "_version";
   const latestCompletePlayersKey = "update_complete_players_for_" + block_name;
 
-  return GetVersionedCache(
-    cacheKey,
-    [
-      latestScheduleIdUpdateKey,
-      latestGameIdUpdateKey,
-      latestChangeOrderKey,
-      latestUpdateResultKey,
-      latestCompletePlayersKey,
-    ],
-    () => GetFromDB({ query }),
-    (loaded) => loaded.length !== 0,
-  );
+  const load = () =>
+    GetVersionedCache(
+      cacheKey,
+      [
+        latestScheduleIdUpdateKey,
+        latestGameIdUpdateKey,
+        latestChangeOrderKey,
+        latestUpdateResultKey,
+        latestCompletePlayersKey,
+      ],
+      () => GetFromDB({ query }),
+      (loaded) => loaded.length !== 0,
+    );
+
+  // schedule_id is used by the scoring screen and must remain an independent
+  // request. Public result viewers do not send it and can safely share a load.
+  return query.schedule_id === undefined
+    ? SingleFlight(cacheKey, load)
+    : load();
 }
 
 const CurrentGameOnTable = async (req, res) => {
