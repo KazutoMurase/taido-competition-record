@@ -293,7 +293,7 @@ psql -h 127.0.0.1 -p 5432 -U postgres -d postgres -f generate_tables.sql
 <li>PRODUCTION: 0にするとデバッグ機能をつけてページをビルド、1にすると本番用にビルド</li>
 <li>PRODUCTION_TEST: 1にするとadminで入力した結果を公開ページには見せないなど、デプロイしたサイトでも結果入力のテストができる状況になる</li>
 <li>USE_LOCAL_DB: 1でローカル(手元でdocker compose upするときは手元のPC、デプロイした時はCloud Runのインスタンス)のデータベースを使う</li>
-<li>SHOW_HIGHLIGHT_IN_TOURNAMENT: 1にすると次の試合がトーナメント上で強調表示される</li>
+<li>SHOW_HIGHLIGHT: 1にすると次の試合がトーナメント上で強調表示され、団体法形・展開では現在演技中の行が強調表示される</li>
 <li>SHOW_TOTAL_IN_ADMIN: 総合得点表をadminで表示</li>
 <li>SHOW_TOTAL_IN_PUBLIC: 総合得点表を公開ページで表示</li>
 <li>SHOW_AWARD_IN_PUBLIC: 優秀選手賞等の褒章受賞者を公開ページで表示</li>
