@@ -77,6 +77,12 @@ GCPコンソールからCloud SQLを開き、インスタンスを作成する
 - パスワード: postgres
 - リージョン: asia-northeast1
 - 可用性: シングルゾーン
+- マシンの構成:
+    - 汎用-専用コア
+    - 1vCPU、6.5GiB
+- ストレージ:
+    - 種類: SSD
+    - ストレージ容量: 10GB
 
 ## 5. cloudbuild.yamlファイルの作成
 CIにおいて実行する内容を定義するyamlファイルを作成する。Cloud Buildの実行時にこのファイルを参照させる。
