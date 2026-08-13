@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import React from "react";
 React.useLayoutEffect = React.useEffect;
 import { useRouter } from "next/router";
@@ -1179,7 +1179,7 @@ function GetResult({
   const [lineWidth, setLineWidth] = useState(50);
   const [currentBlockData, setCurrentBlockData] = useState({});
   const [courts, setCourts] = useState([]);
-  const [blinkState, setBlinkState] = useState(true);
+  const highlightLayerRef = useRef(null);
 
   const fetchCurrentBlock = useCallback(async () => {
     const blockNumbers = courts.map((court) =>
@@ -1290,15 +1290,6 @@ function GetResult({
     }
   }, [event_name, updateInterval, block_number, courts.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    if (Object.keys(currentBlockData).length > 0) {
-      const blinkInterval = setInterval(() => {
-        setBlinkState((prev) => !prev);
-      }, 500);
-      return () => clearInterval(blinkInterval);
-    }
-  }, [currentBlockData]);
-
   const { sortedData, maxHeight, numOfPlayers } = useMemo(() => {
     const sorted = [...data].sort((a, b) => a.id - b.id);
     let height = 0;
@@ -1334,6 +1325,30 @@ function GetResult({
     () => Object.values(currentBlockData),
     [currentBlockData],
   );
+  const currentGameItems = useMemo(() => {
+    const gameIds = new Set(
+      Object.values(currentGameIds).filter((gameId) => gameId != null),
+    );
+    return sortedData.filter((item) => gameIds.has(item.id));
+  }, [currentGameIds, sortedData]);
+
+  useEffect(() => {
+    const layer = highlightLayerRef.current;
+    if (!layer) return;
+
+    layer.visible(true);
+    layer.batchDraw();
+    if (currentGameItems.length === 0) return;
+
+    const blinkInterval = window.setInterval(() => {
+      layer.visible(!layer.visible());
+      layer.batchDraw();
+    }, 500);
+    return () => {
+      window.clearInterval(blinkInterval);
+      layer.visible(true);
+    };
+  }, [currentGameItems]);
 
   // set winner
   const final_data = sortedData[sortedData.length - 1];
@@ -1588,33 +1603,58 @@ function GetResult({
                 onTouchEnd={handleTouchEnd}
               >
                 <Layer>
-                  {sortedData.map((item, index) =>
-                    CreateBlock(
-                      item,
-                      lineWidth,
-                      maxHeight,
-                      editable,
-                      event_name,
-                      returnUrl,
-                      hide,
-                      router,
-                      currentGameIds,
-                      blinkState,
-                      fromAdmin,
-                    ),
-                  )}
-                  {sortedData.map((item, index) =>
-                    event_name.includes("dantai")
-                      ? CreateDantaiText(item, lineWidth, y_padding, hide)
-                      : CreateText(
-                          item,
-                          lineWidth,
-                          y_padding,
-                          hide,
-                          currentGames,
-                          before_final_data,
-                        ),
-                  )}
+                  {sortedData.map((item) => (
+                    <React.Fragment key={`block-${item.id}`}>
+                      {CreateBlock(
+                        item,
+                        lineWidth,
+                        maxHeight,
+                        editable,
+                        event_name,
+                        returnUrl,
+                        hide,
+                        router,
+                        null,
+                        true,
+                        fromAdmin,
+                      )}
+                    </React.Fragment>
+                  ))}
+                </Layer>
+                <Layer ref={highlightLayerRef}>
+                  {currentGameItems.map((item) => (
+                    <React.Fragment key={item.id}>
+                      {CreateBlock(
+                        item,
+                        lineWidth,
+                        maxHeight,
+                        editable,
+                        event_name,
+                        returnUrl,
+                        hide,
+                        router,
+                        currentGameIds,
+                        true,
+                        fromAdmin,
+                      )}
+                    </React.Fragment>
+                  ))}
+                </Layer>
+                <Layer>
+                  {sortedData.map((item) => (
+                    <React.Fragment key={`text-${item.id}`}>
+                      {event_name.includes("dantai")
+                        ? CreateDantaiText(item, lineWidth, y_padding, hide)
+                        : CreateText(
+                            item,
+                            lineWidth,
+                            y_padding,
+                            hide,
+                            currentGames,
+                            before_final_data,
+                          )}
+                    </React.Fragment>
+                  ))}
                 </Layer>
               </Stage>
             </Box>
