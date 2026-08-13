@@ -7,13 +7,22 @@ async function GetFromDB(req, res) {
   const block_name = "block_" + req.query.block_number;
   const current_block_name = "current_" + block_name;
   let query =
-    "SELECT t0.id, t0.game_id from " +
+    "SELECT t0.id, t0.game_id, t2.name_en AS event_name from " +
     current_block_name +
     " AS t0 LEFT JOIN " +
     block_name +
-    " AS t1 ON t0.id = t1.id";
+    " AS t1 ON t0.id = t1.id" +
+    " LEFT JOIN event_type AS t2 ON t1.event_id = t2.id";
   let result = await client.query(query);
   const event_name = req.query.event_name;
+  if (result.rows.length === 0) {
+    return [];
+  }
+  const dbEventName = result.rows[0].event_name;
+  const normalizedEventName = event_name.replace(/^test_/, "");
+  if (dbEventName !== normalizedEventName) {
+    return [];
+  }
   if (
     req.query.schedule_id !== undefined &&
     parseInt(req.query.schedule_id) !== result.rows[0].id
@@ -26,6 +35,9 @@ async function GetFromDB(req, res) {
     "_games where order_id = $1 and schedule_id = $2";
   let values = [result.rows[0].game_id, result.rows[0].id];
   result = await client.query(query, values);
+  if (result.rows.length === 0) {
+    return [];
+  }
   let current_id = result.rows[0].game_id;
   const groups_name = event_name + "_groups";
   const groups = event_name.includes("test") ? "test_groups" : "groups";

@@ -27,7 +27,7 @@ export const getServerSideProps = async (context) => {
       eventName: event.name_en,
       title: String(event.name || "").replace(/['"]+/g, ""),
       hide: process.env.PRODUCTION_TEST === "1",
-      showHighlight: process.env.SHOW_HIGHLIGHT_IN_TOURNAMENT === "1",
+      showHighlight: process.env.SHOW_HIGHLIGHT === "1",
       hasLiveStreams: GetLiveStreams().length > 0,
     },
   };
@@ -53,6 +53,7 @@ export default function ResultPage({
           <GetTableResult
             event_name={eventName}
             hide={hide}
+            show_highlight={showHighlight}
             show_live_stream_link={hasLiveStreams}
           />
         ) : (
