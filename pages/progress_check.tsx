@@ -1,5 +1,5 @@
 import React from "react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import {
@@ -15,6 +15,7 @@ import { useTheme } from "@mui/material/styles";
 
 import ProgressOnBlock from "../components/progress_on_block";
 import { GetLiveStreams } from "../lib/live_streams";
+import { FetchJson } from "../lib/fetch_json";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const params = {
@@ -42,18 +43,35 @@ const ProgressCheck: React.FC = ({
   const hide = params.production_test === "1";
   const [courts, setCourts] = useState([]);
 
-  const fetchCourts = async () => {
-    const response = await fetch("/api/get_courts");
-    const result = await response.json();
-    let tmp_courts = [];
-    result.map((item) => {
-      tmp_courts.push(item.name[1].toLowerCase());
-    });
-    setCourts(tmp_courts);
-  };
-  useEffect(() => {
-    fetchCourts();
+  const fetchCourts = useCallback(async () => {
+    try {
+      const result = await FetchJson("/api/get_courts");
+      if (!Array.isArray(result)) {
+        throw new Error("Invalid courts response");
+      }
+      const tmp_courts = result.map((item) => item.name[1].toLowerCase());
+      setCourts(tmp_courts);
+      return true;
+    } catch (error) {
+      console.error("Failed to load courts", error);
+      return false;
+    }
   }, []);
+  useEffect(() => {
+    let retryTimer: number | undefined;
+    let cancelled = false;
+    const loadCourts = async () => {
+      const loaded = await fetchCourts();
+      if (!loaded && !cancelled) {
+        retryTimer = window.setTimeout(loadCourts, 10000);
+      }
+    };
+    loadCourts();
+    return () => {
+      cancelled = true;
+      window.clearTimeout(retryTimer);
+    };
+  }, [fetchCourts]);
   if (courts.length === 0) {
     return <></>;
   }

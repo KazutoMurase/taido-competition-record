@@ -8,6 +8,7 @@ import Grid from "@mui/material/Grid";
 import FlagCircleRoundedIcon from "@mui/icons-material/FlagCircleRounded";
 import SquareTwoToneIcon from "@mui/icons-material/SquareTwoTone";
 import checkStyles from "../styles/checks.module.css";
+import { FetchJson } from "../lib/fetch_json";
 
 function onMoveDown(order_id, block_number, schedule_id, function_after_post) {
   let post = {
@@ -50,21 +51,27 @@ function GamesOnBlock({
 
   const [data, setData] = useState([]);
   const fetchData = useCallback(async () => {
-    const response = await fetch(
-      "/api/get_games_on_block?block_number=" +
-        block_number +
-        "&schedule_id=" +
-        schedule_id +
-        "&event_name=" +
-        event_name,
-    );
-    const result = await response.json();
-    if (result.length === 0) {
-      localStorage.removeItem(leftLocalStateKey);
-      localStorage.removeItem(rightLocalStateKey);
-      router.push("block?block_number=" + block_number);
+    try {
+      const result = await FetchJson(
+        "/api/get_games_on_block?block_number=" +
+          block_number +
+          "&schedule_id=" +
+          schedule_id +
+          "&event_name=" +
+          event_name,
+      );
+      if (!Array.isArray(result)) {
+        throw new Error("Invalid games response");
+      }
+      if (result.length === 0) {
+        localStorage.removeItem(leftLocalStateKey);
+        localStorage.removeItem(rightLocalStateKey);
+        router.push("block?block_number=" + block_number);
+      }
+      setData(result);
+    } catch (error) {
+      console.error("Failed to update games", error);
     }
-    setData(result);
   }, [
     block_number,
     schedule_id,

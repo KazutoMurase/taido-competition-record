@@ -8,6 +8,7 @@ import Grid from "@mui/material/Grid";
 import checkStyles from "../styles/checks.module.css";
 import Summary from "./show_summary";
 import tableStyles from "../styles/TableResult.module.css";
+import { FetchJson } from "../lib/fetch_json";
 
 function MakeTable(event_name, resultTable, title, show_caption) {
   return (
@@ -161,203 +162,204 @@ const GetTableResult: React.FC<{
 
   const fetchData = useCallback(
     async (currentGames = currentGamesRef.current) => {
-      fetch("/api/get_table_result?event_name=" + event_name)
-        .then((response) => response.json())
-        .then((data) => {
-          const tables = {};
-          const winners = {};
-          let final_num = 0;
-          let final_finished_num = 0;
-          // check if final is confirmed or not
-          let final_is_confirmed = false;
-          for (let i = 0; i < data.length; i++) {
-            if (data[i].is_final) {
-              final_num += 1;
-              if (data[i]["name"]) {
-                final_is_confirmed = true;
-              }
-              if (data[i]["sum_score"] || data[i]["retire"]) {
-                final_finished_num += 1;
-              }
+      try {
+        const data = await FetchJson(
+          "/api/get_table_result?event_name=" + event_name,
+        );
+        if (!Array.isArray(data)) {
+          throw new Error("Invalid table result response");
+        }
+        const tables = {};
+        const winners = {};
+        let final_num = 0;
+        let final_finished_num = 0;
+        // check if final is confirmed or not
+        let final_is_confirmed = false;
+        for (let i = 0; i < data.length; i++) {
+          if (data[i].is_final) {
+            final_num += 1;
+            if (data[i]["name"]) {
+              final_is_confirmed = true;
+            }
+            if (data[i]["sum_score"] || data[i]["retire"]) {
+              final_finished_num += 1;
             }
           }
-          data.forEach((elem) => {
-            const group_name = elem.name?.replace(/['"]+/g, "");
-            const currentCourtNames = Object.entries(currentGames)
-              .filter(
-                ([, game]: [string, any]) =>
-                  Number(game?.id) === Number(elem.id),
-              )
-              .map(([court]) => court.toUpperCase());
-            if (!(elem.round in tables)) {
-              tables[elem.round] = [];
-            }
-            const visible =
-              !hide && (elem.is_final || final_is_confirmed || editable);
-            tables[elem.round].push(
-              <tr
-                key={elem.id}
-                className={
-                  currentCourtNames.length > 0
-                    ? tableStyles.currentGame
-                    : undefined
-                }
-              >
-                <td>
-                  {editable ? (
-                    <a
-                      className="color-disabled"
-                      href={
-                        "update_table_result?event_name=" +
-                        event_name +
-                        "&id=" +
-                        elem.id +
-                        "&return_url=" +
-                        return_url
-                      }
-                    >
-                      {elem.id}
-                    </a>
-                  ) : (
-                    <>{elem.id}</>
-                  )}
-                  {currentCourtNames.length > 0 ? (
-                    <span className={tableStyles.currentCourtLabel}>
-                      {currentCourtNames.join("・")}
-                    </span>
-                  ) : null}
-                </td>
-                {event_name.includes("tenkai") ? (
-                  <>
-                    <td>
-                      {elem.retire && visible ? (
-                        <s>{group_name}</s>
-                      ) : hide && elem.is_final ? (
-                        <></>
-                      ) : (
-                        <>{group_name}</>
-                      )}
-                    </td>
-                    <td>
-                      {elem.main_score && visible
-                        ? elem.main_score.toFixed(1)
-                        : ""}
-                    </td>
-                    <td>
-                      {elem.sub1_score && visible
-                        ? elem.sub1_score.toFixed(1)
-                        : ""}
-                    </td>
-                    <td>
-                      {elem.sub2_score && visible
-                        ? elem.sub2_score.toFixed(1)
-                        : ""}
-                    </td>
-                    <td>
-                      {elem.sub3_score && visible
-                        ? elem.sub3_score.toFixed(1)
-                        : ""}
-                    </td>
-                    <td>
-                      {elem.sub4_score && visible
-                        ? elem.sub4_score.toFixed(1)
-                        : ""}
-                    </td>
-                    <td className={checkStyles.border_right}>
-                      {elem.sub5_score && visible
-                        ? elem.sub5_score.toFixed(1)
-                        : ""}
-                    </td>
-                    <td className={checkStyles.border_right}>
-                      {elem.sum_score_without_penalty && visible
-                        ? elem.sum_score_without_penalty.toFixed(1)
-                        : ""}
-                    </td>
-                    <td>
-                      {elem.elapsed_time && visible
-                        ? elem.elapsed_time.toFixed(2)
-                        : ""}
-                    </td>
-                    <td>
-                      {elem.time_penalty && visible
-                        ? elem.time_penalty.toFixed(1)
-                        : ""}
-                    </td>
-                    <td>
-                      {elem.penalty && visible ? elem.penalty.toFixed(1) : ""}
-                    </td>
-                    <td>
-                      {elem.start_penalty && visible
-                        ? elem.start_penalty.toFixed(1)
-                        : ""}
-                    </td>
-                    <td className={checkStyles.border_right}>
-                      {elem.sum_score && visible
-                        ? elem.sum_score.toFixed(1)
-                        : ""}
-                    </td>
-                    <td className={elem.winner ? checkStyles.winner : null}>
-                      {visible ? elem.rank : ""}
-                    </td>
-                  </>
+        }
+        data.forEach((elem) => {
+          const group_name = elem.name?.replace(/['"]+/g, "");
+          const currentCourtNames = Object.entries(currentGames)
+            .filter(
+              ([, game]: [string, any]) => Number(game?.id) === Number(elem.id),
+            )
+            .map(([court]) => court.toUpperCase());
+          if (!(elem.round in tables)) {
+            tables[elem.round] = [];
+          }
+          const visible =
+            !hide && (elem.is_final || final_is_confirmed || editable);
+          tables[elem.round].push(
+            <tr
+              key={elem.id}
+              className={
+                currentCourtNames.length > 0
+                  ? tableStyles.currentGame
+                  : undefined
+              }
+            >
+              <td>
+                {editable ? (
+                  <a
+                    className="color-disabled"
+                    href={
+                      "update_table_result?event_name=" +
+                      event_name +
+                      "&id=" +
+                      elem.id +
+                      "&return_url=" +
+                      return_url
+                    }
+                  >
+                    {elem.id}
+                  </a>
                 ) : (
-                  <>
-                    <td>
-                      {elem.retire && visible ? (
-                        <s>{group_name}</s>
-                      ) : hide && elem.is_final ? (
-                        <></>
-                      ) : (
-                        <>{group_name}</>
-                      )}
-                    </td>
-                    {event_name === "dantai_hokei_newcommer" ? (
-                      <td>{elem.hokei_name}</td>
-                    ) : (
-                      <></>
-                    )}
-                    <td>
-                      {elem.main_score && visible
-                        ? elem.main_score.toFixed(1)
-                        : ""}
-                    </td>
-                    <td>
-                      {elem.sub1_score && visible
-                        ? elem.sub1_score.toFixed(1)
-                        : ""}
-                    </td>
-                    <td>
-                      {elem.sub2_score && visible
-                        ? elem.sub2_score.toFixed(1)
-                        : ""}
-                    </td>
-                    <td className={checkStyles.border_right}>
-                      {elem.penalty && visible ? elem.penalty.toFixed(1) : ""}
-                    </td>
-                    <td className={checkStyles.border_right}>
-                      {elem.sum_score && visible
-                        ? elem.sum_score.toFixed(1)
-                        : ""}
-                    </td>
-                    <td className={elem.winner ? checkStyles.winner : null}>
-                      {visible ? elem.rank : ""}
-                    </td>
-                  </>
+                  <>{elem.id}</>
                 )}
-              </tr>,
-            );
-            if (
-              final_finished_num === final_num &&
-              elem.rank &&
-              elem.is_final &&
-              visible
-            ) {
-              winners[elem.rank] = { group: group_name };
-            }
-          });
-          setResultTable(tables);
-          setResultWinners(winners);
+                {currentCourtNames.length > 0 ? (
+                  <span className={tableStyles.currentCourtLabel}>
+                    {currentCourtNames.join("・")}
+                  </span>
+                ) : null}
+              </td>
+              {event_name.includes("tenkai") ? (
+                <>
+                  <td>
+                    {elem.retire && visible ? (
+                      <s>{group_name}</s>
+                    ) : hide && elem.is_final ? (
+                      <></>
+                    ) : (
+                      <>{group_name}</>
+                    )}
+                  </td>
+                  <td>
+                    {elem.main_score && visible
+                      ? elem.main_score.toFixed(1)
+                      : ""}
+                  </td>
+                  <td>
+                    {elem.sub1_score && visible
+                      ? elem.sub1_score.toFixed(1)
+                      : ""}
+                  </td>
+                  <td>
+                    {elem.sub2_score && visible
+                      ? elem.sub2_score.toFixed(1)
+                      : ""}
+                  </td>
+                  <td>
+                    {elem.sub3_score && visible
+                      ? elem.sub3_score.toFixed(1)
+                      : ""}
+                  </td>
+                  <td>
+                    {elem.sub4_score && visible
+                      ? elem.sub4_score.toFixed(1)
+                      : ""}
+                  </td>
+                  <td className={checkStyles.border_right}>
+                    {elem.sub5_score && visible
+                      ? elem.sub5_score.toFixed(1)
+                      : ""}
+                  </td>
+                  <td className={checkStyles.border_right}>
+                    {elem.sum_score_without_penalty && visible
+                      ? elem.sum_score_without_penalty.toFixed(1)
+                      : ""}
+                  </td>
+                  <td>
+                    {elem.elapsed_time && visible
+                      ? elem.elapsed_time.toFixed(2)
+                      : ""}
+                  </td>
+                  <td>
+                    {elem.time_penalty && visible
+                      ? elem.time_penalty.toFixed(1)
+                      : ""}
+                  </td>
+                  <td>
+                    {elem.penalty && visible ? elem.penalty.toFixed(1) : ""}
+                  </td>
+                  <td>
+                    {elem.start_penalty && visible
+                      ? elem.start_penalty.toFixed(1)
+                      : ""}
+                  </td>
+                  <td className={checkStyles.border_right}>
+                    {elem.sum_score && visible ? elem.sum_score.toFixed(1) : ""}
+                  </td>
+                  <td className={elem.winner ? checkStyles.winner : null}>
+                    {visible ? elem.rank : ""}
+                  </td>
+                </>
+              ) : (
+                <>
+                  <td>
+                    {elem.retire && visible ? (
+                      <s>{group_name}</s>
+                    ) : hide && elem.is_final ? (
+                      <></>
+                    ) : (
+                      <>{group_name}</>
+                    )}
+                  </td>
+                  {event_name === "dantai_hokei_newcommer" ? (
+                    <td>{elem.hokei_name}</td>
+                  ) : (
+                    <></>
+                  )}
+                  <td>
+                    {elem.main_score && visible
+                      ? elem.main_score.toFixed(1)
+                      : ""}
+                  </td>
+                  <td>
+                    {elem.sub1_score && visible
+                      ? elem.sub1_score.toFixed(1)
+                      : ""}
+                  </td>
+                  <td>
+                    {elem.sub2_score && visible
+                      ? elem.sub2_score.toFixed(1)
+                      : ""}
+                  </td>
+                  <td className={checkStyles.border_right}>
+                    {elem.penalty && visible ? elem.penalty.toFixed(1) : ""}
+                  </td>
+                  <td className={checkStyles.border_right}>
+                    {elem.sum_score && visible ? elem.sum_score.toFixed(1) : ""}
+                  </td>
+                  <td className={elem.winner ? checkStyles.winner : null}>
+                    {visible ? elem.rank : ""}
+                  </td>
+                </>
+              )}
+            </tr>,
+          );
+          if (
+            final_finished_num === final_num &&
+            elem.rank &&
+            elem.is_final &&
+            visible
+          ) {
+            winners[elem.rank] = { group: group_name };
+          }
         });
+        setResultTable(tables);
+        setResultWinners(winners);
+      } catch (error) {
+        console.error("Failed to update table result", error);
+      }
     },
     [event_name, editable, hide, return_url],
   );
@@ -402,9 +404,13 @@ const GetTableResult: React.FC<{
       return;
     }
     const query = event_name.includes("test") ? "?is_test=true" : "";
-    fetch("/api/get_courts" + query)
-      .then((response) => response.json())
-      .then(setCourts)
+    FetchJson("/api/get_courts" + query)
+      .then((result) => {
+        if (!Array.isArray(result)) {
+          throw new Error("Invalid courts response");
+        }
+        setCourts(result);
+      })
       .catch((error) => console.error("Failed to fetch courts", error));
   }, [event_name, fetchData, hide, show_highlight]);
 
@@ -432,23 +438,30 @@ const GetTableResult: React.FC<{
   }, [fetchData, update_interval]);
 
   const fetchEventInfo = useCallback(async () => {
-    const response = await fetch(
-      "/api/get_event_info?event_name=" +
-        (event_name.includes("test")
-          ? event_name.replace("test_", "")
-          : event_name),
-    );
-    const result = await response.json();
-    if (
-      result.length > 0 &&
-      result[0]["full_name"] &&
-      result[0]["description"]
-    ) {
-      // use "|" as a separator
-      setEventInfo({
-        full_name: result[0]["full_name"].replace(/['"]+/g, ""),
-        description: result[0]["description"].replace(/['"]+/g, "").split("|"),
-      });
+    try {
+      const result = await FetchJson(
+        "/api/get_event_info?event_name=" +
+          (event_name.includes("test")
+            ? event_name.replace("test_", "")
+            : event_name),
+      );
+      if (!Array.isArray(result)) {
+        throw new Error("Invalid event information response");
+      }
+      if (
+        result.length > 0 &&
+        result[0]["full_name"] &&
+        result[0]["description"]
+      ) {
+        setEventInfo({
+          full_name: result[0]["full_name"].replace(/['"]+/g, ""),
+          description: result[0]["description"]
+            .replace(/['"]+/g, "")
+            .split("|"),
+        });
+      }
+    } catch (error) {
+      console.error("Failed to update event information", error);
     }
   }, [event_name]);
   useEffect(() => {
