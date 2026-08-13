@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import React from "react";
 React.useLayoutEffect = React.useEffect;
 import { useRouter } from "next/router";
@@ -532,12 +532,11 @@ function CreateBlock(
   event_name,
   returnUrl,
   hide,
+  router,
   currentGameIds = [],
   blinkState = true,
   fromAdmin = false,
 ) {
-  const router = useRouter();
-
   const onUpdate = (id, editable) => {
     if (editable) {
       router.push(
@@ -1300,30 +1299,42 @@ function GetResult({
     }
   }, [currentBlockData]);
 
-  const sortedData = data.sort((a, b) => a.id - b.id);
-  let maxHeight = 0;
-  for (let i = 0; i < data.length; i++) {
-    if ("left_begin_y" in data[i] && maxHeight < data[i]["left_begin_y"]) {
-      maxHeight = data[i]["left_begin_y"];
+  const { sortedData, maxHeight, numOfPlayers } = useMemo(() => {
+    const sorted = [...data].sort((a, b) => a.id - b.id);
+    let height = 0;
+    let playerCount = 0;
+    for (const item of sorted) {
+      if ("left_begin_y" in item && height < item.left_begin_y) {
+        height = item.left_begin_y;
+      }
+      if ("right_begin_y" in item && height < item.right_begin_y) {
+        height = item.right_begin_y;
+      }
+      if (item.block_pos !== "left" && item.block_pos !== "right") continue;
+      if (!("has_left" in item)) playerCount += 1;
+      if (!("has_right" in item)) playerCount += 1;
     }
-    if ("right_begin_y" in data[i] && maxHeight < data[i]["right_begin_y"]) {
-      maxHeight = data[i]["right_begin_y"];
-    }
-  }
+    return {
+      sortedData: sorted,
+      maxHeight: height,
+      numOfPlayers: playerCount,
+    };
+  }, [data]);
+  const currentGameIds = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.entries(currentBlockData).map(([key, value]) => [
+          key,
+          value?.id,
+        ]),
+      ),
+    [currentBlockData],
+  );
+  const currentGames = useMemo(
+    () => Object.values(currentBlockData),
+    [currentBlockData],
+  );
 
-  // calc num of players
-  let num_of_players = 0;
-  for (let i = 0; i < sortedData.length; i++) {
-    const item = sortedData[i];
-    if (item["block_pos"] === "left" || item["block_pos"] === "right") {
-      if (!("has_left" in item)) {
-        num_of_players++;
-      }
-      if (!("has_right" in item)) {
-        num_of_players++;
-      }
-    }
-  }
   // set winner
   const final_data = sortedData[sortedData.length - 1];
   const before_final_data = sortedData[sortedData.length - 2];
@@ -1527,9 +1538,9 @@ function GetResult({
                 <h1>
                   <u>
                     {eventInfo.full_name +
-                      (num_of_players > 0
+                      (numOfPlayers > 0
                         ? "　" +
-                          num_of_players +
+                          numOfPlayers +
                           (event_name.includes("dantai") ? "チーム" : "人")
                         : "")}
                   </u>
@@ -1586,12 +1597,8 @@ function GetResult({
                       event_name,
                       returnUrl,
                       hide,
-                      Object.fromEntries(
-                        Object.entries(currentBlockData).map(([key, value]) => [
-                          key,
-                          value?.id,
-                        ]),
-                      ),
+                      router,
+                      currentGameIds,
                       blinkState,
                       fromAdmin,
                     ),
@@ -1604,7 +1611,7 @@ function GetResult({
                           lineWidth,
                           y_padding,
                           hide,
-                          Object.values(currentBlockData),
+                          currentGames,
                           before_final_data,
                         ),
                   )}
