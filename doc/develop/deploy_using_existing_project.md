@@ -120,7 +120,7 @@ GitHubの[taido-competition-deploy](https://github.com/KazutoMurase/taido-compet
 - PRODUCTION: 0にするとデバッグ機能をつけてページをビルド、1にすると本番用にビルド
 - PRODUCTION_TEST: 1にするとadminで入力した結果を公開ページには見せないなど、デプロイしたサイトでも結果入力のテストができる状況になる
 - USE_LOCAL_DB: 1でローカル(手元でdocker compose upするときは手元のPC、デプロイした時はCloud Runのインスタンス)のデータベースを使う
-- SHOW_HIGHLIGHT_IN_TOURNAMENT: 1にすると次の試合がトーナメント上で強調表示される
+- SHOW_HIGHLIGHT: 1にすると次の試合がトーナメント上で強調表示され、団体法形・展開では現在演技中の行が強調表示される
 - SHOW_TOTAL_IN_ADMIN: 総合得点表をadminで表示
 - SHOW_TOTAL_IN_PUBLIC: 総合得点表を公開ページで表示
 - SHOW_AWARD_IN_PUBLIC: 優秀選手賞等の褒章受賞者を公開ページで表示

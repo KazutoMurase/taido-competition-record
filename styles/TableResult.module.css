@@ -46,9 +46,60 @@
   border-radius: 0 0 5px 0;
 }
 
+.table tr.currentGame td {
+  animation: current-game-highlight 1s steps(1, end) infinite;
+  box-shadow:
+    0 3px 0 #ff9800 inset,
+    0 -3px 0 #ff9800 inset;
+}
+
+.table tr.currentGame td:first-child {
+  position: relative;
+  box-shadow:
+    3px 0 0 #ff9800 inset,
+    0 3px 0 #ff9800 inset,
+    0 -3px 0 #ff9800 inset;
+}
+
+.table tr.currentGame td:last-child {
+  box-shadow:
+    -3px 0 0 #ff9800 inset,
+    0 3px 0 #ff9800 inset,
+    0 -3px 0 #ff9800 inset;
+}
+
+.currentCourtLabel {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: -24px;
+  transform: translateY(-50%);
+  min-width: 1.5em;
+  color: #ff5722;
+  font-weight: bold;
+  font-size: 20px;
+  line-height: 24px;
+}
+
+@keyframes current-game-highlight {
+  50% {
+    box-shadow: none;
+  }
+}
+
 @media print {
   .table td {
     background: #fff;
     box-shadow: none;
+    animation: none;
+  }
+
+  .table tr.currentGame td {
+    background: #fff;
+    box-shadow: none;
+  }
+
+  .currentCourtLabel {
+    display: none;
   }
 }
