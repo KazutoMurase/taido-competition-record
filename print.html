@@ -831,7 +831,8 @@ curl &quot;(URL)/api/record_awards?id=1&amp;player_id=1&quot;
 <h2 id="データベース更新"><a class="header" href="#データベース更新">データベース更新</a></h2>
 <p>一般にデータベースを更新する方法が用意されている。</p>
 <p>例: block_aテーブルにおけるid=1のplayers_checked要素を1に更新</p>
-<pre><code class="language-bash">curl &quot;(URL)/api/update_db?id=1&amp;table_name=block_a&amp;key=players_checked&amp;value=1&quot;
+<pre><code class="language-bash">curl -u &quot;$USERNAME:$PASSWORD&quot; \
+  &quot;(URL)/api/update_db?id=1&amp;table_name=block_a&amp;key=players_checked&amp;value=1&quot;
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="サイトの構成"><a class="header" href="#サイトの構成">サイトの構成</a></h1>
 <p>大会結果閲覧用を除いて、BASIC認証がかかっている。
