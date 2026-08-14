@@ -7,7 +7,6 @@
 (URL)/admin/danger_zone にアクセスし"データベース初期化"ボタンを押下することで、
 その名の通りデータベースを全て初期化できる。
 
-
 ## キャッシュリセット
 
 データベースを更新したものの、古いキャシュが参照されてしまってる場合は以下を実行、
@@ -51,6 +50,8 @@ curl "(URL)/api/record_awards?id=1&player_id=1"
 一般にデータベースを更新する方法が用意されている。
 
 例: block_aテーブルにおけるid=1のplayers_checked要素を1に更新
+
 ```bash
-curl "(URL)/api/update_db?id=1&table_name=block_a&key=players_checked&value=1"
+curl -u "$USERNAME:$PASSWORD" \
+  "(URL)/api/update_db?id=1&table_name=block_a&key=players_checked&value=1"
 ```

@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export const config = {
-  matcher: ["/admin/:path*", "/test/:path*"],
+  matcher: [
+    "/admin/:path*",
+    "/test/:path*",
+    "/api/edit_tournament/:path*",
+    "/api/reset_db",
+    "/api/update_db",
+  ],
 };
 
 export default function middleware(req: NextRequest) {
