@@ -81,7 +81,7 @@ const Record = async (req, res) => {
     await client.query("COMMIT");
     transactionOpen = false;
 
-    const cacheUpdates = [MarkResultUpdated(event_name)];
+    const cacheUpdates = [];
     if (position) {
       const currentBlockName = `current_block_${block}`;
       cacheUpdates.push(
@@ -94,6 +94,7 @@ const Record = async (req, res) => {
       }
     }
     await Promise.all(cacheUpdates);
+    await MarkResultUpdated(event_name);
     res.json({});
   } catch (error) {
     if (transactionOpen && client) {
