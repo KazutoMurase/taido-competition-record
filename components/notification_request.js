@@ -9,6 +9,7 @@ import FlagCircleRoundedIcon from "@mui/icons-material/FlagCircleRounded";
 import SquareTwoToneIcon from "@mui/icons-material/SquareTwoTone";
 import checkStyles from "../styles/checks.module.css";
 import { FetchJson } from "../lib/fetch_json";
+import { StartSseWithPolling } from "../lib/sse_with_polling";
 import {
   Table,
   TableHead,
@@ -101,14 +102,14 @@ function NotificationRequest({
   }, [is_test]);
   const [data, setData] = useState([]);
   useEffect(() => {
-    const interval = setInterval(() => {
-      fetchData();
-    }, update_interval);
     fetchData();
-    return () => {
-      clearInterval(interval);
-    };
-  }, [fetchData, update_interval]);
+    return StartSseWithPolling({
+      url: "/api/notification_updates?is_test=" + is_test,
+      eventName: "notification-updated",
+      onUpdate: fetchData,
+      pollInterval: update_interval,
+    });
+  }, [fetchData, is_test, update_interval]);
 
   const [previousDataLength, setPreviousDataLength] = useState(0);
 

@@ -1,5 +1,5 @@
 import GetClient from "../../lib/db_client";
-import { TouchCacheVersion } from "../../lib/versioned_cache";
+import { MarkNotificationUpdated } from "../../lib/notification_updates";
 
 const ClearNotificationRequest = async (req, res) => {
   try {
@@ -31,8 +31,7 @@ const ClearNotificationRequest = async (req, res) => {
       const query = "DELETE FROM " + notification_request_name + " WHERE 1 = 1";
       await client.query(query);
     }
-    const key = "latest_update_for_" + notification_request_name;
-    await TouchCacheVersion(key);
+    await MarkNotificationUpdated(req.body.is_test === true);
     res.json({});
   } catch (error) {
     console.log(error);
