@@ -10,6 +10,7 @@ import { Layer, Stage, Rect, Text } from "react-konva";
 import Grid from "@mui/material/Grid";
 import Summary from "./show_summary";
 import { FetchJson } from "../lib/fetch_json";
+import { StartSseWithPolling } from "../lib/sse_with_polling";
 
 function CreateDantaiText(item, lineWidth, y_padding, hide = false) {
   const is_left = item["block_pos"] === "left";
@@ -1277,17 +1278,34 @@ function GetResult({
       }
       fetchCurrentBlock();
     }
-    if (updateInterval > 0) {
-      const interval = setInterval(() => {
+
+    const refreshResultAndHighlight = () => {
+      fetchData();
+      if (!hide && show_highlight) {
+        fetchCurrentBlock();
+      }
+    };
+    const stopResultUpdates = StartSseWithPolling({
+      url: "/api/result_updates?event_name=" + encodeURIComponent(event_name),
+      eventName: "result-updated",
+      onUpdate: refreshResultAndHighlight,
+      pollInterval: updateInterval,
+    });
+
+    const fetchDataWhenVisible = () => {
+      if (document.visibilityState === "visible") {
         fetchData();
-        if (courts.length > 0) {
+        if (!hide && show_highlight) {
           fetchCurrentBlock();
         }
-      }, updateInterval);
-      return () => {
-        clearInterval(interval);
-      };
-    }
+      }
+    };
+    document.addEventListener("visibilitychange", fetchDataWhenVisible);
+
+    return () => {
+      stopResultUpdates();
+      document.removeEventListener("visibilitychange", fetchDataWhenVisible);
+    };
   }, [event_name, updateInterval, block_number, courts.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const { sortedData, maxHeight, numOfPlayers } = useMemo(() => {
