@@ -9,6 +9,7 @@ import checkStyles from "../styles/checks.module.css";
 import Summary from "./show_summary";
 import tableStyles from "../styles/TableResult.module.css";
 import { FetchJson } from "../lib/fetch_json";
+import { StartSseWithPolling } from "../lib/sse_with_polling";
 
 function MakeTable(event_name, resultTable, title, show_caption) {
   return (
@@ -418,30 +419,29 @@ const GetTableResult: React.FC<{
   }, [event_name, fetchData, hide, show_highlight]);
 
   useEffect(() => {
-    if (courts.length === 0 || hide || !show_highlight) {
-      return;
-    }
-    fetchCurrentGames();
-    if (update_interval > 0) {
-      const interval = setInterval(fetchCurrentGames, update_interval);
-      return () => clearInterval(interval);
-    }
-  }, [courts.length, fetchCurrentGames, hide, show_highlight, update_interval]);
-
-  useEffect(() => {
-    // Once courts are available, fetchCurrentGames also refreshes the result.
-    // Keep this fallback for pages without highlighting and while courts load.
-    if (!hide && show_highlight && courts.length > 0) {
-      return;
-    }
-    fetchData();
-    if (update_interval > 0) {
-      const interval = setInterval(fetchData, update_interval);
-      return () => {
-        clearInterval(interval);
-      };
-    }
-  }, [courts.length, fetchData, hide, show_highlight, update_interval]);
+    const refreshResultAndHighlight = () => {
+      if (!hide && show_highlight && courts.length > 0) {
+        fetchCurrentGames();
+      } else {
+        fetchData();
+      }
+    };
+    refreshResultAndHighlight();
+    return StartSseWithPolling({
+      url: "/api/result_updates?event_name=" + encodeURIComponent(event_name),
+      eventName: "result-updated",
+      onUpdate: refreshResultAndHighlight,
+      pollInterval: update_interval,
+    });
+  }, [
+    courts.length,
+    event_name,
+    fetchCurrentGames,
+    fetchData,
+    hide,
+    show_highlight,
+    update_interval,
+  ]);
 
   const fetchEventInfo = useCallback(async () => {
     try {
