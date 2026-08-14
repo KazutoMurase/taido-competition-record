@@ -139,12 +139,9 @@ const ProgressCheck: React.FC = ({
             <ProgressOnBlock
               key={courts[tabIndex]}
               block_number={courts[tabIndex]}
-              update_interval={UPDATE_INTERVAL_MS}
-              return_url="/"
               hide={hide}
               has_live_stream={params.live_courts.includes(courts[tabIndex])}
               current_schedule={currentSchedules[courts[tabIndex]]}
-              poll_current_schedule={false}
             />
           </Box>
         </Box>
@@ -154,12 +151,9 @@ const ProgressCheck: React.FC = ({
             <ProgressOnBlock
               key={court}
               block_number={court}
-              update_interval={UPDATE_INTERVAL_MS}
-              return_url="/"
               hide={hide}
               has_live_stream={params.live_courts.includes(court)}
               current_schedule={currentSchedules[court]}
-              poll_current_schedule={false}
             />
           ))}
         </Box>
