@@ -1,4 +1,5 @@
 import GetClient from "../../lib/db_client";
+import { MarkNotificationUpdated } from "../../lib/notification_updates";
 import { MarkResultUpdated } from "../../lib/result_cache";
 import { TouchCacheVersion } from "../../lib/versioned_cache";
 import fs from "fs";
@@ -163,9 +164,7 @@ const ResetDb = async (req, res) => {
         TouchCacheVersion("update_complete_players_for_" + block_name),
       ]);
     }
-    await TouchCacheVersion(
-      "latest_update_for_" + (is_test ? "test_" : "") + "notification_request",
-    );
+    await MarkNotificationUpdated(is_test);
     res.json([]);
   } catch (error) {
     console.log(error);

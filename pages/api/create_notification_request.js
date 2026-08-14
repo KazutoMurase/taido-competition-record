@@ -1,5 +1,5 @@
 import GetClient from "../../lib/db_client";
-import { TouchCacheVersion } from "../../lib/versioned_cache";
+import { MarkNotificationUpdated } from "../../lib/notification_updates";
 
 const CreateNotificationRequest = async (req, res) => {
   try {
@@ -29,8 +29,7 @@ const CreateNotificationRequest = async (req, res) => {
       ];
       result = await client.query(query, values);
     }
-    const key = "latest_update_for_" + notification_request_name;
-    await TouchCacheVersion(key);
+    await MarkNotificationUpdated(req.body.is_test === true);
     res.json({});
   } catch (error) {
     console.log(error);

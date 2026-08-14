@@ -1,4 +1,5 @@
 import GetClient from "../../lib/db_client";
+import { SingleFlight } from "../../lib/single_flight";
 import { GetVersionedCache } from "../../lib/versioned_cache";
 
 async function GetFromDB(req, res, notification_request_name) {
@@ -49,10 +50,10 @@ const NotificationRequest = async (req, res) => {
     const cacheKey = "get_" + notification_request_name;
     const latestNotificationUpdateKey =
       "latest_update_for_" + notification_request_name;
-    const data = await GetVersionedCache(
-      cacheKey,
-      [latestNotificationUpdateKey],
-      () => GetFromDB(req, res, notification_request_name),
+    const data = await SingleFlight(cacheKey, () =>
+      GetVersionedCache(cacheKey, [latestNotificationUpdateKey], () =>
+        GetFromDB(req, res, notification_request_name),
+      ),
     );
     res.json(data);
   } catch (error) {
