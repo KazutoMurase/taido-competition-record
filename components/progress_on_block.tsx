@@ -56,22 +56,10 @@ function GetGamesText(schedule) {
 
 const ProgressOnBlock: React.FC<{
   block_number: string;
-  update_interval: number;
-  return_url: string;
   hide: boolean;
   has_live_stream?: boolean;
   current_schedule?: CurrentScheduleData;
-  poll_current_schedule?: boolean;
-}> = ({
-  block_number,
-  update_interval,
-  hide,
-  has_live_stream = false,
-  current_schedule,
-  poll_current_schedule = true,
-}) => {
-  const [fetchedCurrentScheduleData, setFetchedCurrentScheduleData] =
-    useState<CurrentScheduleData>();
+}> = ({ block_number, hide, has_live_stream = false, current_schedule }) => {
   const [timeSchedules, setTimeSchedules] = useState<TimeScheduleData[]>([]);
   const [games, setGames] = useState<GameIdsData[]>([]);
   const [scheduleTables, setScheduleTables] = useState<JSX.Element[]>([]);
@@ -103,46 +91,13 @@ const ProgressOnBlock: React.FC<{
     }
   }, [block_number]);
 
-  const fetchCurentSchedule = useCallback(async () => {
-    try {
-      const data = await FetchJson(
-        "/api/current_schedule?block_number=" + block_number,
-      );
-      if (!data || typeof data !== "object" || Array.isArray(data)) {
-        throw new Error("Invalid current schedule response");
-      }
-      setFetchedCurrentScheduleData(data);
-    } catch (error) {
-      console.error("Failed to update current schedule", error);
-    }
-  }, [block_number]);
-
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
   useEffect(() => {
-    if (!poll_current_schedule) {
-      return;
-    }
-    fetchCurentSchedule();
-    if (update_interval > 0) {
-      const interval = setInterval(() => {
-        fetchCurentSchedule();
-      }, update_interval);
-      return () => {
-        clearInterval(interval);
-      };
-    }
-  }, [fetchCurentSchedule, poll_current_schedule, update_interval]);
-
-  const currentScheduleData = poll_current_schedule
-    ? fetchedCurrentScheduleData
-    : current_schedule;
-
-  useEffect(() => {
     if (
-      currentScheduleData === undefined ||
+      current_schedule === undefined ||
       timeSchedules.length === 0 ||
       games.length === 0
     ) {
@@ -150,7 +105,7 @@ const ProgressOnBlock: React.FC<{
       return;
     }
     const tables: JSX.Element[] = timeSchedules.map((schedule) => {
-      const isCurrentEvent = hide ? 0 : schedule.id === currentScheduleData.id;
+      const isCurrentEvent = hide ? 0 : schedule.id === current_schedule.id;
       return (
         <TableRow
           key={schedule.id}
@@ -181,8 +136,8 @@ const ProgressOnBlock: React.FC<{
             {isCurrentEvent
               ? games.find(
                   (game) =>
-                    game.schedule_id === currentScheduleData.id &&
-                    game.order_id === currentScheduleData.game_id,
+                    game.schedule_id === current_schedule.id &&
+                    game.order_id === current_schedule.game_id,
                 )?.game_id
               : "-"}
           </TableCell>
@@ -190,7 +145,7 @@ const ProgressOnBlock: React.FC<{
       );
     });
     setScheduleTables(tables);
-  }, [block_number, currentScheduleData, timeSchedules, games, hide, isMobile]);
+  }, [block_number, current_schedule, timeSchedules, games, hide, isMobile]);
 
   return (
     <div
