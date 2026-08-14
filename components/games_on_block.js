@@ -9,6 +9,7 @@ import FlagCircleRoundedIcon from "@mui/icons-material/FlagCircleRounded";
 import SquareTwoToneIcon from "@mui/icons-material/SquareTwoTone";
 import checkStyles from "../styles/checks.module.css";
 import { FetchJson } from "../lib/fetch_json";
+import { StartSseWithPolling } from "../lib/sse_with_polling";
 
 function onMoveDown(order_id, block_number, schedule_id, function_after_post) {
   let post = {
@@ -81,14 +82,14 @@ function GamesOnBlock({
     rightLocalStateKey,
   ]);
   useEffect(() => {
-    const interval = setInterval(() => {
-      fetchData();
-    }, update_interval);
     fetchData();
-    return () => {
-      clearInterval(interval);
-    };
-  }, [fetchData, update_interval]);
+    return StartSseWithPolling({
+      url: "/api/result_updates?event_name=" + encodeURIComponent(event_name),
+      eventName: "result-updated",
+      onUpdate: fetchData,
+      pollInterval: update_interval,
+    });
+  }, [event_name, fetchData, update_interval]);
 
   const forceFetchData = () => {
     fetchData();

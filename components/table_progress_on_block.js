@@ -7,6 +7,7 @@ import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import checkStyles from "../styles/checks.module.css";
 import { FetchJson } from "../lib/fetch_json";
+import { StartSseWithPolling } from "../lib/sse_with_polling";
 
 function onMoveDown(order_id, block_number, schedule_id, function_after_post) {
   let post = {
@@ -56,14 +57,14 @@ function TableProgressOnBlock({
     }
   }, [block_number, schedule_id, event_name, router]);
   useEffect(() => {
-    const interval = setInterval(() => {
-      fetchData();
-    }, update_interval);
     fetchData();
-    return () => {
-      clearInterval(interval);
-    };
-  }, [fetchData, update_interval]);
+    return StartSseWithPolling({
+      url: "/api/result_updates?event_name=" + encodeURIComponent(event_name),
+      eventName: "result-updated",
+      onUpdate: fetchData,
+      pollInterval: update_interval,
+    });
+  }, [event_name, fetchData, update_interval]);
 
   const forceFetchData = () => {
     fetchData();
