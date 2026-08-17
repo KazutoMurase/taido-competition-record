@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Alert,
   Box,
@@ -22,6 +28,13 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import {
+  blockRowsToCsv,
+  buildGamesRows,
+  csvFilesToBlockRows,
+  gamesRowsToCsv,
+  identifyBlockScheduleCsv,
+} from "../lib/block_schedule_csv";
 
 const emptyForm = {
   event_id: "",
@@ -98,14 +111,6 @@ function rowToForm(row) {
   };
 }
 
-function csvEscape(value) {
-  const text = value == null ? "" : String(value);
-  if (/[",\n]/.test(text)) {
-    return `"${text.replace(/"/g, '""')}"`;
-  }
-  return text;
-}
-
 function downloadText(filename, text) {
   const blob = new Blob([text], { type: "text/csv;charset=utf-8" });
   const url = URL.createObjectURL(blob);
@@ -116,62 +121,6 @@ function downloadText(filename, text) {
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
-}
-
-function blockRowsToCsv(rows) {
-  const header = [
-    "id",
-    "event_id",
-    "time_schedule",
-    "before_final",
-    "final",
-    "players_checked",
-    "next_unused_num",
-  ];
-  return [
-    header.join(","),
-    ...rows.map((row, index) =>
-      [
-        index + 1,
-        row.event_id,
-        row.time_schedule || "",
-        row.before_final ? 1 : 0,
-        row.final ? 1 : 0,
-        0,
-        row.next_unused_num || 0,
-      ]
-        .map((value, valueIndex) =>
-          valueIndex === 2 ? csvEscape(value ? `'${value}'` : "''") : value,
-        )
-        .join(","),
-    ),
-  ].join("\n");
-}
-
-function buildGamesRows(rows) {
-  const gamesRows = [];
-  let id = 1;
-  rows.forEach((row, rowIndex) => {
-    const scheduleId = rowIndex + 1;
-    (row.game_ids || []).forEach((gameId, index) => {
-      gamesRows.push({
-        id,
-        schedule_id: scheduleId,
-        order_id: index + 1,
-        game_id: gameId,
-      });
-      id += 1;
-    });
-  });
-  return gamesRows;
-}
-
-function gamesRowsToCsv(rows) {
-  const header = ["id", "schedule_id", "order_id", "game_id"];
-  return [
-    header.join(","),
-    ...rows.map((row) => header.map((column) => row[column]).join(",")),
-  ].join("\n");
 }
 
 export default function BlockScheduleEditor({
@@ -187,6 +136,7 @@ export default function BlockScheduleEditor({
   const [saveStatus, setSaveStatus] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const csvInputRef = useRef(null);
 
   const blockLabel = block ? `${String(block).toUpperCase()}コート` : "";
   const eventNameById = useMemo(() => {
@@ -358,6 +308,49 @@ export default function BlockScheduleEditor({
     );
   };
 
+  const handleImportCsv = async (event) => {
+    const files = Array.from(event.target.files || []);
+    event.target.value = "";
+    if (files.length !== 2) {
+      setSaveStatus({
+        type: "error",
+        text: `block_${block}.csv と block_${block}_games.csv の2ファイルを選択してください。`,
+      });
+      return;
+    }
+    if (
+      !window.confirm(
+        "現在の画面上の編集内容を、選択したCSVの内容で置き換えます。よろしいですか？",
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const fileContents = await Promise.all(
+        files.map(async (file) => ({ file, text: await file.text() })),
+      );
+      const { blockText, gamesText } = identifyBlockScheduleCsv(
+        fileContents,
+        block,
+      );
+      const importedRows = csvFilesToBlockRows(
+        blockText,
+        gamesText,
+        new Set(events.map((item) => Number(item.id))),
+      );
+      setRows(importedRows);
+      setSelectedIndex(-1);
+      setForm(emptyForm);
+      setSaveStatus({
+        type: "warning",
+        text: `${importedRows.length}件をCSVから読み込みました。DBにはまだ保存されていません。内容を確認して「保存」を押してください。`,
+      });
+    } catch (e) {
+      setSaveStatus({ type: "error", text: e.message });
+    }
+  };
+
   if (isLoading) {
     return (
       <Container maxWidth="md" sx={{ py: 4 }}>
@@ -494,6 +487,14 @@ export default function BlockScheduleEditor({
                   onChange={(e) => updateForm("game_ids", e.target.value)}
                 />
                 <Grid container spacing={1}>
+                  <input
+                    ref={csvInputRef}
+                    type="file"
+                    accept=".csv,text/csv"
+                    multiple
+                    hidden
+                    onChange={handleImportCsv}
+                  />
                   <Grid item xs={6}>
                     <Button fullWidth variant="contained" onClick={addRow}>
                       追加
@@ -536,7 +537,16 @@ export default function BlockScheduleEditor({
                       削除
                     </Button>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={4}>
+                    <Button
+                      fullWidth
+                      variant="outlined"
+                      onClick={() => csvInputRef.current?.click()}
+                    >
+                      CSV読込
+                    </Button>
+                  </Grid>
+                  <Grid item xs={4}>
                     <Button
                       fullWidth
                       variant="outlined"
@@ -545,7 +555,7 @@ export default function BlockScheduleEditor({
                       CSV出力
                     </Button>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={4}>
                     <Button
                       fullWidth
                       variant="contained"
