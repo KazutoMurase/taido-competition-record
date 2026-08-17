@@ -55,3 +55,11 @@ curl "(URL)/api/record_awards?id=1&player_id=1"
 curl -u "$USERNAME:$PASSWORD" \
   "(URL)/api/update_db?id=1&table_name=block_a&key=players_checked&value=1"
 ```
+
+`value` に日本語を指定する場合は、`-G` と `--data-urlencode` を使用する。
+
+```bash
+curl -u "user:pass" -G \
+  "(URL)/api/update_db?id=18&table_name=event_type&key=description" \
+  --data-urlencode 'value=日本語'
+```
