@@ -176,6 +176,11 @@ curl &quot;(URL)/api/record_awards?id=1&amp;player_id=1&quot;
 <pre><code class="language-bash">curl -u &quot;$USERNAME:$PASSWORD&quot; \
   &quot;(URL)/api/update_db?id=1&amp;table_name=block_a&amp;key=players_checked&amp;value=1&quot;
 </code></pre>
+<p><code>value</code> に日本語を指定する場合は、<code>-G</code> と <code>--data-urlencode</code> を使用する。</p>
+<pre><code class="language-bash">curl -u &quot;user:pass&quot; -G \
+  &quot;(URL)/api/update_db?id=18&amp;table_name=event_type&amp;key=description&quot; \
+  --data-urlencode 'value=日本語'
+</code></pre>
 
                     </main>
 

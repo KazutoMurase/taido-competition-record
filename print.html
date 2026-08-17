@@ -834,6 +834,11 @@ curl &quot;(URL)/api/record_awards?id=1&amp;player_id=1&quot;
 <pre><code class="language-bash">curl -u &quot;$USERNAME:$PASSWORD&quot; \
   &quot;(URL)/api/update_db?id=1&amp;table_name=block_a&amp;key=players_checked&amp;value=1&quot;
 </code></pre>
+<p><code>value</code> に日本語を指定する場合は、<code>-G</code> と <code>--data-urlencode</code> を使用する。</p>
+<pre><code class="language-bash">curl -u &quot;user:pass&quot; -G \
+  &quot;(URL)/api/update_db?id=18&amp;table_name=event_type&amp;key=description&quot; \
+  --data-urlencode 'value=日本語'
+</code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="サイトの構成"><a class="header" href="#サイトの構成">サイトの構成</a></h1>
 <p>大会結果閲覧用を除いて、BASIC認証がかかっている。
 .envのUSERNAME, PASSWORDに設定される。</p>
