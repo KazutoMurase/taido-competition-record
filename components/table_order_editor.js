@@ -253,7 +253,11 @@ export default function TableOrderEditor({
     () => breakPositionsFromRows(entryRows, courtCount),
     [courtCount, entryRows],
   );
-  const finalSlotCount = fixedRows.length;
+  const isDirectFinal =
+    fixedRows.length === 0 &&
+    entryRows.length > 0 &&
+    entryRows.every((row) => Number(row.round) === 1);
+  const finalMatchCount = isDirectFinal ? entryRows.length : fixedRows.length;
 
   const setEntryRows = (nextEntryRows) => {
     setRows(sortRowsForSave([...nextEntryRows, ...fixedRows]));
@@ -294,24 +298,36 @@ export default function TableOrderEditor({
     setSaveStatus(null);
   };
 
-  const handleFinalSlotCountChange = (event) => {
-    const nextFinalSlotCount = Number(event.target.value);
+  const handleFinalMatchCountChange = (event) => {
+    const nextFinalMatchCount = Number(event.target.value);
     const finalRound = courtCount + 1;
+    if (nextFinalMatchCount === entryRows.length) {
+      setCourtCount(1);
+    }
     setRows((currentRows) => {
       const currentEntryRows = currentRows.filter(isEntryRow);
       const currentFixedRows = currentRows.filter((row) => !isEntryRow(row));
+
+      if (nextFinalMatchCount === currentEntryRows.length) {
+        return currentEntryRows.map((row) => ({ ...row, round: 1 }));
+      }
+
       const nextFixedRows =
-        nextFinalSlotCount <= currentFixedRows.length
-          ? currentFixedRows.slice(0, nextFinalSlotCount)
+        nextFinalMatchCount <= currentFixedRows.length
+          ? currentFixedRows.slice(0, nextFinalMatchCount)
           : [
               ...currentFixedRows,
               ...Array.from(
-                { length: nextFinalSlotCount - currentFixedRows.length },
+                { length: nextFinalMatchCount - currentFixedRows.length },
                 () => blankFinalRow(eventName, finalRound),
               ),
             ];
       return sortRowsForSave([
-        ...currentEntryRows,
+        ...applyBreakPositions(
+          currentEntryRows,
+          defaultBreakPositions(currentEntryRows.length, courtCount),
+          courtCount,
+        ),
         ...nextFixedRows.map((row) => ({ ...row, round: finalRound })),
       ]);
     });
@@ -443,6 +459,7 @@ export default function TableOrderEditor({
                 label="コート数"
                 value={courtCount}
                 onChange={handleCourtCountChange}
+                disabled={isDirectFinal}
               >
                 {[1, 2, 3].map((count) => (
                   <MenuItem
@@ -456,24 +473,22 @@ export default function TableOrderEditor({
               </Select>
             </FormControl>
             <FormControl size="small" sx={{ minWidth: 240 }}>
-              <InputLabel id="final-slot-count-label">勝ち上がり枠</InputLabel>
+              <InputLabel id="final-match-count-label">決勝の試合数</InputLabel>
               <Select
-                labelId="final-slot-count-label"
-                label="勝ち上がり枠"
-                value={finalSlotCount}
-                onChange={handleFinalSlotCountChange}
+                labelId="final-match-count-label"
+                label="決勝の試合数"
+                value={finalMatchCount}
+                onChange={handleFinalMatchCountChange}
               >
-                {Array.from({ length: 13 }, (_, count) => count).map(
-                  (count) => (
-                    <MenuItem
-                      key={count}
-                      value={count}
-                      disabled={count > entryRows.length}
-                    >
-                      {count}枠
-                    </MenuItem>
-                  ),
-                )}
+                {Array.from(
+                  { length: entryRows.length },
+                  (_, index) => index + 1,
+                ).map((count) => (
+                  <MenuItem key={count} value={count}>
+                    {count}試合
+                    {count === entryRows.length ? "（最初から決勝）" : ""}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
           </Stack>
