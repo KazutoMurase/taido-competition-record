@@ -161,7 +161,7 @@ function NotificationRequest({
               {data.length === 0 ? (
                 <>
                   <TableCell />
-                  <TableCell sx={{ "font-size": "20px" }}>
+                  <TableCell sx={{ fontSize: "20px" }}>
                     呼び出し待ちはありません
                   </TableCell>
                   <TableCell />
@@ -171,25 +171,25 @@ function NotificationRequest({
               ) : (
                 data.map((item, index) => (
                   <TableRow key={item["id"]} className={checkStyles.column}>
-                    <TableCell sx={{ "font-size": "20px" }}>
+                    <TableCell sx={{ fontSize: "20px" }}>
                       {item["event_name"].replace("'", "").replace("'", "")}
                     </TableCell>
-                    <TableCell sx={{ "font-size": "20px" }}>
+                    <TableCell sx={{ fontSize: "20px" }}>
                       {ShowName(item, is_mobile)}
                     </TableCell>
-                    <TableCell sx={{ "font-size": "20px" }}>
+                    <TableCell sx={{ fontSize: "20px" }}>
                       {is_mobile
                         ? item["court_name"]
                             .replace(/['"]+/g, "")
                             .replace("コート", "")
                         : item["court_name"].replace(/['"]+/g, "")}
                     </TableCell>
-                    <TableCell sx={{ "font-size": "20px" }}>
+                    <TableCell sx={{ fontSize: "20px" }}>
                       {"name" in item
                         ? item["group_name"].replace("'", "").replace("'", "")
                         : ""}
                     </TableCell>
-                    <TableCell sx={{ "font-size": "20px" }}>
+                    <TableCell sx={{ fontSize: "20px" }}>
                       <Button
                         variant="contained"
                         type="submit"

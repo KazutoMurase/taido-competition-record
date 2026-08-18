@@ -43,7 +43,7 @@ USER root
 EXPOSE 5432
 
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-RUN source /root/.nvm/nvm.sh && nvm install v20.13.1
+RUN source /root/.nvm/nvm.sh && nvm install v20.19.5
 
 COPY . /ws
 
@@ -53,7 +53,7 @@ ENV PORT 3000
 
 ENV HOSTNAME "0.0.0.0"
 
-ENV PATH /root/.nvm/versions/node/v20.13.1/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV PATH /root/.nvm/versions/node/v20.19.5/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 WORKDIR /ws
 

@@ -1,11 +1,11 @@
 {
   "private": true,
   "scripts": {
-    "build": "next build",
+    "build": "next build --webpack",
     "check-format": "prettier --check --ignore-path .gitignore './**/*.{js,jsx,ts,tsx,css}'",
     "dev": "next dev",
     "format": "prettier --write --ignore-path .gitignore './**/*.{js,jsx,ts,tsx,css}'",
-    "lint": "next lint --max-warnings 0",
+    "lint": "eslint . --max-warnings 0",
     "ts": "tsc --noEmit --incremental",
     "start": "next start"
   },
@@ -35,13 +35,14 @@
     "remark-html": "^16.0.1"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20.19.0"
   },
   "devDependencies": {
     "@types/node": "20.8.6",
-    "@types/react": "18.2.28",
-    "eslint": "8.57.0",
-    "eslint-config-next": "14.2.3",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.2.12",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "3.2.5",
     "typescript": "5.2.2"

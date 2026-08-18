@@ -184,14 +184,12 @@ function ShowGamesText(item, is_mobile) {
         <>
           {prefix}
           <br />
-          {elems.map((value, index) => {
-            return (
-              <>
-                {value}
-                {index % 2 === 1 ? <br /> : <>,</>}
-              </>
-            );
-          })}
+          {elems.map((value, index) => (
+            <React.Fragment key={index}>
+              {value}
+              {index % 2 === 1 ? <br /> : <>,</>}
+            </React.Fragment>
+          ))}
         </>
       );
     }
@@ -433,10 +431,7 @@ function Block({
   const minWidth = is_mobile ? "400px" : "1000px";
   return (
     <div>
-      <Container
-        maxWidth="md"
-        sx={{ "margin-left": "0px", "margin-right": "0px" }}
-      >
+      <Container maxWidth="md" sx={{ marginLeft: "0px", marginRight: "0px" }}>
         <Box style={{ minWidth: minWidth }}>
           <Grid
             container
@@ -483,7 +478,7 @@ function Block({
             <TableBody>
               {data.map((item, index) => (
                 <TableRow
-                  key={item["id"]}
+                  key={`${item["id"] ?? "schedule"}-${index}`}
                   className={"admin"}
                   bgcolor={item["id"] === current.id ? "#ffd54f" : "white"}
                   data-schedule-id={item["id"]}
