@@ -172,6 +172,8 @@ const GetTableResult: React.FC<{
         }
         const tables = {};
         const winners = {};
+        const hideFinalGroupNames =
+          hide && data.some((result) => !result.is_final);
         let final_num = 0;
         let final_finished_num = 0;
         // check if final is confirmed or not
@@ -237,7 +239,7 @@ const GetTableResult: React.FC<{
                   <td>
                     {elem.retire && visible ? (
                       <s>{group_name}</s>
-                    ) : hide && elem.is_final ? (
+                    ) : hideFinalGroupNames && elem.is_final ? (
                       <></>
                     ) : (
                       <>{group_name}</>
@@ -308,7 +310,7 @@ const GetTableResult: React.FC<{
                   <td>
                     {elem.retire && visible ? (
                       <s>{group_name}</s>
-                    ) : hide && elem.is_final ? (
+                    ) : hideFinalGroupNames && elem.is_final ? (
                       <></>
                     ) : (
                       <>{group_name}</>
