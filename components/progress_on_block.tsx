@@ -62,7 +62,9 @@ const ProgressOnBlock: React.FC<{
 }> = ({ block_number, hide, has_live_stream = false, current_schedule }) => {
   const [timeSchedules, setTimeSchedules] = useState<TimeScheduleData[]>([]);
   const [games, setGames] = useState<GameIdsData[]>([]);
-  const [scheduleTables, setScheduleTables] = useState<JSX.Element[]>([]);
+  const [scheduleTables, setScheduleTables] = useState<React.ReactElement[]>(
+    [],
+  );
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -104,7 +106,7 @@ const ProgressOnBlock: React.FC<{
       setScheduleTables([]);
       return;
     }
-    const tables: JSX.Element[] = timeSchedules.map((schedule) => {
+    const tables: React.ReactElement[] = timeSchedules.map((schedule) => {
       const isCurrentEvent = hide ? 0 : schedule.id === current_schedule.id;
       return (
         <TableRow
@@ -155,10 +157,7 @@ const ProgressOnBlock: React.FC<{
         justifyItems: "center",
       }}
     >
-      <Container
-        maxWidth="md"
-        sx={{ "padding-left": "0px", "padding-right": "0px" }}
-      >
+      <Container maxWidth="md" sx={{ paddingLeft: "0px", paddingRight: "0px" }}>
         <Box>
           <Grid
             container

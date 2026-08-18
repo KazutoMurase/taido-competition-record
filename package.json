@@ -1,11 +1,11 @@
 {
   "private": true,
   "scripts": {
-    "build": "next build",
+    "build": "next build --webpack",
     "check-format": "prettier --check --ignore-path .gitignore './**/*.{js,jsx,ts,tsx,css}'",
     "dev": "next dev",
     "format": "prettier --write --ignore-path .gitignore './**/*.{js,jsx,ts,tsx,css}'",
-    "lint": "next lint --max-warnings 0",
+    "lint": "eslint . --max-warnings 0",
     "ts": "tsc --noEmit --incremental",
     "start": "next start"
   },
@@ -14,8 +14,8 @@
     "@emotion/styled": "^11.11.0",
     "@fontsource/noto-sans-jp": "^5.0.16",
     "@fontsource/roboto": "^5.0.8",
-    "@mui/icons-material": "^5.14.16",
-    "@mui/material": "^5.14.16",
+    "@mui/icons-material": "5.18.0",
+    "@mui/material": "5.18.0",
     "@vercel/kv": "^1.0.0",
     "@vercel/postgres": "^0.5.1",
     "axios": "^1.6.0",
@@ -25,23 +25,24 @@
     "gray-matter": "^4.0.3",
     "json2csv": "^6.0.0-alpha.2",
     "konva": "^9.2.3",
-    "next": "latest",
+    "next": "16.2.12",
     "pg": "^8.11.3",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "react-konva": "^18.2.10",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "react-konva": "19.2.5",
     "redis": "^4.6.11",
     "remark": "^15.0.1",
     "remark-html": "^16.0.1"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20.19.0"
   },
   "devDependencies": {
     "@types/node": "20.8.6",
-    "@types/react": "18.2.28",
-    "eslint": "8.57.0",
-    "eslint-config-next": "14.2.3",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.2.12",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "3.2.5",
     "typescript": "5.2.2"

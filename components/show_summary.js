@@ -53,7 +53,7 @@ function Summary({ winners }) {
       <table
         className="default"
         border="1"
-        style={{ width: "800px", "table-layout": "fixed" }}
+        style={{ width: "800px", tableLayout: "fixed" }}
       >
         <tbody>
           <tr style={{ fontSize: "12px" }}>

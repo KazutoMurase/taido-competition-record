@@ -3,6 +3,6 @@ DOCKER_IMAGE=ghcr.io/kazutomurase/taido-competition-record:latest
 CMD="cd /ws/ && npm run format"
 
 docker run --rm --volume "./:/ws" \
-       --env PATH=/root/.nvm/versions/node/v20.13.1/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+       --env PATH=/root/.nvm/versions/node/v20.19.5/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
        -it ${DOCKER_IMAGE} \
        /bin/bash -c "${CMD}"
