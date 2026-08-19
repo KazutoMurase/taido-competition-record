@@ -57,6 +57,6 @@ ENV PATH /root/.nvm/versions/node/v20.19.5/bin:/usr/local/sbin:/usr/local/bin:/u
 
 WORKDIR /ws
 
-RUN npm install && npm run build
+RUN npm install && npm run build && rm -rf .next/cache
 
 CMD ["bash", "-c" , "/ws/tools/setup.bash"]

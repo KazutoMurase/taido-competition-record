@@ -12,15 +12,11 @@
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
-    "@fontsource/noto-sans-jp": "^5.0.16",
-    "@fontsource/roboto": "^5.0.8",
     "@mui/icons-material": "5.18.0",
     "@mui/material": "5.18.0",
     "axios": "1.19.0",
     "canvas": "3.2.3",
     "csv-parse": "^5.5.2",
-    "date-fns": "^2.30.0",
-    "gray-matter": "^4.0.3",
     "json2csv": "^6.0.0-alpha.2",
     "konva": "^9.2.3",
     "next": "16.3.1",
@@ -28,9 +24,7 @@
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "react-konva": "19.2.5",
-    "redis": "^4.6.11",
-    "remark": "^15.0.1",
-    "remark-html": "^16.0.1"
+    "redis": "^4.6.11"
   },
   "engines": {
     "node": ">=20.19.0"
