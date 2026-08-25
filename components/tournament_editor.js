@@ -622,6 +622,7 @@ function TournamentCanvas({
 function validateRows(rows, players) {
   const warnings = [];
   const playerIds = new Set(players.map((player) => player.player_id));
+  const playerMap = buildPlayerMap(players);
   const usedPlayerIds = rows
     .flatMap((row) => [row.left_player_id, row.right_player_id])
     .filter(Boolean);
@@ -650,6 +651,33 @@ function validateRows(rows, players) {
     warnings.push({
       type: "warning",
       text: `未配置の選手IDがあります: ${missingPlayers.join(", ")}`,
+    });
+  }
+
+  for (const row of rows) {
+    const leftPlayerId = row.left_player_id;
+    const rightPlayerId = row.right_player_id;
+    if (!leftPlayerId || !rightPlayerId || leftPlayerId === rightPlayerId) {
+      continue;
+    }
+
+    const leftPlayer = playerMap[leftPlayerId];
+    const rightPlayer = playerMap[rightPlayerId];
+    if (
+      !leftPlayer?.group_id ||
+      !rightPlayer?.group_id ||
+      leftPlayer.group_id !== rightPlayer.group_id
+    ) {
+      continue;
+    }
+
+    const groupName =
+      leftPlayer.group_name ||
+      rightPlayer.group_name ||
+      `団体ID ${leftPlayer.group_id}`;
+    warnings.push({
+      type: "warning",
+      text: `試合番号 ${row.draft_id}: ${leftPlayer.name || `選手ID ${leftPlayerId}`} と ${rightPlayer.name || `選手ID ${rightPlayerId}`} は初戦で同じ団体（${groupName}）です。`,
     });
   }
 
