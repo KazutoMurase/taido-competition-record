@@ -75,6 +75,7 @@ GCPコンソールからCloud SQLを開き、インスタンスを作成する
 - インスタンスID: postgres-instance
     - 任意に設定可能。ここで設定したインスタンスIDを以後`$CLOUDSQL_INSTANCE_ID`とする
 - パスワード: postgres
+    - パスワードポリシーを有効にする のチェックを外す必要がある
 - リージョン: asia-northeast1
 - 可用性: シングルゾーン
 - マシンの構成:
@@ -83,6 +84,26 @@ GCPコンソールからCloud SQLを開き、インスタンスを作成する
 - ストレージ:
     - 種類: SSD
     - ストレージ容量: 10GB
+
+
+トーナメント編集用など、継続利用したいものの値段を抑えたい場合は以下
+- エディション: Enterprise（サンドボックス）
+- バージョン: PostgresSQL 15
+- インスタンスID: postgres-instance
+    - 任意に設定可能。ここで設定したインスタンスIDを以後`$CLOUDSQL_INSTANCE_ID`とする
+- パスワード: postgres
+    - パスワードポリシーを有効にする のチェックを外す必要がある
+- リージョン: us-central1 (アイオワ)
+- 可用性: シングルゾーン
+- マシンの構成:
+    - 汎用-共有コア
+    - 1vCPU、0.614GB (db-f1-micro)
+- ストレージ
+    - 種類: HDD
+    - ストレージ容量: 10GB
+- フラグとパラメータ
+    - shared_buffers: 13107
+    - max_connections: 20
 
 ## 5. cloudbuild.yamlファイルの作成
 CIにおいて実行する内容を定義するyamlファイルを作成する。Cloud Buildの実行時にこのファイルを参照させる。
@@ -107,7 +128,9 @@ cd ci && ./generate-cloudbuild.py
 
 ## 6. GitHubとのCloud Build連携
 
-GCPコンソールから`Cloud Build`→プロジェクトを選択 →`リポジトリを接続`→GitHub
+GCPコンソールから`Cloud Build`→リポジトリ→第1世代→リポジトリを接続
+
+- "ソースコード管理プロバイダを選択"でGitHubを選択
 - GitHubアカウントをOAuthで接続（リポジトリの管理者レベルの権限が必要、適宜依頼する）
 - 対象のリポジトリ(上記デプロイ用レポジトリ)を選択して登録
 
