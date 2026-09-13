@@ -88,6 +88,7 @@ steps:
           --no-cpu-throttling \
           --max-instances 1 \
           --min-instances 0 \
+          --concurrency 1000 \
           --set-cloudsql-instances $$PROJECT_ID:asia-northeast1:$$CLOUDSQL_INSTANCE_ID \
           --update-env-vars COMPETITION_NAME=$$COMPETITION_NAME \
           --update-env-vars ON_EDIT=$$ON_EDIT \
