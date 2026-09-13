@@ -780,9 +780,46 @@ def generate_from_source_csvs(args):
     print(f"wrote {original_sql}")
 
 
+def fix_unquoted_newlines(f):
+    current_buffer = []
+    
+    for raw_line in f:
+        line = raw_line.replace('"', '')
+        if re.match(r'^(id|\d+),', line):
+            if current_buffer:
+                if len(current_buffer) == 1:
+                    yield current_buffer[0]
+                else:
+                    joined = "".join(current_buffer).rstrip('\n')
+                    fields = joined.split(',')
+                    new_fields = []
+                    for field in fields:
+                        if '\n' in field:
+                            new_fields.append(f'"{field}"')
+                        else:
+                            new_fields.append(field)
+                    yield ",".join(new_fields) + '\n'
+            current_buffer = [line]
+        else:
+            current_buffer.append(line)
+            
+    if current_buffer:
+        if len(current_buffer) == 1:
+            yield current_buffer[0]
+        else:
+            joined = "".join(current_buffer).rstrip('\n')
+            fields = joined.split(',')
+            new_fields = []
+            for field in fields:
+                if '\n' in field:
+                    new_fields.append(f'"{field}"')
+                else:
+                    new_fields.append(field)
+            yield ",".join(new_fields) + '\n'
+
 def read_players_table(players_csv):
     with players_csv.open(encoding="utf-8-sig", newline="") as f:
-        reader = csv.reader(f)
+        reader = csv.reader(fix_unquoted_newlines(f))
         try:
             fieldnames = next(reader)
         except StopIteration:
