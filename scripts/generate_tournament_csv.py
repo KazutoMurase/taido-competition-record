@@ -690,7 +690,7 @@ def write_individual_event(competition, event_name, player_count, games):
 
 def generate_individual_events(args, event_players):
     if not event_players:
-        return
+        return []
 
     tasks = [
         (
@@ -724,11 +724,7 @@ def generate_individual_events(args, event_players):
                 warnings.append(f"{event_name}: {warning}")
             write_individual_event(args.competition, event_name, player_count, games)
             
-        if warnings:
-            print("\n--- Fallback Warnings ---")
-            for w in warnings:
-                print(w)
-            print("-------------------------")
+        return warnings
     finally:
         if worker_count > 1:
             executor.shutdown()
@@ -757,7 +753,7 @@ def generate_from_source_csvs(args):
         event_players.append((event_name, players))
         generated_event_names.append(event_name)
 
-    generate_individual_events(args, event_players)
+    warnings = generate_individual_events(args, event_players)
 
     group_names = read_group_names(players_csv.parent / "groups.csv")
     group_event_names = source_group_event_names(source_tables)
@@ -796,6 +792,12 @@ def generate_from_source_csvs(args):
         generated_group_event_names,
     )
     print(f"wrote {original_sql}")
+
+    if warnings:
+        print("\n--- Fallback Warnings ---")
+        for w in warnings:
+            print(w)
+        print("-------------------------")
 
 
 def fix_unquoted_newlines(f):
