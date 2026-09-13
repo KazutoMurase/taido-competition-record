@@ -47,10 +47,8 @@ pip install -r requirements.txt
 
 #### 昨年度の同一大会を参考に用意するもの
 - original/awarded_players.csv (優秀選手などの褒章が存在しない大会の場合は不要)
-- original/generate_tables.sql
 - static/court_type.csv
 - static/event_type.csv
-- static/generate_tables.sql
 
 変化がなければ昨年度の同一大会のファイルをコピーする。
 コート数、競技、賞の有無などが変わる場合は、昨年度の同一大会のファイルを参考に適宜編集する。
