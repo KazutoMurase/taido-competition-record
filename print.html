@@ -502,19 +502,58 @@ block_&lt;block&gt;_games.csv
 <li>任意に設定可能。ここで設定したインスタンスIDを以後<code>$CLOUDSQL_INSTANCE_ID</code>とする</li>
 </ul>
 </li>
-<li>パスワード: postgres</li>
+<li>パスワード: postgres
+<ul>
+<li>パスワードポリシーを有効にする のチェックを外す必要がある</li>
+</ul>
+</li>
 <li>リージョン: asia-northeast1</li>
 <li>可用性: シングルゾーン</li>
 <li>マシンの構成:
 <ul>
 <li>汎用-専用コア</li>
-<li>1vCPU、6.5GiB</li>
+<li>2vCPU、8GiB</li>
 </ul>
 </li>
 <li>ストレージ:
 <ul>
 <li>種類: SSD</li>
 <li>ストレージ容量: 10GB</li>
+</ul>
+</li>
+</ul>
+<p>トーナメント編集用など、継続利用したいものの値段を抑えたい場合は以下</p>
+<ul>
+<li>エディション: Enterprise（サンドボックス）</li>
+<li>バージョン: PostgresSQL 15</li>
+<li>インスタンスID: postgres-instance
+<ul>
+<li>任意に設定可能。ここで設定したインスタンスIDを以後<code>$CLOUDSQL_INSTANCE_ID</code>とする</li>
+</ul>
+</li>
+<li>パスワード: postgres
+<ul>
+<li>パスワードポリシーを有効にする のチェックを外す必要がある</li>
+</ul>
+</li>
+<li>リージョン: us-central1 (アイオワ)</li>
+<li>可用性: シングルゾーン</li>
+<li>マシンの構成:
+<ul>
+<li>汎用-共有コア</li>
+<li>1vCPU、0.614GB (db-f1-micro)</li>
+</ul>
+</li>
+<li>ストレージ
+<ul>
+<li>種類: HDD</li>
+<li>ストレージ容量: 10GB</li>
+</ul>
+</li>
+<li>フラグとパラメータ
+<ul>
+<li>shared_buffers: 13107</li>
+<li>max_connections: 20</li>
 </ul>
 </li>
 </ul>
@@ -539,8 +578,8 @@ block_&lt;block&gt;_games.csv
 <li>作成したファイルをレポジトリのルートに置く。</li>
 </ul>
 <h2 id="6-githubとのcloud-build連携"><a class="header" href="#6-githubとのcloud-build連携">6. GitHubとのCloud Build連携</a></h2>
-<p>GCPコンソールから<code>Cloud Build</code>→プロジェクトを選択 →<code>リポジトリを接続</code>→GitHub</p>
 <ul>
+<li>GCPコンソールから<code>Cloud Build</code>→リポジトリ→第1世代→リポジトリを接続→GitHub</li>
 <li>GitHubアカウントをOAuthで接続（リポジトリの管理者レベルの権限が必要、適宜依頼する）</li>
 <li>対象のリポジトリ(上記デプロイ用レポジトリ)を選択して登録</li>
 </ul>
@@ -686,7 +725,7 @@ CREATE SCHEMA public;
 <li>マシンの構成:
 <ul>
 <li>汎用-専用コア</li>
-<li>1vCPU、6.5GiB</li>
+<li>2vCPU、8GiB</li>
 </ul>
 </li>
 <li>ストレージ:
