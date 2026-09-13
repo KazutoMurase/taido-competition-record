@@ -644,9 +644,11 @@ def build_individual_event(task):
         seed,
         placement_attempts,
         placement_search_nodes,
+        fallback_to_random,
     ) = task
     progress = io.StringIO()
     error = None
+    warning = None
     games = None
     with redirect_stderr(progress):
         try:
@@ -668,8 +670,14 @@ def build_individual_event(task):
             slot_players = placement_strategy.build_slot_players(players)
             games = build_games_from_slots(slot_players)
         except ValueError as e:
-            error = str(e)
-    return event_name, len(players), games, progress.getvalue(), error
+            if placement != "random" and fallback_to_random:
+                warning = f"Failed with smart strategy ({e}), falling back to random placement."
+                placement_strategy = RandomPlacementStrategy(random.Random(seed))
+                slot_players = placement_strategy.build_slot_players(players)
+                games = build_games_from_slots(slot_players)
+            else:
+                error = str(e)
+    return event_name, len(players), games, progress.getvalue(), error, warning
 
 
 def write_individual_event(competition, event_name, player_count, games):
@@ -692,6 +700,7 @@ def generate_individual_events(args, event_players):
             args.seed,
             args.placement_attempts,
             args.placement_search_nodes,
+            args.fallback_to_random,
         )
         for event_name, players in event_players
     ]
@@ -705,12 +714,21 @@ def generate_individual_events(args, event_players):
         results = executor.map(build_individual_event, tasks)
 
     try:
-        for event_name, player_count, games, progress, error in results:
+        warnings = []
+        for event_name, player_count, games, progress, error, warning in results:
             if progress:
                 print(progress, end="", file=sys.stderr)
             if error is not None:
                 raise ValueError(f"{event_name}: {error}")
+            if warning:
+                warnings.append(f"{event_name}: {warning}")
             write_individual_event(args.competition, event_name, player_count, games)
+            
+        if warnings:
+            print("\n--- Fallback Warnings ---")
+            for w in warnings:
+                print(w)
+            print("-------------------------")
     finally:
         if worker_count > 1:
             executor.shutdown()
@@ -856,6 +874,11 @@ def parse_args():
         help="player placement strategy (default: smart)",
     )
     parser.add_argument("--seed", type=int, help="random seed for reproducible shuffling")
+    parser.add_argument(
+        "--fallback-to-random",
+        action="store_true",
+        help="fallback to random placement on failure",
+    )
     parser.add_argument(
         "--placement-attempts",
         type=int,
