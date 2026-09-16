@@ -8,8 +8,9 @@ import re
 import sys
 import unicodedata
 from concurrent.futures import ProcessPoolExecutor
-from contextlib import redirect_stderr
+from multiprocessing import Manager
 from pathlib import Path
+from threading import Thread
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
@@ -644,40 +645,39 @@ def build_individual_event(task):
         seed,
         placement_attempts,
         placement_search_nodes,
-        fallback_to_random,
+        progress_queue,
     ) = task
-    progress = io.StringIO()
     error = None
-    warning = None
     games = None
-    with redirect_stderr(progress):
-        try:
-            if placement == "random":
-                placement_strategy = RandomPlacementStrategy(random.Random(seed))
-            else:
-                strategy_class = (
-                    BalancedGroupPlacementStrategy
-                    if placement == "balanced"
-                    else SmartSeedPlacementStrategy
-                )
-                placement_strategy = strategy_class(
-                    random.Random(seed),
-                    seed=seed,
-                    max_attempts=placement_attempts,
-                    max_search_nodes=placement_search_nodes,
-                    progress_label=event_name,
-                )
-            slot_players = placement_strategy.build_slot_players(players)
-            games = build_games_from_slots(slot_players)
-        except ValueError as e:
-            if placement != "random" and fallback_to_random:
-                warning = f"Failed with smart strategy ({e}), falling back to random placement."
-                placement_strategy = RandomPlacementStrategy(random.Random(seed))
-                slot_players = placement_strategy.build_slot_players(players)
-                games = build_games_from_slots(slot_players)
-            else:
-                error = str(e)
-    return event_name, len(players), games, progress.getvalue(), error, warning
+    try:
+        if placement == "random":
+            placement_strategy = RandomPlacementStrategy(random.Random(seed))
+        else:
+            strategy_class = (
+                BalancedGroupPlacementStrategy
+                if placement == "balanced"
+                else SmartSeedPlacementStrategy
+            )
+            placement_strategy = strategy_class(
+                random.Random(seed),
+                seed=seed,
+                max_attempts=placement_attempts,
+                max_search_nodes=placement_search_nodes,
+                progress_label=event_name,
+                progress_callback=progress_queue.put if progress_queue is not None else None,
+            )
+        slot_players = placement_strategy.build_slot_players(players)
+        games = build_games_from_slots(slot_players)
+    except ValueError as e:
+        error = str(e)
+    return event_name, len(players), games, error
+
+
+def display_placement_progress(progress_queue):
+    # One writer in the parent process keeps worker messages readable, even
+    # while executor.map waits for an earlier event's result.
+    for message in iter(progress_queue.get, None):
+        print(message, file=sys.stderr, flush=True)
 
 
 def write_individual_event(competition, event_name, player_count, games):
@@ -690,8 +690,11 @@ def write_individual_event(competition, event_name, player_count, games):
 
 def generate_individual_events(args, event_players):
     if not event_players:
-        return []
+        return
 
+    worker_count = min(args.jobs or (os.cpu_count() or 1), len(event_players))
+    manager = Manager() if worker_count > 1 else None
+    progress_queue = manager.Queue() if manager is not None else None
     tasks = [
         (
             event_name,
@@ -700,34 +703,36 @@ def generate_individual_events(args, event_players):
             args.seed,
             args.placement_attempts,
             args.placement_search_nodes,
-            args.fallback_to_random,
+            progress_queue,
         )
         for event_name, players in event_players
     ]
-    worker_count = args.jobs or (os.cpu_count() or 1)
-    worker_count = min(worker_count, len(tasks))
-
-    if worker_count == 1:
-        results = map(build_individual_event, tasks)
-    else:
-        executor = ProcessPoolExecutor(max_workers=worker_count)
-        results = executor.map(build_individual_event, tasks)
-
+    executor = None
+    progress_thread = None
     try:
-        warnings = []
-        for event_name, player_count, games, progress, error, warning in results:
-            if progress:
-                print(progress, end="", file=sys.stderr)
+        if worker_count == 1:
+            results = map(build_individual_event, tasks)
+        else:
+            executor = ProcessPoolExecutor(max_workers=worker_count)
+            results = executor.map(build_individual_event, tasks)
+            progress_thread = Thread(target=display_placement_progress, args=(progress_queue,))
+            progress_thread.start()
+        for event_name, player_count, games, error in results:
             if error is not None:
                 raise ValueError(f"{event_name}: {error}")
-            if warning:
-                warnings.append(f"{event_name}: {warning}")
             write_individual_event(args.competition, event_name, player_count, games)
-            
-        return warnings
     finally:
-        if worker_count > 1:
-            executor.shutdown()
+        try:
+            if executor is not None:
+                executor.shutdown()
+        finally:
+            try:
+                if progress_thread is not None:
+                    progress_queue.put(None)
+                    progress_thread.join()
+            finally:
+                if manager is not None:
+                    manager.shutdown()
 
 
 def generate_from_source_csvs(args):
@@ -753,7 +758,7 @@ def generate_from_source_csvs(args):
         event_players.append((event_name, players))
         generated_event_names.append(event_name)
 
-    warnings = generate_individual_events(args, event_players)
+    generate_individual_events(args, event_players)
 
     group_names = read_group_names(players_csv.parent / "groups.csv")
     group_event_names = source_group_event_names(source_tables)
@@ -793,53 +798,10 @@ def generate_from_source_csvs(args):
     )
     print(f"wrote {original_sql}")
 
-    if warnings:
-        print("\n--- Fallback Warnings ---")
-        for w in warnings:
-            print(w)
-        print("-------------------------")
-
-
-def fix_unquoted_newlines(f):
-    current_buffer = []
-    
-    for raw_line in f:
-        line = raw_line.replace('"', '')
-        if re.match(r'^(id|\d+),', line):
-            if current_buffer:
-                if len(current_buffer) == 1:
-                    yield current_buffer[0]
-                else:
-                    joined = "".join(current_buffer).rstrip('\n')
-                    fields = joined.split(',')
-                    new_fields = []
-                    for field in fields:
-                        if '\n' in field:
-                            new_fields.append(f'"{field}"')
-                        else:
-                            new_fields.append(field)
-                    yield ",".join(new_fields) + '\n'
-            current_buffer = [line]
-        else:
-            current_buffer.append(line)
-            
-    if current_buffer:
-        if len(current_buffer) == 1:
-            yield current_buffer[0]
-        else:
-            joined = "".join(current_buffer).rstrip('\n')
-            fields = joined.split(',')
-            new_fields = []
-            for field in fields:
-                if '\n' in field:
-                    new_fields.append(f'"{field}"')
-                else:
-                    new_fields.append(field)
-            yield ",".join(new_fields) + '\n'
 
 def read_players_table(players_csv):
     with players_csv.open(encoding="utf-8-sig", newline="") as f:
-        reader = csv.reader(fix_unquoted_newlines(f))
+        reader = csv.reader(f)
         try:
             fieldnames = next(reader)
         except StopIteration:
@@ -876,11 +838,6 @@ def parse_args():
         help="player placement strategy (default: smart)",
     )
     parser.add_argument("--seed", type=int, help="random seed for reproducible shuffling")
-    parser.add_argument(
-        "--fallback-to-random",
-        action="store_true",
-        help="fallback to random placement on failure",
-    )
     parser.add_argument(
         "--placement-attempts",
         type=int,
