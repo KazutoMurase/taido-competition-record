@@ -8,8 +8,9 @@ import re
 import sys
 import unicodedata
 from concurrent.futures import ProcessPoolExecutor
-from contextlib import redirect_stderr
+from multiprocessing import Manager
 from pathlib import Path
+from threading import Thread
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
@@ -644,32 +645,39 @@ def build_individual_event(task):
         seed,
         placement_attempts,
         placement_search_nodes,
+        progress_queue,
     ) = task
-    progress = io.StringIO()
     error = None
     games = None
-    with redirect_stderr(progress):
-        try:
-            if placement == "random":
-                placement_strategy = RandomPlacementStrategy(random.Random(seed))
-            else:
-                strategy_class = (
-                    BalancedGroupPlacementStrategy
-                    if placement == "balanced"
-                    else SmartSeedPlacementStrategy
-                )
-                placement_strategy = strategy_class(
-                    random.Random(seed),
-                    seed=seed,
-                    max_attempts=placement_attempts,
-                    max_search_nodes=placement_search_nodes,
-                    progress_label=event_name,
-                )
-            slot_players = placement_strategy.build_slot_players(players)
-            games = build_games_from_slots(slot_players)
-        except ValueError as e:
-            error = str(e)
-    return event_name, len(players), games, progress.getvalue(), error
+    try:
+        if placement == "random":
+            placement_strategy = RandomPlacementStrategy(random.Random(seed))
+        else:
+            strategy_class = (
+                BalancedGroupPlacementStrategy
+                if placement == "balanced"
+                else SmartSeedPlacementStrategy
+            )
+            placement_strategy = strategy_class(
+                random.Random(seed),
+                seed=seed,
+                max_attempts=placement_attempts,
+                max_search_nodes=placement_search_nodes,
+                progress_label=event_name,
+                progress_callback=progress_queue.put if progress_queue is not None else None,
+            )
+        slot_players = placement_strategy.build_slot_players(players)
+        games = build_games_from_slots(slot_players)
+    except ValueError as e:
+        error = str(e)
+    return event_name, len(players), games, error
+
+
+def display_placement_progress(progress_queue):
+    # One writer in the parent process keeps worker messages readable, even
+    # while executor.map waits for an earlier event's result.
+    for message in iter(progress_queue.get, None):
+        print(message, file=sys.stderr, flush=True)
 
 
 def write_individual_event(competition, event_name, player_count, games):
@@ -684,6 +692,9 @@ def generate_individual_events(args, event_players):
     if not event_players:
         return
 
+    worker_count = min(args.jobs or (os.cpu_count() or 1), len(event_players))
+    manager = Manager() if worker_count > 1 else None
+    progress_queue = manager.Queue() if manager is not None else None
     tasks = [
         (
             event_name,
@@ -692,28 +703,36 @@ def generate_individual_events(args, event_players):
             args.seed,
             args.placement_attempts,
             args.placement_search_nodes,
+            progress_queue,
         )
         for event_name, players in event_players
     ]
-    worker_count = args.jobs or (os.cpu_count() or 1)
-    worker_count = min(worker_count, len(tasks))
-
-    if worker_count == 1:
-        results = map(build_individual_event, tasks)
-    else:
-        executor = ProcessPoolExecutor(max_workers=worker_count)
-        results = executor.map(build_individual_event, tasks)
-
+    executor = None
+    progress_thread = None
     try:
-        for event_name, player_count, games, progress, error in results:
-            if progress:
-                print(progress, end="", file=sys.stderr)
+        if worker_count == 1:
+            results = map(build_individual_event, tasks)
+        else:
+            executor = ProcessPoolExecutor(max_workers=worker_count)
+            results = executor.map(build_individual_event, tasks)
+            progress_thread = Thread(target=display_placement_progress, args=(progress_queue,))
+            progress_thread.start()
+        for event_name, player_count, games, error in results:
             if error is not None:
                 raise ValueError(f"{event_name}: {error}")
             write_individual_event(args.competition, event_name, player_count, games)
     finally:
-        if worker_count > 1:
-            executor.shutdown()
+        try:
+            if executor is not None:
+                executor.shutdown()
+        finally:
+            try:
+                if progress_thread is not None:
+                    progress_queue.put(None)
+                    progress_thread.join()
+            finally:
+                if manager is not None:
+                    manager.shutdown()
 
 
 def generate_from_source_csvs(args):

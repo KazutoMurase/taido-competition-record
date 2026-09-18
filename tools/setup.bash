@@ -6,6 +6,10 @@ fi
 
 if [ "${USE_LOCAL_DB}" == "1" ]; then
     /etc/init.d/postgresql start
+    if [ "${RESET_DB}" == "1" ]; then
+        echo "Forcing PostgreSQL tables recreation..."
+        sudo -u postgres psql -d postgres -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public; GRANT ALL ON SCHEMA public TO postgres; GRANT ALL ON SCHEMA public TO public;"
+    fi
     count=$(sudo -u postgres psql -d postgres -t -c "SELECT count(*) FROM pg_catalog.pg_tables WHERE schemaname='public';" | xargs)
     if [ "$count" -eq 0 ]; then
         sudo -u postgres createdb postgres
