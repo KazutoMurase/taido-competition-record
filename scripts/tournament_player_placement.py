@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from dataclasses import replace
 import random
 import sys
+import time
 
 
 @dataclass
@@ -143,6 +144,10 @@ class RandomPlacementStrategy(PlacementStrategy):
 
 class SmartSeedPlacementStrategy(PlacementStrategy):
     RANK_FIELDS = ("rank_total", "rank_lastyear", "rank_group")
+    # Coordinates use bit 1 for right and bit 0 for bottom. XOR reflects
+    # a whole group's layout without changing the relationships between ranks.
+    QUARTERS = ("left_top", "left_bottom", "right_top", "right_bottom")
+    GROUP_RANK_QUARTERS = (0, 3, 2, 1)
     RELAX_ORDER = (
         "same_rank_first_round",
         "same_group_rank_1_4_quarter",
@@ -158,6 +163,7 @@ class SmartSeedPlacementStrategy(PlacementStrategy):
         max_attempts=100,
         max_search_nodes=1000,
         progress_label="",
+        progress_callback=None,
     ):
         self.rng = rng or random.Random()
         self.max_seed = max_seed
@@ -165,34 +171,60 @@ class SmartSeedPlacementStrategy(PlacementStrategy):
         self.max_attempts = max_attempts
         self.max_search_nodes = max_search_nodes
         self.progress_label = progress_label
+        self.progress_callback = progress_callback
         self.search_nodes = 0
         self.relaxed_constraints = set()
+        self.group_seed_preferences = {}
+        self.started_at = time.monotonic()
+        self.last_progress_at = self.started_at
+        self.attempt_number = 0
+        self.attempt_limit = 0
+        self.phase = "seeds"
+
+    def report_progress(self, status="running", force=False):
+        if not self.progress_label:
+            return
+        now = time.monotonic()
+        if not force and now - self.last_progress_at < 1:
+            return
+        self.last_progress_at = now
+        relaxed = ",".join(name for name in self.RELAX_ORDER if name in self.relaxed_constraints) or "none"
+        message = (
+            f"placing {self.progress_label}: attempt={self.attempt_number}/{self.attempt_limit} "
+            f"phase={self.phase} nodes={self.search_nodes}/{self.max_search_nodes} "
+            f"elapsed={now - self.started_at:.1f}s relaxed={relaxed} {status}"
+        )
+        if self.progress_callback is not None:
+            self.progress_callback(message)
+        else:
+            print(message, file=sys.stderr, flush=True)
 
     def build_slot_players(self, players):
         last_error = None
         relax_steps = range(len(self.RELAX_ORDER) + 1)
         attempts_per_step = max(1, self.max_attempts // len(list(relax_steps)))
+        self.started_at = time.monotonic()
+        self.attempt_limit = attempts_per_step * len(relax_steps)
         for relax_count in relax_steps:
             self.relaxed_constraints = set(self.RELAX_ORDER[:relax_count])
             for attempt in range(attempts_per_step):
-                if self.progress_label:
-                    relaxed = ",".join(self.RELAX_ORDER[:relax_count]) or "none"
-                    print(
-                        f"placing {self.progress_label}: relaxed={relaxed} "
-                        f"attempt={attempt + 1}/{attempts_per_step}",
-                        file=sys.stderr,
-                    )
+                self.attempt_number = relax_count * attempts_per_step + attempt + 1
                 if self.seed is None:
                     self.rng = random.Random(self.rng.random())
                 else:
                     self.rng = random.Random(self.seed + relax_count * attempts_per_step + attempt)
                 self.search_nodes = 0
+                self.phase = "seeds"
+                self.report_progress("started", force=True)
                 try:
-                    return self.build_slot_players_once(players)
+                    result = self.build_slot_players_once(players)
+                    self.report_progress("success", force=True)
+                    return result
                 except ValueError as e:
                     last_error = e
+                    self.report_progress(f"failed: {e}", force=True)
         raise ValueError(
-            f"could not place players after {attempts_per_step} attempts at each relax step"
+            f"could not place players after {self.attempt_limit} attempts: {last_error}"
         ) from last_error
 
     def build_slot_players_once(self, players):
@@ -201,6 +233,15 @@ class SmartSeedPlacementStrategy(PlacementStrategy):
         apply_byes(slots, len(placement_players))
 
         seeded_players = self.seeded_players(placement_players)
+        # Overall/recommendation seeds are fixed. Group-only seeds are slot
+        # preferences: fixing those blindly can make the four-quarter rule
+        # impossible (e.g. a recommendation plus group ranks 1 through 4).
+        self.group_seed_preferences = {
+            player.player_id: seed
+            for seed, player in enumerate(seeded_players, start=1)
+            if self.is_group_only_seed(player)
+        }
+        seeded_players = [player for player in seeded_players if not self.is_group_only_seed(player)]
         seeded_players = self.reorder_tied_seed_players(
             slots,
             placement_players,
@@ -215,6 +256,9 @@ class SmartSeedPlacementStrategy(PlacementStrategy):
             seed_to_slot[seed].player_id = player.player_id
             seeded_player_ids.add(player.player_id)
 
+        if not self.is_group_rank_placement_valid(slots, {p.player_id: p for p in placement_players}):
+            raise ValueError("fixed seeds conflict with group-rank quarter placement")
+
         remaining_players = [
             player
             for player in placement_players
@@ -222,6 +266,13 @@ class SmartSeedPlacementStrategy(PlacementStrategy):
         ]
         self.place_remaining_players(slots, placement_players, remaining_players)
         return slot_player_ids(slots)
+
+    def is_group_only_seed(self, player):
+        return (
+            "rank_group" in self.RANK_FIELDS
+            and rank_value(player.rank_total) is None
+            and rank_value(player.rank_lastyear) is None
+        )
 
     def seeded_players(self, players):
         seeded_players = []
@@ -356,6 +407,7 @@ class SmartSeedPlacementStrategy(PlacementStrategy):
         future_start_seed,
         remaining_players,
     ):
+        self.report_progress()
         trial_slots = [replace(slot) for slot in slots]
         trial_by_seed = {slot.seed: slot for slot in trial_slots}
         for seed, player in enumerate(fixed_seeded_players, start=1):
@@ -367,6 +419,9 @@ class SmartSeedPlacementStrategy(PlacementStrategy):
         for seed, player in enumerate(future_seeded_players, start=future_start_seed):
             if seed in trial_by_seed:
                 trial_by_seed[seed].player_id = player.player_id
+
+        if not self.is_group_rank_placement_valid(trial_slots, player_by_id):
+            return (len(player_by_id) + 1, 0, 0)
 
         # Tied seed candidates have equal rank priority. Choose the order
         # that leaves the most legal slots for non-seeded teammates.
@@ -428,6 +483,8 @@ class SmartSeedPlacementStrategy(PlacementStrategy):
     def place_remaining_players(self, slots, all_players, remaining_players):
         player_by_id = {player.player_id: player for player in all_players}
         self.rng.shuffle(remaining_players)
+        self.phase = "search"
+        self.report_progress("started", force=True)
 
         solved_slots = self.solve_players_backtracking(slots, player_by_id, list(remaining_players))
         if not solved_slots:
@@ -437,6 +494,7 @@ class SmartSeedPlacementStrategy(PlacementStrategy):
 
     def solve_players_backtracking(self, slots, player_by_id, remaining_players):
         self.search_nodes += 1
+        self.report_progress()
         if self.search_nodes > self.max_search_nodes:
             raise PlacementSearchLimitExceeded(
                 f"placement search exceeded {self.max_search_nodes} nodes"
@@ -461,6 +519,7 @@ class SmartSeedPlacementStrategy(PlacementStrategy):
         candidate_slots = sorted(
             candidate_slots,
             key=lambda slot: (
+                slot.seed != self.group_seed_preferences.get(player.player_id),
                 self.balance_score(slots, player_by_id, player, slot),
             ),
         )
@@ -483,7 +542,7 @@ class SmartSeedPlacementStrategy(PlacementStrategy):
         return None
 
     def is_complete_placement_valid(self, slots, player_by_id):
-        return True
+        return self.is_group_rank_placement_valid(slots, player_by_id)
 
     def future_constraint_score(self, slots, player_by_id, remaining_players, player, slot):
         trial_slots = [replace(candidate) for candidate in slots]
@@ -500,8 +559,8 @@ class SmartSeedPlacementStrategy(PlacementStrategy):
         # Place constrained players first. This keeps later random fill from
         # consuming the few slots that satisfy recommendation/group-rank rules.
         return (
-            0 if self.lastyear_group_restriction(slots, player_by_id, player) else 1,
-            0 if rank_value(player.rank_group) in (1, 2) else 1,
+            0 if rank_value(player.rank_lastyear) is not None else 1,
+            0 if rank_value(player.rank_group) in (1, 2, 3, 4) else 1,
         )
 
     def hard_constraint_slots(self, slots, player_by_id, player):
@@ -510,22 +569,8 @@ class SmartSeedPlacementStrategy(PlacementStrategy):
             for slot in slots
             if slot.occupied and not slot.player_id
         ]
-        restriction = self.lastyear_group_restriction(slots, player_by_id, player)
-        if restriction:
-            kind, value = restriction
-            candidate_slots = [
-                slot
-                for slot in candidate_slots
-                if getattr(slot, kind) == value
-            ]
-
-        opposing_half = self.opposing_rank_group_half(slots, player_by_id, player)
-        if opposing_half:
-            candidate_slots = [
-                slot
-                for slot in candidate_slots
-                if slot.visual_half != opposing_half
-            ]
+        allowed_quarters = self.group_rank_quarters(slots, player_by_id, player)
+        candidate_slots = [slot for slot in candidate_slots if slot.visual_quarter in allowed_quarters]
         if self.is_hard("same_group_first_round"):
             candidate_slots = [
                 slot
@@ -596,55 +641,84 @@ class SmartSeedPlacementStrategy(PlacementStrategy):
             and rank_value(player_by_id[opponent_player_id].rank_group) == rank_group
         )
 
-    def lastyear_group_restriction(self, slots, player_by_id, player):
-        if not player.group_id or rank_value(player.rank_lastyear) is not None:
-            return None
+    def group_rank_patterns(self, slots, player_by_id, group_id):
+        """Return reflected rank layouts compatible with already placed teammates.
 
-        lastyear_slots = [
-            slot
+        A recommendation anchors the layout: ranks 1/2 are on the opposite
+        half, rank 3 is in the other quarter of its own half, and rank 4 shares
+        its quarter. With multiple recommendations, fill their empty quarters
+        first, keeping the highest-priority recommendation as the anchor.
+        """
+        teammates = [
+            (slot, player_by_id[slot.player_id])
             for slot in slots
-            if slot.player_id
-            and player_by_id[slot.player_id].group_id == player.group_id
-            and rank_value(player_by_id[slot.player_id].rank_lastyear) is not None
+            if slot.player_id and player_by_id[slot.player_id].group_id == group_id
         ]
-        if not lastyear_slots:
-            return None
+        recommendations = [
+            player for player in player_by_id.values()
+            if player.group_id == group_id and rank_value(player.rank_lastyear) is not None
+        ]
+        if recommendations:
+            anchor = min(
+                recommendations,
+                key=lambda player: (self.seed_priority_key(player), player.player_id),
+            )
+            placed_recommendations = {
+                player.player_id: slot.visual_quarter for slot, player in teammates
+                if rank_value(player.rank_lastyear) is not None
+            }
+            occupied_quarters = set(placed_recommendations.values())
+            unplaced_count = len(recommendations) - len(placed_recommendations)
+            anchors = (
+                [self.QUARTERS.index(placed_recommendations[anchor.player_id])]
+                if anchor.player_id in placed_recommendations else range(4)
+            )
+            patterns = []
+            for anchor_index in anchors:
+                order = [self.QUARTERS[anchor_index ^ offset] for offset in (3, 2, 1, 0)]
+                # An unseeded recommendation (outside the top max_seed) will
+                # be placed before ordinary ranks. Keep its possible quarters
+                # open when checking fixed seeds and scoring tied seed orders.
+                for mask in range(1, 16):
+                    eventual_quarters = {q for index, q in enumerate(self.QUARTERS) if mask & (1 << index)}
+                    if (self.QUARTERS[anchor_index] not in eventual_quarters
+                            or not occupied_quarters <= eventual_quarters
+                            or len(eventual_quarters - occupied_quarters) > unplaced_count):
+                        continue
+                    patterns.append(
+                        [q for q in order if q not in eventual_quarters]
+                        + [q for q in order if q in eventual_quarters]
+                    )
+        else:
+            patterns = [
+                [self.QUARTERS[quarter ^ reflection] for quarter in self.GROUP_RANK_QUARTERS]
+                for reflection in range(4)
+            ]
+        return [
+            pattern for pattern in patterns
+            if all(
+                rank_value(player.rank_lastyear) is not None
+                or rank_value(player.rank_group) not in (1, 2, 3, 4)
+                or pattern[rank_value(player.rank_group) - 1] == slot.visual_quarter
+                for slot, player in teammates
+            )
+        ]
 
-        halves = {slot.visual_half for slot in lastyear_slots}
-        verticals = {slot.visual_vertical for slot in lastyear_slots}
-
-        # If a group has recommendation seeds on one side only, non-recommendation
-        # teammates must go to the opposite side. If recommendation seeds already
-        # exist on both sides, avoid their occupied top/bottom side when possible.
-        if halves == {"left"}:
-            return ("visual_half", "right")
-        if halves == {"right"}:
-            return ("visual_half", "left")
-        if len(halves) > 1 and verticals == {"top"}:
-            return ("visual_vertical", "bottom")
-        if len(halves) > 1 and verticals == {"bottom"}:
-            return ("visual_vertical", "top")
-        return None
-
-    def opposing_rank_group_half(self, slots, player_by_id, player):
-        if not player.group_id:
-            return None
-
-        rank_group = rank_value(player.rank_group)
-        if rank_group not in (1, 2):
-            return None
-        opposing_rank = 2 if rank_group == 1 else 1
-
-        opposing_halves = {
-            slot.visual_half
-            for slot in slots
-            if slot.player_id
-            and player_by_id[slot.player_id].group_id == player.group_id
-            and rank_value(player_by_id[slot.player_id].rank_group) == opposing_rank
+    def group_rank_quarters(self, slots, player_by_id, player):
+        rank = rank_value(player.rank_group)
+        if not player.group_id or rank not in (1, 2, 3, 4) or rank_value(player.rank_lastyear) is not None:
+            return set(self.QUARTERS)
+        return {
+            pattern[rank - 1]
+            for pattern in self.group_rank_patterns(slots, player_by_id, player.group_id)
         }
-        if len(opposing_halves) == 1:
-            return next(iter(opposing_halves))
-        return None
+
+    def is_group_rank_placement_valid(self, slots, player_by_id):
+        group_ids = {
+            player_by_id[slot.player_id].group_id
+            for slot in slots if slot.player_id and player_by_id[slot.player_id].group_id
+        }
+        return all(self.group_rank_patterns(slots, player_by_id, group_id) for group_id in group_ids)
 
     def balance_score(self, slots, player_by_id, player, slot):
         group_score = 0
@@ -707,6 +781,10 @@ class BalancedGroupPlacementStrategy(SmartSeedPlacementStrategy):
         "same_group_balance",
         "same_group_first_round",
     )
+
+    def is_group_rank_placement_valid(self, slots, player_by_id):
+        # Balanced placement uses its own hierarchical group-count rules.
+        return True
 
     def hard_constraint_slots(self, slots, player_by_id, player):
         candidate_slots = [
