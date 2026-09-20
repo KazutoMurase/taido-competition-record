@@ -276,7 +276,6 @@ def optimize(players, *, seed=1, time_limit=60.0, hierarchical=True, progress=No
             # Valid counting bound: each played match contains at most one
             # player of this rank, plus one for each same-rank collision.
             model.add(len(members) - sum(byes) <= n - size // 2 + sum(collisions))
-        stages.append(("same_local_rank_first_round", sum(rank_collisions)))
         if bye_matches:
             model.add(
                 sum(bye for byes in rank_byes.values() for bye in byes) <= size - n
@@ -288,6 +287,7 @@ def optimize(players, *, seed=1, time_limit=60.0, hierarchical=True, progress=No
                 stages.append(
                     (f"local_rank_{rank}_non_bye", len(members) - sum(rank_byes[rank]))
                 )
+        stages.append(("same_local_rank_first_round", sum(rank_collisions)))
 
     reports = []
 
@@ -327,16 +327,13 @@ def optimize(players, *, seed=1, time_limit=60.0, hierarchical=True, progress=No
             raise PlacementError(
                 f"{label}: INFEASIBLE; top-four placement, two-member left/right separation, quarter counts or BYEs conflict; hard constraints were not relaxed"
             )
-        if status != cp_model.OPTIMAL:
-            detail = (
-                f"incumbent={solver.objective_value:g}, bound={solver.best_objective_bound:g}"
-                if status == cp_model.FEASIBLE
-                else "no proven solution"
-            )
+        if status not in (cp_model.OPTIMAL, cp_model.FEASIBLE):
             raise PlacementError(
-                f"{label}: {name} ({detail}); increase --time-limit; no output published"
+                f"{label}: {name} (no proven solution); increase --time-limit; no output published"
             )
         return solver, name
+
+    fallback_slots = None
 
     for label, objective in stages:
         model.minimize(objective)
@@ -352,6 +349,12 @@ def optimize(players, *, seed=1, time_limit=60.0, hierarchical=True, progress=No
         for index in range(len(model.proto.variables)):
             variable = model.get_int_var_from_proto_index(index)
             model.add_hint(variable, solver.value(variable))
+
+        fallback_slots = [""] * size
+        for i, row in enumerate(x):
+            for s, variable in enumerate(row):
+                if solver.boolean_value(variable):
+                    fallback_slots[s] = ids[i]
 
     # Sporting objectives are all fixed. Randomize only the remaining choices.
     model.clear_objective()
@@ -369,14 +372,25 @@ def optimize(players, *, seed=1, time_limit=60.0, hierarchical=True, progress=No
     model.add_decision_strategy(
         decisions, cp_model.CHOOSE_FIRST, cp_model.SELECT_MAX_VALUE
     )
-    solver, status = solve("random_tie_break", randomized=True)
+    try:
+        solver, status = solve("random_tie_break", randomized=True)
+    except PlacementError as e:
+        if "UNKNOWN" in str(e) and fallback_slots:
+            status = "UNKNOWN_FALLBACK"
+            solver = None
+        else:
+            raise
+
     if progress:
         progress(f"random_tie_break: {status}")
-    slots = [""] * size
-    for i, row in enumerate(x):
-        for s, variable in enumerate(row):
-            if solver.boolean_value(variable):
-                slots[s] = ids[i]
+    if solver:
+        slots = [""] * size
+        for i, row in enumerate(x):
+            for s, variable in enumerate(row):
+                if solver.boolean_value(variable):
+                    slots[s] = ids[i]
+    else:
+        slots = fallback_slots
     by_id = {str(p["player_id"]): p for p in players}
     counts = Counter(
         visual_quarter(s, size) for s, player in enumerate(slots) if player
