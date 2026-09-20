@@ -8,13 +8,11 @@
 
 ```bash
 uv run --project scripts/or_tournament --locked python scripts/or_tournament/generate.py \
-  2026_student_sub --source-csv ~/temp/players.csv --seed 1
+  2026_student --source-csv ~/temp/players.csv --seed 1
 ```
 
 Python 3.11 以降が必要です。初回実行時に専用の `.venv` が作られ、
 `uv.lock` に記録した OR-Tools と依存パッケージがインストールされます。
-プロジェクト本体を uv 管理へ移行する必要はありません。
-依存を追加する場合は `uv add --project scripts/or_tournament <package>` を使えます。
 
 ## 入出力
 
@@ -32,7 +30,7 @@ data/<competition>/
   generation_report.json
 ```
 
-`competition` は `2026_student_sub` のようなディレクトリ名のみ指定します。
+`competition` は `2026_student` のようなディレクトリ名のみ指定します。
 団体実戦にも新しい配置を適用します。団体法形・展開は既存と同じ出場順の
 シャッフルと決勝4枠の採点表を出力します。
 `groups.csv`、`event_type.csv`、`court_type.csv`、`title.txt` 等は生成しません。
@@ -56,7 +54,7 @@ data/<competition>/
 絶対条件は次の通りです。
 
 - 全員ちょうど1枠、1枠には高々1人。枠数は人数以上の最小の2の冪。
-- BYEの位置はトーナメントのシード順（1位の対戦相手、2位の対戦相手……）に従って構造的に固定。
+- BYE (シード枠を作るためのダミー対戦相手)の位置はトーナメントのシード順（1位の対戦相手、2位の対戦相手……）に従って構造的に固定。
 - 1回戦のBYE対BYEは禁止。4ブロックの人数差は最大1。
 - 全体1位=左上の一番上、2位=右下の一番下、3位=右上の一番上、4位=左下の一番下。
   ブロック内の具体的な角のスロットまで固定する。
