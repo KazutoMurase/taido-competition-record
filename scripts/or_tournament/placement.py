@@ -22,6 +22,26 @@ def positive_rank(value):
     return int(text) if text.isdecimal() and int(text) > 0 else None
 
 
+def visual_seed_order(slot_count):
+    if slot_count == 1:
+        return [1]
+
+    order = []
+    for index, seed in enumerate(visual_seed_order(slot_count // 2)):
+        complement = slot_count + 1 - seed
+        if index % 2 == 0:
+            order.extend([seed, complement])
+        else:
+            order.extend([complement, seed])
+    return order
+
+
+def seed_order(slot_count):
+    visual_order = visual_seed_order(slot_count)
+    middle = slot_count // 2
+    return visual_order[:middle] + list(reversed(visual_order[middle:]))
+
+
 @dataclass
 class PlacementResult:
     slots: list[str]
@@ -87,15 +107,23 @@ def optimize(players, *, seed=1, time_limit=60.0, hierarchical=True, progress=No
         if p.get("group_id"):
             groups[str(p["group_id"])].append(i)
     size = 1 << (n - 1).bit_length()
+    seeds = seed_order(size)
+    seed_to_pos = {seed: pos for pos, seed in enumerate(seeds)}
+    bye_count = size - n
+    bye_slots = set()
+    for seed in range(1, bye_count + 1):
+        s = seed_to_pos[seed]
+        opp = s + 1 if s % 2 == 0 else s - 1
+        bye_slots.add(opp)
+
+    occupied = [0 if s in bye_slots else 1 for s in range(size)]
+
     model = cp_model.CpModel()
     x = [[model.new_bool_var(f"x_{i}_{s}") for s in range(size)] for i in range(n)]
     for row in x:
         model.add_exactly_one(row)
-    occupied = [sum(x[i][s] for i in range(n)) for s in range(size)]
-    for count in occupied:
-        model.add(count <= 1)
-    for s in range(0, size, 2):
-        model.add(occupied[s] + occupied[s + 1] >= 1)
+    for s in range(size):
+        model.add(sum(x[i][s] for i in range(n)) == occupied[s])
     # N=2 has only two halves. N=3 already has four slots/quarters.
     quarter_slots = [
         [s for s in range(size) if visual_quarter(s, size) == q] for q in range(4)
@@ -249,44 +277,33 @@ def optimize(players, *, seed=1, time_limit=60.0, hierarchical=True, progress=No
             )
         stages.append(("same_local_rank_quarter_balance", sum(balance_terms)))
 
-        bye_matches = []
-        if size > n:
-            for s in range(0, size, 2):
-                bye = model.new_bool_var(f"bye_match_{s // 2}")
-                model.add(occupied[s] + occupied[s + 1] + bye == 2)
-                bye_matches.append(bye)
-            model.add(sum(bye_matches) == size - n)
-
-        rank_collisions = []
-        rank_byes = {}
-        for rank, members in sorted(local_ranks.items()):
-            collisions, byes = [], []
-            for match, s in enumerate(range(0, size, 2)):
-                count = sum(x[i][s] + x[i][s + 1] for i in members)
-                collision = model.new_bool_var(f"same_local_rank_match_{rank}_{match}")
-                model.add_max_equality(collision, [0, count - 1])
-                collisions.append(collision)
-                if bye_matches:
-                    bye = model.new_bool_var(f"local_rank_bye_{rank}_{match}")
-                    model.add(bye == count).only_enforce_if(bye_matches[match])
-                    model.add(bye == 0).only_enforce_if(bye_matches[match].Not())
-                    byes.append(bye)
-            rank_collisions.extend(collisions)
-            rank_byes[rank] = byes
-            # Valid counting bound: each played match contains at most one
-            # player of this rank, plus one for each same-rank collision.
-            model.add(len(members) - sum(byes) <= n - size // 2 + sum(collisions))
-        if bye_matches:
-            model.add(
-                sum(bye for byes in rank_byes.values() for bye in byes) <= size - n
-            )
+        bye_receiving_slots = [
+            s for s in range(size) if occupied[s] == 1 and occupied[s ^ 1] == 0
+        ]
+        if bye_receiving_slots:
             # Lexicographic priority, not numeric rank weights: first maximize
             # rank-1 BYEs, then rank-2 BYEs, etc., without worsening any earlier
             # objective. Missing/zero ranks have no priority over known ranks.
             for rank, members in sorted(local_ranks.items()):
                 stages.append(
-                    (f"local_rank_{rank}_non_bye", len(members) - sum(rank_byes[rank]))
+                    (
+                        f"local_rank_{rank}_non_bye",
+                        len(members)
+                        - sum(x[i][s] for i in members for s in bye_receiving_slots),
+                    )
                 )
+
+        rank_collisions = []
+        for rank, members in sorted(local_ranks.items()):
+            collisions = []
+            for s in range(0, size, 2):
+                count = sum(x[i][s] + x[i][s + 1] for i in members)
+                collision = model.new_bool_var(
+                    f"same_local_rank_match_{rank}_{s // 2}"
+                )
+                model.add_max_equality(collision, [0, count - 1])
+                collisions.append(collision)
+            rank_collisions.extend(collisions)
         stages.append(("same_local_rank_first_round", sum(rank_collisions)))
 
     reports = []
