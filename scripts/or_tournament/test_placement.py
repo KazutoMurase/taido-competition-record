@@ -399,6 +399,35 @@ class PlacementTests(unittest.TestCase):
 
 
 class OutputTests(unittest.TestCase):
+    def test_group_output_columns(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for event, expected in (
+                ("tenkai_man", legacy.TENKAI_HEADER),
+                ("tenkai_woman", legacy.TENKAI_HEADER),
+                ("dantai_hokei_man", legacy.DANTAI_HOKEI_HEADER),
+                ("dantai_hokei_woman", legacy.DANTAI_HOKEI_HEADER),
+            ):
+                path = root / f"{event}.csv"
+                legacy.write_group_table_csv(event, ["1", "2"], path)
+                fields, _ = legacy.read_players_table(path)
+                self.assertEqual(fields, expected)
+                sql = "\n".join(legacy.group_table_sql_lines(event))
+                for field in expected:
+                    self.assertIn(f"{field} ", sql)
+
+            sql_path = root / "generate_tables.sql"
+            legacy.write_original_generate_tables_sql(
+                ["hokei_man", "zissen_woman"],
+                sql_path,
+                ["dantai_zissen_man", "tenkai_man", "tenkai_woman", "dantai_hokei_man"],
+            )
+            sql = sql_path.read_text(encoding="utf-8")
+            for event in ("tenkai_man", "tenkai_woman"):
+                self.assertIn("\n".join(legacy.group_table_sql_lines(event)), sql)
+            self.assertIn("\n".join(legacy.group_tournament_sql_lines("dantai_zissen_man")), sql)
+            self.assertIn("\n".join(legacy.group_table_sql_lines("dantai_hokei_man")), sql)
+
     def test_default_publication_does_not_create_backups(self):
         args = parse_args(["example", "--source-csv", "input.csv"])
         self.assertFalse(args.backup)
