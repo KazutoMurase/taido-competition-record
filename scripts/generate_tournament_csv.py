@@ -80,6 +80,7 @@ RANK_SUFFIXES = ["rank_group", "rank_lastyear", "rank_total"]
 COMMENT_SUFFIXES = ["comment"]
 EVENT_PREFIXES_TO_STRIP = ("high_school_",)
 GROUP_TEAM_MARKER_PATTERN = re.compile(r"[A-Z]")
+DANTA_HOKEI_NEWCOMMER_TYPES = ["体1", "体2", "陰1", "陰2"]
 
 
 def player_column_to_event_name(player_column):
@@ -306,6 +307,27 @@ def extract_group_event_teams(source_tables, group_names, group_event_names):
         for event_name in group_event_names
     }
 
+    dantai_hokei_newcomer_types = {
+        group_id: {}
+        for group_id in group_names
+    }
+
+    for _, rows in source_tables:
+        for row in rows:
+            base_group_id = clean_integer(row.get("group_id", ""))
+            if not base_group_id:
+                continue
+            rank_group = row.get(f"dantai_hokei_newcommer_rank_group", "").strip()
+            if is_group_nonparticipant(rank_group):
+                continue
+            if rank_group in DANTA_HOKEI_NEWCOMMER_TYPES:
+                newcomer_types = dantai_hokei_newcomer_types.setdefault(
+                    base_group_id,
+                    {},
+                )
+                if rank_group not in newcomer_types:
+                    newcomer_types[rank_group] = chr(ord("A") + len(newcomer_types))
+
     for _, rows in source_tables:
         for row in rows:
             base_group_id = clean_integer(row.get("group_id", ""))
@@ -319,7 +341,17 @@ def extract_group_event_teams(source_tables, group_names, group_event_names):
                 rank_group = row.get(f"{source_event_name}_rank_group", "").strip()
                 if is_group_nonparticipant(rank_group):
                     continue
-                marker = group_team_marker(rank_group)
+                if output_event_name == "dantai_hokei_newcommer":
+                    newcomer_type = row.get(
+                        "dantai_hokei_newcommer_rank_group",
+                        "",
+                    ).strip()
+                    marker = dantai_hokei_newcomer_types.get(
+                        base_group_id,
+                        {},
+                    ).get(newcomer_type, "") + '(' + newcomer_type + ')'
+                else:
+                    marker = group_team_marker(rank_group)
                 raw_teams[output_event_name].setdefault(
                     (base_group_id, marker),
                     {
