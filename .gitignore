@@ -17,3 +17,7 @@ cloud-sql-proxy
 
 # venv for generate db script
 venv/
+
+# python cache
+**/__pycache__/**
+
