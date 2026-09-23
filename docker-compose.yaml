@@ -7,4 +7,7 @@ services:
       - ${PORT}:${PORT}
     volumes:
       - "./:/ws"
+      # Keep image dependencies and build output separate from host files.
+      - /ws/node_modules
+      - /ws/.next
     command: /ws/tools/setup.bash ${COMPETITION_NAME}
