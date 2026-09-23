@@ -49,11 +49,6 @@ export default function CourtLive({ stream }) {
         <Typography variant="h4" component="h1" align="center" sx={{ mb: 2 }}>
           {courtName} ライブ配信
         </Typography>
-        {currentMatch ? (
-          <Typography variant="h6" align="center" sx={{ mb: 2 }}>
-            {currentMatch}
-          </Typography>
-        ) : null}
         <Box
           sx={{
             position: "relative",
