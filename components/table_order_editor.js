@@ -3,6 +3,7 @@ import {
   Alert,
   Box,
   Button,
+  Chip,
   CircularProgress,
   Container,
   FormControl,
@@ -525,9 +526,33 @@ export default function TableOrderEditor({
                     <Typography variant="body2" sx={{ textAlign: "right" }}>
                       {index + 1}
                     </Typography>
-                    <Typography variant="body2">
-                      {row.name || `group_id=${row.group_id}`}
-                    </Typography>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        flexWrap: "wrap",
+                        gap: 1,
+                        minWidth: 0,
+                      }}
+                    >
+                      <Typography variant="body2">
+                        {row.name || `group_id=${row.group_id}`}
+                      </Typography>
+                      {row.hokei_name ? (
+                        <Chip
+                          label={row.hokei_name}
+                          size="small"
+                          variant="outlined"
+                          color={
+                            row.hokei_name.startsWith("陰")
+                              ? "secondary"
+                              : row.hokei_name.startsWith("体")
+                                ? "primary"
+                                : "default"
+                          }
+                        />
+                      ) : null}
+                    </Box>
                     <Button
                       variant="outlined"
                       size="small"
