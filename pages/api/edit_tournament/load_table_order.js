@@ -46,6 +46,7 @@ function enrichRows(rows, teamRows, groupMap) {
       id: cleanText(row.id),
       group_id: cleanText(row.group_id),
       name: cleanText(row.name),
+      hokei_name: cleanText(row.hokei_name),
       group_name: groupMap[String(row.group_id)] || "",
     };
   }
@@ -57,6 +58,7 @@ function enrichRows(rows, teamRows, groupMap) {
       group_id: cleanText(row.group_id),
       round: Number(row.round),
       name: team.name || "",
+      hokei_name: team.hokei_name || "",
       base_group_id: team.group_id || "",
       base_group_name: team.group_name || "",
     };
@@ -100,8 +102,11 @@ async function loadFromDb(eventName) {
     groupMap[String(row.id)] = cleanText(row.name);
   }
 
+  const hokeiColumn = eventName.endsWith("dantai_hokei_newcommer")
+    ? ", hokei_name"
+    : "";
   const teamResult = await client.query(
-    `SELECT id, group_id, name FROM ${eventName}_groups ORDER BY id`,
+    `SELECT id, group_id, name${hokeiColumn} FROM ${eventName}_groups ORDER BY id`,
   );
   const rowsResult = await client.query(
     `SELECT * FROM ${eventName} ORDER BY id`,
