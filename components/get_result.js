@@ -11,6 +11,7 @@ import Grid from "@mui/material/Grid";
 import Summary from "./show_summary";
 import { FetchJson } from "../lib/fetch_json";
 import { StartSseWithPolling } from "../lib/sse_with_polling";
+import { StartPolling } from "../lib/polling";
 
 function CreateDantaiText(item, lineWidth, y_padding, hide = false) {
   const is_left = item["block_pos"] === "left";
@@ -1159,6 +1160,7 @@ function GetResult({
   is_mobile = false,
   fromAdmin = false,
   show_live_stream_link = false,
+  use_sse = true,
 }) {
   const router = useRouter();
   if (returnUrl === null) {
@@ -1229,7 +1231,9 @@ function GetResult({
         console.error("Failed to update result", error);
       }
     }
-    fetchData();
+    if (use_sse) {
+      fetchData();
+    }
     async function fetchEventDescription() {
       try {
         const result = await FetchJson(
@@ -1276,15 +1280,22 @@ function GetResult({
       if (courts.length === 0) {
         fetchCourts();
       }
-      fetchCurrentBlock();
-    }
-
-    const refreshResultAndHighlight = () => {
-      fetchData();
-      if (!hide && show_highlight) {
+      if (use_sse) {
         fetchCurrentBlock();
       }
-    };
+    }
+
+    const refreshResultAndHighlight = () =>
+      Promise.all([
+        fetchData(),
+        !hide && show_highlight ? fetchCurrentBlock() : Promise.resolve(),
+      ]);
+    if (!use_sse) {
+      return StartPolling({
+        onUpdate: refreshResultAndHighlight,
+        pollInterval: updateInterval,
+      });
+    }
     const stopResultUpdates = StartSseWithPolling({
       url: "/api/result_updates?event_name=" + encodeURIComponent(event_name),
       eventName: "result-updated",
@@ -1306,7 +1317,7 @@ function GetResult({
       stopResultUpdates();
       document.removeEventListener("visibilitychange", fetchDataWhenVisible);
     };
-  }, [event_name, updateInterval, block_number, courts.length]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [event_name, updateInterval, block_number, courts.length, use_sse]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const { sortedData, maxHeight, numOfPlayers } = useMemo(() => {
     const sorted = [...data].sort((a, b) => a.id - b.id);

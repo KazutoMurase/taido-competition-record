@@ -51,6 +51,7 @@ export default function ResultPage({
       <main>
         {isTableEvent ? (
           <GetTableResult
+            use_sse={false}
             event_name={eventName}
             hide={hide}
             show_highlight={showHighlight}
@@ -58,6 +59,7 @@ export default function ResultPage({
           />
         ) : (
           <GetResult
+            use_sse={false}
             event_name={eventName}
             hide={hide}
             show_highlight={showHighlight}

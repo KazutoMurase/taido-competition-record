@@ -10,6 +10,7 @@ import Summary from "./show_summary";
 import tableStyles from "../styles/TableResult.module.css";
 import { FetchJson } from "../lib/fetch_json";
 import { StartSseWithPolling } from "../lib/sse_with_polling";
+import { StartPolling } from "../lib/polling";
 
 function MakeTable(event_name, resultTable, title, show_caption) {
   return (
@@ -115,6 +116,7 @@ const GetTableResult: React.FC<{
   return_url: string;
   show_highlight?: boolean;
   show_live_stream_link?: boolean;
+  use_sse?: boolean;
 }> = ({
   update_interval = 10000,
   event_name = null,
@@ -125,6 +127,7 @@ const GetTableResult: React.FC<{
   return_url = null,
   show_highlight = true,
   show_live_stream_link = false,
+  use_sse = true,
 }) => {
   const router = useRouter();
   if (return_url === null) {
@@ -423,11 +426,17 @@ const GetTableResult: React.FC<{
   useEffect(() => {
     const refreshResultAndHighlight = () => {
       if (!hide && show_highlight && courts.length > 0) {
-        fetchCurrentGames();
+        return fetchCurrentGames();
       } else {
-        fetchData();
+        return fetchData();
       }
     };
+    if (!use_sse) {
+      return StartPolling({
+        onUpdate: refreshResultAndHighlight,
+        pollInterval: update_interval,
+      });
+    }
     refreshResultAndHighlight();
     return StartSseWithPolling({
       url: "/api/result_updates?event_name=" + encodeURIComponent(event_name),
@@ -443,6 +452,7 @@ const GetTableResult: React.FC<{
     hide,
     show_highlight,
     update_interval,
+    use_sse,
   ]);
 
   const fetchEventInfo = useCallback(async () => {
