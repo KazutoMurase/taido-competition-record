@@ -299,7 +299,7 @@ const Total: React.FC<{ params }> = ({ params }) => {
               <thead>
                 <tr>
                   <td style={{ width: "150px", padding: 2 }} rowSpan={3}>
-                    地区名
+                    {use_different_personal_scores ? "大学名" : "地区名"}
                   </td>
                   <td colSpan={spans[0]} style={{ padding: 2 }}>
                     個人種目競技
