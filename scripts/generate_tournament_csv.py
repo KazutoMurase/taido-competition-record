@@ -424,7 +424,7 @@ def group_placement_players(teams):
 
 
 def write_group_table_csv(event_name, team_ids, path):
-    header = TENKAI_HEADER if event_name == "tenkai" else DANTAI_HOKEI_HEADER
+    header = TENKAI_HEADER if event_name.startswith("tenkai") else DANTAI_HOKEI_HEADER
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=header, lineterminator="\n")
@@ -571,7 +571,7 @@ def group_table_sql_lines(event_name):
         "sub1_score real,",
         "sub2_score real,",
     ]
-    if event_name == "tenkai":
+    if event_name.startswith("tenkai"):
         lines.extend(
             [
                 "sub3_score real,",
@@ -583,7 +583,7 @@ def group_table_sql_lines(event_name):
     lines.extend(
         [
             "penalty real,",
-            "start_penalty real," if event_name == "tenkai" else None,
+            "start_penalty real," if event_name.startswith("tenkai") else None,
             "retire integer,",
             f"foreign key (group_id) references {group_table_name}(id),",
             "primary key(id));",
