@@ -1,4 +1,0 @@
-# Install dependencies inside the image; host native modules may be incompatible
-# or incomplete. Build Next.js output from source as well.
-**/node_modules
-**/.next
