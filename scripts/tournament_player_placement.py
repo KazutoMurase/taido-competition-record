@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 from dataclasses import replace
+from functools import cache
+from itertools import combinations
 import random
 import sys
 import time
@@ -175,6 +177,7 @@ class SmartSeedPlacementStrategy(PlacementStrategy):
         self.search_nodes = 0
         self.relaxed_constraints = set()
         self.group_seed_preferences = {}
+        self.seed_conflict_groups = set()
         self.started_at = time.monotonic()
         self.last_progress_at = self.started_at
         self.attempt_number = 0
@@ -228,6 +231,7 @@ class SmartSeedPlacementStrategy(PlacementStrategy):
         ) from last_error
 
     def build_slot_players_once(self, players):
+        self.seed_conflict_groups = set()
         placement_players = [placement_player_from_entry(player) for player in players]
         slots = build_slots(len(placement_players))
         apply_byes(slots, len(placement_players))
@@ -256,8 +260,14 @@ class SmartSeedPlacementStrategy(PlacementStrategy):
             seed_to_slot[seed].player_id = player.player_id
             seeded_player_ids.add(player.player_id)
 
-        if not self.is_group_rank_placement_valid(slots, {p.player_id: p for p in placement_players}):
-            raise ValueError("fixed seeds conflict with group-rank quarter placement")
+        player_by_id = {p.player_id: p for p in placement_players}
+        self.seed_conflict_groups = self.find_seed_conflict_groups(slots, player_by_id)
+        if self.seed_conflict_groups:
+            self.report_progress(
+                "fixed seeds take priority over group-rank quarter placement for groups: "
+                + ",".join(sorted(self.seed_conflict_groups)),
+                force=True,
+            )
 
         remaining_players = [
             player
@@ -266,6 +276,70 @@ class SmartSeedPlacementStrategy(PlacementStrategy):
         ]
         self.place_remaining_players(slots, placement_players, remaining_players)
         return slot_player_ids(slots)
+
+    def find_seed_conflict_groups(self, slots, player_by_id):
+        """Relax only groups whose rank layout cannot fit around fixed seeds.
+
+        Checking free capacity as well as already placed ranks catches cases
+        where fixed seeds fill the quarters needed by unseeded teammates.
+        Other placement constraints still use the normal relaxation order.
+        """
+        conflicts = set()
+        group_ids = {player.group_id for player in player_by_id.values() if player.group_id}
+        placed_ids = {slot.player_id for slot in slots if slot.player_id}
+        open_slots = [slot for slot in slots if slot.occupied and not slot.player_id]
+        capacity = tuple(sum(slot.visual_quarter == q for slot in open_slots) for q in self.QUARTERS)
+        layouts = {}
+        for group_id in sorted(group_ids):
+            remaining_ranked = [
+                player for player in player_by_id.values()
+                if player.group_id == group_id
+                and player.player_id not in placed_ids
+                and rank_value(player.rank_group) in (1, 2, 3, 4)
+                and rank_value(player.rank_lastyear) is None
+            ]
+            demands = set()
+            for pattern in self.group_rank_patterns(slots, player_by_id, group_id):
+                demand = tuple(
+                    sum(pattern[rank_value(player.rank_group) - 1] == q for player in remaining_ranked)
+                    for q in self.QUARTERS
+                )
+                if all(count <= available for count, available in zip(demand, capacity)):
+                    demands.add(demand)
+            if not demands:
+                conflicts.add(group_id)
+            elif remaining_ranked:
+                layouts[group_id] = sorted(demands)
+
+        # A group may fit on its own but consume quarters required by another
+        # group. Check the combined capacity, relaxing the fewest additional
+        # groups anchored by fixed seeds (at most max_seed groups).
+        ordered_groups = sorted(layouts, key=lambda group_id: (len(layouts[group_id]), group_id))
+        anchored_groups = sorted({
+            player_by_id[player_id].group_id for player_id in placed_ids
+            if player_by_id[player_id].group_id in layouts
+        })
+
+        def fits(ignored):
+            constrained = [group_id for group_id in ordered_groups if group_id not in ignored]
+
+            @cache
+            def assign(index, available):
+                if index == len(constrained):
+                    return True
+                for demand in layouts[constrained[index]]:
+                    remaining = tuple(count - used for count, used in zip(available, demand))
+                    if min(remaining) >= 0 and assign(index + 1, remaining):
+                        return True
+                return False
+
+            return assign(0, capacity)
+
+        for count in range(len(anchored_groups) + 1):
+            for ignored in combinations(anchored_groups, count):
+                if fits(ignored):
+                    return conflicts | set(ignored)
+        return conflicts
 
     def is_group_only_seed(self, player):
         return (
@@ -706,7 +780,12 @@ class SmartSeedPlacementStrategy(PlacementStrategy):
 
     def group_rank_quarters(self, slots, player_by_id, player):
         rank = rank_value(player.rank_group)
-        if not player.group_id or rank not in (1, 2, 3, 4) or rank_value(player.rank_lastyear) is not None:
+        if (
+            not player.group_id
+            or player.group_id in self.seed_conflict_groups
+            or rank not in (1, 2, 3, 4)
+            or rank_value(player.rank_lastyear) is not None
+        ):
             return set(self.QUARTERS)
         return {
             pattern[rank - 1]
@@ -718,7 +797,11 @@ class SmartSeedPlacementStrategy(PlacementStrategy):
             player_by_id[slot.player_id].group_id
             for slot in slots if slot.player_id and player_by_id[slot.player_id].group_id
         }
-        return all(self.group_rank_patterns(slots, player_by_id, group_id) for group_id in group_ids)
+        return all(
+            group_id in self.seed_conflict_groups
+            or self.group_rank_patterns(slots, player_by_id, group_id)
+            for group_id in group_ids
+        )
 
     def balance_score(self, slots, player_by_id, player, slot):
         group_score = 0
@@ -785,6 +868,9 @@ class BalancedGroupPlacementStrategy(SmartSeedPlacementStrategy):
     def is_group_rank_placement_valid(self, slots, player_by_id):
         # Balanced placement uses its own hierarchical group-count rules.
         return True
+
+    def find_seed_conflict_groups(self, slots, player_by_id):
+        return set()
 
     def hard_constraint_slots(self, slots, player_by_id, player):
         candidate_slots = [
