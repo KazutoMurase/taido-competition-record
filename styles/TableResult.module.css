@@ -81,6 +81,23 @@
   line-height: 24px;
 }
 
+.editableGameIdLink {
+  color: #1976d2;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 3px;
+  transition: all 0.15s ease-in-out;
+}
+
+.editableGameIdLink:hover {
+  color: #0d47a1;
+  background-color: rgba(25, 118, 210, 0.08);
+  text-decoration: underline;
+}
+
 @keyframes current-game-highlight {
   50% {
     box-shadow: none;
@@ -101,5 +118,11 @@
 
   .currentCourtLabel {
     display: none;
+  }
+
+  .editableGameIdLink {
+    color: #000;
+    text-decoration: none;
+    padding: 0;
   }
 }
