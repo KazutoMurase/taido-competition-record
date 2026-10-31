@@ -285,7 +285,27 @@ const Total: React.FC<{ params }> = ({ params }) => {
           use_different_personal_scores,
       );
       const result = await response.json();
-      setData(result);
+      if (Array.isArray(result)) {
+        const sorted = [...result].sort((a, b) => {
+          if (a.prefecture_number != null || b.prefecture_number != null) {
+            const aPref =
+              a.prefecture_number != null
+                ? Number(a.prefecture_number)
+                : Infinity;
+            const bPref =
+              b.prefecture_number != null
+                ? Number(b.prefecture_number)
+                : Infinity;
+            if (aPref !== bPref) {
+              return aPref - bPref;
+            }
+          }
+          return Number(a.id) - Number(b.id);
+        });
+        setData(sorted);
+      } else {
+        setData(result);
+      }
     }
     fetchData();
   }, [use_different_personal_scores]);
