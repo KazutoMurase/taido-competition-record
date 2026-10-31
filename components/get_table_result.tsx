@@ -216,7 +216,7 @@ const GetTableResult: React.FC<{
               <td>
                 {editable ? (
                   <a
-                    className="color-disabled"
+                    className={tableStyles.editableGameIdLink}
                     href={
                       "update_table_result?event_name=" +
                       event_name +
@@ -225,6 +225,7 @@ const GetTableResult: React.FC<{
                       "&return_url=" +
                       return_url
                     }
+                    title="クリックして得点を修正"
                   >
                     {elem.id}
                   </a>
