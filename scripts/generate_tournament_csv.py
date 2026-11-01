@@ -470,27 +470,14 @@ def players_column_sql(field):
 
 
 def write_static_generate_tables_sql(fieldnames, path):
-    groups_csv_path = path.parent / "groups.csv"
-    has_prefecture_number = False
-    if groups_csv_path.exists():
-        with groups_csv_path.open(encoding="utf-8-sig", newline="") as f:
-            reader = csv.reader(f)
-            header = next(reader, [])
-            if "prefecture_number" in [col.strip() for col in header]:
-                has_prefecture_number = True
-
     lines = [
         "create table groups",
         "(id integer not null,",
         "name text not null,",
-    ]
-    if has_prefecture_number:
-        lines.append("prefecture_number integer,")
-    lines.extend(
-        [
-            "primary key(id));",
-            "",
-            "create table event_type",
+        "display_order integer not null,",
+        "primary key(id));",
+        "",
+        "create table event_type",
         "(id integer not null,",
         " name text not null,",
         " name_en text not null,",
@@ -509,7 +496,7 @@ def write_static_generate_tables_sql(fieldnames, path):
         "",
         "create table players",
         "(",
-    ])
+    ]
     lines.extend(f"{players_column_sql(field)}," for field in fieldnames)
     lines.extend(
         [
