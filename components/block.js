@@ -9,6 +9,7 @@ import Grid from "@mui/material/Grid";
 import checkStyles from "../styles/checks.module.css";
 import { GetEventName } from "../lib/get_event_name";
 import { FetchJson } from "../lib/fetch_json";
+import ScheduleProgress from "./schedule_progress";
 import {
   Table,
   TableHead,
@@ -205,6 +206,7 @@ function Block({
   correction = false,
   correction_return_url,
   show_operation_unlock = false,
+  show_progress = false,
 }) {
   const router = useRouter();
   const ToCheck = (block_number, id, name, event_id) => {
@@ -464,6 +466,9 @@ function Block({
             </Grid>
           ) : (
             <></>
+          )}
+          {show_progress && (
+            <ScheduleProgress schedules={data} current={current} />
           )}
           <Table border="1">
             <TableHead>

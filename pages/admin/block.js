@@ -4,7 +4,13 @@ import { Box, Tabs, Tab, useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import Block from "../../components/block";
 
-const Home = () => {
+export async function getServerSideProps() {
+  return {
+    props: { show_progress: process.env.PRODUCTION_TEST === "0" },
+  };
+}
+
+const Home = ({ show_progress }) => {
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -23,6 +29,7 @@ const Home = () => {
         correction={correction === "true"}
         correction_return_url="/admin/corrections"
         show_operation_unlock={true}
+        show_progress={show_progress}
       />
     </>
   );
