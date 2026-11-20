@@ -12,7 +12,6 @@ RUN apt-get update && apt-get install -y \
     lsb-release \
     locales \
     sudo \
-    systemctl \
     redis-server \
     wget \
     && locale-gen ja_JP.UTF-8 en_US.UTF-8 \

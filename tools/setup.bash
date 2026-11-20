@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ "${USE_LOCAL_REDIS}" == "1" ]; then
-    systemctl start redis-server.service
+    /etc/init.d/redis-server start
 fi
 
 if [ "${USE_LOCAL_DB}" == "1" ]; then
