@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import (
     QGridLayout,
     QHBoxLayout,
 )
+from collections import Counter
 from functools import partial
 import importlib.util
 import os
@@ -19,8 +20,6 @@ from lxml import etree
 import shutil
 
 col_text = ["優勝", "第二位", "第三位"]
-# TODO: get from awarded_players
-awards_text = ["最優秀選手賞", "優秀選手賞1", "優秀選手賞2"]
 # tune these if necessary
 default_font_size = 52
 small_font_size_threshold_letter_num = 11
@@ -91,12 +90,50 @@ def exec_print(doc_path, open_only):
         word.Quit()
 
 
+def format_team_name(group_name):
+    if not group_name:
+        return ""
+    if group_name.endswith("チーム"):
+        return group_name
+    if group_name[-1].isalpha() and group_name[-1].isascii():
+        suffix = chr(ord(group_name[-1]) + 0xFEE0) + "チーム"
+        if len(group_name) >= 2 and group_name[-2] in ("県", "道", "府"):
+            return group_name[:-1] + suffix
+        return group_name[:-1] + "地区" + suffix
+    if group_name[-1] in ("県", "道", "府"):
+        return group_name + "チーム"
+    return group_name + "地区チーム"
+
+
+def build_award_labels(awarded_players):
+    award_names = [elem["award_name"] for elem in awarded_players]
+    counts = Counter(award_names)
+    seen = Counter()
+    display_names = []
+    for name in award_names:
+        if counts[name] > 1:
+            seen[name] += 1
+            display_names.append(f"{name}{seen[name]}")
+        else:
+            display_names.append(name)
+    return award_names, display_names
+
+
 def on_button_click(
-    row, col, url_base, row_text, event_names, input_words_dir, open_only, check_image
+    row,
+    col,
+    url_base,
+    row_text,
+    event_names,
+    input_words_dir,
+    open_only,
+    check_image,
+    award_names=None,
+    award_display_names=None,
 ):
     if row < 0:
         rank = ""
-        event = awards_text[col].replace("1", "").replace("2", "")
+        event = award_names[col]
         url = f"{url_base}/api/get_awarded_players"
     else:
         rank = col_text[col]
@@ -105,34 +142,13 @@ def on_button_click(
     response = requests.get(url)
     if response.status_code == 200:
         if row < 0:
-            name = response.json()[col]["name"].replace("　", " ")
+            award_data = response.json()[col]
+            raw_name = award_data.get("free_name") or award_data.get("name") or ""
+            name = raw_name.replace("　", " ")
             doc_name = "賞状_総合"
         elif "dantai" in event_names[row] or "tenkai" in event_names[row]:
             group_name = response.json()[f"{col + 1}"]["group"]
-            if group_name[-1].isalpha() and group_name[-1].isascii():
-                if (
-                    group_name[-2] == "県"
-                    or group_name[-2] == "道"
-                    or group_name[-2] == "府"
-                ):
-                    name = (
-                        group_name[:-1] + chr(ord(group_name[-1]) + 0xFEE0) + "チーム"
-                    )
-                else:
-                    name = (
-                        group_name[:-1]
-                        + "地区"
-                        + chr(ord(group_name[-1]) + 0xFEE0)
-                        + "チーム"
-                    )
-            elif (
-                group_name[-1] == "県"
-                or group_name[-1] == "道"
-                or group_name[-1] == "府"
-            ):
-                name = group_name + "チーム"
-            else:
-                name = group_name + "地区チーム"
+            name = format_team_name(group_name)
             doc_name = "賞状_団体"
         elif "total" in event_names[row]:
             group_name = response.json()[f"{col + 1}"]["group"]
@@ -185,7 +201,7 @@ def on_button_click(
     tree.write(document_path, xml_declaration=True, encoding="utf-8")
 
     if row < 0:
-        new_docx_file = f"{event}.docx"
+        new_docx_file = f"{award_display_names[col]}.docx"
     else:
         new_docx_file = f"{rank}_{event}.docx"
     with zipfile.ZipFile(new_docx_file, "w") as zip_ref:
@@ -246,9 +262,12 @@ class PrintCertificate(QWidget):
                     button.setStyleSheet("background-color: lightgreen; color: black;")
                 button_layout.addWidget(button, row, col + 1)
 
+        awarded_players = requests.get(f"{url}/api/get_awarded_players").json()
+        award_names, award_display_names = build_award_labels(awarded_players)
+
         button_layout.addWidget(QLabel("褒章", self), len(row_text), 0)
-        for col in range(len(awards_text)):
-            button = QPushButton(f"{awards_text[col]}", self)
+        for col in range(len(award_display_names)):
+            button = QPushButton(f"{award_display_names[col]}", self)
             button.clicked.connect(
                 partial(
                     on_button_click,
@@ -260,11 +279,11 @@ class PrintCertificate(QWidget):
                     input_words_dir,
                     open_only,
                     check_image,
+                    award_names,
+                    award_display_names,
                 )
             )
-            if os.path.exists(
-                f"{awards_text[col].replace('1', '').replace('2', '')}.docx"
-            ):
+            if os.path.exists(f"{award_display_names[col]}.docx"):
                 button.setStyleSheet("background-color: lightgreen; color: black;")
             button_layout.addWidget(button, len(row_text), col + 1)
 
